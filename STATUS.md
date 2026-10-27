@@ -2,6 +2,12 @@
 
 ## Current work
 
+On 27 October 2026 the user accepted the 68 cases for development validation and authorized
+pushing the project changes. `data/rewriter/validation-freeze.json` records the acceptance and
+file hashes. The benchmark bytes and observed failures remain unchanged. All 64 source families
+and all fixtures stay outside training. Per-output human labels and judge calibration remain
+pending. The next work is a separate training-data pilot for the same four rewrite modes.
+
 The rewriter calibration draft is implemented for review. It has 68 cases, four modes,
 156 authored output fixtures, a simple review page, and the guide's three-field export.
 Source context and validation rules remain in supporting files.
@@ -41,15 +47,16 @@ history file's SHA-256 remained unchanged during selection and preparation.
 
 ## Pending
 
-- User review of the proposed references and checks. All 68 worksheet rows are pending.
+- Independent per-output human labels. The user accepted the dataset for development validation;
+  the 68-row human worksheet remains pending and is not fabricated from that acceptance.
 - User review of the 10 personal reference drafts and any preferred corrections.
 - Independent development and locked-test data.
 - Independent human calibration of GPT-6.1 Sol. Both model baselines and Sol judging are complete.
 - Execution of the supplied Colab L4 notebook, 16-row training proof, and fine-tuned comparison.
 - Any public Hugging Face release after data and license review. The private draft is uploaded.
 
-The authorized model baselines and shared judging are complete. No student training, benchmark
-freeze, or cited-lab migration occurred. All model scores remain diagnostic.
+The authorized model baselines and shared judging are complete. Development validation is now
+frozen. No student training or cited-lab migration occurred. All model scores remain diagnostic.
 
 ## Long-document addition, 27 October 2026
 
