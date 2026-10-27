@@ -118,7 +118,8 @@ Sangam or included in the shared bundle.
 The selected student is `LiquidAI/LFM2.5-230M`. GPT-6 Luna is the cloud baseline and teacher.
 GPT-6.1 Sol is the shared semantic evaluator. Training and paired student inference target
 Google Colab L4. The diagnostic runner now supports Liquid on a Modal L4 and Luna/Sol through
-OpenRouter with Arka's client factory. The Colab notebook and training path remain pending.
+OpenRouter with Arka's client factory. The Colab baseline notebook uses the same runner and is
+syntax-checked, but has not been executed in Colab. The training path remains pending.
 
 After reviewing the draft and checking the evaluator, prepare independent development and test
 cases. Freeze their source groups, then run the baseline before creating the training pool.
@@ -133,3 +134,7 @@ missing or failed calls as passes. Sol results remain advisory until human calib
 
 The API provider is OpenRouter. Use the existing `OPENROUTER_API_KEY` environment variable.
 Keys never enter run metadata, dataset files, or Git. No personal transcriptions enter these runs.
+
+Open `notebooks/rewriter_baseline_l4.ipynb` in Colab for the portable baseline. It downloads the
+wheel and config from the private dataset and verifies their hashes. It retains Colab's CUDA
+PyTorch and records its actual version. Use the same environment for the later paired comparison.
