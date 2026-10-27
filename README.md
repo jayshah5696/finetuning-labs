@@ -9,6 +9,10 @@ Separate training-data preparation is described in [TRAINING_DATA.md](TRAINING_D
 uses new fictional source documents, source-group splits, Luna authoring, Sol review, and strict
 token and leakage checks. The original benchmark is not converted into a training split.
 
+The [Luna Decisions audit](DECISION_VALIDATION.md) now adds blind criterion probabilities through
+Arka. It found disagreements and a known false approval. The current scores prioritize review;
+they do not certify the training release or change its rows automatically.
+
 The rewriter benchmark bundle has 68 calibration cases. It retains the original 60 short cases
 and appends eight long examples, with two per mode. There are 30 imported TypeWhisper authored
 cases and 38 new authored examples. The long examples come from four fictional source documents,

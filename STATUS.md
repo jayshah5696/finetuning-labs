@@ -14,7 +14,7 @@ Source context and validation rules remain in supporting files.
 
 Focused failure tests were written before production code. The first test run failed because the
 package did not exist. The long-document failure tests also preceded their implementation.
-All 44 tests pass on Python 3.12. Ruff checks and formatting pass.
+All 49 tests pass on Python 3.12. Ruff checks and formatting pass.
 All authored mechanical fixture expectations match. Forty-nine deliberately wrong outputs still
 pass term checks and require semantic review; this is an explicit validation boundary.
 
@@ -88,6 +88,24 @@ The dataset-check notebook has four code cells with empty outputs. Its three dat
 ran locally against the actual private Hub release, using cached authentication instead of
 Colab Secrets. All 219 token spans and the 16-row selection passed. Actual Colab execution and
 student training remain unverified.
+
+## Luna Decisions audit, 27 October 2026
+
+The new validator uses Arka's pinned `DecisionClient` with `openai/gpt-6-luna-decisions` through
+OpenRouter. Each request asks five named criteria without a reference answer, source identity,
+fixture expectation, or previous Sol verdict. Failure tests preceded implementation.
+
+The 16-control probe and two full 375-item runs completed. The clarified questions accepted
+71 of 80 authored acceptable outputs. Of 76 deliberately wrong outputs, they rejected 58,
+left 17 uncertain, and incorrectly accepted one request changed into an assertion. The current
+training-pilot audit has 157 pass, 48 uncertain, and 14 failure flags. Six flagged pairs have
+unchanged input and output. Flags are disagreements, not confirmed data defects.
+
+The 62 uncertain or flagged training pairs are in the second run's `review-queue.csv`.
+`DECISION_VALIDATION.md` explains the source data, limited earlier Arka integration, current
+decision client, criteria, thresholds, measured errors, and reproduction commands. These
+thresholds are provisional. Independent human agreement has not been measured. The published
+dataset, frozen 68 cases, and original Sol baseline records are unchanged.
 
 ## Long-document addition, 27 October 2026
 

@@ -15,6 +15,11 @@ documents. Eighty pairs are long, with inputs of 1,071 to 1,857 Liquid tokens. O
 pairs, 101 are excluded. Both splits cover all four modes. See `release/quality.json` for the
 counts by mode, length, and language.
 
+The later [blind Luna Decisions audit](DECISION_VALIDATION.md) found 62 uncertain or flagged
+pairs under provisional thresholds, plus a known false approval on the authored controls.
+These results prioritize review. The published rows and the earlier Sol judgments remain
+unchanged; neither evaluator establishes human-verified quality.
+
 The verified private dataset is
 [jayshah5696/finetuning-labs-rewriter-training](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training),
 revision `4610bc987246f266851b698c71bf250bd25a079f`. All 329 uploaded files were downloaded

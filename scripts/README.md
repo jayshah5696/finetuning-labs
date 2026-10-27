@@ -90,3 +90,12 @@ checks an existing run offline. See [TRAINING_DATA.md](../TRAINING_DATA.md) for 
 `publish_training_data.py --run data/rewriter/training/v3-20261027` publishes the verified
 training release to its own private Hugging Face repository and verifies every uploaded file.
 It excludes the validation bundle, the quarantined rehearsal, and personal transcripts.
+
+## Blind decision validation
+
+`python -m finetuning_labs.rewriter.decision_validation --run NEW_PATH --scope all` uses Arka's
+native decision client to evaluate five named criteria without a reference or prior verdict.
+It checks the 156 authored controls and 219 training-pilot pairs, saves exact calls, and writes
+a separate review queue. It changes no training rows. Use the locked `hosted` dependency group
+and an `OPENROUTER_API_KEY`. See [DECISION_VALIDATION.md](../DECISION_VALIDATION.md) for results
+and the limits of the provisional probability thresholds.
