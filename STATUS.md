@@ -8,7 +8,7 @@ Source context and validation rules remain in supporting files.
 
 Focused failure tests were written before production code. The first test run failed because the
 package did not exist. The long-document failure tests also preceded their implementation.
-All 34 tests pass on Python 3.12. Ruff checks and formatting pass.
+All 37 tests pass on Python 3.12. Ruff checks and formatting pass.
 All authored mechanical fixture expectations match. Forty-nine deliberately wrong outputs still
 pass term checks and require semantic review; this is an explicit validation boundary.
 
@@ -25,7 +25,7 @@ checkout. The imported source snapshot matches its original SHA-256.
 Private review page: https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-benchmark-draft
 Sangam document: `a43249ab-3ed4-4055-97ef-f646b1710441`.
 Benchmark revision: `92b2712f-b807-4c8b-987d-728c1e3a062d`, publication version 2, private.
-Plan revision: `3b94826b-57f9-4a54-99b7-a1e6dae73089`, publication version 4, private.
+Plan revision: `c7d18d71-2527-4763-a882-00fa1fbaa3a1`, publication version 5, private.
 Both stored documents match their local HTML exactly.
 
 ## Personal sample
@@ -44,12 +44,12 @@ history file's SHA-256 remained unchanged during selection and preparation.
 - User review of the proposed references and checks. All 68 worksheet rows are pending.
 - User review of the 10 personal reference drafts and any preferred corrections.
 - Independent development and locked-test data.
-- GPT-6.1 Sol validator calibration and real Luna/Liquid baseline calls.
+- Independent human calibration of GPT-6.1 Sol. Both model baselines and Sol judging are complete.
 - Execution of the supplied Colab L4 notebook, 16-row training proof, and fine-tuned comparison.
 - Any public Hugging Face release after data and license review. The private draft is uploaded.
 
-No hosted model API calls, student training, benchmark freeze, or cited-lab migration occurred.
-The authorized Liquid GPU diagnostic run is recorded below.
+The authorized model baselines and shared judging are complete. No student training, benchmark
+freeze, or cited-lab migration occurred. All model scores remain diagnostic.
 
 ## Long-document addition, 27 October 2026
 
@@ -96,9 +96,10 @@ the runtime code. The initial authoring script reproduces the exact eight commit
 Arka uses clean commit `779040204b0f392465b7e6240bf9d9200816dc5d`; unrelated edits in the user's
 Arka checkout are not included. Hosted calls use OpenRouter, not a direct OpenAI key.
 
-Hugging Face and Modal authentication work. The active zshrc has no OpenRouter key and its optional
-local file is absent. Interactive zsh also exports none. The user was asked for the source file
-path. A subsequent private OpenRouter key card timed out. No training is authorized here.
+Hugging Face and Modal authentication work. The user restored the OpenRouter credential in the
+zshrc, and authenticated requests now work. The key was loaded only into process memory.
+The shell configuration contents, symlink, and target were verified unchanged during evaluation.
+No credential was written to Git, Hugging Face, run records, or another configuration file.
 
 The source and scripts were committed as `ba6ec67`; the Hub card URI fix is `22cfabe`; the Colab
 notebook and initial publication/run receipts are committed as `1b512a3`. No Git push was made.
@@ -130,6 +131,30 @@ The image used reference causal-convolution implementations because optimized ca
 was absent. No optimized speed claim is made. The 73 result/report files were uploaded and each
 downloaded and verified at Hub revision `9d32281a7a2e8e4e66e1974e8f0240a1ffd71767`.
 
-Luna and Sol runs are blocked only on the actual OpenRouter credential source. Their runners
-use Arka's pinned clean client factory and OpenRouter Responses. No alternate model or provider
-was substituted. Human judge calibration and the independent locked test also remain pending.
+## Hosted baseline and matched judging
+
+`openai/gpt-6-luna` generated all 68 cases through OpenRouter using Arka's pinned clean client
+factory. The same `openai/gpt-6.1-sol` configuration assessed every Liquid and Luna candidate.
+Both generation arms completed all 68 cases. All 136 judgments parsed and validated; none was
+uncertain or an error. There were no output-limit truncations. No alternate model was used.
+
+Sol-assessed whole-case passes were Liquid 2/68 and Luna 62/68. Equal-mode headlines were 4.2%
+and 92.7%. Per-mode passes were slack 0/12 versus 12/12, transcribe 0/32 versus 28/32, prompt
+1/12 versus 11/12, and polish 1/12 versus 11/12. Long-case passes were 0/8 versus 6/8. Explicit
+identity preservation was 0/3 versus 3/3. Sol flagged critical errors in 46 versus three outputs.
+These counts are model judgments, not independent human findings.
+
+Paired outcomes were both pass 2, Luna-only pass 60, Liquid-only pass 0, neither verified pass 6.
+All 68 scheduled cases stayed in each denominator. The report was recomputed from the exact
+saved provider calls and matched both native metric files. Three new failure tests, written
+before the comparison module, reject a changed judge, foreign candidate binding, and edited
+derived summaries. Raw requests, responses, returned model IDs, usage, and critiques are saved.
+
+The two setup calls are retained separately from the 204 benchmark API calls. OpenRouter
+reported BYOK: its zero gateway charges are distinct from provider-reported upstream costs.
+No zero-total-cost claim is made. GPU cost is outside those API usage fields.
+
+All 217 new hosted/setup/report files were uploaded and downloaded for exact-byte verification
+at Hub revision `f740b9d7908890f5317416c53ce27b174b55bdd9`. Publication stayed private. The six Luna
+failures and a judge critical-error classification inconsistency are recorded for human review.
+The independent locked test, human calibration, training data, and fine-tuning remain pending.

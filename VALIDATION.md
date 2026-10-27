@@ -140,7 +140,7 @@ timing. Deployment measurements need the actual desktop runtime and export.
 
 ## Current evidence and stopping point
 
-Data and token-length checks are implemented. The 68 references, 156 fixture checks, and 22
+Data and token-length checks are implemented. The 68 references, 156 fixture checks, and 37
 software tests pass their offline checks. Full reference chats fit 4,096 tokens. These results
 establish data integrity and declared mechanical expectations, not model accuracy.
 
@@ -149,11 +149,20 @@ Modal L4. All reached EOS without output-limit truncation. Declared mechanical c
 53/68 overall, 0/8 on long cases, and 0/3 for identity preservation. These are mechanical results,
 not a semantic pass rate. Normal termination does not establish that a document is complete.
 
-Luna, tuned Liquid, and the Sol judge have not run. The active shell has no OpenRouter credential;
-its actual source path is still required. Model runners and aggregation are implemented and
-tested, but human labels remain pending. The raw Liquid results remain diagnostic calibration
-data. Human judge checks and an independent frozen test are still required before accepting a
-model or comparing a fine-tune. Training has not run.
+The restored OpenRouter credential enabled Luna and Sol. Luna completed 68 generations, and Sol
+assessed all 136 candidates with identical settings and no judge errors. Whole-case passes were
+Liquid 2/68 and Luna 62/68. Equal-mode headlines were 4.2% and 92.7%. All 68 cases in each arm
+had definite judgments; none was uncertain or truncated. The earlier Liquid mechanical pass
+count of 53/68 is a different measure.
+
+The paired report rechecks exact candidate bindings, matching judge configuration and rubric,
+and saved request/response hashes. It recomputes counts from provider records, not editable
+summary files. Human labels remain pending, so automated agreement with this rubric cannot
+establish independent accuracy. Review Luna's six failures and a blinded sample of passes.
+Confirm consistent treatment of unfinished thoughts and critical-error categories.
+
+No tuned Liquid run or training has occurred. Prepare independent frozen test families and
+human-check the judge before using these scores to accept a fine-tune or training target.
 
 ## Draft boundary
 

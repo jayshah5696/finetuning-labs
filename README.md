@@ -8,7 +8,8 @@ documents.
 
 The benchmark has four columns: input, expected output, mode, and checks. Supporting records keep
 case IDs, profile and dictionary context, literal checks, source identity, and review status.
-The stock Liquid diagnostic run has completed. All human labels remain pending. A separate local bundle has
+The stock Liquid and Luna diagnostic runs and their shared Sol assessments are complete.
+All human labels remain pending. A separate local bundle has
 10 selected personal transcriptions with draft corrections. It is ignored by Git and excluded
 from package builds. Neither bundle is a locked test or training dataset.
 
@@ -152,6 +153,18 @@ not a semantic pass rate. The per-case outputs and [mechanical report](data/rewr
 are retained for review. The runtime used reference convolution kernels, so its timings are not
 an optimized deployment benchmark.
 
-Luna generation and Sol judging have not run. The active zshrc has no OpenRouter key, its optional
-local file is absent, and interactive zsh exports none. The correct credential source path is
-still required. The configured model IDs and resume commands are ready in `scripts/README.md`.
+The restored zshrc credential authenticated through OpenRouter. It was read into process memory;
+the file, its symlink, and its target were left unchanged. Luna generated all 68 cases and Sol
+assessed all 136 candidates with the same rubric and settings. There were no generation-limit
+truncations or judge errors.
+
+Sol-assessed whole-case passes were 2/68 for stock Liquid and 62/68 for Luna. The headline that
+weights all four modes equally was 4.2% versus 92.7%. Long-case passes were 0/8 versus 6/8, and
+explicit identity preservation was 0/3 versus 3/3. These are diagnostic model judgments, not
+human-calibrated accuracy. The earlier 53/68 Liquid number measured mechanical checks only.
+
+The [paired report](data/rewriter/evals/baseline-20261027/comparison/REPORT.md) is recomputed from
+exact saved requests and responses, with candidate hashes and matching judge settings checked.
+The [review priorities](data/rewriter/evals/baseline-20261027/comparison/REVIEW.md) cover Luna's
+six failures and judge-label questions. All new hosted artifacts were downloaded and verified at
+Hub revision `f740b9d7908890f5317416c53ce27b174b55bdd9`. No fine-tuning has run.

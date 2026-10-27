@@ -62,6 +62,19 @@ It deliberately leaves the semantic quality score empty. `publish_liquid_results
 only the 68 known case records, run metadata, receipt, and mechanical report, then verifies every
 published file. The original raw candidates remain unchanged.
 
+The comparison command recomputes scores from bound provider records. It rejects a changed
+judge/rubric or a judgment attached to a different candidate, and ignores edited derived scores.
+Both models keep the same behavioral prompt and the same 68 scheduled inputs.
+
+```sh
+uv run --locked python -m finetuning_labs.rewriter.comparison \
+  --run data/rewriter/evals/baseline-20261027
+```
+
+`publish_hosted_results.py` uploads an explicit list of Luna generations, both Sol judgment
+sets, setup calls, and the paired report. It verifies all bytes at an immutable private Hub
+revision. Existing published results are refused rather than silently replaced.
+
 ```sh
 uv run --locked python scripts/report_generation.py \
   --generation data/rewriter/evals/baseline-20261027/liquid \
