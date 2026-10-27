@@ -1,13 +1,23 @@
 # Finetuning Labs
 
+The reviewed v2 release has 65 training, 17 development and 84 validation pairs. Every released
+input, output and pair has an Opus pass tied to its exact contents. Arka's native generation
+and decision stages use clean commit `5d353740ae1dd34742841071752814028db1489a`.
+These are model judgments, not human gold labels. The old 219-pair pilot failed independent
+data review and is retired for training.
+
 The user accepted the 68 cases as development validation on 27 October 2026. The acceptance and
 immutable file hashes are in `data/rewriter/validation-freeze.json`. These cases, their output
 fixtures, and their source families are excluded from training. Existing failures stay recorded.
 This acceptance does not establish independent human judgments or an unseen final test.
 
-Separate training-data preparation is described in [TRAINING_DATA.md](TRAINING_DATA.md). It
-uses new fictional source documents, source-group splits, Luna authoring, Sol review, and strict
-token and leakage checks. The original benchmark is not converted into a training split.
+Read [TRAINING_DATA.md](TRAINING_DATA.md) for sources, exact checks, review findings and commands.
+Use [the reviewed Colab data notebook](notebooks/rewriter_reviewed_data_check.ipynb).
+Training uses new fictional scenarios. The v2 validation bundle includes the original cases
+with two versioned corrections and 16 new pairs. Historical v1 files and scores remain unchanged.
+
+The [private reviewed dataset](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/tree/70715437e3d6b67ef47eb89c83ccb1a66038082e/reviewed-v2)
+is uploaded. All 69 files were downloaded at the immutable revision and compared byte for byte.
 
 The [Luna Decisions audit](DECISION_VALIDATION.md) now adds blind criterion probabilities through
 Arka. It found disagreements and a known false approval. The current scores prioritize review;

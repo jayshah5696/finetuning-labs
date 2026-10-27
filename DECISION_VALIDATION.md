@@ -1,5 +1,13 @@
 # Data sources and Luna Decisions validation
 
+The current release is reviewed v2. Arka commit `5d353740ae1dd34742841071752814028db1489a`
+runs native `decision_panel` and `labeling_engine` stages with six input, output and pair
+criteria. It scored all 168 final candidates and automatically accepted 75. Independent Opus
+data reviews retain 166 exact rows, including 91 that did not receive automatic Arka approval.
+Both outcomes remain visible. [TRAINING_DATA.md](TRAINING_DATA.md) explains the current policy
+and exclusions. The sections below preserve the earlier five-question direct-client audit of
+the retired pilot. Its thresholds and results are historical and are not v2 acceptance rules.
+
 ## Where the data came from
 
 The training pilot is synthetic. The planner defines fictional situations, names, counts, quotes,

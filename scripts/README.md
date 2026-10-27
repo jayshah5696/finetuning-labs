@@ -2,6 +2,15 @@
 
 Run these from the Finetuning Labs project directory. Use `uv` and the locked dependency groups.
 
+Current data commands are in [TRAINING_DATA.md](../TRAINING_DATA.md).
+`curate_arka_v2.py` preserves exact corrections after data review. `prepare_reviewed_release.py`
+exports only exact Opus passes and packages explicit evidence. `recover_opus_report.py` restores
+the omitted third-round review array from the reviewer's saved command without inventing labels.
+The `reviewed_publication` module verifies and uploads the additive private `reviewed-v2/`
+version. `publish_training_data.py` belongs to the retired pilot and must not be used for v2.
+`check_reviewed_colab.py` runs the three actual notebook data cells locally against the private
+Hub release, with cached Hub authentication in place of Colab Secrets. It does not run training.
+
 `append_long_cases.py` preserves the historical authoring script used to add the eight long
 examples. It contains the four fictional source documents and the controlled edits and attacks.
 It expects the original 60-case bundle and prints an `apply_patch` request. It does not alter

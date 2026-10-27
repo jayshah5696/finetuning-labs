@@ -1,0 +1,49 @@
+$ mkdir -p /home/jshah/Documents/GitHub/jadoo-labs/projects/finetuning-labs/artifacts/opus-reviews && cd /home/jshah/Documents/GitHub/jadoo-labs/projects/finetuning-labs/artifacts/ && python3 - <<'EOF'
+import json
+src='arka-curated-v2-round3/opus-pending-train-dev/'
+rows=[]
+for f in ['transcribe','slack','prompt','polish']:
+  for l in open(src+f+'.jsonl'):
+    if l.strip(): rows.append(json.loads(l))
+P=('pass','pass','pass')
+C={
+'arka-v2-transcribe-08':(P,"Long site-visit transcript cleaned with sentence breaks, capitalization and numeric times/readings (8:27, 9:12, 3.6 kilowatt-hours) only. All hedges preserved (may have misread, fairly sure, Leah's guesses, not a full inspection), the sign literal \"AUTHORIZED PERSONNEL ONLY\" is kept, and nothing is added or omitted. The spoken email address stays in spoken form, which is defensible because the exact spacing would otherwise be guessed. The 'I started to say that cable was unlabeled' meta-remark is kept. That is acceptable because no earlier 'unlabeled' claim exists to correct."),
+'arka-v2-transcribe-09':(P,"Portuguese correction 'no domingo não quer dizer na segunda-feira' is correctly resolved to 'na segunda-feira'. Punctuation is minimal, the language is kept, and the reserva requirement is preserved."),
+'arka-v2-transcribe-18':(P,"Already-clean sentence; identity output is correct."),
+'arka-v2-transcribe-19':(P,"Self-correction chain (remove later sentence -> actually leave it and mark -> 'correction' keep chart sentence, delete later one) is correctly resolved to the final intent, and the abandoned instructions are dropped. Comment-versus-request distinctions, the conditional source instruction, the no-guessed-source constraint and the separation note are all preserved. Segmentation of 'in the middle' is consistent with the later 'edit to the middle'."),
+'arka-v2-transcribe-20':(P,"'monday no tuesday the sixth of may' is correctly resolved to Tuesday. The spoken first-to-fifth question cues are reasonably rendered as a numbered list. All uncertainty and scope limits are preserved (cost center, security partner, production access, RFC meaning, role boundaries), and the long text shows no omissions or additions. Question 3 keeps the speaker's mixed question form, which is faithful."),
+'arka-v2-transcribe-04':(P,"'maybe four no about three seconds' is correctly resolved to 'about three seconds'. The unfinished final clause is preserved with an ellipsis, and the message literals are quoted. All hedges and test limits are kept, and the long text shows no omissions. Minor: 'first thing the hotkey' becomes 'First, the hotkey', dropping 'thing', and UI names such as 'Clear History' are title-cased. Both are cosmetic."),
+'arka-v2-transcribe-identity-long':(P,"Input is already clean prose and output is byte-identical, so the identity pair is correct. Polished input is a plausible identity case for /transcribe."),
+'arka-v2-slack-10':(P,"Correct casual message with emoji is returned unchanged, as required."),
+'arka-v2-slack-12':(P,"Multi-speaker thread excerpt gets minimal capitalization and punctuation fixes, plus product-name casing (Xbox Series, DualSense, Switch Pro, Steam Deck OLED/LCD, Elite 2). All numbers, build label pad-1842, dates, owners, the exact tester quote and the numbered retest plan are preserved. Casual tone and every request are kept. Small grammatical insertions ('the Switch Pro and Xbox Series pads', 'It happened', 'each time') are appropriate."),
+'arka-v2-slack-19':(P,"Run-on message is split into three sentences with correct capitalization. The question and the pending-approval caveat are preserved, and the tone stays casual."),
+'arka-v2-slack-identity-medium':(P,"Already-correct thread excerpt is returned byte-identical. The preset literal 'Warm Voice' and the times are intact."),
+'arka-v2-prompt-05':(P,"Request is restated as a self-contained prompt with both quotes verbatim and the 'distinct, no invented quotations' constraint kept. It does not write the article."),
+'arka-v2-prompt-08':(('pass','fail','fail'),"Mostly faithful, well-organized restatement that keeps the figures (CAD 2,450, 350-850, 200-600, 1,800 at 60/40, 78, 3,000, 1,200), the clarifying questions, the exclusions, the privacy and accessibility constraints, and the do-not-build-or-fill rule. However, it drops an explicit constraint. The input says to allow an essential/optional label 'but don't make a whole second budget for that', and the output keeps only 'Let me label a purchase as essential or optional.' Dropping that limit could invite the scope creep the user ruled out. Minor softening also occurs: craft income loses 'maybe', and 'don't assume you can ... import automatically' is narrowed to bank access."),
+'arka-v2-prompt-12':(P,"Long dictated requirements request is reorganized into a self-contained prompt that does not draft the document. Firm, lower-priority, unresolved and deferred items are preserved, including the UPC-A and Code 128 literals, the Android-only scope, the ban on last-write-wins, PDF as non-firm, the open retention questions and the deferred features. Minor context is dropped ('not just a cached screen', basement or loading-area example, 'no vendor chosen', 'don't assume a company structure'), but the general no-assumption and no-implementation instructions cover them. The input has a leading newline artifact, which is harmless."),
+'arka-v2-prompt-identity-medium':(P,"Already-clear, self-contained request is returned byte-identical. The identity pair is correct."),
+'arka-v2-polish-03':(P,"Capitalization is fixed and phrasing lightly smoothed in the plain profile. The writer's uncertainty ('not completely sure', 'don't know if my experience is enough') and all availability details are kept. Nothing is added."),
+'arka-v2-polish-08':(P,"Long exhibition report is polished with capitalization, sentence splits and date formats. Every count, amount, date, quote and uncertainty is preserved (31 works, 15 of 18 ticks, 42/116 caveats, GBP 420 and unchecked receipts, insurance unconfirmed). The added months (17/20 April, 15/18 April, 16/17 May) follow unambiguously from the timeline. 'Not to tape anything over the fixtures' broadening to 'not to cover the fixtures' is a minor nuance loss, not material."),
+'arka-v2-polish-12':(P,"Long tour review is polished into readable prose with all hedges, quotes, date conflicts (1846/1847), accessibility observations and recommendation conditions preserved. Small shifts ('the earlier market wall' to 'an earlier', 'a few stretches' to 'several', and 'for someone who needs' to 'If you need') do not change the facts or the certainty."),
+'arka-v2-polish-15':(P,"Plain-profile polish keeps both exact quotes, the interpretive hedges ('I don't think', 'might', 'That is my interpretation') and the self-correction about the overbroad note. Edits are light and accurate."),
+'arka-v2-polish-17':(P,"Capitalization and 'p.m.' are fixed, the polite request and casual tone are kept, and no greeting or sign-off is added. 'it's a little hard' to 'it can be a little hard' is a slight softening, but within tolerance for a polite neighbor note."),
+}
+reviews=[]
+for r in rows:
+  (i,o,p),c=C[r['id']]
+  v='fail' if 'fail' in (i,o,p) else 'uncertain' if 'uncertain' in (i,o,p) else 'pass'
+  reviews.append(dict(id=r['id'],row_sha256=r['row_sha256'],input_verdict=i,output_verdict=o,pair_verdict=p,verdict=v,critique=c))
+assert len(reviews)==20 and len(set(x['id'] for x in reviews))==20
+dv='fail' if any(x['verdict']=='fail' for x in reviews) else 'uncertain' if any(x['verdict']=='uncertain' for x in reviews) else 'pass'
+out=dict(reviewer_model="Opus 5.5",scope="data-only review of 20 selected revised or new pairs",coverage_count=20,dataset_verdict=dv,
+ dataset_findings=[
+  "19 of 20 rows pass. One row fails: arka-v2-prompt-08 drops the explicit constraint 'don't make a whole second budget' for the essential/optional label.",
+  "All five identity pairs (transcribe-18, transcribe-identity-long, slack-10, slack-identity-medium, prompt-identity-medium) are byte-identical.",
+  "Spoken corrections in transcribe-04, -09, -19 and -20 are resolved to the final stated intent with no leftover abandoned instructions.",
+  "Long rows (transcribe-08/-20/-04, slack-12, prompt-12, polish-08/-12) preserve facts, literals and hedges. Only minor nuance shifts appear.",
+  "No meta-instruction leakage found. prompt-12 input has a harmless leading newline."])
+json.dump(out,open('opus-reviews/round3-train-dev.json','w'),indent=1,ensure_ascii=False)
+print(dv,[x['id'] for x in reviews if x['verdict']!='pass'])
+EOF
+fail ['arka-v2-prompt-08']
+

@@ -1,127 +1,173 @@
 # Rewriter training data
 
-The 68 user-accepted cases are development validation. Their input, references, output fixtures,
-and 64 source families stay outside training. `data/rewriter/validation-freeze.json` records their
-identity. Keep the observed baseline failures. They help measure whether fine-tuning improves
-the behavior that the user wants.
+Use the reviewed v2 release in `data/rewriter/reviewed-v2/`. It contains 65 training pairs,
+17 development pairs and 84 validation pairs. Every released input, output and pair has an
+Opus 5.5 pass bound to its exact contents. These are model judgments, not human gold labels.
 
-The training pilot uses new fictional documents. It has its own internal validation split.
-Split whole topic groups before creating variants. Related modes and all variants stay together.
-Use this internal split to select checkpoints. Use the fixed 68 cases for the before-and-after
-comparison. An unseen final test remains future work.
+The original 219-pair pilot failed the first independent Opus review. Do not train on it.
+Its files and publication receipts remain for reproduction. The rejected pilot's repeated
+count-check template, artificial noise and padded long texts are documented in
+[data/rewriter/reviews/opus-first-pass.md](data/rewriter/reviews/opus-first-pass.md).
 
-The first retained release has 171 training pairs and 48 internal validation pairs from 55
-documents. Eighty pairs are long, with inputs of 1,071 to 1,857 Liquid tokens. Of 320 planned
-pairs, 101 are excluded. Both splits cover all four modes. See `release/quality.json` for the
-counts by mode, length, and language.
+## Sources and splits
 
-The later [blind Luna Decisions audit](DECISION_VALIDATION.md) found 62 uncertain or flagged
-pairs under provisional thresholds, plus a known false approval on the authored controls.
-These results prioritize review. The published rows and the earlier Sol judgments remain
-unchanged; neither evaluator establishes human-verified quality.
+GPT-6 Luna generated one fictional pair per scenario through clean Arka commit
+`5d353740ae1dd34742841071752814028db1489a`. The scenario briefs cover different subjects and
+genres. Long Slack examples are pasted threads. Long transcription inputs use missing punctuation,
+restarts and spoken corrections. Prompt targets remain requests. Polish targets improve prose.
 
-The verified private dataset is
-[jayshah5696/finetuning-labs-rewriter-training](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training),
-revision `4610bc987246f266851b698c71bf250bd25a079f`. All 329 uploaded files were downloaded
-and compared byte for byte. The original validation repository was not changed.
+The final release has 98 new synthetic pairs and all 68 original authored benchmark cases.
+Training has 65 independent source groups and 65 distinct targets. Development has 17 of each.
+Validation has 84 rows from 80 groups and 80 distinct targets. The related long benchmark variants
+share source groups. No group crosses any of the three splits.
 
-## Source and quality checks
+Use `train` for fitting. Use `dev` for checkpoint selection. Use `validation` for the fixed
+before-and-after comparison. It is development validation, not an unseen final test. The
+validation split includes 16 new pairs and two corrected versions of original cases:
 
-GPT-6 Luna authors canonical rewrites and imperfect inputs. Short and medium sources have three
-teacher-authored variants plus one clean identity case. Long sources use a separate canonical
-document followed by controlled surface errors. The latter teach formatting and light cleanup;
-they do not cover the full range of natural speech-recognition mistakes.
+- `tw-profiles-03` uses consistent punctuation in its numbered list.
+- `polish-06` states the intended timeout explicitly instead of forcing an ambiguous reading.
 
-The source planner has 80 documents across 20 topic groups and schedules four variants per
-document. Sixteen topic groups belong to training and four to internal validation. Variants share
-their target and are correlated. Count documents and topic groups as well as rows.
+The original 68-case files, references and historical baseline scores remain byte-for-byte
+unchanged. Rerun the stock Liquid baseline on v2 before comparing a fine-tune with v2 scores.
 
-Every exported pair must pass these checks:
+Thirty validation cases derive from TypeWhisper authored fixtures. The source snapshot and
+GPL v3 notice are preserved. Training and development contain new synthetic scenarios. No
+personal history text or recordings were sent to the models or included in this release.
+The ten selected personal examples remain local, pending preferred corrections.
 
-1. The source response parses correctly and has distinct variants. Protected names, quantities,
-   quotes, and path literals survive in the input and target.
-2. The input fits its length band. Long means 1,000 to 2,000 tokens with the pinned Liquid
-   tokenizer. Complete training conversations fit 4,096 tokens. The inference prompt also leaves
-   room for the same 2,048-token generation limit used by the baseline. Do not truncate a pair.
-3. Sol passes meaning, terms and literals, mode, readability, and output discipline. Every
-   criterion must pass, with no critical error. Missing, failed, invalid, or uncertain reviews
-   cannot authorize a training target. Each review is bound to the exact input and target.
-4. Exact, embedded, and near-copy checks find no overlap with the accepted validation cases,
-   their output fixtures, or the local personal holdout. Topic groups and close wording cannot
-   cross training and internal validation. Wording checks do not prove semantic independence.
-5. The exported text matches the baseline prompt contract. Only assistant content through EOS
-   receives training labels. System and user labels are -100. The native template's trailing
-   newline after EOS is also masked. Reject empty or inconsistent assistant spans.
+## How quality was verified
 
-Sol uses the same rubric, model, and reasoning settings as the diagnostic baseline. Its judgments
-are still not independently human calibrated. A release pass means that the automatic gates
-passed. It does not establish perfect data quality.
+Arka ran its native `prompt_based_generator`, normalization, exact and length checks,
+`decision_panel`, and `labeling_engine`. The panel uses `openai/gpt-6-luna-decisions`
+through OpenRouter's alpha endpoint. It tests six dimensions:
 
-## Files and commands
+1. The input is plausible, clear enough to recover, and free of padding or authoring rules.
+2. The output is readable and suitable for the requested mode.
+3. The pair preserves facts, conditions, negation and uncertainty.
+4. Questions, requests, proposals and explicit corrections retain their intent.
+5. Names, quantities, quoted text and code literals survive permitted edits.
+6. The rewrite follows the mode and adds no wrapper or formatter commentary.
 
-The release has four-column `train.jsonl` and `validation.jsonl` files. The `sft/` versions have
-only `system`, `user`, and `assistant`, as in the supplied HTML guide. Source IDs, profile context,
-literal rules, and review critiques remain in `supporting.json`. Only the profile or dictionary
-context needed for the actual request enters the user text. Checks and review metadata do not.
+The final native check scored all 168 candidate pairs. Arka automatically accepted 75.
+Its weighted-score and confidence policy left the others for review. All six scores and the
+automatic policy outcome remain in the supporting records. These scores are not measured
+probabilities of agreement with people.
 
-The release is under `data/rewriter/training/v3-20261027/release/`. Read its `quality.json` for
-actual accepted counts. `ledger.json` at the run root includes rejection reasons. `audit.json`
-records the verification of exact saved calls, prompts, exports, and token spans.
+Opus reviewed data only. It did not generate examples, edit data, review code, or invoke other
+models. Its packets contain mode instructions, required context, input and output. They omit
+Luna scores, previous verdicts and separate reference answers. The first full replacement review
+covered 161 pairs. The parent corrected 23 rows and added seven complete examples. Opus then
+rechecked all 30 changed or new pairs. The release excludes:
 
-Run the offline audit without an API credential:
+- `arka-v2-prompt-08`, whose output still drops an explicit budget constraint.
+- `arka-v2-transcribe-23`, whose self-correction cue remains ambiguous.
 
-```sh
-uv run --locked --group data python -m finetuning_labs.rewriter.training \
-  --run data/rewriter/training/v3-20261027 --audit
-```
+All 166 retained rows pass input, output and pair verification. Mechanical failures cannot be
+overridden by an Opus pass. Each verdict binds to the exact row hash. Changing a row invalidates
+its old review. The incomplete third-round train/dev report and its mechanically recovered
+array are both retained. The recovery uses the reviewer's original saved verdicts and critiques.
 
-Generate a new run only with an explicit new path and an `OPENROUTER_API_KEY` in the environment:
+The export also checks literal rules, exact and close wording overlap with the original benchmark,
+its fixtures and the local personal holdout, and all source-group boundaries. Close wording checks
+do not prove semantic independence. It verifies the actual pinned Liquid chat template, assistant
+content through EOS, and masked system/user tokens. No example is truncated.
 
-```sh
-uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.training \
-  --run artifacts/my-new-training-run --extended-long
-```
+There are 33 long inputs of 1,094 to 1,906 Liquid tokens. The maximum complete chat has 4,029 tokens.
+The largest prompt plus the 2,048-token generation allowance has 4,091 tokens. Use a 4,096-token
+context. There are 19 short, two medium and two long unchanged pairs.
 
-The run saves each request before spending and each result before aggregation. Re-running the
-same path reuses recorded calls. It never silently retries failed or interrupted calls. A changed
-prompt or model setting requires a new run. `--reuse-from` can copy compatible earlier short and
-medium calls without spending again. The audit verifies their exact requests and responses.
+## Files and reproduction
 
-`notebooks/rewriter_dataset_check.ipynb` is the Colab entry point for data checks. It resolves
-one immutable Hub revision, verifies file hashes, checks every native Liquid token span, and
-selects 16 training rows for the first training proof. It loads no weights and does not train.
-The notebook needs a read-only `HF_TOKEN` in Colab Secrets. All three data-check cells ran
-locally against the actual private Hub release. The local run used cached Hugging Face auth
-instead of Colab Secrets. Actual execution inside Colab remains unverified.
+Main rows have only `input`, `output`, `mode` and `checks`. Guide-format SFT rows have only
+`system`, `user` and `assistant`. Only needed language, profile or dictionary context enters
+the user request. Source records, checks and review labels never enter supervised text.
 
-The quarantined transport rehearsal and earlier rejected long-source attempts are evidence.
-They are excluded from the final training export. The first bulk attempt also preceded the final
-medium-length gate and is not an eligible release under the stricter audit.
+`supporting.json` contains source identity, six native decisions, Opus verdicts and token counts.
+`quality.json` contains coverage and limits. `excluded.json` records the two unresolved rows.
+`reviews/` and `evidence/` preserve the attempts, corrections, exact reviews and native records.
+`validation-bundle/` works with the existing evaluation runner. Its judge rubric matches v1.
+It has no new authored output-control fixtures.
 
-Publish only the verified release to a separate private repository:
+Run the offline project checks:
 
 ```sh
-uv run --locked --group data --group hosted python scripts/publish_training_data.py \
-  --run data/rewriter/training/v3-20261027
+make check
+make build
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.reviewed_publication \
+  --release data/rewriter/reviewed-v2 --prepare-only
+uv run --locked finetuning-labs --bundle data/rewriter/reviewed-v2/validation-bundle audit
 ```
 
-The publisher uses an explicit file list, refuses a public or populated destination, checks for
-configured credentials and selected personal content, then downloads every uploaded file at the
-immutable Hub revision and compares its bytes. It leaves the validation repository unchanged.
+The authoring entry point creates a new stochastic run. It does not recreate the same examples.
+It requires `OPENROUTER_API_KEY` in the environment. Do not reuse a completed run path with
+changed prompts or scenarios.
 
-## What to measure next
+```sh
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.arka_pipeline \
+  --run artifacts/new-arka-run
+```
 
-Start with a 16-row training proof on Colab L4. Check that the student can learn the exact prompt
-format and response boundary before using the full pilot. Cover all four modes and include long
-examples. Save the environment and checkpoint. Then fine-tune the 230M model with the full
-training split and select a checkpoint using only internal validation.
+`scripts/curate_arka_v2.py` records the exact parent corrections. The release preparer consumes
+saved attempts and reviews without making model calls. Use a fresh output path:
 
-Run that checkpoint on the unchanged 68 cases. Reuse the same Sol rubric and settings. Report
-the pass rate for each mode and their equal-weight average, plus the raw pass count. Also report
-long-case passes, exact identity preservation, literal violations, critical semantic errors,
-truncations, and call failures. Training loss measures fit to targets; it is not rewrite quality.
+```sh
+uv run --locked --group data --group hosted python scripts/prepare_reviewed_release.py \
+  --pool artifacts/arka-curated-v2-round3 --output artifacts/reviewed-v2-rebuilt
+```
 
-Inspect failures and a varied sample of successful rewrites. Use those findings to add new
-training source families. Keep the validation cases out of that expansion. The pilot still has
-limited languages and repeated count-check scenarios. Natural ASR errors, dictionary corrections,
-and more varied user-preferred edits need more coverage before a production-quality claim.
+To reproduce the six data and SFT files from committed evidence alone:
+
+```sh
+uv run --locked --group data python -m finetuning_labs.rewriter.reviewed_release \
+  --pool data/rewriter/reviewed-v2/evidence/pool \
+  --review data/rewriter/reviewed-v2/reviews/round2-train-dev.json \
+  --review data/rewriter/reviewed-v2/reviews/round2-validation.json \
+  --review data/rewriter/reviewed-v2/reviews/round3-train-dev-recovered.json \
+  --review data/rewriter/reviewed-v2/reviews/round3-validation.json \
+  --output artifacts/reviewed-v2-from-evidence
+```
+
+The publisher adds `reviewed-v2/` to the existing private training repository and redirects its
+default data configs there. It refuses to overwrite that version or publish to a public repo.
+It scans for credentials and selected personal content. It downloads every new file at the
+immutable upload revision and compares its bytes. Historical data files remain unchanged.
+
+The private [reviewed v2 publication](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/tree/70715437e3d6b67ef47eb89c83ccb1a66038082e/reviewed-v2)
+is revision `70715437e3d6b67ef47eb89c83ccb1a66038082e`. All 69 uploaded files were downloaded
+and compared byte for byte. The receipt is `data/rewriter/releases/reviewed-v2.json`.
+
+```sh
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.reviewed_publication \
+  --release data/rewriter/reviewed-v2
+```
+
+## Colab and the next measurement
+
+Use [notebooks/rewriter_reviewed_data_check.ipynb](notebooks/rewriter_reviewed_data_check.ipynb).
+Add a read-only `HF_TOKEN` in Colab Secrets. The notebook resolves one immutable Hub revision,
+verifies the manifest, checks all 166 exact reviews and token spans, and prepares 16 training
+examples across the four modes. It loads no weights and runs no training. The earlier
+`rewriter_dataset_check.ipynb` is retained as a retired v1 artifact.
+
+All three data cells ran locally against the actual private Hub revision, with cached Hub
+authentication replacing Colab Secrets. `scripts/check_reviewed_colab.py` reproduces that check.
+The receipt is `data/rewriter/releases/colab-reviewed-data-check-local.json`. Actual execution
+inside Colab and L4 training remain unverified.
+
+The next step is a 16-row memorization proof on Colab L4. Check assistant-only training loss,
+EOS handling and the ability to learn the prompt format. Then train on the 65 training pairs
+and choose a checkpoint using only the 17 development pairs. Memorization and low loss do not
+measure generalization.
+
+Run stock and tuned Liquid on the same 84 v2 validation cases with the same decoding settings.
+Keep the same Sol output rubric and judge settings in both arms. Report the verified pass rate
+in each mode and the average of the four mode rates with equal weights. Also report the pooled
+pass count, long-case passes, exact unchanged-input preservation, literal violations, critical
+meaning errors, truncations and failed calls. Missing, uncertain and failed outputs stay in
+the denominator and do not count as passes.
+
+This remains a small reviewed pilot. English accounts for 160 of 166 rows. Only six rows are
+German or Portuguese. Dictionary and profile coverage remain narrow, uncertainty-preservation
+cases are common, and no recordings establish that the synthetic noise matches real ASR.
+Independent human labels, an unseen final test and student improvement are still unmeasured.

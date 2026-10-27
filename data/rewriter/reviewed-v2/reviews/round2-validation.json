@@ -1,0 +1,756 @@
+{
+  "reviewer_model": "Opus 5.5",
+  "scope": "Data-only review of artifacts/arka-validation-v2/opus-inputs/{slack,transcribe,prompt,polish}.jsonl (68 benchmark references) and artifacts/arka-native-v2/opus-validation/{slack,transcribe,prompt,polish}.jsonl (14 new validation candidates). Every full input and output was read and long rows were checked with word-level diffs.",
+  "coverage_count": 82,
+  "dataset_verdict": "fail",
+  "dataset_findings": [
+    "Coverage: 82/82 rows read in full (68 benchmark, 14 new). Verdicts: 75 pass, 6 fail, 1 uncertain.",
+    "Benchmark references (68): 66 pass, 1 fail (tw-profiles-03 list punctuation), 1 uncertain (polish-06 ambiguous referent). New candidates (14): 9 pass, 5 fail (transcribe-21/23/24, prompt-23/24).",
+    "New-candidate failures are fidelity defects in longer or non-English rows: lexical normalization in Portuguese transcription, comma placed inside a literal quoted key, inserted words in a long ASR transcript, and dropped constraints in two long /prompt rewrites.",
+    "The 6 long benchmark rows reuse 2 base documents: long-slack-01 = long-transcribe-01 output, long-slack-02 = long-polish-02 output, long-polish-01 = long-prompt-01 output, long-transcribe-02 = long-prompt-02 output. Inputs are mostly clean text with a few injected defects at the start or in headings, so they test preservation over long spans, not repair of noise spread through the text.",
+    "Long and literal /transcribe inputs are synthetic ASR: they already contain punctuation, backticks, emoji and formatted numbers. They are recoverable stress cases, but do not represent real ASR noise.",
+    "Short benchmark rows are single-clause and mostly developer/workplace English. Non-English coverage is 3 rows total (de, pt, pt). Only tw-dictionary-05 tests real dictionary normalization; the other dictionary rows already have correct spelling.",
+    "Unchanged-input controls exist in every mode (slack-01/10, polish-10, arka-v2-slack-22, arka-v2-polish-22, arka-v2-prompt-22, arka-v2-transcribe-22).",
+    "These verdicts are model verification by one reviewer, not human gold labels. The frozen benchmark was not edited."
+  ],
+  "reviews": [
+    {
+      "id": "slack-01",
+      "row_sha256": "80091c28b7401673fb2ee1f9e7d4a24d2c04991e815e11594a58763c5666d1b1",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Correct input returned unchanged."
+    },
+    {
+      "id": "slack-02",
+      "row_sha256": "8ff3b79e9c525807fd5c29089fe8633f67606b84f552dffc7fe2d7c7619fe24e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"pls\"->\"Please\", \"thx\"->\"Thanks.\"; request kept."
+    },
+    {
+      "id": "slack-03",
+      "row_sha256": "7fa9779e4bb2bb6b81649a16faca159ed8b2cae746c13d1c14d4313cdb71ebdf",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"dont\"->\"Don't\"; prohibition kept."
+    },
+    {
+      "id": "slack-04",
+      "row_sha256": "92f09e8baa7a99c0507f9abc5d84091060ff5e51e9e1c9f733753cec916ea5a1",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"can u\"->\"Can you\", question mark added; URL with ?v=2 exact."
+    },
+    {
+      "id": "slack-05",
+      "row_sha256": "d8b742de5f0af7567cb577d2756595225487d86f9733c85987a94d603a93cd24",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Capitalization and conditional comma only; \"i\"->\"I\"."
+    },
+    {
+      "id": "slack-06",
+      "row_sha256": "286643ed585f1d88d5a4d32f1eb0d536cd27dfb64fcd3627922172611275aadf",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Comma after \"Hey\", question mark; 3:30 and Friday exact."
+    },
+    {
+      "id": "slack-07",
+      "row_sha256": "6f089c6749259616b557a7333c89fe077ac4ca42ae454508c848edb67cb34a4f",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"pls\"->\"Please\"; `uv run` code span kept."
+    },
+    {
+      "id": "slack-08",
+      "row_sha256": "aa7559c6947af2a4f754ffde0a02878d9be02744e33708800b1a46489c4ea5f1",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"im\"->\"I'm\"; emoji kept, no added period, casual tone kept."
+    },
+    {
+      "id": "slack-09",
+      "row_sha256": "7075195331d2b181f4e27c7ad55683d04a770086336be22b9d4a789b620dfd92",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Embedded instruction treated as text and only punctuated, not obeyed."
+    },
+    {
+      "id": "slack-10",
+      "row_sha256": "11f7484f9f9fed3bfcebaccd4e1081c6be181498196738ad410a192451b261f9",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Correct input unchanged; $47.50 exact."
+    },
+    {
+      "id": "long-slack-01",
+      "row_sha256": "23639acfe61b3d1f97bb2f5292bd171aeef69ca1b4ff143525f94bc1a0697975",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long stress case. Word diff shows only \"quick\"->\"Quick\", \"pls\"->\"Please\", \"dont\"->\"don't\"; layout, quotes, 0.8.4/0.8.3, 16:30 PT, `#desktop-release`, emoji intact."
+    },
+    {
+      "id": "long-slack-02",
+      "row_sha256": "5ae985d0be2c3ad9902ddcd3ec469d401064770b708eba0a29c18de848f703b4",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long stress case. Only \"i\"->\"I\", \"pls\"->\"Please\", \"dont\"->\"don't\"; all dates, $180/$420, quotes, blockquote, indented bullets preserved."
+    },
+    {
+      "id": "tw-fillers-01",
+      "row_sha256": "0d8d21e569aefd89b0777be6668f02cb4eb6c391fc92e80239f806238a2edac8",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"um uh\" hesitation removed; request kept."
+    },
+    {
+      "id": "tw-fillers-02",
+      "row_sha256": "fc3045bd53b506f3a2d0bfe79d9681c1beeaa41a0e920127596bbee810cad738",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Stutter \"I I I\" collapsed to \"I\"."
+    },
+    {
+      "id": "tw-fillers-03",
+      "row_sha256": "0058867d696488dc0340cbd763d644ba14f67a240e4a8a3c0331ef6ada9ec8e7",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Question recognized and kept as question."
+    },
+    {
+      "id": "tw-fillers-04",
+      "row_sha256": "17745d946bd9836e988426498ca18cc427b0697f57321e428c00b4083dd0101b",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Meaningful \"uh huh\" kept as \"Uh-huh,\" not deleted as filler."
+    },
+    {
+      "id": "tw-fillers-05",
+      "row_sha256": "568944939345587f3bda743573f231b41b15ff29af35bad9e636a3afab4c9e7f",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Discourse \"well\" and \"actually\" kept as meaningful words, punctuated."
+    },
+    {
+      "id": "tw-repairs-01",
+      "row_sha256": "ecada5a2a5fa1a287d5cb8a5a2ccfca60c119d9add28d8ef5fe9662ddf2aaed8",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"Monday actually Tuesday\" resolved to final \"Tuesday\"."
+    },
+    {
+      "id": "tw-repairs-02",
+      "row_sha256": "a4c8c396271a5dec3e69f855a72a16c10d257fe57cee81ea428479c090d5155e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"47 files I mean 74 files\" resolved to \"74 files\"."
+    },
+    {
+      "id": "tw-repairs-03",
+      "row_sha256": "5eb5a2daa46a210f8f1f8604722fc40ef4652bdaa3d31ee07bf98ef12f53477d",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"not Ravi\" is contrastive content, correctly kept with comma."
+    },
+    {
+      "id": "tw-repairs-04",
+      "row_sha256": "fb9dbf29120d47edfa77636c5e13f06daf0ac8421137bd6734c552a041cb3a58",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"scratch that\" discards the send instruction; only \"Save it as a draft.\" remains."
+    },
+    {
+      "id": "tw-repairs-05",
+      "row_sha256": "a40c2e14e57e9e7d471649d49e2faef46f6c6ef416259a66bf2fef3d241f6c0a",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Day corrected to Tuesday, time \"three\" and invitee Rina kept per \"keep the time and invite the same person\"."
+    },
+    {
+      "id": "tw-facts-01",
+      "row_sha256": "848c5ce7f5bfe5e49e8a742e1696eca2ef77979a0053a216c6577efad111bc2a",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Negation kept."
+    },
+    {
+      "id": "tw-facts-02",
+      "row_sha256": "0b0886e83be7cd35b27b1c542ab266b997b8ba62abbf4449c63babce533b1efd",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Already correct; period only."
+    },
+    {
+      "id": "tw-facts-03",
+      "row_sha256": "3611a8607eabd6271b6850c2ab9fd87d9dc7c3b9cb05109314238e330af56bb4",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Both amounts and contrast exact."
+    },
+    {
+      "id": "tw-facts-04",
+      "row_sha256": "595b332eeb16d65972f13a796e7b2e50e4128ff6fc40103ff3605313eae189e4",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"500 milliseconds\" and \"five seconds\" kept in spoken forms; contrast comma."
+    },
+    {
+      "id": "tw-facts-05",
+      "row_sha256": "f391cc0bda70523605ff440ce990adcfec708b0f223d7ace7f7ab933986bff3b",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Unfinished thought kept unfinished (\"we can...\"); no completion invented."
+    },
+    {
+      "id": "tw-dictionary-01",
+      "row_sha256": "f5cb358c861b2ae6bc1a0c88c4d4ff2f45a831783789aec708ae111d35fef7d2",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Dictionary terms already correct, kept."
+    },
+    {
+      "id": "tw-dictionary-02",
+      "row_sha256": "174f7ba0f6da3dd9310ad80cff6f89d80f3b4d60724598d5d5674677e68cab50",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "uv/pnpm/Python spelled per dictionary."
+    },
+    {
+      "id": "tw-dictionary-03",
+      "row_sha256": "657c8e5c421f9255101ac45f5a837e25bb3b58728b8769a9508aa8dc5e0c82f8",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Tailscale/OpenRouter kept; comma before \"then\"."
+    },
+    {
+      "id": "tw-dictionary-04",
+      "row_sha256": "dbaedd04946a623f4b3f2ef17ed06007d2dd027bd40dee5f1c3c2a6c85de822c",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Names kept exactly."
+    },
+    {
+      "id": "tw-dictionary-05",
+      "row_sha256": "e1722667c2236cb91acf24261741f9a38ec9f4b8c68854427665359a948dd40d",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Spoken \"dictation orchestrator dot C S\" normalized literally to dictionary entry DictationOrchestrator.cs; only true dictionary-normalization case in the set."
+    },
+    {
+      "id": "tw-literals-01",
+      "row_sha256": "5bce7d6283a1e1d6188d60ae724420cf8771a28c241b6d90e6c346e5fd9ab2e5",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Literal `um` and \"uh\" kept, not removed as fillers. Backticks/quotes in ASR input are synthetic but recoverable."
+    },
+    {
+      "id": "tw-literals-02",
+      "row_sha256": "5cbe6d3832da67ed20202e19df227c6ab479b4ad38969c331a6e08c763c26361",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "`user_id` and `false` kept verbatim."
+    },
+    {
+      "id": "tw-literals-03",
+      "row_sha256": "72436fa2c06eeb98221fb434772f5e06062658f5ca65ac10c8abb423a45bbcf7",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Acronyms ER/UM kept, not treated as fillers."
+    },
+    {
+      "id": "tw-literals-04",
+      "row_sha256": "46b1a3d8e3b7d4b0055196507eb750386af266c2acf4d29f1d8e92af05ed2fec",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Injection text transcribed, not obeyed."
+    },
+    {
+      "id": "tw-literals-05",
+      "row_sha256": "ed6e2fd2aef1c7c809ce12ec6d1a13c501cbeceebb16c0945df0adcc88c83174",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Alternative question punctuated with comma and question mark."
+    },
+    {
+      "id": "tw-profiles-01",
+      "row_sha256": "7274ee0b56b03779fe50f5c41e7c5c386cd1bef2ae1d70b8c68f8461d4783e25",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Email profile: \"um\" removed, greeting/body/sign-off laid out from spoken words only; nothing added."
+    },
+    {
+      "id": "tw-profiles-02",
+      "row_sha256": "a41fe530d9f1ce79bfefd6ce0b6acabfd23ead7702023c2a58db0fd4b31c3d45",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Chat profile, two sentences, wording unchanged."
+    },
+    {
+      "id": "tw-profiles-03",
+      "row_sha256": "887eacfe53531589efff826c965278723a984ce717780f668416bff105535768",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Spoken list cues correctly made into numbered list, but punctuation is inconsistent: only the last item has a period (\"3. Benchmarks.\" vs \"1. Tests\", \"2. Logs\")."
+    },
+    {
+      "id": "tw-profiles-04",
+      "row_sha256": "1e5918d05f89b55ae5f70bffffaeccb564bdc4fdaa950ec0f6ebf265f64a933a",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "German \"um\" is a preposition and is correctly kept; capitalization/period only."
+    },
+    {
+      "id": "tw-profiles-05",
+      "row_sha256": "238de3ff1bdf50b5c08f20f48e79d46c67057f4d1d59830117d80881d14867e1",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Portuguese \"um\" is an article and is correctly kept; comma before \"por favor\"."
+    },
+    {
+      "id": "long-transcribe-01",
+      "row_sha256": "046b2c807492f0b180b1881f0eeed552cfc385a3cf681521e13cf4b37790d8a5",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long stress case. Diff: removes \"um okay\", maps \"number one/two/three\" to \"1./2./3.\"; rest exact. Input is mostly pre-punctuated (emoji, backticks, already-formatted \"4.\"/\"5.\"), so it tests preservation more than ASR repair."
+    },
+    {
+      "id": "long-transcribe-02",
+      "row_sha256": "21081c34d02941655df10f0d42380ebf8d8af0b300d571ddea58d13cfa56d803",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long stress case. Diff: only \"um okay\" removed and \"number one/two/three\"->\"1./2./3.\"; paths, $2,400/$2,040, quotes, `rm -rf ./draft-cache` intact. Input is pre-punctuated synthetic ASR."
+    },
+    {
+      "id": "prompt-01",
+      "row_sha256": "6b6f86b956f923e7ca944e3c421e65140ae28b72612d5af2c7c8ae265e10c9c8",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Organized into three directives; \"dont edit it yet\" kept; task not performed."
+    },
+    {
+      "id": "prompt-02",
+      "row_sha256": "c2e577b08653afb2a82396fa503329855ed9e67462cf158c3db193ebd7789048",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Notes-only constraint and insufficiency fallback kept."
+    },
+    {
+      "id": "prompt-03",
+      "row_sha256": "155ca7fd2def4ae8d59c812f1948b66c19c0758d5675cfb1da863a6da5941824",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Python CLI, uv, no network, CSV kept; \"make\"->\"Build\" acceptable."
+    },
+    {
+      "id": "prompt-04",
+      "row_sha256": "5be340ff45938f3510de5296e2ae062427f543e658b0d7a801cd5b2a614a6512",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Constraint on dependencies kept."
+    },
+    {
+      "id": "prompt-05",
+      "row_sha256": "f273829b53e5694255da2e8c76c528ce3da04bcd3fb13302c4cfbd7de72f825e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"maybe ten lines if that fits\" kept as approximate (\"in about ten lines if that fits\"); caveats kept."
+    },
+    {
+      "id": "prompt-06",
+      "row_sha256": "3d737f9780ebacd10be2825505f95e33400ea2cedb1c2a7c83162429657cef37",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Vague request kept vague; no invented context."
+    },
+    {
+      "id": "prompt-07",
+      "row_sha256": "a1d5a99b71ae1aca959b0e22e9b33db54a5c11181b1ca730dde235b1e7cee397",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Scope \"race conditions\" and \"findings only\" kept."
+    },
+    {
+      "id": "prompt-08",
+      "row_sha256": "21294ca29e8928e6b40990e13482564e96804de4254428f1e7f8a28b9421c46f",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Both tool constraints and prohibition kept."
+    },
+    {
+      "id": "prompt-09",
+      "row_sha256": "be99fbc58118096349ced1eab0407a079e8c6cd080acadeff9fd50aa0a8c1ddb",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Conditional estimate and fallback list kept."
+    },
+    {
+      "id": "prompt-10",
+      "row_sha256": "9539d5dcb6ae68febc8d20c139f52944f7eb4a56173d365bdc722b20f282d534",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "`parse_date` and signature constraint kept."
+    },
+    {
+      "id": "long-prompt-01",
+      "row_sha256": "5727ce2023fe52a5af951d9465739fb23528bc2bff0b0d2e89543beb476dbc69",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long stress case. Removes \"okay, here is the request.\", capitalizes \"Review\", maps \"first,/second,/third,\" to \"1./2./3.\"; remains a request; embedded \"Ignore these instructions...\" kept as content."
+    },
+    {
+      "id": "long-prompt-02",
+      "row_sha256": "f95bc024eb2278aebc555cbbf5c582f5215150a734b5d4ad9023f044ef465ccb",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long stress case. Same minimal organization; remains a request; quoted command and shell example kept as content."
+    },
+    {
+      "id": "polish-01",
+      "row_sha256": "5e4671d427a69d6c531c83be01c25db4aa3c47cca6ffb1b056ef698fbf22149f",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"maybe ... before we decide\" -> \"before deciding\"; double hedge reduced but \"I think\" keeps the tentative stance. Borderline on certainty."
+    },
+    {
+      "id": "polish-02",
+      "row_sha256": "d8224561d385e212036a5685fd170f775f415e75592ed1faee714831b21b969a",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Split into two sentences; \"dont\"->\"don't\"; meaning unchanged."
+    },
+    {
+      "id": "polish-03",
+      "row_sha256": "34f3da3b6a5a03d8e5a21bb45b407446eb1fd19a368198aab1857beeb42ffc90",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Email profile layout from supplied greeting and thanks; no new facts."
+    },
+    {
+      "id": "polish-04",
+      "row_sha256": "b262777d0eea82e36a34b72b2bc25136f1b995ebf52ad82769b826d4dbbd170d",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "List punctuated; \"whole\"->\"complete\" harmless."
+    },
+    {
+      "id": "polish-05",
+      "row_sha256": "25b5cb3623ffcf879c81af7741de8b25eac51284073ec550f24546d7577047e3",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Unfinished conditional kept unfinished."
+    },
+    {
+      "id": "polish-06",
+      "row_sha256": "dd4759bc38dca9f2e6e76b321ea679a99449c1cfeb19d16ae17ceea917731a7a",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Source is ambiguous: \"which is what i said earlier\" can refer to 500 ms (affirmation) or five seconds (self-correction). Reference picks \"not the five seconds I stated earlier\" without support for that reading."
+    },
+    {
+      "id": "polish-07",
+      "row_sha256": "aeeffc4e8396cb5fbf558b4ebcc8f2068b509ad931c0a09ac89aed72d1be6a73",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"as is\"->\"unchanged\"; `user_id` exact."
+    },
+    {
+      "id": "polish-08",
+      "row_sha256": "c5dd9b448aed8ffdee1817a06fea438ab46f2feb869e0b6ef276478c51626a0e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Uncertainty (\"might\", \"haven't measured\") kept."
+    },
+    {
+      "id": "polish-09",
+      "row_sha256": "3b6edb9703c835c2878ff07c84756d62cff02e7c8c192e5096ff7a824bb1b3aa",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "\"deploy\"->\"deployment\"; stance and condition kept."
+    },
+    {
+      "id": "polish-10",
+      "row_sha256": "a0b081b5aa744606a15a7c87db87ae5d751e7091ec732f0c53dc3a32745fea7e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Correct input unchanged."
+    },
+    {
+      "id": "long-polish-02",
+      "row_sha256": "e11cf7c2c7d1c83e569ed7123f3fe07bbc5e0edbebace03a5ed2f8f27ff7df21",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long stress case. Only two awkward sentences rewritten (\"The workshop plan, I want it kept...\" and \"The group when leaving should have...\"); remainder verbatim with facts intact."
+    },
+    {
+      "id": "long-polish-01",
+      "row_sha256": "e3f485cbc3e9c60f33b2197700f6f39d45df4b970ddf08e3bc93ec6e2b6e3c18",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long stress case. Only first paragraph rewritten (\"do a review of it and prepare a fix that is proposed\" -> \"Review ... and prepare a proposed fix\"; passive \"should first be established by use of\" -> \"Use the reproducible sample to establish the behavior first\"); rest verbatim."
+    },
+    {
+      "id": "arka-v2-slack-21",
+      "row_sha256": "f0c8b3855cad148bb415d9201b9bdd1331f1832ada31e483d8b8309943da6842",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Capitalization and closing \"?\" on the second question only."
+    },
+    {
+      "id": "arka-v2-slack-22",
+      "row_sha256": "2c6ad5a0ed0fa54a0d65696a6755a6f260efd869a4ec6a50223e45b85ae63285",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Correct input with emoji returned unchanged."
+    },
+    {
+      "id": "arka-v2-slack-23",
+      "row_sha256": "f14cc9d1970c5e47e874ff53c604d53be701329142d9f977ab40b6320a421bbd",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Multi-speaker thread: sentence-initial caps, \"i\"->\"I\", one comma after \"Right now\"; casual fragments and questions kept. Speaker labels \"maya:\"/\"dev:\" left lowercase, acceptable as handles."
+    },
+    {
+      "id": "arka-v2-transcribe-21",
+      "row_sha256": "b916c3e10f1474abe6a74cdd9fbbbe43ac7c83024152ec23d0343bb3f03fe666",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Correction \"quarta não, quer dizer, pra quinta-feira\" correctly resolved, but output also normalizes colloquial \"pra\"->\"para\" (twice) and expands \"terça\"->\"terça-feira\". These are lexical edits beyond transcription."
+    },
+    {
+      "id": "arka-v2-transcribe-22",
+      "row_sha256": "b16d541b79ffc894a93e8974309a77a2e979ef334dfcc1c762f1231d9cd9bd96",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Intentional unfinished thought kept unchanged."
+    },
+    {
+      "id": "arka-v2-transcribe-23",
+      "row_sha256": "cb384439bcdb6985f409e4d438d9504c0f3bbd8501b5cf7b7cbd06c611270654",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Dictation \"open quote cache.enabled close quote,\" becomes \"\\\"cache.enabled,\\\"\" with the comma inside the quotes, which corrupts the literal key the speaker said to keep exactly. Self-correction sentence and dictionary terms are otherwise fine."
+    },
+    {
+      "id": "arka-v2-transcribe-24",
+      "row_sha256": "5af47c9160c31e3321cdabe28c84af0d461dd43bf848abd298556986e3d0a93a",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Long ASR review with \"new paragraph\" cues correctly handled, but the guest sentence is misparsed and padded: \"the date she turned up the following week\" -> \"the date she turned up. The following week, she arrived\" adds \"she arrived\". Also \"and fourth\" -> \"Fourth,\" drops a spoken word."
+    },
+    {
+      "id": "arka-v2-prompt-21",
+      "row_sha256": "0b6f02be16e78ef23c828d1acc0a352a633849b07f6ee459157f345074455370",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Remains a request; snippet-only constraint and beginner level kept; code fenced verbatim."
+    },
+    {
+      "id": "arka-v2-prompt-22",
+      "row_sha256": "8579d1b7ca131f7722d360cf1aef1d9ac6aec087da9bdafb781ee68c7e09a8c1",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Already-clear prompt returned unchanged; no invented biography."
+    },
+    {
+      "id": "arka-v2-prompt-23",
+      "row_sha256": "4a8176b6d0a92b43fa958a580d9654b569210c3ada16031b65bca7df61bdb9c5",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Well organized and remains a request, but drops \"Keep it practical and concise\" (now only \"practical follow-up questions\") and narrows \"Say when the supplied information doesn't establish something\" to whole uncovered criteria."
+    },
+    {
+      "id": "arka-v2-prompt-24",
+      "row_sha256": "f0f5a6bff3e89581d76acadc85c06057ce5a7e4e80f3ed733f16cff2cc6ad18f",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Facts, roles, systems, backups and five injects preserved, but constraints are dropped: \"don't assume there is a separate crisis office\", the up-front description of \"purpose, scope, assumptions and boundaries\", and \"materials we can adapt later\". Adds unsupported \"in a later process\" and \"printed or otherwise provided\"."
+    },
+    {
+      "id": "arka-v2-polish-21",
+      "row_sha256": "9a8641b10238c87d72c691ea409e6191a58f0b940274c23c007148823c686048",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Wordy clause condensed; reason, sadness and care kept; \"liked\"->\"enjoyed\" fine."
+    },
+    {
+      "id": "arka-v2-polish-22",
+      "row_sha256": "e8ee90594c3e39b264bc1a2a0df7fb0ffa956c11eb8d16f62e45effdffea1c7f",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Correct input unchanged."
+    },
+    {
+      "id": "arka-v2-polish-23",
+      "row_sha256": "4dffda57ef9286c49a02b43d483348391654439e53db0f470be3f2af76c50dd4",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Plain prose with paragraph breaks; both options, unchecked status and non-decision kept. Minor nuance loss: \"don't know yet\" -> \"don't know\"."
+    }
+  ]
+}

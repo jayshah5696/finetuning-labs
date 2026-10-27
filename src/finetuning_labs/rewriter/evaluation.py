@@ -29,7 +29,7 @@ from .benchmark import (
     validate_judgment,
 )
 
-ARKA_REVISION = "779040204b0f392465b7e6240bf9d9200816dc5d"
+ARKA_REVISION = "5d353740ae1dd34742841071752814028db1489a"
 STATUSES = ("pass", "fail", "uncertain", "judge_error", "generation_error", "truncated", "pending")
 
 

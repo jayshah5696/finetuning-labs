@@ -1,0 +1,43 @@
+version: '1'
+llm:
+  provider: openai
+  model: openai/gpt-6-luna
+  api_key: ${OPENROUTER_API_KEY}
+  base_url: https://openrouter.ai/api/v1
+  timeout_seconds: 180
+  max_retries: 1
+  supports_json_schema: true
+decisions:
+  provider: openrouter
+  model: openai/gpt-6-luna-decisions
+  api_key: ${OPENROUTER_API_KEY}
+  base_url: https://openrouter.ai/api/alpha
+  max_state_chars: 100000
+  timeout_seconds: 60
+  max_retries: 1
+executor:
+  mode: threadpool
+  max_workers: 4
+pipeline:
+- type: seed_source
+  path: seeds.jsonl
+- type: normalize_conversation
+- type: exact
+- type: length
+  min_instruction_chars: 1
+  max_instruction_chars: 24000
+  min_response_chars: 1
+  max_response_chars: 24000
+- type: decision_panel
+  include:
+  - labeling_engine
+- type: labeling_engine
+  backend: decision
+  rubric_path: rubric.yaml
+  min_overall_score: 0.8
+  min_confidence: 0.2
+  on_uncertain: escalate
+output:
+  format: jsonl
+  path: native-output.jsonl
+  on_unresolved_escalation: drop

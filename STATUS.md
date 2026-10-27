@@ -1,5 +1,43 @@
 # Status
 
+## Reviewed data v2, 27 October 2026
+
+The original 219-pair pilot failed independent Opus data verification and is retired for training.
+Its data files and receipts remain historical. The replacement has 65 training, 17 development
+and 84 validation pairs. Every exact released input, output and pair has an Opus 5.5 pass.
+One failed prompt and one uncertain transcription are excluded. Opus was restricted to data
+verification. It did not generate or edit examples or review implementation.
+
+Clean Arka commit `5d353740ae1dd34742841071752814028db1489a` supplies native generation,
+decision-panel and labeling stages. The final native check scored 168 pairs and automatically
+accepted 75. Independent Opus passes adjudicate the retained disagreements. Scores, policy
+outcomes, critiques and hashes remain separate from supervised text. The user's dirty Arka
+checkout was not modified.
+
+All 166 pairs fit the pinned Liquid chat template without truncation. There are 33 long inputs
+of 1,094 to 1,906 tokens and unchanged cases at short, medium and long lengths. The complete
+chat maximum is 4,029 tokens. Source families do not cross any of the three splits. Training
+contains 65 distinct targets from 65 new fictional scenarios. No personal history is shared.
+
+The original 68-case benchmark and historical scores remain unchanged. V2 validation includes
+all 68 cases with two versioned corrections and 16 new pairs. The runnable 84-case bundle is
+`data/rewriter/reviewed-v2/validation-bundle`. Baselines must be rerun on v2 before a tuned
+comparison. Human labels, an unseen final test and student training remain pending.
+
+The new Colab entry point is `notebooks/rewriter_reviewed_data_check.ipynb`. It checks the data
+and selects 16 training rows. Actual Colab execution and the L4 training proof remain pending.
+The sections below record earlier work and superseded release claims.
+
+The private Hub revision is `70715437e3d6b67ef47eb89c83ccb1a66038082e`. All 69 uploaded files
+were downloaded and verified byte for byte. Its default configs use `reviewed-v2/`. The three
+notebook data cells ran locally against this actual Hub revision. All 166 reviews and token
+spans, the split boundaries and the 16-row proof selection passed. Colab Secrets was replaced
+by cached Hub authentication for that local run. No GPU execution is claimed.
+
+All 65 focused tests, Ruff checks and formatting pass. The package builds. Re-export from the
+committed pool and review evidence produces all six data and SFT files byte for byte. The four
+original validation-freeze hashes remain unchanged.
+
 ## Current work
 
 On 27 October 2026 the user accepted the 68 cases for development validation and authorized
