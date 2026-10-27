@@ -17,7 +17,7 @@ language:
 - pt
 license: other
 license_name: mixed-source-draft
-license_link: DATA_LICENSE.md
+license_link: https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter/blob/main/DATA_LICENSE.md
 task_categories:
 - text-generation
 tags:
