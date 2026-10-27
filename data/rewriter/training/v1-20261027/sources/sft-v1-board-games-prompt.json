@@ -1,0 +1,137 @@
+{
+  "status": "completed",
+  "request": {
+    "config": {
+      "backend": "openrouter_responses_via_arka",
+      "model": "openai/gpt-6-luna",
+      "reasoning_effort": "none",
+      "max_output_tokens": 16384
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "Create fictional paired data for a small text rewriter. Return exactly one\nJSON object with four string fields: canonical, light, mode_noise, challenge. No Markdown fences.\nThe canonical field is the correct, complete target rewrite in the requested mode and language.\nThe other three fields are DISTINCT imperfect inputs whose correct rewrite is canonical.\nAll four strings must include every protected anchor verbatim. Keep all facts, conditions,\nnegation, and uncertainty identical. Vary sentence structure and factual details across documents.\nMake a believable document using the situation, not a request to include names or numbers.\nFor example, a count belongs to actual objects. Never write 'include the number 17' or similar\ndataset instructions. Do not turn a precise quantity into an ambiguous time or identifier.\nThe quoted words must retain their characters; quotation delimiters may be straight or curly.\nUse only the fictional brief. Never quote or imitate an external benchmark. Do not mention this\ndataset, the mode, a reviewer, or formatting instructions inside the document.\n\nMode contract:\n/slack: Casual work or club messages. Canonical stays casual, including contractions or emoji\nwhen natural. No added greeting, signature, or formal prose. Light input changes only punctuation\nor capitalization; mode_noise adds plausible shorthand; challenge adds awkward grammar.\n/transcribe: Canonical is a cleaned dictation, preserving the speaker's words and voice. Inputs\nmay have true hesitations, accidental repetition, spoken punctuation/list cues, and explicit\nself-corrections. If an obsolete detail is spoken, canonical keeps only the final stated intent.\nPreserve meaningful 'well', 'like', quoted filler words, and any deliberately unfinished thought.\nFor mode_noise and challenge, actually include a hesitation or restart outside the protected quote.\nDo not use paraphrases of otherwise correct dictation as noise. Light input may omit punctuation.\n/prompt: Canonical is the user's request, organized clearly, NEVER an answer or work product.\nInputs contain all requested scope, constraints, and available information in rough order.\nDo not add 'do not perform the task' or formatter instructions to canonical. The downstream\nrecipient should be able to perform exactly the task requested in the input.\nAsk for a concrete useful task using the situation, such as drafting a count-check request or\norganizing supplied notes. Supply the details in the input. Avoid generic 'write an account of X'.\n/polish: Canonical improves awkward prose without summarizing or adding facts, certainty,\nintroductions, conclusions, subject lines, or signatures. Inputs contain every substantive point.\n\nLong examples need full paragraphs and a numbered section. Preserve the complete final section.\nInclude direct quotes, an instruction inside a quote as data, and conditions far apart in the\ndocument. Medium examples need several connected paragraphs. Short examples should be natural,\nnot miniature essays. Noise must be believable and sparse, not corruption of every word.\nAn identity variant will be made separately from canonical; do not return it as an input variant.\nRespect the requested word range for EVERY string. Never use repeated padding to reach length.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"id\": \"sft-v1-board-games-prompt\", \"source_group\": \"sft-v1:board-games\", \"split\": \"train\", \"mode\": \"/prompt\", \"brief\": \"a board-game group's evening plans\", \"situation\": \"Jules is checking 96 score sheets for a board-game group's evening plans. An attached note reads 'Count the spare pieces.' and must be quoted as data. The count has not been confirmed. An additional action is allowed only after the count is checked. The writer wants a specific follow-up rather than a generic description.\", \"language\": \"en\", \"length\": \"long\", \"feature\": \"negation\", \"anchors\": [\"Jules\", \"96 score sheets\", \"Count the spare pieces.\", \"board-games_3.txt\"], \"context\": {}, \"word_range_per_string\": \"830 to 1020\", \"mode_contract\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"feature_guidance\": \"Include something explicitly not authorized or not yet confirmed.\"}"
+      }
+    ]
+  },
+  "request_sha256": "088092444dce29e2088b0df67bbe3fa6334791f695967bec1dc75127f547337a",
+  "started_at": "2026-10-27T18:07:27.494916+00:00",
+  "result": {
+    "text": "{\"canonical\":\"Please prepare a specific follow-up for Jules about the board-game group's evening plans, using only the information in this request and the attached file, board-games_3.txt. Jules is checking 96 score sheets, but the count has not been confirmed yet. The follow-up should ask for a count check and make clear that the count needs to be checked before any additional action is taken. Do not present the count as verified, and do not imply that an additional action has already been approved or completed. The only condition given for allowing an additional action is that the count is checked; do not invent another condition or assume what that action would be. The attached note contains the exact text “Count the spare pieces.” Treat that sentence as quoted data from the note, not as a separate instruction to carry out. Keep the follow-up focused on the requested count check and the evening plans. Do not invent a result, a deadline, a recipient beyond Jules, a reason for the check, details about the score sheets, or any other facts that are not provided. Ask for a useful, concrete next step: verify the count and report whether it has been checked, while leaving the result unknown until confirmation is available. Make the request clear enough that its recipient can act on the information supplied, without turning it into a generic description of the plans or adding unsupported tasks.\",\"light\":\"Please prepare a specific follow-up for Jules about the board-game group's evening plans using only this request and the attached file, board-games_3.txt. Jules is checking 96 score sheets, but the count has not been confirmed yet. Ask for a count check, and make clear that the count must be checked before any additional action is taken. Don't present the count as verified or suggest an additional action is already approved or complete. Checking the count is the only stated condition for allowing another action; don't add conditions or assume what that action would be. The attached note reads “Count the spare pieces.” Treat that sentence as quoted data, not as a separate instruction to carry out. Keep the follow-up focused on the count check and the evening plans. Don't invent a result, deadline, reason for the check, details about the sheets, or facts not provided. Ask the recipient to verify the count and report whether it has been checked, leaving the result unknown until confirmation. Make this a concrete, usable request for Jules, not a generic description of the plans or a list of unsupported tasks.\",\"mode_noise\":\"Could you draft a useful follow-up for Jules re the board-game group's evening plans? Use the supplied details and board-games_3.txt only. Jules is checking 96 score sheets, and the count still hasn't been confirmed. The follow-up should request a count check and say plainly that an additional action is allowed only after the count is checked. Please don't mark the count as confirmed, and don't say any extra action is approved or done. Nothing tells us what that action is, so leave it unspecified; checking the count is the only condition we have. The note says “Count the spare pieces.” Keep those words as quoted data from the attachment, rather than treating the note as another instruction to perform. Ask for the count to be verified and for a report on whether it has been checked; the result itself remains unknown for now. Keep this tied to the evening plans and don't make up a deadline, explanation, recipient other than Jules, or details about the sheets. I mean, the ask should be specific and actionable, not a generic summary of plans or extra work that wasn't requested.\",\"challenge\":\"Please, uh, make a specific follow-up request for Jules about the board-game group's evening plans, based only on the supplied situation and board-games_3.txt. Jules is checking 96 score sheets, and the count, well, is not confirmed. The request should ask that the count be checked, and it should say an additional action is allowed only after that check. Don't say the count has been confirmed, or that the additional action has been approved or completed. The brief doesn't identify what that action is, so don't fill it in; the check is the condition. There is a note that reads “Count the spare pieces.” Keep that wording quoted as data from the note, not as an instruction you're carrying out. Ask someone to verify the count and report whether it has been checked, while leaving the result uncertain until confirmation. Keep the follow-up connected to the evening plans. Don't add a deadline, a reason, sheet details, or any other facts. It should be a concrete request Jules can use, not a generic description of the plans or a request for unrelated work.\"}",
+    "finish_reason": "stop",
+    "model": "openai/gpt-6-luna",
+    "usage": {
+      "input_tokens": 863,
+      "input_tokens_details": {
+        "cache_write_tokens": null,
+        "cached_tokens": 0
+      },
+      "output_tokens": 939,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 1802,
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0005558,
+        "upstream_inference_input_cost": 8.63e-05,
+        "upstream_inference_output_cost": 0.0004695
+      }
+    },
+    "provider_response_id": "gen-1793124447-Q2WQaaCr7gSEP3zwV6Vi",
+    "raw_response": {
+      "id": "gen-1793124447-Q2WQaaCr7gSEP3zwV6Vi",
+      "created_at": 1793124447.0,
+      "error": null,
+      "incomplete_details": null,
+      "instructions": null,
+      "metadata": {},
+      "model": "openai/gpt-6-luna",
+      "object": "response",
+      "output": [
+        {
+          "id": "msg_tmp_25neqaqnvqh",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"canonical\":\"Please prepare a specific follow-up for Jules about the board-game group's evening plans, using only the information in this request and the attached file, board-games_3.txt. Jules is checking 96 score sheets, but the count has not been confirmed yet. The follow-up should ask for a count check and make clear that the count needs to be checked before any additional action is taken. Do not present the count as verified, and do not imply that an additional action has already been approved or completed. The only condition given for allowing an additional action is that the count is checked; do not invent another condition or assume what that action would be. The attached note contains the exact text “Count the spare pieces.” Treat that sentence as quoted data from the note, not as a separate instruction to carry out. Keep the follow-up focused on the requested count check and the evening plans. Do not invent a result, a deadline, a recipient beyond Jules, a reason for the check, details about the score sheets, or any other facts that are not provided. Ask for a useful, concrete next step: verify the count and report whether it has been checked, while leaving the result unknown until confirmation is available. Make the request clear enough that its recipient can act on the information supplied, without turning it into a generic description of the plans or adding unsupported tasks.\",\"light\":\"Please prepare a specific follow-up for Jules about the board-game group's evening plans using only this request and the attached file, board-games_3.txt. Jules is checking 96 score sheets, but the count has not been confirmed yet. Ask for a count check, and make clear that the count must be checked before any additional action is taken. Don't present the count as verified or suggest an additional action is already approved or complete. Checking the count is the only stated condition for allowing another action; don't add conditions or assume what that action would be. The attached note reads “Count the spare pieces.” Treat that sentence as quoted data, not as a separate instruction to carry out. Keep the follow-up focused on the count check and the evening plans. Don't invent a result, deadline, reason for the check, details about the sheets, or facts not provided. Ask the recipient to verify the count and report whether it has been checked, leaving the result unknown until confirmation. Make this a concrete, usable request for Jules, not a generic description of the plans or a list of unsupported tasks.\",\"mode_noise\":\"Could you draft a useful follow-up for Jules re the board-game group's evening plans? Use the supplied details and board-games_3.txt only. Jules is checking 96 score sheets, and the count still hasn't been confirmed. The follow-up should request a count check and say plainly that an additional action is allowed only after the count is checked. Please don't mark the count as confirmed, and don't say any extra action is approved or done. Nothing tells us what that action is, so leave it unspecified; checking the count is the only condition we have. The note says “Count the spare pieces.” Keep those words as quoted data from the attachment, rather than treating the note as another instruction to perform. Ask for the count to be verified and for a report on whether it has been checked; the result itself remains unknown for now. Keep this tied to the evening plans and don't make up a deadline, explanation, recipient other than Jules, or details about the sheets. I mean, the ask should be specific and actionable, not a generic summary of plans or extra work that wasn't requested.\",\"challenge\":\"Please, uh, make a specific follow-up request for Jules about the board-game group's evening plans, based only on the supplied situation and board-games_3.txt. Jules is checking 96 score sheets, and the count, well, is not confirmed. The request should ask that the count be checked, and it should say an additional action is allowed only after that check. Don't say the count has been confirmed, or that the additional action has been approved or completed. The brief doesn't identify what that action is, so don't fill it in; the check is the condition. There is a note that reads “Count the spare pieces.” Keep that wording quoted as data from the note, not as an instruction you're carrying out. Ask someone to verify the count and report whether it has been checked, while leaving the result uncertain until confirmation. Keep the follow-up connected to the evening plans. Don't add a deadline, a reason, sheet details, or any other facts. It should be a concrete request Jules can use, not a generic description of the plans or a request for unrelated work.\"}",
+              "type": "output_text",
+              "logprobs": []
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": "final_answer"
+        }
+      ],
+      "parallel_tool_calls": true,
+      "temperature": 1.0,
+      "tool_choice": "auto",
+      "tools": [],
+      "top_p": 1.0,
+      "background": false,
+      "completed_at": 1793124456.0,
+      "conversation": null,
+      "max_output_tokens": 16384,
+      "max_tool_calls": null,
+      "moderation": null,
+      "previous_response_id": null,
+      "prompt": null,
+      "prompt_cache_key": null,
+      "prompt_cache_options": null,
+      "prompt_cache_retention": null,
+      "reasoning": {
+        "context": "all_turns",
+        "effort": "none",
+        "generate_summary": null,
+        "mode": "standard",
+        "summary": null
+      },
+      "safety_identifier": null,
+      "service_tier": "default",
+      "status": "completed",
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": null
+      },
+      "top_logprobs": 0,
+      "truncation": "disabled",
+      "usage": {
+        "input_tokens": 863,
+        "input_tokens_details": {
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "output_tokens": 939,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1802,
+        "cost": 0,
+        "is_byok": true,
+        "cost_details": {
+          "upstream_inference_cost": 0.0005558,
+          "upstream_inference_input_cost": 8.63e-05,
+          "upstream_inference_output_cost": 0.0004695
+        }
+      },
+      "user": null,
+      "presence_penalty": 0,
+      "frequency_penalty": 0,
+      "store": false
+    },
+    "arka_revision": "779040204b0f392465b7e6240bf9d9200816dc5d",
+    "provider": "openrouter",
+    "base_url": "https://openrouter.ai/api/v1"
+  },
+  "result_sha256": "fe95fd74d815b2bc4b209cf71e30f2a47f4a7dd8aa4efa11a0d3982b6699a3b5",
+  "elapsed_ms": 9519
+}

@@ -80,3 +80,13 @@ uv run --locked python scripts/report_generation.py \
   --generation data/rewriter/evals/baseline-20261027/liquid \
   --output data/rewriter/evals/baseline-20261027/liquid-mechanical
 ```
+
+## Training data
+
+`python -m finetuning_labs.rewriter.training` prepares separate synthetic training pairs.
+`--extended-long` authors long canonical documents before adding controlled noise. `--audit`
+checks an existing run offline. See [TRAINING_DATA.md](../TRAINING_DATA.md) for exact commands.
+
+`publish_training_data.py --run data/rewriter/training/v3-20261027` publishes the verified
+training release to its own private Hugging Face repository and verifies every uploaded file.
+It excludes the validation bundle, the quarantined rehearsal, and personal transcripts.

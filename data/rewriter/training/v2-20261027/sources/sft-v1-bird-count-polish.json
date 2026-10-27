@@ -1,0 +1,137 @@
+{
+  "status": "completed",
+  "request": {
+    "config": {
+      "backend": "openrouter_responses_via_arka",
+      "model": "openai/gpt-6-luna",
+      "reasoning_effort": "none",
+      "max_output_tokens": 16384
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "Create fictional paired data for a small text rewriter. Return exactly one\nJSON object with four string fields: canonical, light, mode_noise, challenge. No Markdown fences.\nThe canonical field is the correct, complete target rewrite in the requested mode and language.\nThe other three fields are DISTINCT imperfect inputs whose correct rewrite is canonical.\nAll four strings must include every protected anchor verbatim. Keep all facts, conditions,\nnegation, and uncertainty identical. Vary sentence structure and factual details across documents.\nMake a believable document using the situation, not a request to include names or numbers.\nFor example, a count belongs to actual objects. Never write 'include the number 17' or similar\ndataset instructions. Do not turn a precise quantity into an ambiguous time or identifier.\nThe quoted words must retain their characters; quotation delimiters may be straight or curly.\nUse only the fictional brief. Never quote or imitate an external benchmark. Do not mention this\ndataset, the mode, a reviewer, or formatting instructions inside the document.\n\nMode contract:\n/slack: Casual work or club messages. Canonical stays casual, including contractions or emoji\nwhen natural. No added greeting, signature, or formal prose. Light input changes only punctuation\nor capitalization; mode_noise adds plausible shorthand; challenge adds awkward grammar.\n/transcribe: Canonical is a cleaned dictation, preserving the speaker's words and voice. Inputs\nmay have true hesitations, accidental repetition, spoken punctuation/list cues, and explicit\nself-corrections. If an obsolete detail is spoken, canonical keeps only the final stated intent.\nPreserve meaningful 'well', 'like', quoted filler words, and any deliberately unfinished thought.\nFor mode_noise and challenge, actually include a hesitation or restart outside the protected quote.\nDo not use paraphrases of otherwise correct dictation as noise. Light input may omit punctuation.\n/prompt: Canonical is the user's request, organized clearly, NEVER an answer or work product.\nInputs contain all requested scope, constraints, and available information in rough order.\nDo not add 'do not perform the task' or formatter instructions to canonical. The downstream\nrecipient should be able to perform exactly the task requested in the input.\nAsk for a concrete useful task using the situation, such as drafting a count-check request or\norganizing supplied notes. Supply the details in the input. Avoid generic 'write an account of X'.\n/polish: Canonical improves awkward prose without summarizing or adding facts, certainty,\nintroductions, conclusions, subject lines, or signatures. Inputs contain every substantive point.\n\nLong examples need full paragraphs and a numbered section. Preserve the complete final section.\nInclude direct quotes, an instruction inside a quote as data, and conditions far apart in the\ndocument. Medium examples need several connected paragraphs. Short examples should be natural,\nnot miniature essays. Noise must be believable and sparse, not corruption of every word.\nAn identity variant will be made separately from canonical; do not return it as an input variant.\nRespect the requested word range for EVERY string. Never use repeated padding to reach length.\n"
+      },
+      {
+        "role": "user",
+        "content": "{\"id\": \"sft-v1-bird-count-polish\", \"source_group\": \"sft-v1:bird-count\", \"split\": \"validation\", \"mode\": \"/polish\", \"brief\": \"a local bird count's observation notes\", \"situation\": \"Selma is checking 146 observation sheets for a local bird count's observation notes. An attached note reads 'Record the distant calls.' and must be quoted as data. The count has not been confirmed. An additional action is allowed only after the count is checked. The writer wants a specific follow-up rather than a generic description.\", \"language\": \"en\", \"length\": \"medium\", \"feature\": \"negation\", \"anchors\": [\"Selma\", \"146 observation sheets\", \"Record the distant calls.\", \"bird-count_4.txt\"], \"context\": {\"profile\": \"Plain, direct prose. Preserve the writer's uncertainty.\"}, \"word_range_per_string\": \"220 to 340\", \"mode_contract\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"feature_guidance\": \"Include something explicitly not authorized or not yet confirmed.\"}"
+      }
+    ]
+  },
+  "request_sha256": "6a5c29f80bf2991b5eacbc44317b6a14670e39bf984f7582978c686b06649666",
+  "started_at": "2026-10-27T18:08:51.122847+00:00",
+  "result": {
+    "text": "{\"canonical\":\"Selma is checking 146 observation sheets for the local bird count, but the count has not been confirmed. The sheets are observation notes, not a verified total, so the current records should not be described as a confirmed count. One attached note reads, “Record the distant calls.” Keep that wording as a note from the sheets; it is not confirmation that the calls were recorded or that the count is complete. The attached file is bird-count_4.txt. Please check the sheets and report whether their records support a confirmed count, noting any missing or unclear observations that affect that assessment. An additional action is allowed only after the count has been checked, so do not take that action before the check is complete. If the records support a confirmed count, identify that result; if they do not, state that the count remains unconfirmed and specify what still needs checking. The follow-up should address these observation sheets and this count, rather than provide a general description of the local bird count.\",\"light\":\"Selma is checking 146 observation sheets for the local bird count, but the count has not been confirmed. The sheets are observation notes, not a verified total, so the current records should not be described as a confirmed count. One attached note reads, \\\"Record the distant calls.\\\" Keep that wording as a note from the sheets; it is not confirmation that the calls were recorded or that the count is complete. The attached file is bird-count_4.txt. Please check the sheets and report whether their records support a confirmed count, noting any missing or unclear observations that affect that assessment. An additional action is allowed only after the count has been checked, so do not take that action before the check is complete. If the records support a confirmed count, identify that result; if they do not, state that the count remains unconfirmed and specify what still needs checking. The follow-up should address these observation sheets and this count, rather than provide a general description of the local bird count.\",\"mode_noise\":\"Selma is checking 146 observation sheets for the local bird count, but the count hasn’t been confirmed. These sheets are observation notes, not a verified total, so the records shouldn’t be described as a confirmed count. One note attached to the sheets reads, “Record the distant calls.” Keep that as wording from the notes; it doesn’t confirm that anyone recorded the calls or that the count is complete. The attached file is bird-count_4.txt. Please check the sheets and report whether the records support a confirmed count. Note any missing or unclear observations that affect the assessment. An additional action is allowed only after the count has been checked, so don’t take it before the check is complete. If the records support a confirmed count, identify that result. If they don’t, say the count remains unconfirmed and specify what still needs checking. Keep the follow-up focused on these observation sheets and this count, rather than giving a general description of the local bird count.\",\"challenge\":\"For the local bird count, Selma is checking 146 observation sheets, and the count is not confirmed yet. They are observation notes rather than a verified total; don't call the records a confirmed count. In the attached notes, one line says, “Record the distant calls.” That line is data from the sheets, not proof the calls were recorded, and it doesn't establish that the count is complete. The file attached is bird-count_4.txt. Please check whether the records in the sheets support confirming the count, and mention missing or unclear observations if they affect the assessment. Don't take any additional action until the count has been checked; that action is allowed only afterward. If the records support confirmation, say so. If they don't, state that the count remains unconfirmed and say what still needs checking. The follow-up should be specific to these sheets and this count, not a generic description of the local bird count.\"}",
+    "finish_reason": "stop",
+    "model": "openai/gpt-6-luna",
+    "usage": {
+      "input_tokens": 895,
+      "input_tokens_details": {
+        "cache_write_tokens": null,
+        "cached_tokens": 0
+      },
+      "output_tokens": 793,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 1688,
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.000486,
+        "upstream_inference_input_cost": 8.95e-05,
+        "upstream_inference_output_cost": 0.0003965
+      }
+    },
+    "provider_response_id": "gen-1793124531-XVqHrC4F570o4OPjCVXn",
+    "raw_response": {
+      "id": "gen-1793124531-XVqHrC4F570o4OPjCVXn",
+      "created_at": 1793124531.0,
+      "error": null,
+      "incomplete_details": null,
+      "instructions": null,
+      "metadata": {},
+      "model": "openai/gpt-6-luna",
+      "object": "response",
+      "output": [
+        {
+          "id": "msg_tmp_mpx460j1dvr",
+          "content": [
+            {
+              "annotations": [],
+              "text": "{\"canonical\":\"Selma is checking 146 observation sheets for the local bird count, but the count has not been confirmed. The sheets are observation notes, not a verified total, so the current records should not be described as a confirmed count. One attached note reads, “Record the distant calls.” Keep that wording as a note from the sheets; it is not confirmation that the calls were recorded or that the count is complete. The attached file is bird-count_4.txt. Please check the sheets and report whether their records support a confirmed count, noting any missing or unclear observations that affect that assessment. An additional action is allowed only after the count has been checked, so do not take that action before the check is complete. If the records support a confirmed count, identify that result; if they do not, state that the count remains unconfirmed and specify what still needs checking. The follow-up should address these observation sheets and this count, rather than provide a general description of the local bird count.\",\"light\":\"Selma is checking 146 observation sheets for the local bird count, but the count has not been confirmed. The sheets are observation notes, not a verified total, so the current records should not be described as a confirmed count. One attached note reads, \\\"Record the distant calls.\\\" Keep that wording as a note from the sheets; it is not confirmation that the calls were recorded or that the count is complete. The attached file is bird-count_4.txt. Please check the sheets and report whether their records support a confirmed count, noting any missing or unclear observations that affect that assessment. An additional action is allowed only after the count has been checked, so do not take that action before the check is complete. If the records support a confirmed count, identify that result; if they do not, state that the count remains unconfirmed and specify what still needs checking. The follow-up should address these observation sheets and this count, rather than provide a general description of the local bird count.\",\"mode_noise\":\"Selma is checking 146 observation sheets for the local bird count, but the count hasn’t been confirmed. These sheets are observation notes, not a verified total, so the records shouldn’t be described as a confirmed count. One note attached to the sheets reads, “Record the distant calls.” Keep that as wording from the notes; it doesn’t confirm that anyone recorded the calls or that the count is complete. The attached file is bird-count_4.txt. Please check the sheets and report whether the records support a confirmed count. Note any missing or unclear observations that affect the assessment. An additional action is allowed only after the count has been checked, so don’t take it before the check is complete. If the records support a confirmed count, identify that result. If they don’t, say the count remains unconfirmed and specify what still needs checking. Keep the follow-up focused on these observation sheets and this count, rather than giving a general description of the local bird count.\",\"challenge\":\"For the local bird count, Selma is checking 146 observation sheets, and the count is not confirmed yet. They are observation notes rather than a verified total; don't call the records a confirmed count. In the attached notes, one line says, “Record the distant calls.” That line is data from the sheets, not proof the calls were recorded, and it doesn't establish that the count is complete. The file attached is bird-count_4.txt. Please check whether the records in the sheets support confirming the count, and mention missing or unclear observations if they affect the assessment. Don't take any additional action until the count has been checked; that action is allowed only afterward. If the records support confirmation, say so. If they don't, state that the count remains unconfirmed and say what still needs checking. The follow-up should be specific to these sheets and this count, not a generic description of the local bird count.\"}",
+              "type": "output_text",
+              "logprobs": []
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": "final_answer"
+        }
+      ],
+      "parallel_tool_calls": true,
+      "temperature": 1.0,
+      "tool_choice": "auto",
+      "tools": [],
+      "top_p": 1.0,
+      "background": false,
+      "completed_at": 1793124538.0,
+      "conversation": null,
+      "max_output_tokens": 16384,
+      "max_tool_calls": null,
+      "moderation": null,
+      "previous_response_id": null,
+      "prompt": null,
+      "prompt_cache_key": null,
+      "prompt_cache_options": null,
+      "prompt_cache_retention": null,
+      "reasoning": {
+        "context": "all_turns",
+        "effort": "none",
+        "generate_summary": null,
+        "mode": "standard",
+        "summary": null
+      },
+      "safety_identifier": null,
+      "service_tier": "default",
+      "status": "completed",
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": null
+      },
+      "top_logprobs": 0,
+      "truncation": "disabled",
+      "usage": {
+        "input_tokens": 895,
+        "input_tokens_details": {
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "output_tokens": 793,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1688,
+        "cost": 0,
+        "is_byok": true,
+        "cost_details": {
+          "upstream_inference_cost": 0.000486,
+          "upstream_inference_input_cost": 8.95e-05,
+          "upstream_inference_output_cost": 0.0003965
+        }
+      },
+      "user": null,
+      "presence_penalty": 0,
+      "frequency_penalty": 0,
+      "store": false
+    },
+    "arka_revision": "779040204b0f392465b7e6240bf9d9200816dc5d",
+    "provider": "openrouter",
+    "base_url": "https://openrouter.ai/api/v1"
+  },
+  "result_sha256": "a888d1e592d81d2efe5a4d611cc7ac7a344576630871bb837b8a2067313d5cc3",
+  "elapsed_ms": 7112
+}

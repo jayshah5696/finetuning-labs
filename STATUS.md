@@ -14,7 +14,7 @@ Source context and validation rules remain in supporting files.
 
 Focused failure tests were written before production code. The first test run failed because the
 package did not exist. The long-document failure tests also preceded their implementation.
-All 37 tests pass on Python 3.12. Ruff checks and formatting pass.
+All 44 tests pass on Python 3.12. Ruff checks and formatting pass.
 All authored mechanical fixture expectations match. Forty-nine deliberately wrong outputs still
 pass term checks and require semantic review; this is an explicit validation boundary.
 
@@ -50,13 +50,44 @@ history file's SHA-256 remained unchanged during selection and preparation.
 - Independent per-output human labels. The user accepted the dataset for development validation;
   the 68-row human worksheet remains pending and is not fabricated from that acceptance.
 - User review of the 10 personal reference drafts and any preferred corrections.
-- Independent development and locked-test data.
+- An independent locked final test. The training pilot has its own internal development split.
 - Independent human calibration of GPT-6.1 Sol. Both model baselines and Sol judging are complete.
 - Execution of the supplied Colab L4 notebook, 16-row training proof, and fine-tuned comparison.
 - Any public Hugging Face release after data and license review. The private draft is uploaded.
 
 The authorized model baselines and shared judging are complete. Development validation is now
 frozen. No student training or cited-lab migration occurred. All model scores remain diagnostic.
+
+## Training-data pilot, 27 October 2026
+
+The final preparation run is `data/rewriter/training/v3-20261027`. It retained 219 pairs from
+320 planned pairs. Training has 171 rows from 43 source documents in 15 topic groups. Internal
+validation has 48 rows from 12 documents in four different topic groups. The four modes are
+present in both splits. Related variants and modes stay in the same topic group.
+
+There are 80 long pairs, 64 in training and 16 in internal validation. Their inputs contain
+1,071 to 1,857 pinned Liquid tokens. The longest complete training chat has 3,860 tokens;
+the largest inference prompt plus the 2,048-token response allowance has 4,072 tokens. No pair
+was truncated. All 219 exported targets passed the mechanical gates and the shared Sol rubric.
+These are machine-reviewed synthetic targets. Independent human labels remain pending.
+
+Luna authored new fictional documents. Long examples use protected, controlled input noise;
+they do not represent the full range of natural ASR mistakes. The data still has repeated
+count-check scenarios and limited language coverage. Earlier malformed or undersized source
+attempts and the initial transport rehearsal remain as evidence and are excluded from this
+release. The original 68 validation cases and their fixtures remain byte-for-byte unchanged.
+
+`TRAINING_DATA.md` documents the exact formats, commands, checks, limitations, and next Colab
+step. Training rows have four fields. The separate guide-format SFT export has only system,
+user, and assistant. Supporting metadata and review critiques never enter supervised text.
+
+The private training dataset is `jayshah5696/finetuning-labs-rewriter-training`, revision
+`4610bc987246f266851b698c71bf250bd25a079f`. All 329 uploaded files were downloaded and
+verified byte for byte. The receipt is `data/rewriter/releases/training-data.json`.
+The dataset-check notebook has four code cells with empty outputs. Its three data-check cells
+ran locally against the actual private Hub release, using cached authentication instead of
+Colab Secrets. All 219 token spans and the 16-row selection passed. Actual Colab execution and
+student training remain unverified.
 
 ## Long-document addition, 27 October 2026
 

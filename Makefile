@@ -1,4 +1,4 @@
-.PHONY: sync test check build review export tokens
+.PHONY: sync test check build review export tokens training-audit
 
 sync:
 	uv sync --locked
@@ -22,6 +22,9 @@ export:
 
 tokens:
 	uv run --locked --group data finetuning-labs tokens --report artifacts/benchmark-tokens.json
+
+training-audit:
+	uv run --locked --group data python -m finetuning_labs.rewriter.training --run data/rewriter/training/v3-20261027 --audit
 
 # Evaluation and publication commands have explicit output paths and run IDs.
 # See README.md. Neither is part of the default offline check.

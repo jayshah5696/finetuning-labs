@@ -5,6 +5,10 @@ immutable file hashes are in `data/rewriter/validation-freeze.json`. These cases
 fixtures, and their source families are excluded from training. Existing failures stay recorded.
 This acceptance does not establish independent human judgments or an unseen final test.
 
+Separate training-data preparation is described in [TRAINING_DATA.md](TRAINING_DATA.md). It
+uses new fictional source documents, source-group splits, Luna authoring, Sol review, and strict
+token and leakage checks. The original benchmark is not converted into a training split.
+
 The rewriter benchmark bundle has 68 calibration cases. It retains the original 60 short cases
 and appends eight long examples, with two per mode. There are 30 imported TypeWhisper authored
 cases and 38 new authored examples. The long examples come from four fictional source documents,
