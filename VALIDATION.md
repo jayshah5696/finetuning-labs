@@ -144,10 +144,16 @@ Data and token-length checks are implemented. The 68 references, 156 fixture che
 software tests pass their offline checks. Full reference chats fit 4,096 tokens. These results
 establish data integrity and declared mechanical expectations, not model accuracy.
 
-No Luna, stock Liquid, tuned Liquid, or Sol judge output has been measured. Human labels are
-pending. This contract defines the future score report; aggregation and model runners are not
-implemented. Stop here before model calls or training. Next comes the human-review and judge
-pilot, then independent test data and the Colab L4 stock baseline before training-data preparation.
+The user later authorized a diagnostic baseline. Stock Liquid has generated all 68 cases on a
+Modal L4. All reached EOS without output-limit truncation. Declared mechanical checks passed
+53/68 overall, 0/8 on long cases, and 0/3 for identity preservation. These are mechanical results,
+not a semantic pass rate. Normal termination does not establish that a document is complete.
+
+Luna, tuned Liquid, and the Sol judge have not run. The active shell has no OpenRouter credential;
+its actual source path is still required. Model runners and aggregation are implemented and
+tested, but human labels remain pending. The raw Liquid results remain diagnostic calibration
+data. Human judge checks and an independent frozen test are still required before accepting a
+model or comparing a fine-tune. Training has not run.
 
 ## Draft boundary
 

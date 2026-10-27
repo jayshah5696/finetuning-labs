@@ -8,7 +8,7 @@ documents.
 
 The benchmark has four columns: input, expected output, mode, and checks. Supporting records keep
 case IDs, profile and dictionary context, literal checks, source identity, and review status.
-No model has run against this draft. All human labels are pending. A separate local bundle has
+The stock Liquid diagnostic run has completed. All human labels remain pending. A separate local bundle has
 10 selected personal transcriptions with draft corrections. It is ignored by Git and excluded
 from package builds. Neither bundle is a locked test or training dataset.
 
@@ -138,3 +138,20 @@ Keys never enter run metadata, dataset files, or Git. No personal transcriptions
 Open `notebooks/rewriter_baseline_l4.ipynb` in Colab for the portable baseline. It downloads the
 wheel and config from the private dataset and verifies their hashes. It retains Colab's CUDA
 PyTorch and records its actual version. Use the same environment for the later paired comparison.
+
+The private dataset is [jayshah5696/finetuning-labs-rewriter](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter).
+Its 68 rows and supporting files were downloaded and hash-verified after publication. Colab runtime
+assets and the collected Liquid outputs are also published with immutable revision receipts under
+`data/rewriter/releases/`. The private Dataset Viewer returns 501 on this account because it needs
+PRO or Enterprise access. Authenticated file downloads work; the dataset remains private.
+
+The first Liquid run used an NVIDIA L4 on Modal and produced 68 end-token completions with no
+output-limit truncations. Only 53 of 68 outputs passed declared mechanical checks. All eight long
+cases failed a check, and none of the three explicit identity cases stayed unchanged. This is
+not a semantic pass rate. The per-case outputs and [mechanical report](data/rewriter/evals/baseline-20261027/liquid-mechanical/REPORT.md)
+are retained for review. The runtime used reference convolution kernels, so its timings are not
+an optimized deployment benchmark.
+
+Luna generation and Sol judging have not run. The active zshrc has no OpenRouter key, its optional
+local file is absent, and interactive zsh exports none. The correct credential source path is
+still required. The configured model IDs and resume commands are ready in `scripts/README.md`.

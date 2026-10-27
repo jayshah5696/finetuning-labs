@@ -52,3 +52,18 @@ uv run --locked --group data python -m finetuning_labs.rewriter.hub upload \
   --package artifacts/huggingface --repo-id jayshah5696/finetuning-labs-rewriter \
   --receipt data/rewriter/releases/huggingface.json
 ```
+
+`publish_runtime_assets.py` uploads exactly the wheel, config, and Colab notebook to the private
+dataset and verifies the resulting bytes. The notebook resolves one immutable Hub revision at
+startup and records asset hashes. Its code cells are syntax-checked; Colab execution is pending.
+
+`report_generation.py` records mechanical findings for the collected stock Liquid L4 run.
+It deliberately leaves the semantic quality score empty. `publish_liquid_results.py` uploads
+only the 68 known case records, run metadata, receipt, and mechanical report, then verifies every
+published file. The original raw candidates remain unchanged.
+
+```sh
+uv run --locked python scripts/report_generation.py \
+  --generation data/rewriter/evals/baseline-20261027/liquid \
+  --output data/rewriter/evals/baseline-20261027/liquid-mechanical
+```

@@ -25,7 +25,7 @@ checkout. The imported source snapshot matches its original SHA-256.
 Private review page: https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-benchmark-draft
 Sangam document: `a43249ab-3ed4-4055-97ef-f646b1710441`.
 Benchmark revision: `92b2712f-b807-4c8b-987d-728c1e3a062d`, publication version 2, private.
-Plan revision: `bf9cac8a-6309-43e1-b8ce-2d5881c48f40`, publication version 3, private.
+Plan revision: `3b94826b-57f9-4a54-99b7-a1e6dae73089`, publication version 4, private.
 Both stored documents match their local HTML exactly.
 
 ## Personal sample
@@ -45,10 +45,11 @@ history file's SHA-256 remained unchanged during selection and preparation.
 - User review of the 10 personal reference drafts and any preferred corrections.
 - Independent development and locked-test data.
 - GPT-6.1 Sol validator calibration and real Luna/Liquid baseline calls.
-- Colab L4 notebook, 16-row training proof, and the fine-tuned comparison.
-- Hugging Face packaging and publication after the data is reviewed.
+- Execution of the supplied Colab L4 notebook, 16-row training proof, and fine-tuned comparison.
+- Any public Hugging Face release after data and license review. The private draft is uploaded.
 
-No paid model calls, student training, benchmark freeze, or cited-lab migration occurred.
+No hosted model API calls, student training, benchmark freeze, or cited-lab migration occurred.
+The authorized Liquid GPU diagnostic run is recorded below.
 
 ## Long-document addition, 27 October 2026
 
@@ -96,5 +97,39 @@ Arka uses clean commit `779040204b0f392465b7e6240bf9d9200816dc5d`; unrelated edi
 Arka checkout are not included. Hosted calls use OpenRouter, not a direct OpenAI key.
 
 Hugging Face and Modal authentication work. The active zshrc has no OpenRouter key and its optional
-local file is absent. The user has been asked only for the correct source file path. Shared-data
-publication and Liquid execution can proceed independently. No training is authorized here.
+local file is absent. Interactive zsh also exports none. The user was asked for the source file
+path. A subsequent private OpenRouter key card timed out. No training is authorized here.
+
+The source and scripts were committed as `ba6ec67`; the Hub card URI fix is `22cfabe`; the Colab
+notebook and initial publication/run receipts are committed as `1b512a3`. No Git push was made.
+
+The private dataset is `jayshah5696/finetuning-labs-rewriter`. Calibration revision
+`10656b47271081e64764849857a68f66d4a552a5` contains 68 four-column rows. All 14 upload files were
+downloaded and hash-verified. Runtime-assets revision `287fd2d44e6c8d9f044c348d0aa7267487be924a`
+adds four verified files: the wheel, config, notebook, and asset manifest. The notebook's five
+Python cells compile and have empty outputs; it has not been executed in Colab.
+
+The Hub Dataset Viewer returned 501 because this private repository needs PRO or Enterprise
+viewer access. Authenticated file downloads were verified. Repository visibility remains private.
+
+## Liquid baseline result
+
+Modal app `ap-V0ckxbaG1XjKTsMpmDkPtO`, call `fc-01M5YTGFB05E7KNGWJRQJHCXBM`, completed and
+its artifacts were collected. The image used PyTorch 2.13.0+cu130 and Transformers 5.21.0 on an
+NVIDIA L4, BF16, eager attention, greedy decoding, seed 42, and a 2,048-token generation limit.
+The code commit was `ba6ec67884acb860a21b6be51f82b44f4393f06c`; the exact runner hash is saved
+in the run receipt. The model and tokenizer revision are pinned in the config and raw records.
+
+All 68 generations ended with EOS. None reached the output limit. Declared mechanical passes
+were 53/68 overall: slack 8/12, transcribe 26/32, prompt 10/12, and polish 9/12. Long-case passes
+were 0/8, and explicit identity preservation was 0/3. Added wrappers, omitted sections, and
+summarized long inputs are visible in the raw outputs. The 53 mechanical passes remain pending
+semantic assessment. There is no measured semantic quality score or Luna comparison.
+
+The image used reference causal-convolution implementations because optimized causal_conv1d
+was absent. No optimized speed claim is made. The 73 result/report files were uploaded and each
+downloaded and verified at Hub revision `9d32281a7a2e8e4e66e1974e8f0240a1ffd71767`.
+
+Luna and Sol runs are blocked only on the actual OpenRouter credential source. Their runners
+use Arka's pinned clean client factory and OpenRouter Responses. No alternate model or provider
+was substituted. Human judge calibration and the independent locked test also remain pending.
