@@ -1,5 +1,25 @@
 # Status
 
+## Trained adapter evaluation, 28 October 2026
+
+The uploaded 230M LoRA at 034d54e5b7c291fea1f8fcacba77fc8dad543bc4 completed the matched
+84-case comparison. Stock passed 4/84; the LoRA passed 48/84. Equal-mode scores are 6.25%
+and 58.1%. All 168 generations and 168 Sol assessments completed without truncation,
+judge errors or uncertainty. Paired results are 46 LoRA-only passes, two stock-only passes,
+two shared passes and 34 neither passes. Identity preservation improved from 0/8 to 8/8;
+long-case passes improved from 0/13 to 3/13. Critical errors decreased from 33 to 25.
+
+Both arms used the same Modal A10, BF16 base weights, FP32 adapter tensors, pinned tokenizer,
+prompts and greedy configuration. The L4 attempt was cancelled before execution because no
+worker was assigned. Its receipt and setup control remain separate. No dataset or notebook
+was changed. Raw calls, scores, critiques, CSV review, runtime checks and reproduction commands
+are in data/rewriter/evals/lora-validation-20261028-a10g.
+
+The model learned much of the output format but does not meet the per-mode or critical-error
+targets. New independent training examples should target corrections, conditions, code and
+literal preservation, and long-document completeness. Keep validation frozen. Human calibration
+and an independent final test remain pending. Earlier training-pending statements below are historical.
+
 ## Current public data and LoRA notebook, 28 October 2026
 
 The two Hugging Face datasets are public. Their current trees contain only Parquet splits,

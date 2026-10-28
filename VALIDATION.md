@@ -1,6 +1,11 @@
 # Validation contract
 
-This draft defines what a rewriter should do. It does not measure a model yet.
+This contract defines what a rewriter should do. The current trained-adapter diagnostic uses
+the 84 frozen reviewed-v2 cases. Stock passes 4/84; the LoRA passes 48/84. Both arms used the
+same A10 runtime and unchanged Sol rubric. All 168 generations and assessments completed.
+The LoRA still has 25 judge-flagged critical errors and only 3/13 long-case passes.
+See [the full report](data/rewriter/evals/lora-validation-20261028-a10g/comparison/REPORT.md).
+The historical 68-case results below remain separate. Human calibration and a final test are pending.
 
 ## What can fail
 

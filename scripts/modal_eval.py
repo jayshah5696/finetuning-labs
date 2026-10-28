@@ -187,9 +187,12 @@ def collect(run_id: str = "baseline-20261027"):
             else destination / "liquid" / relative
         )
         target.parent.mkdir(parents=True, exist_ok=True)
-        with target.open("wb") as stream:
-            for part in volume.read_file(entry.path):
-                stream.write(part)
+        data = b"".join(volume.read_file(entry.path))
+        if target.exists() and target.read_bytes() == data:
+            continue
+        temporary = target.with_suffix(target.suffix + ".collecting")
+        temporary.write_bytes(data)
+        temporary.replace(target)
     receipt.update(status="collected", result=result)
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n")
     print(json.dumps(receipt, indent=2))

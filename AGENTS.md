@@ -43,5 +43,6 @@ bytes and exclude their source families and fixtures from training. Acceptance o
 does not supply independent human labels for model outputs or establish a locked final test.
 Import only selected personal transcriptions. Keep personal exports out of Git and hosted calls.
 The user authorizes Git commits and pushes, public shared-data Hugging Face uploads, diagnostic
-evaluations, and preparation of separate training data. GPU training remains a later step.
+evaluations, and preparation of separate training data. The user has trained and uploaded the
+230M LoRA. Use its pinned revision for diagnostic comparison; do not retrain it as part of evaluation.
 Human calibration is still pending; mark model scores diagnostic.

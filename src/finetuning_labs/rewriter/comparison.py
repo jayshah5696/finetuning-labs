@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from collections import Counter
 from pathlib import Path
@@ -200,6 +201,26 @@ def markdown(report: dict) -> str:
         "recorded separately. GPU cost is not included in those API cost fields.",
         "",
     ]
+    lines += [
+        "## Semantic criteria",
+        "",
+        "These counts describe each criterion separately. They do not replace the whole-case",
+        "pass rule. A case can fail several criteria. Missing assessments never count as passes.",
+        "",
+        "| Criterion | Stock Liquid passes | Compared model passes |",
+        "| --- | ---: | ---: |",
+    ]
+    for criterion in ["meaning", "terms_and_literals", "mode", "readability", "output_discipline"]:
+        counts = [
+            sum(
+                row.get("judgment", {}).get("criteria", {}).get(criterion) == "pass" for row in rows
+            )
+            for rows in [report["assessments"]["left"], report["assessments"]["right"]]
+        ]
+        lines.append(
+            f"| {criterion} | {counts[0]}/{report['scheduled_pairs']} | {counts[1]}/{report['scheduled_pairs']} |"
+        )
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -207,17 +228,55 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--bundle", type=Path)
+    parser.add_argument("--left", default="liquid")
+    parser.add_argument("--right", default="luna")
     args = parser.parse_args()
+    bundle = load_bundle(args.bundle)
     report = paired_report(
-        load_bundle(),
-        args.run / "liquid",
-        args.run / "luna",
-        args.run / "liquid-judge",
-        args.run / "luna-judge",
+        bundle,
+        args.run / args.left,
+        args.run / args.right,
+        args.run / f"{args.left}-judge",
+        args.run / f"{args.right}-judge",
     )
     output = args.output or args.run / "comparison"
     write_json(output / "comparison.json", report)
     (output / "REPORT.md").write_text(markdown(report))
+    left_generations = _load_generations(bundle, args.run / args.left)
+    right_generations = _load_generations(bundle, args.run / args.right)
+    reviews = []
+    long_ids = set(bundle.manifest.get("long_form", {}).get("case_ids", []))
+    for case, left, right, left_gen, right_gen in zip(
+        bundle.cases,
+        report["assessments"]["left"],
+        report["assessments"]["right"],
+        left_generations,
+        right_generations,
+        strict=True,
+    ):
+        reviews.append(
+            {
+                "case_id": case.id,
+                "mode": case.mode,
+                "long": case.id in long_ids,
+                "input": case.input,
+                "reference": case.output,
+                f"{args.left}_output": left_gen["text"],
+                f"{args.right}_output": right_gen["text"],
+                f"{args.left}_status": left["status"],
+                f"{args.right}_status": right["status"],
+                f"{args.left}_critical_error": left["critical_error"],
+                f"{args.right}_critical_error": right["critical_error"],
+                f"{args.left}_critique": left.get("judgment", {}).get("critique"),
+                f"{args.right}_critique": right.get("judgment", {}).get("critique"),
+            }
+        )
+    if reviews:
+        with (output / "case-reviews.csv").open("w", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=list(reviews[0]))
+            writer.writeheader()
+            writer.writerows(reviews)
     print(markdown(report))
 
 

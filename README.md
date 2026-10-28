@@ -3,6 +3,16 @@
 Fine-tune a small rewriter with a LoRA adapter. The default model is LiquidAI/LFM2.5-230M.
 Code and notebooks stay in Git. Hugging Face hosts the public data and trained adapters.
 
+## Latest trained adapter
+
+The [230M LoRA](https://huggingface.co/jayshah5696/lfm2.5-230m-rewriter-lora) is trained and uploaded.
+On the frozen 84-case diagnostic, stock passes 4/84 and the LoRA passes 48/84. The LoRA preserves
+all eight explicit identity cases, but has 25 judge-flagged critical errors and passes only
+3/13 long cases. It is not ready for acceptance under the current targets.
+[Read the findings](data/rewriter/evals/lora-validation-20261028-a10g/FINDINGS.md) and
+[the full report](data/rewriter/evals/lora-validation-20261028-a10g/comparison/REPORT.md).
+Both arms used the same A10 runtime and Sol rubric. These are development-validation model judgments.
+
 ## Data
 
 [Browse the training dataset](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/viewer/default/train).
@@ -65,4 +75,4 @@ The notebook helpers are in `src/finetuning_labs/rewriter/lora_training.py`.
 The notebook builder and CPU integration check are in `scripts/`.
 [TRAINING_DATA.md](TRAINING_DATA.md) records data sources and review history.
 [VALIDATION.md](VALIDATION.md) defines later semantic scoring. Training and validation loss
-are not rewrite accuracy. Actual 230M GPU training remains the user's Colab step.
+are not rewrite accuracy. The uploaded adapter has now completed the paired GPU diagnostic above.
