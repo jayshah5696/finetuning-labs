@@ -9,7 +9,7 @@ from finetuning_labs.rewriter.comparison import paired_report
 from finetuning_labs.rewriter.evaluation import digest, generate_cases, judge_cases
 
 
-def prepare(tmp_path, *, different_judge=False):
+def prepare(tmp_path, *, different_judge=False, generation_configs=None):
     cases = (
         Case(
             "one",
@@ -41,7 +41,8 @@ def prepare(tmp_path, *, different_judge=False):
             return {"text": next(selected_outputs), "model": model_name, "finish_reason": "stop"}
 
         generation_dir = tmp_path / name
-        generate_cases(bundle, generation_dir, {"model": name}, generate)
+        config = generation_configs[name] if generation_configs else {"model": name}
+        generate_cases(bundle, generation_dir, config, generate)
 
         def judge(packet):
             wrong = "Rinaldo" in packet["candidate"]
@@ -108,4 +109,16 @@ def test_valid_hashes_cannot_bind_a_judgment_to_another_candidate(tmp_path):
     record["request_sha256"] = digest(record["request"])
     path.write_text(json.dumps(record))
     with pytest.raises(ValueError, match="candidate|packet"):
+        compare(bundle, tmp_path)
+
+
+def test_adapter_comparison_rejects_different_generation_settings(tmp_path):
+    stock = {"model": "base", "revision": "a" * 40, "max_new_tokens": 64}
+    tuned = stock | {
+        "adapter_model": "owner/lora",
+        "adapter_revision": "b" * 40,
+        "max_new_tokens": 128,
+    }
+    bundle = prepare(tmp_path, generation_configs={"left": stock, "right": tuned})
+    with pytest.raises(ValueError, match="generation settings"):
         compare(bundle, tmp_path)

@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import subprocess
 import time
 import tomllib
@@ -167,6 +168,16 @@ def _load_generations(bundle: Bundle, destination: Path) -> list[dict]:
     result = []
     for case in bundle.cases:
         record = json.loads((destination / "calls" / f"{case.id}.json").read_text())
+        expected = {
+            "case_id": case.id,
+            "config": manifest["spec"]["config"],
+            "messages": [
+                {"role": "system", "content": COMMON_SYSTEM + MODES[case.mode]},
+                {"role": "user", "content": case.user_message()},
+            ],
+        }
+        if record["request"] != expected:
+            raise ValueError("Saved generation request/config differs from the frozen run")
         if digest(record["request"]) != record["request_sha256"]:
             raise ValueError("saved request hash differs from its contents")
         if record["status"] == "completed" and digest(record["result"]) != record["result_sha256"]:
@@ -324,34 +335,67 @@ def aggregate(bundle: Bundle, assessments: list[dict]) -> dict:
     }
 
 
+def adapter_identity(config: dict):
+    model, revision = config.get("adapter_model"), config.get("adapter_revision")
+    if model is None and revision is None:
+        return None
+    if not model or not isinstance(revision, str) or not re.fullmatch(r"[a-f0-9]{40}", revision):
+        raise ValueError("An adapter model and immutable adapter revision are required together")
+    return {"model": model, "revision": revision}
+
+
 def liquid_backend(config: dict):
     import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    import transformers
+    from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 
+    adapter = adapter_identity(config)
     if not torch.cuda.is_available():
         raise RuntimeError("The Liquid evaluation requires the selected CUDA L4 runtime")
     device = torch.cuda.get_device_name(0)
     if "L4" not in device:
         raise RuntimeError(f"Expected L4, received {device}")
     torch.manual_seed(42)
-    tokenizer = AutoTokenizer.from_pretrained(config["model"], revision=config["revision"])
+    tokenizer = AutoTokenizer.from_pretrained(
+        config["model"], revision=config["revision"], token=False
+    )
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token = tokenizer.eos_token
     model = (
         AutoModelForCausalLM.from_pretrained(
             config["model"],
             revision=config["revision"],
+            token=False,
             dtype=torch.bfloat16,
             attn_implementation="eager",
         )
         .to("cuda")
         .eval()
     )
+    if adapter:
+        from peft import PeftModel
+
+        model = PeftModel.from_pretrained(
+            model, adapter["model"], revision=adapter["revision"], token=False, is_trainable=False
+        ).eval()
+    decoding = GenerationConfig(
+        do_sample=False,
+        num_beams=1,
+        max_new_tokens=config["max_new_tokens"],
+        eos_token_id=tokenizer.eos_token_id,
+        pad_token_id=tokenizer.pad_token_id,
+        use_cache=True,
+    )
+    model.generation_config = decoding
     runtime = {
         "device": device,
         "torch": torch.__version__,
+        "transformers": transformers.__version__,
         "python": platform.python_version(),
         "dtype": "bfloat16",
         "attention": "eager",
         "seed": 42,
+        "generation_config": decoding.to_dict(),
     }
 
     def generate(messages):
@@ -370,10 +414,8 @@ def liquid_backend(config: dict):
         with torch.inference_mode():
             output = model.generate(
                 **encoded,
-                do_sample=False,
-                max_new_tokens=config["max_new_tokens"],
-                pad_token_id=tokenizer.pad_token_id,
-                use_cache=True,
+                generation_config=decoding,
+                use_model_defaults=False,
             )
         torch.cuda.synchronize()
         tokens = output[0, prompt_count:].tolist()
@@ -384,6 +426,7 @@ def liquid_backend(config: dict):
             "finish_reason": "eos" if complete else "length",
             "model": config["model"],
             "revision": config["revision"],
+            "adapter": adapter,
             "prompt_tokens": prompt_count,
             "output_tokens": len(tokens),
             "latency_ms": round((time.perf_counter() - started) * 1000),

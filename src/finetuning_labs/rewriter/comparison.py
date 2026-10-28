@@ -77,6 +77,13 @@ def paired_report(
     right_spec = json.loads((right_generation / "run.json").read_text())["spec"]
     if left_spec["prompt_sha256"] != right_spec["prompt_sha256"]:
         raise ValueError("Generator behavioral prompts differ")
+    left_config, right_config = left_spec["config"], right_spec["config"]
+    if right_config.get("adapter_model"):
+        base_config = {
+            k: v for k, v in right_config.items() if k not in {"adapter_model", "adapter_revision"}
+        }
+        if left_config != base_config:
+            raise ValueError("Stock and adapter generation settings differ")
     left_rows, left_calls, left_config = _bound_assessments(bundle, left_generation, left_judge)
     right_rows, right_calls, right_config = _bound_assessments(
         bundle, right_generation, right_judge
@@ -109,7 +116,8 @@ def paired_report(
         "judge_config": left_config,
         "judge_rubric_sha256": digest(left_config.get("rubric", "")),
         "left_model": left_spec["config"]["model"],
-        "right_model": right_spec["config"]["model"],
+        "right_model": right_spec["config"].get("adapter_model", right_spec["config"]["model"]),
+        "generation_configs": {"left": left_spec["config"], "right": right_spec["config"]},
         "left": aggregate(bundle, left_rows),
         "right": aggregate(bundle, right_rows),
         "pairs": {
@@ -136,16 +144,16 @@ def markdown(report: dict) -> str:
         return "N/A" if value is None else f"{value:.1f}%"
 
     lines = [
-        "# Liquid and Luna diagnostic comparison",
+        "# Rewriter diagnostic comparison",
         "",
         "Sol assessed both models with the same rubric and hidden generator identity.",
-        "These are diagnostic scores on 68 calibration cases. Human judge calibration and",
+        f"These are diagnostic scores on {report['scheduled_pairs']} validation cases. Human judge calibration and",
         "an independent test set are pending. This is not a release-quality accuracy claim.",
         "",
         f"Left: `{report['left_model']}`. Right: `{report['right_model']}`.",
         f"Judge: `{report['judge_config']['model']}` through OpenRouter and Arka.",
         "",
-        "| Slice | Stock Liquid passes | Luna passes |",
+        "| Slice | Stock Liquid passes | Compared model passes |",
         "| --- | ---: | ---: |",
     ]
     for mode, left in report["left"]["per_mode"].items():
@@ -166,7 +174,7 @@ def markdown(report: dict) -> str:
         )
     lines += [
         "",
-        "| Diagnostic | Stock Liquid | Luna |",
+        "| Diagnostic | Stock Liquid | Compared model |",
         "| --- | ---: | ---: |",
         f"| Definite assessment coverage | {rate(left['assessment_coverage_pct'])} | {rate(right['assessment_coverage_pct'])} |",
         f"| Semantic review coverage | {left['semantic_reviewed']}/{left['scheduled']} | {right['semantic_reviewed']}/{right['scheduled']} |",
@@ -181,13 +189,14 @@ def markdown(report: dict) -> str:
         "errors cannot be offset by style. A missing judgment never becomes a pass.",
         "",
         "Paired outcomes: " + ", ".join(f"{name}={n}" for name, n in report["pairs"].items()) + ".",
-        f"Luna's pooled difference is {report['pooled_gain_percentage_points']:.1f} percentage points.",
+        f"The compared model's pooled difference is {report['pooled_gain_percentage_points']:.1f} percentage points.",
         "",
-        "The eight long cases represent four source documents. The three identity cases are",
-        "too few for a precise generalization claim. All references remain draft.",
+        f"The long slice contains {report['left']['by_length']['long']['scheduled']} cases.",
+        f"There are {left['identity_count']} explicit identity cases.",
+        "The validation set is small and was used during development. It is not an unseen final test.",
         "",
-        "API usage is retained in comparison.json. OpenRouter reported BYOK calls. A zero",
-        "gateway charge does not mean free inference; upstream provider-reported costs are",
+        "API usage is retained in comparison.json. A zero gateway charge does not mean",
+        "free inference; upstream provider-reported costs, when available, are",
         "recorded separately. GPU cost is not included in those API cost fields.",
         "",
     ]

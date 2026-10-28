@@ -7,6 +7,7 @@ import pytest
 
 from finetuning_labs.rewriter.benchmark import Bundle, Case, Rules
 from finetuning_labs.rewriter.evaluation import (
+    _load_generations,
     aggregate,
     assess,
     generate_cases,
@@ -194,6 +195,26 @@ def test_judge_is_blind_and_result_binds_to_exact_candidate(tmp_path):
     (gen / "calls/one.json").write_text(json.dumps(call))
     with pytest.raises(ValueError, match="hash"):
         judge_cases(b, gen, judged, {"model": "test-judge"}, judge)
+
+
+def test_generation_record_cannot_change_config_with_a_recomputed_hash(tmp_path):
+    c = sample()
+    bundle = Bundle(cases=(c,), fixtures=(), manifest={})
+    generate_cases(
+        bundle,
+        tmp_path,
+        {"model": "stock"},
+        lambda _: {"text": c.output, "finish_reason": "stop"},
+    )
+    path = tmp_path / "calls/one.json"
+    record = json.loads(path.read_text())
+    record["request"]["config"]["model"] = "different-model"
+    from finetuning_labs.rewriter.evaluation import digest
+
+    record["request_sha256"] = digest(record["request"])
+    path.write_text(json.dumps(record))
+    with pytest.raises(ValueError, match="request|config"):
+        _load_generations(bundle, tmp_path)
 
 
 def test_hub_package_is_an_allowlist_and_retains_simple_rows_and_license(tmp_path):
