@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-28T21:54:33Z",
+  "reviewed_commit": "ef2f71419c9895a8207c7d3a9f3ca95a8b628d50",
+  "reviewed_changes": ["73b6bd1", "ef2f714"],
+  "run_id": "lora-validation-20261028",
+  "verdict": "pass_with_limits",
+  "conclusion": "No unresolved code issue that invalidates the paired quality comparison was found in the reviewed path. The protocol now states the decoding behavior accurately. This review does not establish GPU completion or model quality.",
+  "scope": [
+    "Review the stock and pinned LoRA generation path without changing production code or generating outputs.",
+    "Check frozen prompts, public validation data, pinned source revisions, adapter loading, decoding settings, saved-call binding, judge settings, and aggregate denominators.",
+    "Check local tests and package build. Do not call model APIs or remote GPUs."
+  ],
+  "open_findings": [],
+  "resolved_findings": [
+    {
+      "id": "protocol-eos-at-cap",
+      "kind": "documentation_mismatch",
+      "observation": "The original protocol called every response at the token limit truncated. The backend treats a final EOS as complete, including EOS at the 2048th generated token.",
+      "evidence": "A local reproduction with 2048 tokens ending in EOS produced finish_reason=eos and could pass assessment with a valid passing judgment. No model generation was performed.",
+      "resolution": "The parent changed the protocol to say that reaching the token limit without EOS is truncated. The existing generation and baseline assessment semantics remain the same.",
+      "status": "resolved_in_protocol"
+    },
+    {
+      "id": "protocol-effective-config",
+      "kind": "documentation_mismatch",
+      "observation": "runtime.generation_config records the explicit GenerationConfig object before Transformers resolves null fields on a copy. It is not a fully resolved effective configuration.",
+      "evidence": "Using installed Transformers 5.21.0, GenerationMixin._prepare_generation_config filled repetition_penalty=1.0, top_p=1.0, temperature=1.0, and other defaults that were null in the recorded object. The model's generation_config is replaced with that same explicit object before either arm generates, so the downloaded model-specific repetition_penalty=1.05 does not enter either arm.",
+      "resolution": "The parent changed the protocol to describe the configured object, saved library versions, and pinned library defaults. It no longer claims a fully resolved effective configuration.",
+      "status": "resolved_in_protocol"
+    }
+  ],
+  "checks": {
+    "frozen_validation": {
+      "status": "pass",
+      "case_count": 84,
+      "per_mode": {"/slack": 16, "/transcribe": 35, "/prompt": 16, "/polish": 17},
+      "long_cases": 13,
+      "identity_cases": 8,
+      "public_parquet_equals_reconstructed_local_rows": true,
+      "public_split_counts": {"train": 1000, "dev": 100, "validation": 84},
+      "exact_train_validation_prompt_overlap": 0,
+      "exact_dev_validation_prompt_overlap": 0,
+      "personal_transcription_cases": 0
+    },
+    "generation_prompts": {
+      "status": "pass",
+      "observation": "generate_cases builds the same system and user messages for both arms from COMMON_SYSTEM, the mode instruction, and Case.user_message. It does not include the reference, checks, or review metadata in the generation messages. Public system, user, and assistant rows match all reconstructed local rows exactly."
+    },
+    "source_identity": {
+      "status": "pass",
+      "base_model": "LiquidAI/LFM2.5-230M",
+      "base_revision": "40cb2ad3b3044d5a41eee083a6103c8b523afa45",
+      "adapter_model": "jayshah5696/lfm2.5-230m-rewriter-lora",
+      "adapter_revision": "034d54e5b7c291fea1f8fcacba77fc8dad543bc4",
+      "dataset": "jayshah5696/finetuning-labs-rewriter-training",
+      "dataset_revision": "bbcdb7692445a4310296060606b8a6dcce439f47",
+      "adapter_config_matches_base_identity": true,
+      "observation": "The submitted revisions are immutable commits. The tokenizer and base use the pinned base revision with token=False. PeftModel.from_pretrained receives the pinned adapter revision with token=False and is_trainable=False. The adapter identity validator rejects incomplete or mutable adapter identities."
+    },
+    "matched_arms": {
+      "status": "pass",
+      "observation": "execute_lora uses the same local bundle and config for both arms. The right arm adds only adapter_model and adapter_revision. paired_report rejects other differences for this adapter comparison. The same explicit greedy GenerationConfig replaces downloaded defaults in both arms. Both use one beam, seed 42, eager attention, a 4096-token limit, and max_new_tokens=2048."
+    },
+    "gpu_and_precision": {
+      "status": "source_checked_runtime_pending",
+      "observation": "The backend requires CUDA and an L4 device name, loads the base with torch.bfloat16, moves it to CUDA, and uses inference_mode. No CPU generation fallback exists. The saved adapter contains 164 F32 tensors. PEFT 0.21.2 defaults to float32 adapter handling, so the bfloat16 runtime label describes the base model rather than every model tensor."
+    },
+    "saved_output_binding": {
+      "status": "pass",
+      "observation": "Every saved generation request is checked against the frozen case ID, reconstructed messages, and run config. Request and completed-result hashes are checked. Judge runs bind to the reconstructed generation digest, and each saved judge packet must equal the exact case and candidate. Editable generations, assessments, and metrics summary files do not determine the paired result."
+    },
+    "judge": {
+      "status": "pass",
+      "model": "openai/gpt-6.1-sol",
+      "reasoning_effort": "high",
+      "max_output_tokens": 16384,
+      "arka_revision": "5d353740ae1dd34742841071752814028db1489a",
+      "rubric_matches_original_baseline_bytes": true,
+      "observation": "The packet includes input, reference, candidate, mode, checks, and supplied context, with no generator identity. Both arms must use identical judge config and rubric. validate_judgment requires all five criteria and prevents critical errors or uncertain criteria from becoming passes."
+    },
+    "counts": {
+      "status": "pass_for_complete_call_sets",
+      "scheduled_generation_cases_per_arm": 84,
+      "scheduled_candidate_assessments": 168,
+      "observation": "aggregate requires every scheduled case exactly once and uses all scheduled cases in pass-rate denominators. Durable started or error calls, empty outputs, context overflow, truncation, invalid judge results, and uncertainty cannot become passes. Mode averages give each present mode equal weight. A physically missing call file aborts report loading, as documented under limits."
+    }
+  },
+  "verification": {
+    "focused_tests": "21 passed for test_adapter_evaluation.py, test_evaluation.py, and test_comparison.py.",
+    "make_check": "Passed: 108 tests, Ruff lint, Ruff format check, and the existing offline benchmark audit.",
+    "make_build": "Passed: wheel and source distribution built.",
+    "cached_data_check": "Read the pinned public Parquet files from the local Hugging Face cache with HF_HUB_OFFLINE=1. All 84 validation rows and the receipt hash matched.",
+    "configuration_check": "Called the installed Transformers 5.21.0 generation-config preparation method without loading or generating with a model.",
+    "local_library_versions": {"torch": "2.14.1+cpu", "transformers": "5.21.0", "peft": "0.21.2", "accelerate": "1.15.0", "pyarrow": "26.0.0"},
+    "remote_generation_or_model_api_calls_by_reviewer": 0,
+    "production_code_changes_by_reviewer": 0
+  },
+  "limits": [
+    "No completed GPU generation records or new judge records were available in the reviewed run directory. Actual CUDA execution, output coverage, and quality scores remain unverified by this review.",
+    "The submitted Modal image pins torch==2.13.0. The available local CPU environment has torch==2.14.1+cpu. The local configuration check verifies the pinned Transformers and PEFT APIs, not the remote Torch or GPU runtime.",
+    "A physically absent generation or required judge call file raises FileNotFoundError. It never becomes a pass, but the current report cannot express that absence as a pending row. Preserve complete raw call sets or state that the report is incomplete. Do not report a subset as the 84-case result.",
+    "comparison.py main still uses the original default bundle and liquid/luna directory names. This run must call paired_report with the explicit reviewed-v2 validation bundle and the stock/lora generation and judge directories.",
+    "The stored GenerationConfig object contains null fields resolved by pinned library defaults. It is sufficient to identify shared settings with those versions, but it is not a fully resolved per-call effective configuration.",
+    "The adapter uses F32 tensors with a BF16 base. Treat precision descriptions as mixed precision and do not infer all-tensor BF16 execution from the single runtime dtype field.",
+    "Exact prompt overlap checks do not independently audit source-family separation or establish the uploaded adapter's full training history.",
+    "The validation split was used during development. Human judge calibration and an independent final test remain pending. Any resulting scores are diagnostic model judgments."
+  ],
+  "identity": {
+    "bundle_sha256": "60ae7e6cf92fdcb8b6c8f99efc21793c8b00ff3c275d52298e6a92a6adbab093",
+    "behavioral_prompt_sha256": "c7c7a434483a1ec49e9cf13c104428bf1a6bbd07962afdedcee3423cd93c932d",
+    "validation_parquet_sha256": "63a35fcde810de40d6a65cc7e8ae679649bdabf22870053b9e5afedc7cafdb81",
+    "adapter_weights_sha256": "bc7e0fb01499fcad7ed077f17381ef3c49726428ce2bebc9a8f6a85c2c526e89",
+    "adapter_config_sha256": "0c7b49f0c57f00e72d748b5a48231fc8d50fbdea5254fe3a8c0a7c64dbd178a5",
+    "base_config_sha256": "f7d0bcc454b7a30fa471b1e7b9e359e11fb25b56f5b4ffd59bb18248e3c2ea3d",
+    "base_generation_config_sha256": "4f88574c47c3215f7f952e1f520d1df7387422dde0345655228fb7b3fde6858c",
+    "base_tokenizer_sha256": "df1d8d5ec5d091b460562ffd545e4a5e91d17d4a0db7ebe733be34ed374377bd",
+    "base_tokenizer_config_sha256": "75c287923e252b08b0a0f1c367bbe557ab23a681d0b71c5a34e0932ddbe2f5ee",
+    "base_chat_template_sha256": "c5b67247c9f736f6c40eaa91ae1ef27dc67f5b041eedaadb97a1bea5030fb0ff"
+  },
+  "reviewed_file_sha256": {
+    "scripts/modal_eval.py": "a11afc2d3892257b3d66373d2d86d3e9f7339c1f64e7ffbd1b2c84dd56cde1dc",
+    "src/finetuning_labs/rewriter/evaluation.py": "6a18f8444eda3eb5d51d96b729b9522daff0073891a138f3964d5fb0d5c4ace2",
+    "src/finetuning_labs/rewriter/comparison.py": "4d0732fb7f30fbfbcf088df6cc7c28b350797b7f544a1e12ba745836dc997f38",
+    "src/finetuning_labs/rewriter/benchmark.py": "829b6874494e97bdf8d75b6b0b42ce20c07e02da5f607508545cf4066e175571",
+    "tests/test_adapter_evaluation.py": "99e7c8141b816d92b906bb548fc37ccb6d36835a49e48aa3e9b98e379531c820",
+    "tests/test_evaluation.py": "da886f2b4c8507c5dbdfa9aebbc1a7aff87b2dbd8303780f3040efb4bf10d0da",
+    "tests/test_comparison.py": "1c077e26e30df99db2ba4035d55ebadcc601d7190487e0ce0863326c9d991550",
+    "configs/rewriter.toml": "1da22669c00d129471975cf9cd72f52c11ad32e084367b51092aebc4fbb9fa31",
+    "data/rewriter/evals/lora-validation-20261028/PROTOCOL.md": "835023f553676c42cc028b95972dd4506a88f3a762ae1cfaac2190c85465cb00",
+    "data/rewriter/evals/lora-validation-20261028/modal.json": "796a4162a8d983754035a964555d61e88f151550eeda3cdeeacdc97b31f10f40",
+    "data/rewriter/reviewed-v2/validation-bundle/manifest.json": "6d8ad9e8b6c6f49008da09df1e2b8f6cd11b62348ca5bf4783e3a1aa0a429e38",
+    "data/rewriter/reviewed-v2/validation-bundle/cases.jsonl": "37457d267394e2ac9b6a74463e1772063de6df8dbf09b781035d45894067484b",
+    "data/rewriter/reviewed-v2/validation-bundle/supporting/cases.json": "18094af39e0e110aaad2c86438941862e8d4ad3234d94ddd0b8a779f1d8a5372",
+    "data/rewriter/reviewed-v2/validation-bundle/supporting/judge-system.txt": "0d567c1edb4549373b9efa7d8b0fe12525b34d7454d13cd22edb52fc64c177d0",
+    "uv.lock": "67b336ddebdafeecd48213e511b917d6b8b5a49cd1b9036fec1dc6ec3978a951"
+  }
+}

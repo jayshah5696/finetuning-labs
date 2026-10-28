@@ -40,7 +40,7 @@ def execute(run_id: str, config: dict):
         volume.commit()
 
 
-@app.function(image=image, gpu="L4", cpu=4, memory=12288, timeout=7200, volumes={"/runs": volume})
+@app.function(image=image, gpu="L4", cpu=2, memory=6144, timeout=7200, volumes={"/runs": volume})
 def execute_lora(run_id: str, config: dict, adapter: dict):
     import gc
 
@@ -68,7 +68,7 @@ def execute_lora(run_id: str, config: dict, adapter: dict):
 
 
 @app.local_entrypoint()
-def submit_lora(run_id: str = "lora-validation-20261028"):
+def submit_lora(run_id: str = "lora-validation-20261028", gpu: str = "L4"):
     import hashlib
 
     import pyarrow.parquet as pq
@@ -78,6 +78,9 @@ def submit_lora(run_id: str = "lora-validation-20261028"):
 
     if not run_id or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-_" for c in run_id):
         raise ValueError("Use a lowercase run ID with digits, hyphens, or underscores")
+    devices = {"L4": "L4", "A10G": "A10"}
+    if gpu not in devices:
+        raise ValueError("Use L4 or A10G for matched BF16 evaluation")
     destination = PROJECT / "data/rewriter/evals" / run_id
     receipt_path = destination / "modal.json"
     if receipt_path.exists():
@@ -104,7 +107,8 @@ def submit_lora(run_id: str = "lora-validation-20261028"):
         settings["liquid"]
         | code_provenance()
         | {
-            "execution": "modal-L4",
+            "execution": f"modal-{gpu}",
+            "expected_gpu": devices[gpu],
             "source_bundle_sha256": bundle_identity(bundle),
             "dataset_revision": dataset_revision,
             "validation_parquet_sha256": hashlib.sha256(data.read_bytes()).hexdigest(),
@@ -128,7 +132,7 @@ def submit_lora(run_id: str = "lora-validation-20261028"):
     }
     with receipt_path.open("x") as stream:
         json.dump(receipt, stream, indent=2)
-    call = execute_lora.spawn(run_id, config, adapter)
+    call = execute_lora.with_options(gpu=gpu).spawn(run_id, config, adapter)
     receipt.update(status="submitted", function_call_id=call.object_id)
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n")
     print(json.dumps(receipt, indent=2))

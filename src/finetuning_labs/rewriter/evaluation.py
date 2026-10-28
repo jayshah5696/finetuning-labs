@@ -351,10 +351,13 @@ def liquid_backend(config: dict):
 
     adapter = adapter_identity(config)
     if not torch.cuda.is_available():
-        raise RuntimeError("The Liquid evaluation requires the selected CUDA L4 runtime")
+        raise RuntimeError("The Liquid evaluation requires the selected CUDA runtime")
     device = torch.cuda.get_device_name(0)
-    if "L4" not in device:
-        raise RuntimeError(f"Expected L4, received {device}")
+    expected_gpu = config.get("expected_gpu", "L4")
+    if expected_gpu not in {"L4", "A10"} or expected_gpu not in device:
+        raise RuntimeError(f"Expected {expected_gpu}, received {device}")
+    if not torch.cuda.is_bf16_supported():
+        raise RuntimeError("The matched evaluation requires BF16 base-model support")
     torch.manual_seed(42)
     tokenizer = AutoTokenizer.from_pretrained(
         config["model"], revision=config["revision"], token=False
@@ -393,6 +396,10 @@ def liquid_backend(config: dict):
         "transformers": transformers.__version__,
         "python": platform.python_version(),
         "dtype": "bfloat16",
+        "base_dtype": "bfloat16",
+        "adapter_dtypes": sorted(
+            {str(p.dtype) for n, p in model.named_parameters() if "lora_" in n}
+        ),
         "attention": "eager",
         "seed": 42,
         "generation_config": decoding.to_dict(),
