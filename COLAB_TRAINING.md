@@ -2,6 +2,7 @@
 
 Open [rewriter_train_l4.ipynb](notebooks/rewriter_train_l4.ipynb) in Google Colab.
 Choose a fresh L4 GPU runtime.
+The first cell identifies the current notebook as `public-parquet-lora-2`.
 
 Add exactly two secrets in Colab's Secrets panel and enable notebook access:
 
@@ -12,6 +13,7 @@ Add exactly two secrets in Colab's Secrets panel and enable notebook access:
 
 The public dataset is readable without a paid Hugging Face plan. The HF token is needed
 to upload your adapter. Keep both values in Secrets. Do not paste them into CONFIG.
+Dataset, tokenizer and base-model downloads explicitly use `token=False`.
 
 ## Configure and run
 
@@ -67,3 +69,6 @@ uv run --no-project --python /tmp/rewriter-training-check/bin/python python \
 ```
 
 The notebook is self-contained. It does not download code or review artifacts from Hugging Face.
+It is the only supported notebook in Git. The builder embeds the Git helper module,
+and the integration check verifies that the embedded code matches it. Older notebook copies
+and packaging scripts are retained only in Git history.

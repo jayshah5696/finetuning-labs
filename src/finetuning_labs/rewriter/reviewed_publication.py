@@ -1,4 +1,4 @@
-"""Audit and publish an additive reviewed-data version to the private Hub repository."""
+"""Audit local reviewed data and exact-row reviews. Publication uses hf_data."""
 
 from __future__ import annotations
 
@@ -31,6 +31,7 @@ def require_script_review(review, script: bytes, notebook: bytes):
 
 
 def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
+    """Verify data provenance without requiring retired code from historical manifests."""
     root = root.resolve()
     manifest = json.loads((root / "manifest.json").read_text())
     if manifest.get("role") == "local_data_selection_only":
@@ -45,6 +46,10 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
             or not path.resolve().is_relative_to(root)
         ):
             raise ValueError("unsafe publication path")
+        # Historical manifests also index code. Git history retains those artifacts;
+        # data integrity and row reviews do not depend on that retired workflow.
+        if relative.parts[0] in {"notebooks", "runtime"}:
+            continue
         data = path.read_bytes()
         if hashlib.sha256(data).hexdigest() != expected:
             raise ValueError(f"publication hash differs: {name}")
@@ -54,11 +59,6 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
         for name, expected in FROZEN_VALIDATION.items():
             if hashlib.sha256(contents[name]).hexdigest() != expected:
                 raise ValueError("Frozen v2 validation bytes changed")
-        require_script_review(
-            json.loads(contents["runtime/script-review.json"]),
-            contents["runtime/train_rewriter.py"],
-            contents["notebooks/rewriter_train_l4.ipynb"],
-        )
     for data in contents.values():
         if re.search(rb"sk-or-v1-[A-Za-z0-9_-]{20,}|hf_[A-Za-z0-9]{25,}", data) or any(
             needle and needle in data for needle in private_needles

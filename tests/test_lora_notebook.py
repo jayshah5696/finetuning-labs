@@ -1,10 +1,61 @@
 """Specify assistant loss and adapter-only upload before writing the LoRA helpers."""
 
 import json
+import sys
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from finetuning_labs.rewriter.lora_training import adapter_files, encode_sft, push_adapter
+
+
+def test_public_data_cell_runs_without_auth_environment(monkeypatch):
+    notebook = json.loads(
+        (Path(__file__).parents[1] / "notebooks/rewriter_train_l4.ipynb").read_text()
+    )
+    source = next("".join(c["source"]) for c in notebook["cells"] if c["id"] == "data")
+    calls = []
+
+    class Rows(list):
+        column_names = ("system", "user", "assistant")
+
+    class Dataset(dict):
+        def map(self, *args, **kwargs):
+            return self
+
+    raw = Dataset(
+        {s: Rows([None] * n) for s, n in {"train": 1000, "dev": 100, "validation": 84}.items()}
+    )
+
+    def public_load(*args, **kwargs):
+        assert kwargs["token"] is False
+        calls.append(args)
+        return raw
+
+    def public_tokenizer(*args, **kwargs):
+        assert kwargs["token"] is False
+        return SimpleNamespace(pad_token_id=0)
+
+    monkeypatch.setitem(sys.modules, "datasets", SimpleNamespace(load_dataset=public_load))
+    monkeypatch.setitem(
+        sys.modules,
+        "transformers",
+        SimpleNamespace(AutoTokenizer=SimpleNamespace(from_pretrained=public_tokenizer)),
+    )
+    scope = {
+        "CONFIG": {
+            "dataset_id": "public/data",
+            "dataset_config": "sft",
+            "dataset_revision": "data-rev",
+            "model_id": "public/base",
+            "model_revision": "base-rev",
+            "max_length": 4096,
+        }
+    }
+    exec(compile(source, "notebook:data", "exec"), scope)  # noqa: S102 -- exercise trusted notebook cell without secrets
+    assert calls == [("public/data", "sft")]
+    assert scope["encoded"] is raw
 
 
 class Tokenizer:

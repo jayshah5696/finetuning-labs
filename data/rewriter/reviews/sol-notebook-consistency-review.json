@@ -1,0 +1,84 @@
+{
+  "model": "gpt-6.1-sol",
+  "review_mode": "native review agent; no model API calls",
+  "review_date": "2026-10-28",
+  "verdict": "pass",
+  "findings": [],
+  "scope": "Review the canonical public-Parquet LoRA notebook, its builder, embedded helpers, CPU checker, historical runner retirement, data auditor, focused tests, documentation and stale artifact deletions.",
+  "conclusions": [
+    "The existing tracked notebook inventory contains only notebooks/rewriter_train_l4.ipynb after pending deletions. The notebook identifies itself as public-parquet-lora-2.",
+    "The notebook embeds lora_training.py. Their parsed Python ASTs match. No notebook cell fetches a Hub manifest, runtime script or script-review report.",
+    "The data, tokenizer and base-model download calls explicitly pass token=False. Colab Secrets contain only HF_TOKEN and WANDB_API_KEY. The model write uses the authenticated adapter upload helper.",
+    "The retired full-training CLI exits with a pointer to the canonical notebook. No current caller of its removed load_release function remains.",
+    "The data auditor applies path safety checks before skipping historical runtime and notebook entries. It still verifies all retained manifest file hashes, frozen validation hashes, exact row reviews, supervised context, source identities and split groups.",
+    "The pending release-directory changes delete code artifacts only. Data files, supporting records, raw manifests and exact-row review evidence have no diff. The active hf_data publisher still audits the release and exports only data and source notices.",
+    "Historical STATUS sections explicitly describe superseded workflows. Ignored artifacts directories retain local evidence and are outside the supported notebook entry points."
+  ],
+  "checks": [
+    {
+      "name": "focused tests",
+      "command": "uv run --locked pytest -q tests/test_lora_notebook.py tests/test_reviewed_publication.py tests/test_colab_training.py tests/test_training_recovery.py tests/test_script_review_gate.py",
+      "result": "29 passed in 0.14s",
+      "performed_by_reviewer": true
+    },
+    {
+      "name": "actual local reviewed-v2 audit",
+      "result": "audit_publication passed for 67 retained files and split counts train=65, dev=17, validation=84. Returned contents exclude runtime and notebook artifacts.",
+      "performed_by_reviewer": true
+    },
+    {
+      "name": "actual local reviewed-v3-1000 audit",
+      "result": "audit_publication passed for 325 retained files and split counts train=1000, dev=100, validation=84. Returned contents exclude runtime and notebook artifacts.",
+      "performed_by_reviewer": true
+    },
+    {
+      "name": "existing tracked notebook inventory",
+      "method": "git ls-files '*.ipynb', filtered to files that exist after pending deletions",
+      "result": ["notebooks/rewriter_train_l4.ipynb"],
+      "performed_by_reviewer": true
+    },
+    {
+      "name": "static notebook verification",
+      "result": "All code cells parse. Their execution counts and outputs are empty. The embedded helper AST matches its Git source. No hf_hub_download, manifest.json or script-review fetch occurs in notebook code.",
+      "performed_by_reviewer": true
+    },
+    {
+      "name": "current CPU integration evidence binding",
+      "report": "artifacts/lora-notebook-public-consistency-check/report.json",
+      "result": "Current notebook and helper SHA-256 values match the report. The report records actual public-data encoding of 1184 rows, a maximum of 4029 chat tokens, four tiny native LFM optimizer steps, unchanged base weights, changed LoRA weights, exact saved-adapter reload, offline W&B loss logging and a mocked model upload.",
+      "performed_by_reviewer": "Report and exact-file bindings inspected. The integration was not rerun."
+    },
+    {
+      "name": "deletion and caller inspection",
+      "result": "Five obsolete notebooks, the release runtime script and three old artifact-packaging/check scripts are absent. Source searches found no live code caller of the removed load_release function or deleted scripts.",
+      "performed_by_reviewer": true
+    }
+  ],
+  "reviewed_files_sha256": {
+    "AGENTS.md": "80e0858ba000351286007cd503eaf19650d4da20a6c904825e6ac4b7c435136a",
+    "COLAB_TRAINING.md": "d8e8c771966b79f86f9e747b22de83eba5e4d50dd2dbc26e7b304dad5520c448",
+    "README.md": "1ada2aa4b705f9229927b4896535c5b00a2b29d120940099ecdf28aac73c161d",
+    "STATUS.md": "18a09e5fff5d37e6fcad01d0a4198788d2f6bec58817378386197411b8868936",
+    "TRAINING_DATA.md": "fd39f40932bb1b4dd3c60d4737d63d9dcf23ebdc71257ac3f95b3934b64d2fdf",
+    "scripts/README.md": "a59228d0907c0a8378a80a60c7a4a42352e12848ff2eb2323b240561c5b21099",
+    "notebooks/rewriter_train_l4.ipynb": "092b30a71dd684ce17f379385be3562835e482aaee48ef6d12391a1bcf141676",
+    "scripts/build_lora_notebook.py": "a0c6dd7ab786de66b36eedba3fc58ef58fee7d0b2e117a50e97c39b7c41823fd",
+    "scripts/check_lora_notebook.py": "635ac716c2ce00d63d6d15ef5fc50d093f353c4958c19f75080f5b9d442b7281",
+    "src/finetuning_labs/rewriter/lora_training.py": "11cbef03a92d3f58e35354cc5386a7cb84b5ec1268a7ed9e688d5a434a2883e5",
+    "src/finetuning_labs/rewriter/colab_training.py": "3ce18980232cd55f3d282431ed93d1bfa69aa9a944e23d98404d82306dedb45d",
+    "src/finetuning_labs/rewriter/reviewed_publication.py": "a38a992fb8688cf0cc756ffa4914241574b112e5eba8ae87ffb3faaa267b8ded",
+    "src/finetuning_labs/rewriter/reviewed_release.py": "50b54053037bb215b097cdb4d316d3ee6cdfb7d969075023891b78a960f880ae",
+    "src/finetuning_labs/rewriter/hf_data.py": "1c94bca94971c1437e2fc9835e600f34dffebb95c9b0269fc21ac4da05999197",
+    "tests/test_lora_notebook.py": "15a877b7c8dcd035db0650bb407345907f3bf91411bb2bfa6b96edd142874cc7",
+    "tests/test_reviewed_publication.py": "7b166ebc7832ac69f53ffb37539e1ad1e52a857ddd65e5892165b65eac4d5249",
+    "artifacts/lora-notebook-public-consistency-check/report.json": "31cfe8d43fcc7741a1f24d34c9e841b90d7c11820bcd63e2a52ccf7465d4acf8",
+    "data/rewriter/reviewed-v2/manifest.json": "b2d8a9388f481c4e04a0525adbe5680d1ea2f7ecdb95c33746514300f9ddda88",
+    "data/rewriter/reviewed-v3-1000/manifest.json": "f22708b5f30d4fda9896f9522f36670617fe1d416e46fc7030f6a83b0a717019"
+  },
+  "limitations": [
+    "This review did not run the notebook inside Colab, load the 230M model weights, use a GPU or BF16 training, contact online W&B, or upload an adapter.",
+    "The CPU integration evidence uses a tiny random native LFM and a mocked final Hub write. Its limits remain explicit in the report and current documentation.",
+    "Retired runtime and notebook hashes are intentionally outside the data auditor. This review does not approve those historical code bundles.",
+    "No examples or data were authored or edited. This review does not add semantic data verification, human labels or a locked final test."
+  ]
+}

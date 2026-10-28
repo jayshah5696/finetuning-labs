@@ -30,6 +30,12 @@ def main():
     from transformers import AutoConfig, AutoModelForCausalLM, Lfm2Config, set_seed
 
     notebook_path = ROOT / "notebooks/rewriter_train_l4.ipynb"
+    notebooks = sorted(
+        p for directory in (ROOT / "notebooks", ROOT / "data") for p in directory.rglob("*.ipynb")
+    )
+    assert notebooks == [notebook_path], (
+        "Keep one canonical notebook; retrieve old copies from Git history"
+    )
     notebook = json.loads(notebook_path.read_text())
     cells = {c["id"]: "".join(c["source"]) for c in notebook["cells"] if c["cell_type"] == "code"}
     for source in cells.values():
@@ -40,7 +46,8 @@ def main():
         if c["cell_type"] == "code":
             assert c["execution_count"] is None and c["outputs"] == []
     assert "hf_hub_download" not in "\n".join(cells.values())
-    scope = {"os": SimpleNamespace(environ={"HF_TOKEN": False}), "torch": torch, "wandb": wandb}
+    assert "manifest.json" not in "\n".join(cells.values())
+    scope = {"torch": torch, "wandb": wandb}
 
     def execute(identity):
         exec(compile(cells[identity], "notebook:" + identity, "exec"), scope)  # noqa: S102 -- trusted Git notebook is the integration target
@@ -148,6 +155,8 @@ def main():
             (ROOT / "src/finetuning_labs/rewriter/lora_training.py").read_bytes()
         ).hexdigest(),
         "actual_public_hub_data": True,
+        "notebook_count": len(notebooks),
+        "public_download_token": False,
         "dataset_revision": config["dataset_revision"],
         "encoded_split_counts": original_counts,
         "max_chat_tokens": max_tokens,

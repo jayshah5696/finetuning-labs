@@ -15,18 +15,21 @@ validation loss once and uploads the final adapter to a Hugging Face model repos
 It reads only HF_TOKEN with model-write access and WANDB_API_KEY from Colab Secrets.
 W&B records training, dev and final validation loss. Loss does not measure rewrite accuracy.
 The old full-training, proof, Drive and code-download workflow is superseded.
+Git now has one supported notebook, marked `public-parquet-lora-2`. The five stale notebook
+copies and the scripts that packaged them have been removed from the current tree. Git history
+retains their original bytes. Public data and base-model downloads use `token=False`.
 
 The actual notebook cells passed a CPU integration using the public data, pinned tokenizer
 and a tiny random native LFM. All 1,184 rows encoded without truncation, with a maximum chat
 length of 4,029 tokens. Four optimizer steps changed LoRA weights while all base weights stayed
 unchanged. The saved adapter reloaded exactly. W&B ran offline and the upload was mocked.
 No 230M weights, GPU, online W&B or actual adapter upload were used in this check.
-The report is `data/rewriter/releases/lora-notebook-check.json`.
+The current report is `data/rewriter/releases/lora-notebook-public-consistency-check.json`.
 
 GPT-6.1 Sol reviewed the new notebook and helpers and found no blocking issues. Its independent
 encoding check verified that supervised labels reproduce every assistant target exactly.
-The exact-file review is `data/rewriter/reviews/sol-lora-notebook-review-round1.json`.
-All 99 project tests, Ruff checks and formatting pass. The package builds.
+The previous exact-file review is `data/rewriter/reviews/sol-lora-notebook-review-round1.json`.
+All 102 project tests, Ruff checks and formatting pass. The package builds.
 The public-download and Viewer check is `data/rewriter/releases/public-viewer-check.json`.
 
 The next user action is to run the notebook on Colab L4 with the two secrets. Actual 230M

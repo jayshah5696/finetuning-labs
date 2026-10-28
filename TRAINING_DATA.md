@@ -48,10 +48,10 @@ Source IDs, probabilities, critiques and other metadata never enter supervised t
 Every selected row retains all six native Decisions scores. Those scores prioritize review;
 the independent exact-row Opus verdict adjudicates disagreements. Mechanical failures stay blocked.
 
-The release builder is `scripts/release_scaled_data.py`. It uses the preserved run evidence at
-`artifacts/arka-scale-1000`, `artifacts/arka-scale-1000-supplement`, and
-`artifacts/arka-scale-1000-prompt-topup`. It refuses missing mode quotas, duplicate targets,
-unreviewed rows, changed validation bytes, stale code approvals and stale CPU recovery evidence.
+The original release builder and artifact packagers are retained in Git history at commit
+`91e36a81df60f2520fc9334ef06ec27d729a15ad`. They selected the reviewed rows from the preserved
+Arka run evidence. The current data auditor verifies the original row hashes, exact reviews,
+source groups and frozen validation bytes without requiring those retired code bundles.
 The source plans, pipeline/rubric configs, saved reviews and exclusion records remain in Git.
 The current data-only publication receipt is `data/rewriter/releases/public-parquet.json`.
 The former artifact-bundle receipt is historical. The dataset-only publisher removes non-data
@@ -179,13 +179,8 @@ uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.a
   --run artifacts/new-arka-run
 ```
 
-`scripts/curate_arka_v2.py` records the exact parent corrections. The release preparer consumes
-saved attempts and reviews without making model calls. Use a fresh output path:
-
-```sh
-uv run --locked --group data --group hosted python scripts/prepare_reviewed_release.py \
-  --pool artifacts/arka-curated-v2-round3 --output artifacts/reviewed-v2-rebuilt
-```
+`scripts/curate_arka_v2.py` records the exact parent corrections. Historical bundle builders
+are available in Git history. The current tree contains the single supported training notebook.
 
 To reproduce the six data and SFT files from committed evidence alone:
 
@@ -210,21 +205,20 @@ uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.h
 
 ## Historical v2 data check and comparison contract
 
-The superseded [rewriter_reviewed_data_check.ipynb](notebooks/rewriter_reviewed_data_check.ipynb)
+The superseded `rewriter_reviewed_data_check.ipynb`
 used a read-only HF_TOKEN and one immutable Hub revision. It
 verified the manifest, checked all 166 exact reviews and token spans, and prepared 16 training
 examples across the four modes. It loaded no weights and ran no training. The earlier
-`rewriter_dataset_check.ipynb` is retained as a retired v1 artifact.
+`rewriter_dataset_check.ipynb` is also retired. Both are available only in Git history.
 
 All three data cells ran locally against the actual private Hub revision, with cached Hub
-authentication replacing Colab Secrets. `scripts/check_reviewed_colab.py` reproduces that check.
+authentication replacing Colab Secrets. Its checker is also retained in Git history.
 The receipt is `data/rewriter/releases/colab-reviewed-data-check-local.json`. Actual execution
 inside Colab and L4 training remain unverified.
 
-The next step is a 16-row memorization proof on Colab L4. Check assistant-only training loss,
-EOS handling and the ability to learn the prompt format. Then train on the 65 training pairs
-and choose a checkpoint using only the 17 development pairs. Memorization and low loss do not
-measure generalization.
+The earlier plan proposed a 16-row memorization proof followed by full training on 65 pairs.
+The current notebook instead trains LoRA on the 1,000-row release. Memorization and low loss
+do not measure generalization.
 
 Run stock and tuned Liquid on the same 84 v2 validation cases with the same decoding settings.
 Keep the same Sol output rubric and judge settings in both arms. Report the verified pass rate

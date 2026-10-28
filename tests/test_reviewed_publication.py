@@ -139,3 +139,13 @@ def test_publication_detects_secret_in_review_metadata(release):
     seal(release)
     with pytest.raises(ValueError, match="private"):
         audit_publication(release)
+
+
+@pytest.mark.parametrize("name", ["notebooks/old.ipynb", "runtime/train_rewriter.py"])
+def test_data_audit_does_not_require_retired_runtime_artifacts(release, name):
+    manifest = json.loads((release / "manifest.json").read_text())
+    manifest["files"][name] = hashlib.sha256(b"historical code").hexdigest()
+    save(release, "manifest.json", manifest)
+    verified = audit_publication(release)
+    assert name not in verified
+    assert json.loads(verified["data/train.jsonl"])["output"] == "Can we meet?"

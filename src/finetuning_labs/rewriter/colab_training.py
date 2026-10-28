@@ -1,21 +1,17 @@
-"""Standalone Colab L4 training entry point for the frozen reviewed 1,000-pair release."""
+"""Historical full-training utilities. The supported Colab workflow uses lora_training."""
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import importlib.metadata
 import json
 import os
 import shutil
 import tarfile
-import time
 from pathlib import Path
 
 MODEL = "LiquidAI/LFM2.5-230M"
 MODEL_REVISION = "40cb2ad3b3044d5a41eee083a6103c8b523afa45"
-REPO = "jayshah5696/finetuning-labs-rewriter-training"
-PREFIX = "reviewed-v3-1000"
 MAX_LENGTH = 4096
 MAX_NEW_TOKENS = 2048
 FROZEN_VALIDATION = {
@@ -247,80 +243,6 @@ def bind_run(output, config, *, resume):
         write_json(binding, config)
 
 
-def load_release(revision, token):
-    from huggingface_hub import hf_hub_download
-
-    if len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
-        raise ValueError("An immutable 40-character dataset revision is required")
-
-    def download(name):
-        path = hf_hub_download(
-            REPO, f"{PREFIX}/{name}", repo_type="dataset", revision=revision, token=token
-        )
-        return Path(path).read_bytes()
-
-    raw_manifest = download("manifest.json")
-    manifest = json.loads(raw_manifest)
-
-    def checked(name):
-        data = download(name)
-        if hashlib.sha256(data).hexdigest() != manifest["files"][name]:
-            raise ValueError(f"Dataset file hash differs: {name}")
-        if (
-            name in FROZEN_VALIDATION
-            and hashlib.sha256(data).hexdigest() != FROZEN_VALIDATION[name]
-        ):
-            raise ValueError("Frozen v2 validation bytes changed")
-        return data
-
-    quality = json.loads(checked("quality.json"))
-    if quality["splits"] != {"train": 1000, "dev": 100, "validation": 84}:
-        raise ValueError("Expected 1,000 train, 100 dev and 84 validation pairs")
-    support = json.loads(checked("supporting.json"))
-    guides, metadata, groups, identities = {}, {}, {}, set()
-    for split in ["train", "dev", "validation"]:
-        rows = [json.loads(x) for x in checked(f"data/{split}.jsonl").splitlines()]
-        guides[split] = [json.loads(x) for x in checked(f"sft/{split}.jsonl").splitlines()]
-        metadata[split] = [m for m in support if m["split"] == split]
-        if not (
-            len(rows) == len(guides[split]) == len(metadata[split]) == quality["splits"][split]
-        ):
-            raise ValueError("Split row counts differ")
-        groups[split] = set()
-        for row, guide, meta in zip(rows, guides[split], metadata[split], strict=True):
-            if set(row) != {"input", "output", "mode", "checks"} or sha(row) != meta["row_sha256"]:
-                raise ValueError("Row schema or identity differs")
-            if meta["id"] in identities:
-                raise ValueError("Duplicate source identity")
-            identities.add(meta["id"])
-            groups[split].add(meta["source_group"])
-            review = meta["opus_review"]
-            if (
-                (review["id"], review["row_sha256"]) != (meta["id"], sha(row))
-                or any(
-                    review[k] != "pass"
-                    for k in ["input_verdict", "output_verdict", "pair_verdict", "verdict"]
-                )
-                or meta["mechanical_issues"]
-            ):
-                raise ValueError("Unverified row in release")
-            if guide["assistant"] != row["output"] or set(guide) != {"system", "user", "assistant"}:
-                raise ValueError("Supervised target differs from verified data")
-            header = [f"MODE: {row['mode']}", f"LANGUAGE: {meta['language']}"]
-            if meta["context"].get("profile"):
-                header.append("PROFILE: " + meta["context"]["profile"])
-            if meta["context"].get("dictionary"):
-                header.append("DICTIONARY: " + ", ".join(meta["context"]["dictionary"]))
-            if guide["user"] != "\n".join([*header, "INPUT:", row["input"]]):
-                raise ValueError("Input or required context differs")
-    if len(identities) != len(support):
-        raise ValueError("Foreign metadata in release")
-    for a, b in [("train", "dev"), ("train", "validation"), ("dev", "validation")]:
-        if not groups[a].isdisjoint(groups[b]):
-            raise ValueError("Source group crosses splits")
-    return guides, metadata, hashlib.sha256(raw_manifest).hexdigest()
-
-
 def make_trainer(
     model, tokenizer, train, dev, output, *, proof=False, cpu=False, max_steps=None, callbacks=None
 ):
@@ -477,161 +399,9 @@ def generate(model, tokenizer, guides, metadata, output, *, resume):
 
 
 def main():
-    from transformers import AutoModelForCausalLM, AutoTokenizer, set_seed
-
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=["check", "baseline", "proof", "train", "tuned"])
-    parser.add_argument("--revision", required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--checkpoint", type=Path)
-    parser.add_argument("--resume", action="store_true")
-    parser.add_argument("--work-dir", type=Path, default=Path("/content/rewriter-checkpoints"))
-    args = parser.parse_args()
-    token = os.environ.get("HF_TOKEN")
-    guides, metadata, manifest_sha = load_release(args.revision, token)
-    tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=MODEL_REVISION, token=token)
-    if tokenizer.pad_token_id is None:
-        tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.padding_side = "right"
-    encoded = {s: [encode_example(g, tokenizer) for g in rows] for s, rows in guides.items()}
-    binding = {
-        "stage": args.stage,
-        "dataset_revision": args.revision,
-        "manifest_sha256": manifest_sha,
-        "model": MODEL,
-        "model_revision": MODEL_REVISION,
-        "max_length": MAX_LENGTH,
-        "max_new_tokens": MAX_NEW_TOKENS,
-        "seed": 42,
-        "checkpoint": str(args.checkpoint) if args.checkpoint else None,
-        "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-        "generation_config": greedy_config(tokenizer).to_dict(),
-        "packages": {
-            k: importlib.metadata.version(k)
-            for k in ["transformers", "accelerate", "tokenizers", "safetensors"]
-        },
-    }
-    if args.stage in {"proof", "train"}:
-        binding["local_work_dir"] = str(args.work_dir.resolve())
-    if args.stage == "check":
-        bind_run(args.output, binding, resume=args.resume)
-        report = dict(
-            binding,
-            splits={k: len(v) for k, v in encoded.items()},
-            max_chat_tokens=max(len(r["input_ids"]) for v in encoded.values() for r in v),
-            assistant_only_labels=True,
-            proof_ids=[
-                metadata["train"][i]["id"]
-                for i in proof_indices(metadata["train"], guides["train"])
-            ],
-            student_training=False,
-        )
-        (args.output / "readiness.json").write_text(json.dumps(report, indent=2) + "\n")
-        print(json.dumps(report, indent=2))
-        return
-    import torch
-
-    if args.stage == "tuned":
-        if not args.checkpoint or not (args.checkpoint / "config.json").is_file():
-            raise ValueError("Tuned generation requires the saved selected-model directory")
-        weights = list(args.checkpoint.glob("*.safetensors"))
-        if not weights:
-            raise ValueError("Checkpoint has no safetensors weights")
-        if not (args.checkpoint / "generation_config.json").is_file():
-            raise ValueError("Checkpoint has no generation config")
-        binding["checkpoint_hashes"] = {
-            p.name: file_sha(p) for p in args.checkpoint.iterdir() if p.is_file()
-        }
-    elif args.checkpoint:
-        raise ValueError(
-            "Only tuned generation accepts --checkpoint; training starts from the pinned base"
-        )
-    bind_run(args.output, binding, resume=args.resume)
-    if stage_finished(args.output):
-        print(f"{args.stage}: already completed; verified saved artifacts", flush=True)
-        return
-    require_gpu()
-    set_seed(42)
-    sessions = args.output / "sessions"
-    sessions.mkdir(exist_ok=True)
-    write_json(sessions / f"{time.time_ns()}.json", environment())
-    training = args.stage in {"proof", "train"}
-    model = AutoModelForCausalLM.from_pretrained(
-        str(args.checkpoint) if args.stage == "tuned" else MODEL,
-        **({} if args.stage == "tuned" else {"revision": MODEL_REVISION, "token": token}),
-        dtype=torch.float32 if training else torch.bfloat16,
-        attn_implementation="eager",
+    raise SystemExit(
+        "Retired full-training runner. Use notebooks/rewriter_train_l4.ipynb for public Parquet data and PEFT LoRA."
     )
-    if training:
-        train, dev = encoded["train"], encoded["dev"]
-        if args.stage == "proof":
-            indices = proof_indices(metadata["train"], guides["train"])
-            train = [train[i] for i in indices]
-            dev = train
-        proof = args.stage == "proof"
-        local = args.work_dir / sha(binding)
-        local.parent.mkdir(parents=True, exist_ok=True)
-        # Only this script's hash-bound local scratch directory is cleared.
-        if local.exists():
-            shutil.rmtree(local)
-        local.mkdir()
-        for path, required_gib in [(local, 12), (args.output, 10 if not proof else 1)]:
-            reusable = (
-                sum(p.stat().st_size for p in (args.output / "recovery").glob("slot-*.tar"))
-                if path == args.output
-                else 0
-            )
-            if shutil.disk_usage(path).free + reusable < required_gib * 1024**3:
-                raise RuntimeError(f"Need {required_gib} GiB free at {path}")
-        recovery = args.output / "recovery"
-        checkpoint = (
-            restore_recovery(recovery, local, sha(binding)) if args.resume and not proof else None
-        )
-        print(
-            f"Training {'resumes from ' + str(checkpoint) if checkpoint else 'starts from pinned base (step 0)'}",
-            flush=True,
-        )
-        trainer = make_trainer(
-            model,
-            tokenizer,
-            train,
-            dev,
-            local,
-            proof=proof,
-            callbacks=[] if proof else [recovery_callback(recovery, sha(binding))],
-        )
-        result = trainer.train(resume_from_checkpoint=checkpoint)
-        if not proof:
-            trainer.save_model(str(args.output / "selected-model"))
-            tokenizer.save_pretrained(args.output / "selected-model")
-        trainer.state.save_to_json(str(args.output / "trainer_state.json"))
-        report = {
-            "metrics": result.metrics,
-            "checkpoint_selection": "training memorization only"
-            if args.stage == "proof"
-            else "dev loss only",
-            "validation_used_for_training": False,
-            "best_checkpoint": trainer.state.best_model_checkpoint,
-            "environment": environment(),
-            "resumed_from": str(checkpoint) if checkpoint else None,
-            "proof_checkpoints_saved": False,
-        }
-        write_json(args.output / "training-result.json", report)
-        artifacts = [args.output / "training-result.json", args.output / "trainer_state.json"]
-        if not proof:
-            artifacts += [p for p in (args.output / "selected-model").iterdir() if p.is_file()]
-        finish_stage(args.output, artifacts)
-    else:
-        model.to("cuda")
-        generate(
-            model,
-            tokenizer,
-            guides["validation"],
-            metadata["validation"],
-            args.output,
-            resume=args.resume,
-        )
-        finish_stage(args.output, [args.output / "outputs.jsonl"])
 
 
 if __name__ == "__main__":

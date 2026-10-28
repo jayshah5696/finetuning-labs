@@ -32,6 +32,8 @@ data = load_dataset("jayshah5696/finetuning-labs-rewriter-training", "sft")
 
 Open [the notebook in Colab](https://colab.research.google.com/github/jayshah5696/jadoo-labs/blob/main/projects/finetuning-labs/notebooks/rewriter_train_l4.ipynb)
 in a fresh L4 runtime. The [notebook file](notebooks/rewriter_train_l4.ipynb) is in Git.
+Its first cell shows version `public-parquet-lora-2`. This is the only supported notebook in
+the project. Public dataset and base-model downloads use `token=False`.
 Add two Colab Secrets and enable access:
 
 - `HF_TOKEN`, with write access to the destination model repository.

@@ -10,6 +10,10 @@ adapter config, tokenizer assets and a model card. The active Colab notebook use
 only two Colab Secrets: HF_TOKEN with model-write access, and WANDB_API_KEY. It loads public data
 with load_dataset, logs loss to W&B, and uploads the final adapter. Do not restore the retired
 private artifact-bundle workflow. The user explicitly authorized public synthetic-data visibility.
+Keep exactly one supported notebook in Git: notebooks/rewriter_train_l4.ipynb. Do not copy notebooks
+into data releases. The builder embeds the canonical lora_training.py helpers, and the checker
+compares their ASTs. Public data and base-model downloads use token=False. Old notebooks and
+runtime bundles are available in Git history. Data review must not depend on those code bundles.
 Keep all v2 validation rows and source families out of future training expansions. The student
 is `LiquidAI/LFM2.5-230M`. Comparisons use GPT-6 Luna as the cloud baseline and teacher,
 and GPT-6.1 Sol as the historical baseline evaluator. Replacement data uses the latest clean Arka

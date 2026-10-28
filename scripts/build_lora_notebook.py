@@ -61,6 +61,8 @@ def main():
             """
 # Train and upload a rewriter LoRA
 
+Notebook version: `public-parquet-lora-2`. Training code is included below and generated from Git.
+
 Choose an L4 GPU in Colab. Add these two Colab Secrets and enable notebook access:
 
 - `HF_TOKEN`: a Hugging Face token with **write access** to the model repository in CONFIG.
@@ -122,11 +124,11 @@ from datasets import load_dataset
 from transformers import AutoTokenizer
 
 raw = load_dataset(CONFIG["dataset_id"], CONFIG["dataset_config"],
-                   revision=CONFIG["dataset_revision"], token=os.environ["HF_TOKEN"])
+                   revision=CONFIG["dataset_revision"], token=False)
 print({split: len(rows) for split, rows in raw.items()})
 assert {split: len(rows) for split, rows in raw.items()} == {"train": 1000, "dev": 100, "validation": 84}
 tokenizer = AutoTokenizer.from_pretrained(CONFIG["model_id"], revision=CONFIG["model_revision"],
-                                         token=os.environ["HF_TOKEN"])
+                                         token=False)
 if tokenizer.pad_token_id is None:
     tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
@@ -151,7 +153,7 @@ from transformers import AutoModelForCausalLM, set_seed
 
 set_seed(CONFIG["seed"])
 model = AutoModelForCausalLM.from_pretrained(CONFIG["model_id"],
-    revision=CONFIG["model_revision"], token=os.environ["HF_TOKEN"],
+    revision=CONFIG["model_revision"], token=False,
     dtype=torch.bfloat16, attn_implementation="eager")
 model = attach_lora(model, CONFIG)
 run = wandb.init(project=CONFIG["wandb_project"], name=CONFIG["run_name"], config=CONFIG)

@@ -34,10 +34,11 @@ See [the run guide](../COLAB_TRAINING.md) for the two Colab Secrets and upload c
 
 ## Historical work
 
-`check_training_cpu.py` and `release_scaled_data.py` record the earlier full-training workflow
-and reviewed-data selection. They are retained for local reproduction. Their old artifact
-packages are not the current Hub layout.
+`check_training_cpu.py` checks historical full-training utilities locally. The former Colab
+runner is retired. Use the current LoRA notebook for training.
 
 The scripts that uploaded wheels, notebooks, review reports and raw evaluation runs to datasets
 have been removed. The legacy Hub upload entry points refuse writes. Previous Git commits
 retain their source and evidence.
+The duplicate notebooks, private-data check script and old artifact-packaging scripts have
+also been removed. Retrieve historical versions from Git when you need their original bytes.
