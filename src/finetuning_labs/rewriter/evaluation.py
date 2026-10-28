@@ -415,7 +415,6 @@ def liquid_backend(config: dict):
             output = model.generate(
                 **encoded,
                 generation_config=decoding,
-                use_model_defaults=False,
             )
         torch.cuda.synchronize()
         tokens = output[0, prompt_count:].tolist()
