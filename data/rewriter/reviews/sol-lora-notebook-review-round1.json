@@ -1,0 +1,58 @@
+{
+  "reviewer_model": "gpt-6.1-sol",
+  "review_type": "independent source and artifact review",
+  "round": 1,
+  "verdict": "pass",
+  "summary": "No blocking correctness or usability problem was found in the simple LoRA notebook workflow.",
+  "scope": "Colab L4 training from the pinned public SFT train/dev/validation splits with two secrets, native LiquidAI/LFM2.5-230M, frozen-base PEFT LoRA, assistant-only loss, W&B loss reporting, and final adapter/tokenizer/card upload to a model repository.",
+  "sha256": {
+    "notebooks/rewriter_train_l4.ipynb": "acef6bf9235928a4b2ce0fce7773a3a483a4b727d1dd808c63baccb8969691f4",
+    "scripts/build_lora_notebook.py": "d79185df798202fe45e638f133ed7773cbbbcdf1b6df735ab2076d541ba10804",
+    "scripts/check_lora_notebook.py": "12227beb372d4b6317bf3187caaa4f1defea1aa628650eef45ba2e4a8a6bf42f",
+    "src/finetuning_labs/rewriter/lora_training.py": "11cbef03a92d3f58e35354cc5386a7cb84b5ec1268a7ed9e688d5a434a2883e5",
+    "src/finetuning_labs/rewriter/hf_data.py": "1c94bca94971c1437e2fc9835e600f34dffebb95c9b0269fc21ac4da05999197",
+    "tests/test_lora_notebook.py": "db705ea95568beeee6e1fe2b63b6af46c9be9f1374082aae4756499ec6099be6",
+    "tests/test_public_parquet.py": "cb4fe67c9c88fbb9d1dbfd011136674ff34b5be2410bc1257642bbd1e0b65b16",
+    "artifacts/lora-notebook-check-round3/report.json": "a125a7ce2ef4631a45221aa764f9bf17a85610eba1c5f6700597b185a8304f0c"
+  },
+  "findings": [],
+  "checks": [
+    {
+      "check": "Focused tests",
+      "command": "uv run --locked pytest -q tests/test_lora_notebook.py tests/test_public_parquet.py",
+      "result": "8 passed in 0.29s"
+    },
+    {
+      "check": "Notebook identity and source consistency",
+      "result": "The notebook and helper hashes match the round-3 report. The embedded helper AST equals lora_training.py. All code cells have no execution count or saved outputs."
+    },
+    {
+      "check": "Independent encoding of all cached public rows",
+      "method": "Executed the notebook config, helpers and data cells with HF_HUB_OFFLINE=1, HF_DATASETS_OFFLINE=1 and token=False in /tmp/rewriter-training-check. The cache directory contains the configured dataset revision bbcdb7692445a4310296060606b8a6dcce439f47.",
+      "result": "All 1,184 rows encoded without truncation. Decoding the supervised labels with special tokens removed exactly reproduced each assistant target.",
+      "counts": {"train": 1000, "dev": 100, "validation": 84},
+      "max_tokens_by_split": {"train": 3948, "dev": 4029, "validation": 3877},
+      "min_supervised_tokens_by_split": {"train": 11, "dev": 12, "validation": 5}
+    },
+    {
+      "check": "Training and loss behavior",
+      "result": "Source inspection confirms native AutoModelForCausalLM loading at the pinned model revision, PEFT LoRA with no trainable bias or modules_to_save, prompt/padding loss masking, train-only optimization, dev-only checkpoint selection, and one validation evaluation after training. The pinned Transformers 5.21.0 implementation accepts warmup_steps=0.05 as a ratio. W&B receives Trainer loss logs and the explicit final validation loss."
+    },
+    {
+      "check": "Saved integration evidence",
+      "result": "Inspected the checker and bound round-3 report. The report records four actual optimizer steps on a tiny random native LFM, changed adapter parameters, unchanged frozen base weights, exact saved-adapter reload, offline W&B validation logging, and a mocked model upload. The saved adapter config identifies LoRA, the pinned base revision, and no modules_to_save."
+    },
+    {
+      "check": "Artifact boundaries",
+      "result": "The notebook reads only HF_TOKEN and WANDB_API_KEY from Colab Secrets. It saves the adapter, tokenizer and card to final_adapter. Upload validation rejects base weight files and source files, and push_adapter explicitly uses repo_type=model. The separate dataset publisher allows only Parquet splits, dataset cards and source-license notices. It keeps code, review records and logs out of the dataset payload."
+    }
+  ],
+  "limitations": [
+    "This review did not run an L4 GPU or load the actual 230M base weights. Colab installation and GPU memory use remain unverified by this review.",
+    "This review did not perform online W&B logging or an actual model upload. The saved CPU integration uses offline W&B and a mocked upload.",
+    "The all-row encoding check read the existing public-data cache at the pinned revision. It did not refresh Hub metadata or inspect the current public dataset tree online.",
+    "The prior CPU optimizer run was inspected through its checker, report and saved adapter artifacts. The full training checker was not rerun during this review.",
+    "This verdict covers implementation correctness within the stated workflow. It does not establish semantic rewrite quality or independent human validation."
+  ],
+  "reviewer_changes": "Only this review report was added. No implementation, examples, datasets, credentials or remote model artifacts were changed."
+}

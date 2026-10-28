@@ -1,6 +1,40 @@
 # Status
 
-## Reviewed v3, 1,000 training examples
+## Current public data and LoRA notebook, 28 October 2026
+
+The two Hugging Face datasets are public. Their current trees contain only Parquet splits,
+dataset cards and source-license notices. Code, notebooks, review records and run logs stay
+in Git. The standard Dataset Viewer works without authentication or a paid subscription.
+The training dataset has 1,000 train, 100 dev and 84 validation rows. Its default configuration
+shows input, output, mode and checks. Its SFT configuration shows system, user and assistant.
+The separate original calibration dataset has 68 validation rows. No source rows changed.
+
+The active notebook is `notebooks/rewriter_train_l4.ipynb`. It downloads the public SFT data,
+trains PEFT LoRA with frozen base weights, selects the checkpoint using dev loss, evaluates
+validation loss once and uploads the final adapter to a Hugging Face model repository.
+It reads only HF_TOKEN with model-write access and WANDB_API_KEY from Colab Secrets.
+W&B records training, dev and final validation loss. Loss does not measure rewrite accuracy.
+The old full-training, proof, Drive and code-download workflow is superseded.
+
+The actual notebook cells passed a CPU integration using the public data, pinned tokenizer
+and a tiny random native LFM. All 1,184 rows encoded without truncation, with a maximum chat
+length of 4,029 tokens. Four optimizer steps changed LoRA weights while all base weights stayed
+unchanged. The saved adapter reloaded exactly. W&B ran offline and the upload was mocked.
+No 230M weights, GPU, online W&B or actual adapter upload were used in this check.
+The report is `data/rewriter/releases/lora-notebook-check.json`.
+
+GPT-6.1 Sol reviewed the new notebook and helpers and found no blocking issues. Its independent
+encoding check verified that supervised labels reproduce every assistant target exactly.
+The exact-file review is `data/rewriter/reviews/sol-lora-notebook-review-round1.json`.
+All 99 project tests, Ruff checks and formatting pass. The package builds.
+The public-download and Viewer check is `data/rewriter/releases/public-viewer-check.json`.
+
+The next user action is to run the notebook on Colab L4 with the two secrets. Actual 230M
+training and semantic stock-versus-tuned validation remain pending. Human labels and an unseen
+final test also remain pending. The sections below record historical work; their former private
+Hub layouts and notebook commands are superseded by this section and COLAB_TRAINING.md.
+
+## Historical reviewed v3, 1,000 training examples
 
 The Colab L4 training notebook and standalone runtime are implemented. The first Opus code
 review failed on checkpoint storage, interruption recovery, repeated completed stages and

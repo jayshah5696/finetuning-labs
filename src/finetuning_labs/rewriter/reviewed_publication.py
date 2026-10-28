@@ -8,7 +8,6 @@ import json
 import os
 import re
 from collections import Counter
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from .arka_pipeline import DIMENSIONS
@@ -124,7 +123,7 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
 
 
 def main():
-    from huggingface_hub import CommitOperationAdd, HfApi, get_token, hf_hub_download
+    from huggingface_hub import get_token
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--release", required=True, type=Path)
@@ -132,6 +131,10 @@ def main():
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--prefix", default=PREFIX)
     args = parser.parse_args()
+    if not args.prepare_only:
+        raise SystemExit(
+            "Legacy artifact upload retired. Use python -m finetuning_labs.rewriter.hf_data --publish; code and audits stay in Git."
+        )
     if not re.fullmatch(r"[a-z0-9-]+", args.prefix):
         raise ValueError("Invalid version prefix")
     prefix = args.prefix
@@ -153,48 +156,6 @@ def main():
     if args.prepare_only:
         print(json.dumps({"verified_files": len(contents), "prefix": prefix, "repo": args.repo}))
         return
-    api = HfApi()
-    info = api.repo_info(args.repo, repo_type="dataset")
-    if info.private is not True:
-        raise ValueError("Reviewed data must remain private")
-    existing = api.list_repo_files(args.repo, repo_type="dataset", revision=info.sha)
-    if any(name.startswith(prefix + "/") for name in existing):
-        raise FileExistsError("Reviewed version already exists; never overwrite frozen data")
-    commit = api.create_commit(
-        repo_id=args.repo,
-        repo_type="dataset",
-        parent_commit=info.sha,
-        commit_message=f"Add Opus-verified {prefix}; update default README; preserve historical data",
-        operations=[
-            CommitOperationAdd(path_in_repo=name, path_or_fileobj=data)
-            for name, data in contents.items()
-        ],
-    )
-
-    def verify(item):
-        name, data = item
-        downloaded = hf_hub_download(
-            args.repo, name, repo_type="dataset", revision=commit.oid, force_download=True
-        )
-        if Path(downloaded).read_bytes() != data:
-            raise ValueError(f"Uploaded bytes differ: {name}")
-        return name, hashlib.sha256(data).hexdigest()
-
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        hashes = dict(pool.map(verify, contents.items()))
-    receipt = {
-        "repo_id": args.repo,
-        "revision": commit.oid,
-        "private": True,
-        "prefix": prefix,
-        "root_readme_updated": True,
-        "verified_file_count": len(hashes),
-        "files": hashes,
-        "url": f"https://huggingface.co/datasets/{args.repo}/tree/{commit.oid}/{prefix}",
-    }
-    output = project / f"data/rewriter/releases/{prefix}.json"
-    output.write_text(json.dumps(receipt, indent=2) + "\n")
-    print(json.dumps({k: v for k, v in receipt.items() if k != "files"}, indent=2))
 
 
 if __name__ == "__main__":

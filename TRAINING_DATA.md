@@ -7,6 +7,11 @@ Training has exactly 1,000 pairs and development has 100. Each mode has 250 trai
 The 84 validation data and SFT rows are byte-identical to reviewed v2. Source groups do not cross
 splits. Training has 1,000 distinct targets and source groups. Dev has 100 of each.
 
+The [public Hugging Face dataset](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/viewer/default/train)
+uses standard Parquet splits. The default viewer shows input, output, mode and checks. Select
+`sft` for the guide's system, user and assistant columns. Code, notebooks and verification
+records stay in Git. Dataset publication no longer uploads those artifacts to Hugging Face.
+
 This release retains 65 train, 17 dev and all 84 validation pairs from v2. It adds 935 train and
 83 dev pairs from new fictional scenarios. All retained exact inputs, outputs and pairs have
 completed Opus data passes. The user later selected GPT-6.1 Sol for the remaining implementation
@@ -47,18 +52,24 @@ The release builder is `scripts/release_scaled_data.py`. It uses the preserved r
 `artifacts/arka-scale-1000`, `artifacts/arka-scale-1000-supplement`, and
 `artifacts/arka-scale-1000-prompt-topup`. It refuses missing mode quotas, duplicate targets,
 unreviewed rows, changed validation bytes, stale code approvals and stale CPU recovery evidence.
-The complete private Hub package contains the source plans, pipeline/rubric configs, raw generator
-responses, saved Opus calls, exclusion records, selected data, notebook and approved runtime.
-Its exact receipt is `data/rewriter/releases/reviewed-v3-1000.json`.
+The source plans, pipeline/rubric configs, saved reviews and exclusion records remain in Git.
+The current data-only publication receipt is `data/rewriter/releases/public-parquet.json`.
+The former artifact-bundle receipt is historical. The dataset-only publisher removes non-data
+files from the current Hub trees; previous commits remain in history.
 
-The notebook checks the data, saves stock outputs, runs an optional 16-row memorization proof,
-trains from the pinned 230M base using dev loss, and saves tuned outputs on the same validation
-cases. [COLAB_TRAINING.md](COLAB_TRAINING.md) explains storage, recovery and the comparison metrics.
-All 91 focused tests pass. CPU checks exercised optimizer updates, interruption recovery, distinct
-latest/best checkpoints and selected-weight reload. Actual 230M, L4, BF16, Drive and Colab execution
-remain pending. Human labels, human judge calibration and an unseen final test also remain pending.
+The notebook loads the public SFT data and pinned 230M base, trains LoRA using dev loss for
+checkpoint selection, records loss in W&B and uploads the final adapter to a model repository.
+Add HF_TOKEN with write access and WANDB_API_KEY in Colab Secrets.
+[COLAB_TRAINING.md](COLAB_TRAINING.md) explains this workflow and its limits.
+The actual notebook cells passed a tiny native LFM CPU check with all public data encoded,
+frozen base weights, adapter updates and exact adapter reload. W&B was offline and the model
+upload was mocked. Actual 230M L4 training remains pending. Human labels, human judge calibration
+and an unseen final test also remain pending.
 
-## Previous reviewed v2 release
+## Historical reviewed v2 release
+
+The remaining sections describe the previous release and its reproduction. Their private Hub
+layout and data-check-only notebooks are superseded. Use the current L4 LoRA notebook above.
 
 Use the reviewed v2 release in `data/rewriter/reviewed-v2/`. It contains 65 training pairs,
 17 development pairs and 84 validation pairs. Every released input, output and pair has an
@@ -188,26 +199,21 @@ uv run --locked --group data python -m finetuning_labs.rewriter.reviewed_release
   --output artifacts/reviewed-v2-from-evidence
 ```
 
-The publisher adds `reviewed-v2/` to the existing private training repository and redirects its
-default data configs there. It refuses to overwrite that version or publish to a public repo.
-It scans for credentials and selected personal content. It downloads every new file at the
-immutable upload revision and compares its bytes. Historical data files remain unchanged.
-
-The private [reviewed v2 publication](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/tree/70715437e3d6b67ef47eb89c83ccb1a66038082e/reviewed-v2)
-is revision `70715437e3d6b67ef47eb89c83ccb1a66038082e`. All 69 uploaded files were downloaded
-and compared byte for byte. The receipt is `data/rewriter/releases/reviewed-v2.json`.
+The former reviewed-v2 publisher is retired for writes. The original publication revision was
+`70715437e3d6b67ef47eb89c83ccb1a66038082e`. Its 69 files were downloaded and compared byte for
+byte at the time. The historical receipt is `data/rewriter/releases/reviewed-v2.json`.
+Publish only Parquet data, cards and source-license notices with:
 
 ```sh
-uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.reviewed_publication \
-  --release data/rewriter/reviewed-v2
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.hf_data --publish
 ```
 
-## Colab and the next measurement
+## Historical v2 data check and comparison contract
 
-Use [notebooks/rewriter_reviewed_data_check.ipynb](notebooks/rewriter_reviewed_data_check.ipynb).
-Add a read-only `HF_TOKEN` in Colab Secrets. The notebook resolves one immutable Hub revision,
-verifies the manifest, checks all 166 exact reviews and token spans, and prepares 16 training
-examples across the four modes. It loads no weights and runs no training. The earlier
+The superseded [rewriter_reviewed_data_check.ipynb](notebooks/rewriter_reviewed_data_check.ipynb)
+used a read-only HF_TOKEN and one immutable Hub revision. It
+verified the manifest, checked all 166 exact reviews and token spans, and prepared 16 training
+examples across the four modes. It loaded no weights and ran no training. The earlier
 `rewriter_dataset_check.ipynb` is retained as a retired v1 artifact.
 
 All three data cells ran locally against the actual private Hub revision, with cached Hub

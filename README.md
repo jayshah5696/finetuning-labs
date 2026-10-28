@@ -1,207 +1,66 @@
 # Finetuning Labs
 
-The reviewed v3 release has 1,000 training, 100 development and 84 frozen validation pairs.
-Each mode has 250 training and 25 development pairs. Every released input, output and pair
-retains an Opus pass tied to its exact contents. Arka's native generation
-and decision stages use clean commit `5d353740ae1dd34742841071752814028db1489a`.
-These are model judgments, not human gold labels. The old 219-pair pilot failed independent
-data review and is retired for training.
+Fine-tune a small rewriter with a LoRA adapter. The default model is LiquidAI/LFM2.5-230M.
+Code and notebooks stay in Git. Hugging Face hosts the public data and trained adapters.
 
-Open [the L4 training notebook](notebooks/rewriter_train_l4.ipynb) in Google Colab.
-Add a read-only HF_TOKEN in Colab Secrets and follow [COLAB_TRAINING.md](COLAB_TRAINING.md).
-GPT-6.1 Sol approved the exact runtime script and notebook after the user changed the remaining
-review loop to Sol. The release includes its passing report and the CPU recovery evidence.
-Actual 230M training, L4 memory use, BF16 execution and tuned quality remain unmeasured.
+## Data
 
-The user accepted the 68 cases as development validation on 27 October 2026. The acceptance and
-immutable file hashes are in `data/rewriter/validation-freeze.json`. These cases, their output
-fixtures, and their source families are excluded from training. Existing failures stay recorded.
-This acceptance does not establish independent human judgments or an unseen final test.
+[Browse the training dataset](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/viewer/default/train).
 
-Read [TRAINING_DATA.md](TRAINING_DATA.md) for sources, exact checks, review findings and commands.
-The older [reviewed data notebook](notebooks/rewriter_reviewed_data_check.ipynb) checks v2.
-Training uses new fictional scenarios. The frozen validation bundle includes the original cases
-with two versioned corrections and 16 new pairs. Historical v1 files and scores remain unchanged.
+| Split | Rows | Use |
+| --- | ---: | --- |
+| train | 1,000 | Fit the LoRA adapter |
+| dev | 100 | Select the checkpoint |
+| validation | 84 | Evaluate after training |
 
-Use the [private 1,000-example dataset](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/tree/f3e97879e6a8006e5dd8fedf2c99379c0d097671/reviewed-v3-1000).
-Versioned data and the publication receipt are under `data/rewriter/reviewed-v3-1000/` and
-`data/rewriter/releases/reviewed-v3-1000.json`. Reviewed v2 remains available at its original
-immutable revision `70715437e3d6b67ef47eb89c83ccb1a66038082e`.
-All 331 uploaded files were downloaded and compared byte for byte. All 397 historical files
-other than the intentionally updated root dataset card kept the same Hub blob IDs.
-The actual uploaded notebook's download and readiness cells ran locally against this revision.
-Colab authentication and Drive were replaced with cached authentication and local storage for
-that check. No GPU training cells ran.
+Each mode has 250 training and 25 dev pairs. The 84 validation examples are unchanged.
+The original [68-case calibration benchmark](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter/viewer/default/validation)
+is also public and remains separate.
 
-The [Luna Decisions audit](DECISION_VALIDATION.md) now adds blind criterion probabilities through
-Arka. It found disagreements and a known false approval. The current scores prioritize review;
-they do not certify the training release or change its rows automatically.
+The default Viewer configuration has input, output, mode and checks. The `sft` configuration
+has system, user and assistant, including the required language, profile and dictionary context.
+Both use Parquet. The Hub repositories contain data, dataset cards and source-license notices.
+Model reviews are not human labels. No personal transcription history is included.
 
-The rewriter benchmark bundle has 68 calibration cases. It retains the original 60 short cases
-and appends eight long examples, with two per mode. There are 30 imported TypeWhisper authored
-cases and 38 new authored examples. The long examples come from four fictional source documents,
-each adapted for two modes. They are eight cases from four source families, not eight independent
-documents.
+```python
+from datasets import load_dataset
 
-The benchmark has four columns: input, expected output, mode, and checks. Supporting records keep
-case IDs, profile and dictionary context, literal checks, source identity, and review status.
-The stock Liquid and Luna diagnostic runs and their shared Sol assessments are complete.
-All human labels remain pending. A separate local bundle has
-10 selected personal transcriptions with draft corrections. It is ignored by Git and excluded
-from package builds. Neither bundle is a locked test or training dataset.
+data = load_dataset("jayshah5696/finetuning-labs-rewriter-training", "sft")
+```
 
-## Read and check the draft
+## Train in Colab
 
-Run commands from this directory:
+Open [the notebook in Colab](https://colab.research.google.com/github/jayshah5696/jadoo-labs/blob/main/projects/finetuning-labs/notebooks/rewriter_train_l4.ipynb)
+in a fresh L4 runtime. The [notebook file](notebooks/rewriter_train_l4.ipynb) is in Git.
+Add two Colab Secrets and enable access:
+
+- `HF_TOKEN`, with write access to the destination model repository.
+- `WANDB_API_KEY`, for Weights & Biases logging.
+
+Edit CONFIG if you want a different model, adapter repository or training settings. Then run
+the notebook cells in order. It downloads the data, trains LoRA, logs loss to W&B, saves the
+selected adapter and uploads it to a Hugging Face model repository. The default destination is
+`jayshah5696/lfm2.5-230m-rewriter-lora`. Change the owner if you use another account.
+
+The final folder contains adapter weights, adapter config, tokenizer files and a model card.
+It does not merge or upload the base model. No notebook or source code goes to the Hub.
+See [COLAB_TRAINING.md](COLAB_TRAINING.md) for the short run guide.
+
+## Check and publish
 
 ```sh
 uv sync --locked
 make check
-make review
-make export
 make build
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.hf_data
 ```
 
-`make review` writes `artifacts/benchmark-review.html`. Open it to inspect the four-column table.
-Each case also has expandable acceptable and deliberately wrong outputs. All labels on those
-examples are authored expectations. They are not independent human or model judgments.
+The last command prepares the public Parquet files locally. Add `--publish` to update the
+two project dataset repositories. It removes non-data files from their current trees.
+The older artifact-upload commands are retired.
 
-`make export` writes `artifacts/benchmark-guide.jsonl`. Its only fields are `system`, `user`, and
-`assistant`, following the supplied HTML guide. Profile, dictionary, and language context go into
-the actual model request. Review scores, source records, and expected checks do not. This export
-contains evaluation references and must not be used as training data. Export refuses to overwrite
-an existing file; choose a new output path for another copy.
-
-For explicit paths:
-
-```sh
-uv run --locked finetuning-labs audit --report artifacts/benchmark-audit.json
-uv run --locked finetuning-labs review --output artifacts/benchmark-review.html
-uv run --locked finetuning-labs export --output artifacts/another-evaluation-copy.jsonl
-```
-
-The package includes the draft data, so its audit also works from an installed wheel without the
-TypeWhisper checkout. No default command loads weights, reads credentials, or calls a provider.
-
-## Review expectations
-
-Read [VALIDATION.md](VALIDATION.md) for failure cases and the acceptance rules. The reference is
-one acceptable rewrite. Different valid wording can pass. A wrong fact cannot be offset by better
-grammar or style.
-
-Fill `data/rewriter/benchmark-draft/review/human-labels.csv` with `pass`, `fail`, or `uncertain`
-and a short critique of each proposed reference. Leave unreviewed rows pending. This file is a
-review worksheet; the offline audit does not treat it as model-quality evidence.
-
-The bundle contains 156 authored output fixtures. Some wrong outputs intentionally pass literal
-checks. The offline audit checks mechanical expectations only. GPT-6.1 Sol calibration and human
-review are separate work. The draft judge instructions are in
-`data/rewriter/benchmark-draft/supporting/judge-system.txt`.
-
-## Long examples
-
-The appended inputs contain 1,094 to 1,865 tokens with the pinned `LiquidAI/LFM2.5-230M`
-tokenizer. Every mode has one input near 1,100 tokens and one near 1,850 tokens. The examples
-cover full paragraphs, numbered sections, direct quotes, and conditions stated far apart.
-Two source documents also use Markdown block quotes, and one includes indented bullets.
-The original short cases, their rules, and their output fixtures are unchanged.
-
-The new output fixtures include dropped final sections, changed quotes, reversed amount roles,
-invented approval, and obedience to quoted instructions. Thirteen of the 16 new wrong outputs
-pass the mechanical checks and need semantic review. These are authored failure expectations,
-not measured judge results. All eight references still need human review.
-
-Run the tokenizer-only length check explicitly:
-
-```sh
-make tokens
-```
-
-This optional command installs the locked `data` dependency group and downloads the pinned
-tokenizer and chat template. It loads no model weights and calls no inference provider. The
-normal offline check does not need those dependencies. It measures raw input, reference output,
-the full inference prompt, and the complete reference chat without truncation. Chat controls and
-system instructions count toward the context limit, as described in the
-[Transformers chat-template guide](https://huggingface.co/docs/transformers/v5.21.0/chat_templating).
-
-The longest complete reference chat is 3,877 tokens. Reserving 2,048 generated tokens needs at
-most 4,065 tokens including the prompt. A 4,096-token limit fits this draft. The earlier
-1,024-token setting cannot support these examples. These measurements establish text length;
-Colab L4 memory use and model quality remain unmeasured. Recheck lengths after changing prompts
-or data. The check exits with an error for long inputs outside 1,000 to 2,000 tokens or for a
-context overflow. It never silently truncates text.
-
-The saved evidence is `data/rewriter/benchmark-draft/supporting/long-form-tokens.json`.
-The full 68-case report is generated at `artifacts/benchmark-tokens.json`. The review page links
-directly to all eight long cases, with expandable full input and expected output. The four-field
-data format is unchanged. These calibration references remain separate from a future training pool.
-
-## Data and source boundaries
-
-The imported snapshot is exact. Its hash, source revision, original IDs, and context are retained
-in supporting files. TypeWhisper's repository license is copied to
-`supporting/TYPEWHISPER-LICENSE.txt`; no separate fixture license was verified. The imported cases
-are not being relicensed as Apache-2.0.
-
-All cases and their variants belong to calibration. Do not use those source families in a locked
-test. The existing TypeWhisper model outputs are not target answers; their human review is pending.
-The user authorized source selection with "Use anything." Ten raw history entries now have
-proposed corrections under the ignored `data/rewriter/personal/calibration-10/` directory. The
-saved historical app outputs are retained as evidence, not preferred corrections. Review these
-private cases locally using the commands in that directory's README. They are not uploaded to
-Sangam or included in the shared bundle.
-
-## Later comparison
-
-The selected student is `LiquidAI/LFM2.5-230M`. GPT-6 Luna is the cloud baseline and teacher.
-GPT-6.1 Sol is the shared semantic evaluator. Training and paired student inference target
-Google Colab L4. The diagnostic runner now supports Liquid on a Modal L4 and Luna/Sol through
-OpenRouter with Arka's client factory. The Colab baseline notebook uses the same runner and is
-syntax-checked, but has not been executed in Colab. The training path remains pending.
-
-After reviewing the draft and checking the evaluator, prepare independent development and test
-cases. Freeze their source groups, then run the baseline before creating the training pool.
-
-## Authorized publication and diagnostic evaluation
-
-The user authorized a private Hugging Face upload, local Git commits, and actual Liquid/Luna
-baseline runs. See [scripts/README.md](scripts/README.md) for exact commands and resume behavior.
-Settings are in `configs/rewriter.toml`. The historical long-example authoring script is retained.
-The new runner writes per-case requests and results before producing metrics. It never treats
-missing or failed calls as passes. Sol results remain advisory until human calibration.
-
-The API provider is OpenRouter. Use the existing `OPENROUTER_API_KEY` environment variable.
-Keys never enter run metadata, dataset files, or Git. No personal transcriptions enter these runs.
-
-Open `notebooks/rewriter_baseline_l4.ipynb` in Colab for the portable baseline. It downloads the
-wheel and config from the private dataset and verifies their hashes. It retains Colab's CUDA
-PyTorch and records its actual version. Use the same environment for the later paired comparison.
-
-The private dataset is [jayshah5696/finetuning-labs-rewriter](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter).
-Its 68 rows and supporting files were downloaded and hash-verified after publication. Colab runtime
-assets and the collected Liquid outputs are also published with immutable revision receipts under
-`data/rewriter/releases/`. The private Dataset Viewer returns 501 on this account because it needs
-PRO or Enterprise access. Authenticated file downloads work; the dataset remains private.
-
-The first Liquid run used an NVIDIA L4 on Modal and produced 68 end-token completions with no
-output-limit truncations. Only 53 of 68 outputs passed declared mechanical checks. All eight long
-cases failed a check, and none of the three explicit identity cases stayed unchanged. This is
-not a semantic pass rate. The per-case outputs and [mechanical report](data/rewriter/evals/baseline-20261027/liquid-mechanical/REPORT.md)
-are retained for review. The runtime used reference convolution kernels, so its timings are not
-an optimized deployment benchmark.
-
-The restored zshrc credential authenticated through OpenRouter. It was read into process memory;
-the file, its symlink, and its target were left unchanged. Luna generated all 68 cases and Sol
-assessed all 136 candidates with the same rubric and settings. There were no generation-limit
-truncations or judge errors.
-
-Sol-assessed whole-case passes were 2/68 for stock Liquid and 62/68 for Luna. The headline that
-weights all four modes equally was 4.2% versus 92.7%. Long-case passes were 0/8 versus 6/8, and
-explicit identity preservation was 0/3 versus 3/3. These are diagnostic model judgments, not
-human-calibrated accuracy. The earlier 53/68 Liquid number measured mechanical checks only.
-
-The [paired report](data/rewriter/evals/baseline-20261027/comparison/REPORT.md) is recomputed from
-exact saved requests and responses, with candidate hashes and matching judge settings checked.
-The [review priorities](data/rewriter/evals/baseline-20261027/comparison/REVIEW.md) cover Luna's
-six failures and judge-label questions. All new hosted artifacts were downloaded and verified at
-Hub revision `f740b9d7908890f5317416c53ce27b174b55bdd9`. No fine-tuning has run.
+The notebook helpers are in `src/finetuning_labs/rewriter/lora_training.py`.
+The notebook builder and CPU integration check are in `scripts/`.
+[TRAINING_DATA.md](TRAINING_DATA.md) records data sources and review history.
+[VALIDATION.md](VALIDATION.md) defines later semantic scoring. Training and validation loss
+are not rewrite accuracy. Actual 230M GPU training remains the user's Colab step.

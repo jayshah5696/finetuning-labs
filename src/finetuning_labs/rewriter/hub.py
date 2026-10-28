@@ -103,42 +103,9 @@ def package_dataset(source: Path, destination: Path, *, code_commit: str) -> dic
 
 
 def upload_dataset(package: Path, repo_id: str) -> dict:
-    from huggingface_hub import HfApi, hf_hub_download
-
-    manifest = json.loads((package / "release.json").read_text())
-    files = {
-        **manifest["files"],
-        "release.json": hashlib.sha256((package / "release.json").read_bytes()).hexdigest(),
-    }
-    actual = {str(p.relative_to(package)) for p in package.rglob("*") if p.is_file()}
-    if actual != set(files):
-        raise ValueError("Hub package has unlisted files; refusing upload")
-    for name, expected in files.items():
-        if hashlib.sha256((package / name).read_bytes()).hexdigest() != expected:
-            raise ValueError(f"Hub package file changed: {name}")
-    api = HfApi()
-    api.create_repo(repo_id=repo_id, repo_type="dataset", private=True, exist_ok=True)
-    if api.dataset_info(repo_id).private is not True:
-        raise ValueError("Expected a private draft repository; refusing public upload")
-    commit = api.upload_folder(
-        repo_id=repo_id,
-        repo_type="dataset",
-        folder_path=package,
-        allow_patterns=list(files),
-        commit_message="Upload rewriter calibration draft",
+    raise RuntimeError(
+        "Legacy artifact upload retired. Use python -m finetuning_labs.rewriter.hf_data --publish; code and audits stay in Git."
     )
-    for name, expected in files.items():
-        downloaded = Path(hf_hub_download(repo_id, name, repo_type="dataset", revision=commit.oid))
-        if hashlib.sha256(downloaded.read_bytes()).hexdigest() != expected:
-            raise ValueError(f"Uploaded bytes differ: {name}")
-    return {
-        "repo_id": repo_id,
-        "url": f"https://huggingface.co/datasets/{repo_id}",
-        "revision": commit.oid,
-        "private": True,
-        "verified_file_count": len(files),
-        "case_count": manifest["case_count"],
-    }
 
 
 def main():

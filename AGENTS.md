@@ -3,6 +3,13 @@
 Use `uv` and the project Makefile. Keep this project independent of the root uv workspace.
 
 The current release is reviewed v3 with 1,000 training, 100 development and 84 validation pairs.
+The public Hub repositories now contain Parquet data, dataset cards and source-license notices
+only. Code, notebooks, configs, review reports and run logs belong in Git. Do not upload those
+artifacts to Hugging Face dataset repositories. Model repositories receive trained adapter weights,
+adapter config, tokenizer assets and a model card. The active Colab notebook uses PEFT LoRA and
+only two Colab Secrets: HF_TOKEN with model-write access, and WANDB_API_KEY. It loads public data
+with load_dataset, logs loss to W&B, and uploads the final adapter. Do not restore the retired
+private artifact-bundle workflow. The user explicitly authorized public synthetic-data visibility.
 Keep all v2 validation rows and source families out of future training expansions. The student
 is `LiquidAI/LFM2.5-230M`. Comparisons use GPT-6 Luna as the cloud baseline and teacher,
 and GPT-6.1 Sol as the historical baseline evaluator. Replacement data uses the latest clean Arka
@@ -31,6 +38,6 @@ The user accepted the 68 cases for development validation on 27 October 2026. Pr
 bytes and exclude their source families and fixtures from training. Acceptance of this dataset
 does not supply independent human labels for model outputs or establish a locked final test.
 Import only selected personal transcriptions. Keep personal exports out of Git and hosted calls.
-The user authorizes Git commits and pushes, private shared-data Hugging Face uploads, diagnostic
+The user authorizes Git commits and pushes, public shared-data Hugging Face uploads, diagnostic
 evaluations, and preparation of separate training data. GPU training remains a later step.
 Human calibration is still pending; mark model scores diagnostic.

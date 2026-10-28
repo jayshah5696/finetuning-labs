@@ -1,87 +1,69 @@
-# Train the 230M rewriter
+# Train and upload a rewriter LoRA
 
 Open [rewriter_train_l4.ipynb](notebooks/rewriter_train_l4.ipynb) in Google Colab.
-Choose an L4 GPU runtime. Add a read-only `HF_TOKEN` to Colab Secrets and grant the notebook
-access. The token needs access to the private `jayshah5696/finetuning-labs-rewriter-training`
-dataset. Run the notebook cells in order.
+Choose a fresh L4 GPU runtime.
 
-The notebook uses the versioned `reviewed-v3-1000/` files. It requires exactly 1,000 training,
-100 development and 84 validation pairs. Each mode contributes 250 training and 25 development
-pairs. The 84 validation rows must match the reviewed-v2 bytes. Validation stays outside training,
-the memorization proof and checkpoint selection. The notebook pins the Hub commit on the first run
-and keeps it for resume. It verifies the downloaded script against the manifest and its passing
-GPT-6.1 Sol review. A release that fails these checks cannot start training.
+Add exactly two secrets in Colab's Secrets panel and enable notebook access:
 
-Use a fresh runtime. Installation retains Colab's CUDA PyTorch and pins Transformers 5.21.0,
-Accelerate 1.15.0, Hugging Face Hub 1.33.0, tokenizers 0.23.3, safetensors 0.8.0 and Jinja 3.1.6.
-The notebook saves the installed package list. Each GPU stage also records its environment.
-PyTorch and CUDA version changes are recorded between sessions. The script, dataset and pinned
-training package versions must still match the original run.
+| Secret | Required access |
+| --- | --- |
+| HF_TOKEN | Write access to your Hugging Face model repository |
+| WANDB_API_KEY | Your Weights & Biases API key |
 
-## What runs
+The public dataset is readable without a paid Hugging Face plan. The HF token is needed
+to upload your adapter. Keep both values in Secrets. Do not paste them into CONFIG.
 
-1. Check every file hash, row identity, Opus verdict, source-group boundary and token span.
-   Refuse truncation. Loss covers assistant text through EOS. Prompts and padding receive no loss.
-2. Save stock Liquid outputs on all 84 validation cases. Generation receives only the system
-   instructions and user input. Both comparison arms use the same fully recorded greedy settings.
-3. Run an optional 16-example memorization proof from the pinned base. It uses only training
-   examples and saves metrics. This checks whether training can fit examples. It does not measure
-   rewrite quality or select the full training checkpoint.
-4. Start full training again from `LiquidAI/LFM2.5-230M` at revision
-   `40cb2ad3b3044d5a41eee083a6103c8b523afa45`. Defaults are three epochs, learning rate 0.00005,
-   batch size 1, gradient accumulation 16 and gradient checkpointing. FP32 parameters use BF16
-   mixed precision. Every 20 optimizer steps, evaluate the 100 dev pairs and save a checkpoint.
-   Select the weights with the lowest dev loss. Validation never chooses the checkpoint.
-5. Save tuned outputs on the same 84 validation cases. Export a small report ZIP and retain the
-   selected model directory. The notebook does not publish weights automatically.
+## Configure and run
 
-The total context limit is 4,096 tokens. Every input reserves 2,048 output tokens. An output that
-hits the limit without EOS is marked truncated and cannot count as a quality pass.
+CONFIG contains the model, dataset revision, adapter destination, W&B project and LoRA settings.
+When you change the base model, update both `model_id` and `model_revision`.
+The defaults are LiquidAI/LFM2.5-230M, rank 16, alpha 32, dropout 0.05, three epochs,
+learning rate 0.0002, batch size 1 and gradient accumulation 16. The context limit is 4,096.
+Colab's CUDA PyTorch stays installed. The notebook installs the tested training libraries.
 
-## Storage and resume
+Change `hub_model_id` if another account owns your token. The default destination is
+`jayshah5696/lfm2.5-230m-rewriter-lora`. The `hub_private` setting controls new-repository visibility.
 
-Have at least 10 GiB available on Drive and 12 GiB on local runtime disk. The script checks
-filesystem free space before training. These are storage allowances, not measured L4 requirements.
-Check the Drive account's quota too. Previously deleted files in Drive trash can still use it.
+Run the cells in order:
 
-Training checkpoints rotate on local disk. Drive holds two fixed recovery archives, the selected
-weights and reports. Each archive contains the latest full optimizer checkpoint and any different
-best model's weights. Large archives are overwritten in place instead of deleting a new directory
-at every save. The proof does not save model checkpoints.
+1. Install libraries and read the two secrets.
+2. Download train, dev and validation with `load_dataset`.
+3. Train the LoRA adapter and log loss to W&B.
+4. Evaluate validation loss, save the selected adapter and upload it.
 
-To resume after a runtime reset, paste the previous `RUN_DIR` into `RESUME_RUN`. The script checks
-both archive hashes and restores the newest complete archive. An interrupted copy can fall back to
-the older archive. If neither is complete, a matching run restarts from the pinned base at step zero.
-The log says which path it took. An interrupted proof also restarts. Completed stages verify their
-saved artifact hashes and skip. Rerunning a stage cell in the same session uses the same checks.
+Only adapter parameters receive updates. System and user tokens are masked in the training
+loss. Assistant text and its EOS are supervised. Oversized examples raise an error instead of
+being truncated. Train has 1,000 rows, dev has 100 and validation has 84. Checkpoint selection
+uses dev loss. The final validation pass does not select a checkpoint.
 
-Generation saves and hashes each case before moving on. Resume skips verified completed cases.
-A partial final line is preserved separately and regenerated. Edited complete records are rejected.
+## Output
 
-## How to compare quality
+The last cell uploads to a Hugging Face **model** repository. The final adapter folder contains:
 
-The notebook's completion counter and training loss are not rewrite quality scores.
-Use the same GPT-6.1 Sol rubric and settings for stock and tuned outputs. Keep candidate identity
-and exact output hashes bound to each judgment. Keep the reference answer out of generation.
-Human calibration remains pending, so call the model's scores diagnostic.
+- adapter_model.safetensors
+- adapter_config.json
+- Tokenizer and chat-template files
+- README.md with the base model and training settings
 
-A whole-case pass requires correct meaning, facts, intent, uncertainty, conditions, literal text,
-mode and formatting. A critical meaning change fails the case even if the prose reads well.
-Report the verified pass rate for each mode and average those four rates equally. Keep every
-scheduled case in its denominator. Failed, missing, uncertain and truncated outputs are not passes.
-Also report long-input pass rate, unchanged-input preservation, critical meaning errors, literal
-errors, truncations and judge coverage. Use the same 84 case identities for the paired comparison.
-The existing [validation contract](VALIDATION.md) gives the full rubric and metric definitions.
+The base model is still required when you load the adapter. Full base weights are not uploaded.
+If upload fails, the adapter remains in `CONFIG["output_dir"]/final_adapter`. Correct the token
+or repository name and rerun the upload cell.
 
-## Implementation evidence
+W&B records training loss, dev loss and final `validation/loss`. Model artifacts go to Hugging Face;
+W&B model uploads are disabled. These loss values are not a semantic rewrite pass rate. Use
+the same Sol rubric on stock and adapted outputs for the later quality comparison.
 
-The CPU integration uses a tiny random 2M-parameter LFM model, the real pinned tokenizer and the
-actual Trainer factory. It interrupts after step one, restores model and optimizer state from an
-archive, completes step two, verifies a nonzero parameter change, and reloads the selected weights.
-Its report is included in the release. This checks code paths. It does not establish L4 memory use,
-BF16 execution, throughput or quality of the 230M student. Those require the actual Colab run.
+## Verification boundary
 
-To reproduce data generation and verification, use the commands in [TRAINING_DATA.md](TRAINING_DATA.md).
-The notebook and runtime script require a separate exact-hash GPT-6.1 Sol implementation review. Every
-released data pair also needs an exact-hash Opus input, output and pair pass. Failed and uncertain
-data judgments remain evidence and are excluded. They are not human gold labels.
+The CPU integration executes the notebook's data, training, save and upload cells using public
+Hub data. It substitutes a tiny random native LFM for the 230M model, runs W&B offline and mocks
+the final Hub model upload. It checks real adapter updates, unchanged base weights, adapter-only
+serialization and exact adapter reload. It does not establish L4 memory use, BF16 execution,
+online W&B authentication or the quality of a trained 230M model.
+
+```sh
+uv run --no-project --python /tmp/rewriter-training-check/bin/python python \
+  scripts/check_lora_notebook.py --output artifacts/lora-check-new
+```
+
+The notebook is self-contained. It does not download code or review artifacts from Hugging Face.
