@@ -1,5 +1,65 @@
 # Rewriter training data
 
+## Current 1,000-example release
+
+Use `data/rewriter/reviewed-v3-1000/` and [the L4 training notebook](notebooks/rewriter_train_l4.ipynb).
+Training has exactly 1,000 pairs and development has 100. Each mode has 250 train and 25 dev pairs.
+The 84 validation data and SFT rows are byte-identical to reviewed v2. Source groups do not cross
+splits. Training has 1,000 distinct targets and source groups. Dev has 100 of each.
+
+This release retains 65 train, 17 dev and all 84 validation pairs from v2. It adds 935 train and
+83 dev pairs from new fictional scenarios. All retained exact inputs, outputs and pairs have
+completed Opus data passes. The user later selected GPT-6.1 Sol for the remaining implementation
+review and fix loop. Sol approved the exact notebook and runtime script. No further Opus calls
+were made after that change. The code review and data verdicts are separate evidence.
+
+The native Arka generation and six-dimension Luna Decisions pipeline generated 1,720 new
+candidates across the main run and two top-ups. Schema, length or context checks rejected 57.
+One additional row failed a mechanical overlap check. Opus completed 1,648 exact data reviews:
+1,330 pass, 241 fail and 77 uncertain. Fourteen rows lack a completed review and are excluded.
+Completed failures and uncertain verdicts were preserved. Only interrupted or malformed review
+calls received separate attempts. The final quotas leave 312 other passing candidates unused.
+
+Training has 139 long inputs, dev has 14 and validation has 13. Long inputs contain 1,004 to
+1,906 pinned Liquid tokens. All 139 long training targets have paragraph breaks, 92 have numbered
+sections and 116 have quoted text. The maximum complete chat is 4,029 tokens. The largest prompt
+plus the 2,048-token generation reserve is 4,091. Nothing was truncated.
+
+The selected new training rows cover 68 declared domains. Training contains 188 unchanged pairs.
+Of 715 nonidentity English inputs, 666 start lowercase. The most frequent eight-word target
+sequence appears in five of the 1,000 training documents. These are distribution checks, not
+semantic quality scores. The exact report binds the training file hash in
+`data/rewriter/reviews/scaled-v3-distribution.json`. Recompute it with:
+
+```sh
+uv run --locked python scripts/data_distribution.py \
+  --release data/rewriter/reviewed-v3-1000 \
+  --output artifacts/recomputed-v3-distribution.json
+```
+
+Data rows still contain only input, output, mode and checks. SFT rows contain only system, user
+and assistant. Required language, dictionary and profile context enter the user request.
+Source IDs, probabilities, critiques and other metadata never enter supervised text.
+Every selected row retains all six native Decisions scores. Those scores prioritize review;
+the independent exact-row Opus verdict adjudicates disagreements. Mechanical failures stay blocked.
+
+The release builder is `scripts/release_scaled_data.py`. It uses the preserved run evidence at
+`artifacts/arka-scale-1000`, `artifacts/arka-scale-1000-supplement`, and
+`artifacts/arka-scale-1000-prompt-topup`. It refuses missing mode quotas, duplicate targets,
+unreviewed rows, changed validation bytes, stale code approvals and stale CPU recovery evidence.
+The complete private Hub package contains the source plans, pipeline/rubric configs, raw generator
+responses, saved Opus calls, exclusion records, selected data, notebook and approved runtime.
+Its exact receipt is `data/rewriter/releases/reviewed-v3-1000.json`.
+
+The notebook checks the data, saves stock outputs, runs an optional 16-row memorization proof,
+trains from the pinned 230M base using dev loss, and saves tuned outputs on the same validation
+cases. [COLAB_TRAINING.md](COLAB_TRAINING.md) explains storage, recovery and the comparison metrics.
+All 91 focused tests pass. CPU checks exercised optimizer updates, interruption recovery, distinct
+latest/best checkpoints and selected-weight reload. Actual 230M, L4, BF16, Drive and Colab execution
+remain pending. Human labels, human judge calibration and an unseen final test also remain pending.
+
+## Previous reviewed v2 release
+
 Use the reviewed v2 release in `data/rewriter/reviewed-v2/`. It contains 65 training pairs,
 17 development pairs and 84 validation pairs. Every released input, output and pair has an
 Opus 5.5 pass bound to its exact contents. These are model judgments, not human gold labels.

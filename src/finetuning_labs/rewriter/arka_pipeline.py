@@ -71,7 +71,7 @@ def header(plan):
     ).user_message()
 
 
-def generation_config(seed_path: str, count: int):
+def generation_config(seed_path: str, count: int, *, workers=4):
     return {
         "version": "1",
         "llm": {
@@ -92,7 +92,7 @@ def generation_config(seed_path: str, count: int):
             "timeout_seconds": 60,
             "max_retries": 1,
         },
-        "executor": {"mode": "threadpool", "max_workers": 4},
+        "executor": {"mode": "threadpool", "max_workers": workers},
         "pipeline": [
             {"type": "seed_source", "path": seed_path},
             {"type": "normalize_conversation"},
@@ -326,7 +326,7 @@ def rescore_candidates(source_root: Path, root: Path):
 
 
 def run_generation(
-    root: Path, *, limit=None, resume=False, plans_override=None, prompt_override=None
+    root: Path, *, limit=None, resume=False, plans_override=None, prompt_override=None, workers=4
 ):
     import yaml
     from arka.config.loader import ConfigLoader
@@ -367,7 +367,7 @@ def run_generation(
         (root / "rubric.yaml").write_text(
             yaml.safe_dump(rubric(), sort_keys=False, allow_unicode=True)
         )
-        config = generation_config("seeds.jsonl", len(plans))
+        config = generation_config("seeds.jsonl", len(plans), workers=workers)
         next(x for x in config["pipeline"] if x["type"] == "prompt_based_generator")[
             "prompt_template"
         ] = prompt

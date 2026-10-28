@@ -1,5 +1,55 @@
 # Status
 
+## Reviewed v3, 1,000 training examples
+
+The Colab L4 training notebook and standalone runtime are implemented. The first Opus code
+review failed on checkpoint storage, interruption recovery, repeated completed stages and
+inherited decoding settings. The parent fixed those findings. The next Opus call hit a provider
+credit limit. The user changed the remaining review and fix loop to GPT-6.1 Sol only. Sol's exact
+script and notebook review passed with no unresolved material findings. The first failed report
+remains in the release history. Sol did not author or edit examples or implementation.
+
+All 91 focused tests, Ruff checks and formatting pass. The package builds. A tiny random
+2M-parameter LFM completed a CPU interruption/recovery integration with the real pinned
+tokenizer and actual Trainer factory. It stopped after step one, restored model and optimizer
+state, completed step two, showed a nonzero parameter update and reloaded its selected weights.
+The report binds the exact runtime script. No 230M student training, L4 or BF16 run occurred.
+
+Native Arka and Luna generated 1,440 main candidates, 200 supplemental candidates and 80 extra
+prompt candidates. Extra scenarios compensate for rejected data without changing acceptance
+criteria. Each mechanically valid candidate receives six native Decisions scores and independent
+Opus input, output and pair verification. Failed and uncertain verdicts stay excluded. Interrupted
+or malformed review calls remain preserved; explicit resume retries only incomplete verification.
+A repeated wrong-hash batch was recovered through individually constrained review packets.
+The 14 remaining incomplete reviews are excluded. No new Opus call followed the user's change.
+
+The final export has exactly 1,000 train and 100 dev passes, with 250 and 25 per mode, and the
+unchanged 84 reviewed-v2 validation rows. Training has 1,000 distinct targets and source groups.
+All retained exact inputs, outputs and pairs have completed Opus passes. Of the new candidates,
+1,648 received completed reviews: 1,330 pass, 241 fail and 77 uncertain. Schema, context or length
+checks rejected 57 candidates; another failed a mechanical overlap check. The final quotas leave
+312 passing candidates unused. The release retains 65 train, 17 dev and all 84 validation rows
+from v2, adding 935 train and 83 dev rows.
+
+There are 139 long training inputs, 14 long dev inputs and 13 long validation inputs, from
+1,004 to 1,906 Liquid tokens. All long training targets have paragraph breaks, 92 have numbered
+sections and 116 contain quoted text. Training includes 188 unchanged pairs. The selected new
+training rows cover 68 declared domains. No eight-word target sequence occurs in more than
+five of the 1,000 training documents. These checks describe distribution, not semantic accuracy.
+
+The private Hub revision is `f3e97879e6a8006e5dd8fedf2c99379c0d097671` under `reviewed-v3-1000/`.
+All 331 upload files were downloaded and verified byte for byte. All 397 historical files other
+than the intentionally replaced root README retain their Hub blob IDs. All original benchmark
+and v2 validation bytes are preserved. The receipt and preservation audit are committed under
+`data/rewriter/releases/`.
+
+The actual uploaded notebook's download and readiness cells ran locally with cached Hub auth
+and local storage. They verified the approved script, Sol report, all 1,184 rows, all loss masks,
+all source groups, the frozen validation hashes and the 16-row proof selection. No GPU stage ran.
+The notebook is ready for the user's L4 run. The memorization proof, full 230M training and paired
+stock/tuned semantic comparison remain the next work. Human labels and a locked final test remain
+pending. The review-time preparation context is retained without duplicating its data files.
+
 ## Reviewed data v2, 27 October 2026
 
 The original 219-pair pilot failed independent Opus data verification and is retired for training.

@@ -13,6 +13,7 @@ from pathlib import Path
 
 from .arka_pipeline import DIMENSIONS
 from .benchmark import COMMON_SYSTEM, MODES, Case
+from .colab_training import FROZEN_VALIDATION
 from .evaluation import digest
 from .reviewed_release import load_reviews
 
@@ -20,9 +21,21 @@ PREFIX = "reviewed-v2"
 REPO = "jayshah5696/finetuning-labs-rewriter-training"
 
 
+def require_script_review(review, script: bytes, notebook: bytes):
+    if (
+        review.get("reviewer_model") != "gpt-6.1-sol"
+        or review.get("verdict") != "pass"
+        or review.get("script_sha256") != hashlib.sha256(script).hexdigest()
+        or review.get("notebook_sha256") != hashlib.sha256(notebook).hexdigest()
+    ):
+        raise ValueError("Training script and notebook need an exact passing GPT-6.1 Sol review")
+
+
 def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
     root = root.resolve()
     manifest = json.loads((root / "manifest.json").read_text())
+    if manifest.get("role") == "local_data_selection_only":
+        raise ValueError("Local data selection has no approved runtime and cannot be published")
     contents = {}
     for name, expected in manifest["files"].items():
         relative = Path(name)
@@ -38,6 +51,15 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
             raise ValueError(f"publication hash differs: {name}")
         contents[name] = data
     contents["manifest.json"] = (root / "manifest.json").read_bytes()
+    if manifest.get("role") == "reviewed-v3-1000":
+        for name, expected in FROZEN_VALIDATION.items():
+            if hashlib.sha256(contents[name]).hexdigest() != expected:
+                raise ValueError("Frozen v2 validation bytes changed")
+        require_script_review(
+            json.loads(contents["runtime/script-review.json"]),
+            contents["runtime/train_rewriter.py"],
+            contents["notebooks/rewriter_train_l4.ipynb"],
+        )
     for data in contents.values():
         if re.search(rb"sk-or-v1-[A-Za-z0-9_-]{20,}|hf_[A-Za-z0-9]{25,}", data) or any(
             needle and needle in data for needle in private_needles
@@ -108,7 +130,11 @@ def main():
     parser.add_argument("--release", required=True, type=Path)
     parser.add_argument("--repo", default=REPO)
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument("--prefix", default=PREFIX)
     args = parser.parse_args()
+    if not re.fullmatch(r"[a-z0-9-]+", args.prefix):
+        raise ValueError("Invalid version prefix")
+    prefix = args.prefix
     project = Path(__file__).resolve().parents[3]
     personal = project / "data/rewriter/personal/calibration-10"
     needles = [x.encode() for x in [os.environ.get("OPENROUTER_API_KEY"), get_token()] if x]
@@ -122,23 +148,23 @@ def main():
             for x in json.loads((personal / "supporting/cases.json").read_text())
         )
     verified = audit_publication(args.release, needles)
-    contents = {f"{PREFIX}/{name}": data for name, data in verified.items()}
+    contents = {f"{prefix}/{name}": data for name, data in verified.items()}
     contents["README.md"] = verified["README.md"]
     if args.prepare_only:
-        print(json.dumps({"verified_files": len(contents), "prefix": PREFIX, "repo": args.repo}))
+        print(json.dumps({"verified_files": len(contents), "prefix": prefix, "repo": args.repo}))
         return
     api = HfApi()
     info = api.repo_info(args.repo, repo_type="dataset")
     if info.private is not True:
         raise ValueError("Reviewed data must remain private")
     existing = api.list_repo_files(args.repo, repo_type="dataset", revision=info.sha)
-    if any(name.startswith(PREFIX + "/") for name in existing):
+    if any(name.startswith(prefix + "/") for name in existing):
         raise FileExistsError("Reviewed version already exists; never overwrite frozen data")
     commit = api.create_commit(
         repo_id=args.repo,
         repo_type="dataset",
         parent_commit=info.sha,
-        commit_message="Add Opus-verified rewriter v2; retain rejected pilot as history",
+        commit_message=f"Add Opus-verified {prefix}; update default README; preserve historical data",
         operations=[
             CommitOperationAdd(path_in_repo=name, path_or_fileobj=data)
             for name, data in contents.items()
@@ -160,12 +186,13 @@ def main():
         "repo_id": args.repo,
         "revision": commit.oid,
         "private": True,
-        "prefix": PREFIX,
+        "prefix": prefix,
+        "root_readme_updated": True,
         "verified_file_count": len(hashes),
         "files": hashes,
-        "url": f"https://huggingface.co/datasets/{args.repo}/tree/{commit.oid}/{PREFIX}",
+        "url": f"https://huggingface.co/datasets/{args.repo}/tree/{commit.oid}/{prefix}",
     }
-    output = project / "data/rewriter/releases/reviewed-v2.json"
+    output = project / f"data/rewriter/releases/{prefix}.json"
     output.write_text(json.dumps(receipt, indent=2) + "\n")
     print(json.dumps({k: v for k, v in receipt.items() if k != "files"}, indent=2))
 

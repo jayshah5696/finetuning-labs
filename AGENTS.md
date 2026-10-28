@@ -2,15 +2,17 @@
 
 Use `uv` and the project Makefile. Keep this project independent of the root uv workspace.
 
-The current release is reviewed v2 with 65 training, 17 development and 84 validation pairs.
+The current release is reviewed v3 with 1,000 training, 100 development and 84 validation pairs.
 Keep all v2 validation rows and source families out of future training expansions. The student
 is `LiquidAI/LFM2.5-230M`. Comparisons use GPT-6 Luna as the cloud baseline and teacher,
 and GPT-6.1 Sol as the historical baseline evaluator. Replacement data uses the latest clean Arka
 pipeline with Luna Decisions, followed by Opus verification. GPU work targets Google Colab L4.
 
-Opus is restricted to data verification. It may write row verdicts and critiques. It must not
-generate or edit examples, implement code, or review implementation. The parent and Luna handle
-corrections. Every released exact row needs input, output, and pair verification, with no unresolved
+Existing data retains its exact Opus verification. After an OpenRouter credit-limit failure,
+the user changed the remaining review and fix loop to GPT-6.1 Sol only. Use Sol for new reviews.
+Review agents may write verdicts and critiques. They must not generate or edit examples or
+implement code. The parent handles corrections. Every released exact row needs input, output,
+and pair verification, with no unresolved
 mechanical failure. Keep decision scores separate from Opus verdicts and from human labels.
 Preserve rejected attempts and bind all reviews to exact row hashes. Do not train on the retired
 219-pair pilot. Publish corrected validation references as a new version of the original 68 cases.

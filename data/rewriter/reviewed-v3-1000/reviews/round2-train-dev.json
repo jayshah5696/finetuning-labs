@@ -1,0 +1,729 @@
+{
+  "reviewer_model": "Opus 5.5",
+  "scope": "Data-only review of artifacts/arka-native-v2/opus-train/{slack,transcribe,prompt,polish}.jsonl (63 rows) and opus-dev/{slack,transcribe,prompt,polish}.jsonl (16 rows). Every full input and output was read. No implementation, prior pilot, or judge scores were consulted.",
+  "coverage_count": 79,
+  "dataset_verdict": "fail",
+  "dataset_findings": [
+    "Row verdicts: pass 63, fail 6, uncertain 10 of 79.",
+    "Concrete defects: slack-12 output contains leaked 'MODE:/LANGUAGE:/INPUT:' meta text; prompt-05 drops the supplied quotes; polish-03 drops a fact; polish-15 changes the meaning; transcribe-19 keeps the 'Correction:' cue; transcribe-20 paraphrases indirect speech and questions.",
+    "The rows follow a rigid template. Every mode/split uses the same length tiers (train: 8 short under 350 chars, 4 medium 0.7–1.4k, 4 long 5.7–9.8k; dev: 2/1/1). Rows 02, 10, and 18 are the unchanged identity rows in every mode, 12 of 79 in total. Every identity row is a short, clean sentence, and no medium or long correct input is left unchanged.",
+    "Diversity is narrow. Non-English appears only in transcribe (de x2, pt x1). Context appears only as one fixed dictionary (transcribe-06/11/14) and one fixed polish profile string (polish-03/07/11/15/19). Slack, prompt, and polish are all English.",
+    "Most long inputs share one synthetic register: they repeatedly say 'not decided / don't assume / I haven't confirmed'. This over-represents uncertainty-preservation compared with natural messages. slack-19 is visibly padded, and prompt-12 contains an instruction to the formatter.",
+    "Policies are inconsistent across rows. Lowercase sentence starts are kept in slack-10 and transcribe-18 but fixed everywhere else. Slack article insertion is heavy in slack-20 and absent in slack-04/16. Spaced em dashes are kept in slack-03/09 but closed up in slack-11/15. The leading 'So' is dropped in transcribe-20 but kept in transcribe-12/15.",
+    "Correction cues in transcribe are mostly the formulaic 'X no Y' / 'no sorry' / 'no wait'. One ambiguous case (transcribe-09, pt 'domingo não na segunda-feira') has no explicit cue.",
+    "Facts, numbers, quotes, and dictionary terms are otherwise preserved with high accuracy, including in the very long rows. No /prompt output fulfills the task."
+  ],
+  "reviews": [
+    {
+      "id": "arka-v2-slack-01",
+      "row_sha256": "cb757f9a7a5e89fa203f39e39e81466bd1ef28a2b07f5f9ee1f8ce0117d83d34",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Capitalization, vocative comma, and 'If not,' added. Nothing else changed."
+    },
+    {
+      "id": "arka-v2-slack-02",
+      "row_sha256": "3979f9ce56faeeaeb7f33cee811081c703fc5cab9c2488029c89a394f2d90a29",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Input is already correct and stays unchanged. The emoji and curly apostrophe are kept."
+    },
+    {
+      "id": "arka-v2-slack-03",
+      "row_sha256": "2f358c6c4e9d2c0955a8e85e67f5cfd1858286cd353108a70b7b5671c3d1f3dc",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Only sentence-start capitals are fixed. The casual fragments ('Mostly want to know...') and the question form are kept."
+    },
+    {
+      "id": "arka-v2-slack-04",
+      "row_sha256": "a2258b0adb874b7f2aa6547d8ddd309b5096e75fbcf97b915b3a76b95d5d8064",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long thread. The fixes are capitals and 'wifi'->'Wi-Fi'. Ratios (7:1, 4.5:1), dates (Oct 11/14/15), quoted labels, and 'go only if' conditions are exact."
+    },
+    {
+      "id": "arka-v2-slack-05",
+      "row_sha256": "bbaed4880cfabadf975912adc96b9b37ba64a602b7e1268b672bbea76cd3be2e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'cant'->'can't', capitals, and a comma after 'Hey'. The casual 'gotta' and the emoji are kept."
+    },
+    {
+      "id": "arka-v2-slack-06",
+      "row_sha256": "c2fcd9239e6cc27ed141573db1db115421ceb5a99123733d3992a8624623d497",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Comma splice fixed with a semicolon. 'q-17' and 'staging only' are unchanged."
+    },
+    {
+      "id": "arka-v2-slack-07",
+      "row_sha256": "471020f6e6dc9cb9a899221463b454e6faa6002a6648b978987b040fe27ce46a",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'q'->'question' expands shorthand. The questions stay questions, and the timestamps are kept."
+    },
+    {
+      "id": "arka-v2-slack-08",
+      "row_sha256": "a3d37111540e32f03e8f29bc548b72e519425307ffe3dd84cb0c53003b5b28c8",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Times and offsets (UTC+1/-4/+8, 10pm->11pm SGT Friday correction, 5:30/5-6:30) are exact. a.m./p.m. styling and 'Wi-Fi' are fine. Minor: 'sales'->'Sales' is an unneeded capital."
+    },
+    {
+      "id": "arka-v2-slack-09",
+      "row_sha256": "60234ac7cb062f298e9ab230c65b7da69c410c9f3b938dd1ae7d4bc88d9a133e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Commas after the @mentions and a semicolon added. The 'don't merge yet' request is kept."
+    },
+    {
+      "id": "arka-v2-slack-10",
+      "row_sha256": "434d0fec544e119418c6ba2daa0fa9bef7db1177575cb7115313636976e5f58a",
+      "input_verdict": "pass",
+      "output_verdict": "uncertain",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Output keeps lowercase 'hey' at the start of a sentence. Every other slack row capitalizes 'hey', so it is unclear whether this input counts as correct."
+    },
+    {
+      "id": "arka-v2-slack-11",
+      "row_sha256": "9044cb862057586ae8c1a169f904530c70b422d6f3143f629c593b1e476bab60",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Speaker names capitalized and 'quick q'->'Quick question'. The undo/reopen/sync distinctions and the final question are kept."
+    },
+    {
+      "id": "arka-v2-slack-12",
+      "row_sha256": "bc45b72ca4a31ea61ab275c6f45641fb269ee77bab8e67027e83ac2eb2b4ec57",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Output starts with leaked meta text 'MODE: /slack\\nLANGUAGE: en\\nINPUT:' in place of the 'Mara — 9:12' header. The first paragraph after it stays lowercase ('morning all... i tried'). Smaller rewrites go beyond minimal edits: 'there was no obvious loss', 'one'->'issue', 'it is'->'it's'."
+    },
+    {
+      "id": "arka-v2-slack-13",
+      "row_sha256": "e9b341a09d1663c5fb762ff4912b1480d5d1c49775f6003049f80c4f363b32d4",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Added 'as' ('tagging every issue as urgent') and an em dash. Both are acceptable minimal grammar fixes. The intent is kept."
+    },
+    {
+      "id": "arka-v2-slack-14",
+      "row_sha256": "b12dcee4e9df828c3c17b526302b45308a3a52a79c42e7a54f6697236e9c9649",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Comma fixes and capitals only. The request and the 'no need to rerun' limit are kept."
+    },
+    {
+      "id": "arka-v2-slack-15",
+      "row_sha256": "7cc29a85b2b93e10c17579ffca89b8404601ebeb613b61931117053b2f568cb5",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Capitals, periods, and one semicolon added. Times (3, 2:45, 10:30, 1:30), the emoji, and the open-ended tone are kept."
+    },
+    {
+      "id": "arka-v2-slack-16",
+      "row_sha256": "0d55dfbc428c1b440e973e2813f5442807b417c2e09758dbe00723d9816ae5c3",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Only capitals and punctuation change. Names, song titles, the exact Harbor Credit Union quote, 45 s, the seven-second delay, and the open items are exact."
+    },
+    {
+      "id": "arka-v2-transcribe-01",
+      "row_sha256": "2e93a1d39a156d6f6666b8e2043d3d4c12baad4e16ab104897f94d182a9a356f",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'today no tomorrow' resolved to 'tomorrow'."
+    },
+    {
+      "id": "arka-v2-transcribe-02",
+      "row_sha256": "ad6e612f3ace05c4ec03a547a0b2bd5d0f3b00ec4502e1b82f344e0c6140ecea",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Correct text stays unchanged."
+    },
+    {
+      "id": "arka-v2-transcribe-03",
+      "row_sha256": "232337be2b96e0aa35fc73012aede4235074bc8d0fd61279aa386b54f4cff275",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "The 'first i start by opening— no first i connect' restart is removed correctly, and the spoken order is kept. Minor: an em dash in otherwise unpunctuated ASR text is slightly unrealistic. 'and then switch' became ', then switch'."
+    },
+    {
+      "id": "arka-v2-transcribe-05",
+      "row_sha256": "906c723b3f70f45603cd6868bb632ec553d1006b55187afa3838cb9fc27fc51a",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'äh' removed and 'vierzehn uhr nein um fünfzehn uhr' resolved to '15 Uhr'. German casing and commas are correct. The referent of 'er' is unexplained but plausible in speech, and it is kept."
+    },
+    {
+      "id": "arka-v2-transcribe-06",
+      "row_sha256": "aee17e7493dd5a9236cebadd2e249a92b2b1b9e4df4690ab6a9c66d71eb1863e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Dictionary applied literally: 'aurora pad'->AuroraPad and 'settings dot toml'->settings.toml. 'ten'/'fifteen minutes' stay as words, and the request ends with a question mark."
+    },
+    {
+      "id": "arka-v2-transcribe-07",
+      "row_sha256": "5e6d46002a79ed6204bc38dd2eaf758ee9b9541240cc32a7049f78259972a238",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'a a' removed and 'two bottles no three bottles' resolved to three. The meaningful rationale 'I thought two would be enough' is kept."
+    },
+    {
+      "id": "arka-v2-transcribe-08",
+      "row_sha256": "f24204205fcdad020ba5f7055cb7a21c7d14350effd5bd1035b62c0e68cb90f2",
+      "input_verdict": "pass",
+      "output_verdict": "uncertain",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Numbers are normalized correctly (8:27, 9:12, 1842 kWh, 3.6, 9:08, 7:14/7:16, 10:30). The phone number and the spoken-form email are kept, and so is the self-correction about the 'unlabeled' cable. Small paraphrases: 'it was just what i could see'->'that was just what I could see' and 'but that the solar equipment'->'but the solar equipment'."
+    },
+    {
+      "id": "arka-v2-transcribe-09",
+      "row_sha256": "e9cbe10a909b3f56209078f82cb3953493912d42d138e7d1d00d79e6ee792b8b",
+      "input_verdict": "uncertain",
+      "output_verdict": "uncertain",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "'vou passar no domingo não na segunda-feira' can mean 'Sunday, not Monday' or a correction from Sunday to Monday. There is no explicit correction cue. The output picks Monday and deletes Sunday, so the final date may be wrong."
+    },
+    {
+      "id": "arka-v2-transcribe-10",
+      "row_sha256": "5f39bfa3957c6015d19d6d58ad35854a87b5c2971ff3587efe028063f46dd87b",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Correct text stays unchanged. The meaningful 'Well' is kept."
+    },
+    {
+      "id": "arka-v2-transcribe-11",
+      "row_sha256": "7f08c6daf4c1aea1f0e57079cc4303c0199626c199edfb7a64260bd2390fffed",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'tools no wait under scripts' resolves to scripts, the spoken 'comma' and 'new paragraph' are applied, and dictionary terms are exact. The 'actually don't update it yet' reversal is kept as instructed."
+    },
+    {
+      "id": "arka-v2-transcribe-12",
+      "row_sha256": "063db74d330df2e8dc13781b4e430bb559dd02fb99e60ca944ff4b1c00ecf296",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'nine, no sorry, ten thirty' resolves to ten thirty. The 'small appliances too no, leave that off' correction is resolved. Quoted phrases from speech and the list punctuation are fine."
+    },
+    {
+      "id": "arka-v2-transcribe-13",
+      "row_sha256": "efa4205905153c9c91f56a91c45f1649a854ceb7033df560e75eb061e14ab450",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'i thought i'd say yes no i mean' is resolved, and the unfinished 'cost of...' is kept."
+    },
+    {
+      "id": "arka-v2-transcribe-14",
+      "row_sha256": "36797da63c92115a8a07c5a1ef48b795af6000e9ac36e1ac97fe8dc3195bcccd",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'black, no sorry blue' resolves to blue. BriarSync and 'ten dollars' are kept."
+    },
+    {
+      "id": "arka-v2-transcribe-15",
+      "row_sha256": "745068a4ac836cd80b59556bc55d79a32d43c3dac83be84f895df3996214f717",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'uh' and 'the the' removed. 413, 20 MB, and 90 percent are exact. The meaningful 'Actually' is kept."
+    },
+    {
+      "id": "arka-v2-transcribe-16",
+      "row_sha256": "169facc9e323c06a9b6cb1fa47eeec0a9db7610f67ec31af716aa073aeb5dd7e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Spoken 'number one/two/three' becomes a list. Times (8:42, 10:16, 10:19, 10:06, 11:42) and the refund-not-granted statements are exact."
+    },
+    {
+      "id": "arka-v2-prompt-01",
+      "row_sha256": "fad8a0f7e0ed5f97d8db4801802dcdd703bedfc4601e77658cc4a0c948c92361",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "The two excerpts are quoted exactly. The output stays a request and keeps 'based on these lines'."
+    },
+    {
+      "id": "arka-v2-prompt-02",
+      "row_sha256": "8cf599f363eac4ed7d862d4334b93d9f2cd41cfc5229e2d5b9d901538686e09b",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Already a clear prompt and stays unchanged."
+    },
+    {
+      "id": "arka-v2-prompt-03",
+      "row_sha256": "3f19a8329e01d6cdc30888a6fe9868bd2b480049e6cece82326fe7d43069d06b",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "All constraints are kept: no subfolders, photo_001 scheme, extensions, --dry-run, and the example command. The example mapping is exact."
+    },
+    {
+      "id": "arka-v2-prompt-04",
+      "row_sha256": "cb4e5ec58fd8624c29411712664d52dc3254880a15e1e6f55df5abee6fdfa28a",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Long brief reorganized faithfully: ten-session cap, $1,800/$250 separate limits, 30-day retention without a date, and all open questions listed. Minor: 'try the app without a tutorial first' became 'before receiving a tutorial'."
+    },
+    {
+      "id": "arka-v2-prompt-05",
+      "row_sha256": "c1adb7f9f2c1073c2f8fc9b1ede1b3ea6b9364d92f5ee82a9d012e0604ffa483",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "The output drops the supplied interview content. Mira's and Luis's quotations are replaced by 'the supplied interview notes', so the prompt no longer contains the material it refers to."
+    },
+    {
+      "id": "arka-v2-prompt-06",
+      "row_sha256": "0238bd0565fa0e3aea49713992c6b94128c1af08b4a42a9d2dab138e7b29f371",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "The CSS is kept verbatim in a code block. The output stays a diagnosis request with 'no need to rewrite'."
+    },
+    {
+      "id": "arka-v2-prompt-07",
+      "row_sha256": "b86149eefc1e95b4bef195da01059965fea7cccbd8dc071fcba31da6e0a74c5b",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Dates (Aug 12/13/15), 4B at 18 Willow Court, the reset attempt, and the exclusions are kept. It asks for a draft and does not write the email."
+    },
+    {
+      "id": "arka-v2-prompt-08",
+      "row_sha256": "79958c13c123a20e8dfeeaf2b78ee9ae7759a6297df3ce1b996b95d64e00f33b",
+      "input_verdict": "pass",
+      "output_verdict": "uncertain",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Numbers and splits (2,450 twice monthly, 350–850, 200–600, 1,800 at 60/40, 78 internet, 3,000/18 mo, 1,200) are exact, and all ask-first questions are kept. One frequency changed: 'groceries are usually shared but not always'->'often shared'. 'explanations of what each part is for' is dropped."
+    },
+    {
+      "id": "arka-v2-prompt-09",
+      "row_sha256": "52111b2ef5d62344f69fa0e5aff0fcc206ece141c06bb34e406dcf4e536ee4ba",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Shifts expanded to 9 a.m.–5 p.m. and noon–8 p.m. The one-hour evening limit and weekly revision are kept."
+    },
+    {
+      "id": "arka-v2-prompt-10",
+      "row_sha256": "a8da0fbf9543b0ee21858b69f2eab522bbb39807fd72264d7eb9d66543341ed5",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Already clear and stays unchanged."
+    },
+    {
+      "id": "arka-v2-prompt-11",
+      "row_sha256": "2b1a523b7c78495fb872972050c395492b3246dc9cb331c1877b4b627de3d9a3",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "The three messages are quoted exactly. Audience, the 250–350 word range, 2–4 sentences each, and the scope limits are kept."
+    },
+    {
+      "id": "arka-v2-prompt-12",
+      "row_sha256": "fdf185df487dc1e461f57a5f6dffd857330ac780b0dc274a221edb1c5e304291",
+      "input_verdict": "uncertain",
+      "output_verdict": "pass",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Output organizes the firm, open, and deferred items faithfully. Barcode examples are exact, and it adds no thresholds. The input ends with 'produce the requirements document request as a clear prompt', which is an instruction to the formatter and looks like leaked generation text."
+    },
+    {
+      "id": "arka-v2-prompt-13",
+      "row_sha256": "394be915f63d98fffec8458ce6f18c65c8f703b7c4ef0ebd2362c90a4ac1df71",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Stays a request. It refers to the transcript without inventing one."
+    },
+    {
+      "id": "arka-v2-prompt-14",
+      "row_sha256": "213b0169dd7040d66b715effba841c3e8de40522d33fc1b4b29af722630e49f3",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Six days, early October, 10 kg carry-on plus a personal item, and laundry once halfway are all kept."
+    },
+    {
+      "id": "arka-v2-prompt-15",
+      "row_sha256": "2b47027f70c9f18f0c9ab4aff4dd46f18cce7bb220a14165e18e2a8088502921",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Amounts and steps are exact. The output stays a rewrite request with no time or temperature added."
+    },
+    {
+      "id": "arka-v2-prompt-16",
+      "row_sha256": "358b46d6f06f5866dbe7d945407fc2d4d4a32eeb0dbd17ca7b4b1ee64332f147",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "All question wording, counts, denominators, blanks, and cleared quotes are exact (Q1 sums to 184, Q3 to 146+38). Privacy and chart rules are kept, and the output does not write the report."
+    },
+    {
+      "id": "arka-v2-polish-01",
+      "row_sha256": "be27554ce66b81476288f05a097a8624f59bae3e69217010cb1b36b42146b175",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Readable rewrite. The uncertainty about the older laptops is kept. 'which is good' is dropped harmlessly."
+    },
+    {
+      "id": "arka-v2-polish-02",
+      "row_sha256": "436e379b9c3b5efb49ecd8ac2ae9de04838ce251c3ec168651cd72597414ba7b",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Already polished and stays unchanged."
+    },
+    {
+      "id": "arka-v2-polish-03",
+      "row_sha256": "0fb52e897334b78ed8ddd9c7a23a2036c2bdcb6191953150938774f6e753bd69",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Content is dropped: 'My schedule is usually steady' is removed, and 'usually organized' loses 'usually'. 'be part of something useful in the neighborhood' is flattened to 'contribute to the neighborhood'."
+    },
+    {
+      "id": "arka-v2-polish-04",
+      "row_sha256": "2f12417029bd38c5f6e01f97e3babdb41bc425ca1b5e358a4c6e42552b87d081",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Costs ($180, $78, $24, $22, $18, total $142), 65 psi, and every mistake and uncertainty are kept. The prose is cleaner."
+    },
+    {
+      "id": "arka-v2-polish-05",
+      "row_sha256": "c8982c92294a97fca0625fdb6a6e1204fa1cbad077d9818ff1c31ebb05cbe292",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Apology rewritten clearly. The admission of fault and the request are kept."
+    },
+    {
+      "id": "arka-v2-polish-06",
+      "row_sha256": "3df5c3e77085eb3e08d33b00fdb04ed8ac4453bc84c97e8489f197c147233553",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Steps and uncertainty about the cause are kept."
+    },
+    {
+      "id": "arka-v2-polish-07",
+      "row_sha256": "5c4d35800a0042c194e3c42f8020c69180f7356c0ff2ada6dfa1e018e1097ebe",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Hedges ('maybe', 'not definitely better') and Mara's objection are kept. 'some of the agenda'->'agendas' is minor."
+    },
+    {
+      "id": "arka-v2-polish-08",
+      "row_sha256": "2304039c4477c1176f35dbdcec057680a2411d70c2a322c8c89e3c42680d4139",
+      "input_verdict": "uncertain",
+      "output_verdict": "pass",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Output keeps all counts, quotes, and uncertainties, and the inferred months (April/May) are well supported. The source contradicts itself: 24 artists are on the selected list, but only 18 artists submitted (20 with the two late entries), and 18 is repeated in the permissions section."
+    },
+    {
+      "id": "arka-v2-polish-09",
+      "row_sha256": "ad466a17c0517f5019c0e63934df21d9fdea812bcf7f06c0f56c75b109de6001",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Minimal polish. 'hope' became 'I hope'."
+    },
+    {
+      "id": "arka-v2-polish-10",
+      "row_sha256": "ecb3f960b7d2dcf5967baa85556c7649f3c35e6c1717a63f0095fab94fd6471b",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Already polished and stays unchanged."
+    },
+    {
+      "id": "arka-v2-polish-11",
+      "row_sha256": "6661e164b9d7078f629598ada40683ec8f8345e3d6a53cefd2c4ccbdc73aff5e",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Limits and conflict caveats are kept. 'could... and may help' merges under 'could', which is acceptable."
+    },
+    {
+      "id": "arka-v2-polish-12",
+      "row_sha256": "3c6620d1790eb31de4f5f8f7483c763156031676e3dbb790a707515b33a4bbc7",
+      "input_verdict": "pass",
+      "output_verdict": "uncertain",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Quotes and dates (1846/1847) are kept exactly. One hedge is removed: 'which looked a bit uncomfortable for them'->'which looked uncomfortable'."
+    },
+    {
+      "id": "arka-v2-polish-13",
+      "row_sha256": "4b3ce70571bbaef8c129ecfab2c356e343b63f9edd35414d95e07c6327d0792d",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Clear rewrite with the same concern and question."
+    },
+    {
+      "id": "arka-v2-polish-14",
+      "row_sha256": "d39710944d77d8860777918ab21567d1a81e692226b78060d874b9688dd3e0e0",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "The conflicting tracking states and the unknown date are kept."
+    },
+    {
+      "id": "arka-v2-polish-15",
+      "row_sha256": "dc1809793006730cd785e865206d2f53fa6e03eeb5a7f2db564b91f0339c64d5",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "Meaning shift: 'that seems too broad from these comments alone' (the note is too broad) became 'these comments alone seem too broad to support that', which calls the comments too broad. The quotes are exact."
+    },
+    {
+      "id": "arka-v2-polish-16",
+      "row_sha256": "a03172f27f8e2b1b46abe49c458ceac69fcca6d368c8972a5785e167247983cc",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Prices (120, under 160, 180, 25, about 35), uncertainties, and the voice are kept."
+    },
+    {
+      "id": "arka-v2-slack-17",
+      "row_sha256": "3ca5911d18545bc30633f76b11d2d9101f237bc19ab9fb1c88f60d3816454e42",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Run-on split into a statement and a question. The question mark is correct."
+    },
+    {
+      "id": "arka-v2-slack-18",
+      "row_sha256": "e8fe7330d538e37cbbfd2db73883e71eb558bc9f7641c406a93ea6e3c7c84a24",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Correct text stays unchanged."
+    },
+    {
+      "id": "arka-v2-slack-19",
+      "row_sha256": "edbe6a242069358c2ad8eec931d93abce11344735f4a073b13c0ee074b34af8f",
+      "input_verdict": "uncertain",
+      "output_verdict": "pass",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Output fixes only capitals and one semicolon, and it keeps the question form. The input asks the same finance-approval question about five times, which looks like padding added to test question-versus-assertion handling, not a natural message."
+    },
+    {
+      "id": "arka-v2-slack-20",
+      "row_sha256": "bb6afd856144339b7d48066d63cdeda4cf5954b9d2017e4e5342d8f820cec9ec",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Numbers, times, phone numbers, and street names are exact. Many inserted articles ('The store manager', 'The pantry contact said to use') and 'who is'->'who's' go a little beyond minimal edits, but the meaning is kept."
+    },
+    {
+      "id": "arka-v2-transcribe-17",
+      "row_sha256": "6c795c4ff5ffca9721cfe505b6fa2b48c2b9729c15ba5b093b88a16e50bbf0d6",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "'äh' removed. The question mark and German noun capitals are correct."
+    },
+    {
+      "id": "arka-v2-transcribe-18",
+      "row_sha256": "8563ec43b05af18535a5732e1f63da7b6abdaabe7713b7c84e9cf4af136577c2",
+      "input_verdict": "pass",
+      "output_verdict": "uncertain",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "Output keeps the lowercase 'please' at the start. Other rows capitalize, so it is unclear whether this input counts as correct."
+    },
+    {
+      "id": "arka-v2-transcribe-19",
+      "row_sha256": "a6ea9c07f56d6a416e7168744ec3d6068401743bbf44957c5317c025fdd9d26d",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "The final edit intent is resolved correctly: keep the chart sentence and delete the later repeat. But the spoken cue survives as the label 'Correction: keep the sentence...'. It should be dropped, as 'no'/'no sorry' are dropped in other rows."
+    },
+    {
+      "id": "arka-v2-transcribe-20",
+      "row_sha256": "12ffebf63dc1f37840290cfe179ce4457793ec5b282fc7b5161a0364695baf8f",
+      "input_verdict": "pass",
+      "output_verdict": "fail",
+      "pair_verdict": "fail",
+      "verdict": "fail",
+      "critique": "'monday no tuesday' resolved correctly. But the output paraphrases: it drops 'because' ('been like because a few things'->'been like. A few things'), turns the indirect 'and whether production access is expected' into the direct 'and is production access expected?', changes the indirect 'she said answer the comment first...' into a direct quote, and adds a 'Release Flow' title case and backticks around make check."
+    },
+    {
+      "id": "arka-v2-prompt-17",
+      "row_sha256": "dc3f24059829ced02bb9d024b0156b7768b0fae85f2e05e0128c320054f9e9e9",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "The four outline points are kept as a list. The reading level is kept."
+    },
+    {
+      "id": "arka-v2-prompt-18",
+      "row_sha256": "08a3650cf778e30ec499b1f4efadf8cc5fd62a45b0495df08779ee2ab24e5a73",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Already clear and stays unchanged."
+    },
+    {
+      "id": "arka-v2-prompt-19",
+      "row_sha256": "99e46d8cc70800c3ce63af2a4f81c4c47a66930e1ae15a6d59c1f789b6e186fd",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "All constraints are kept: filenames, no auto-delete, backup, uncertain dates, and no face recognition. 'say where questionable files should stay' is slightly softened to 'set aside'."
+    },
+    {
+      "id": "arka-v2-prompt-20",
+      "row_sha256": "13a5a7c6c60f727258478e5c40990a4543b39979a92aa87b5178fe49bd2dd007",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Schema, identifiers, 1.8/1.1 TB, 45-minute window, 900/250/600 TPS, and the instance classes are exact. Open choices stay open, and the output stays a review request."
+    },
+    {
+      "id": "arka-v2-polish-17",
+      "row_sha256": "a5e4d5e29d8af145162ce8d696e656d8fe0cd1743a37a66462aa951881e2ed28",
+      "input_verdict": "pass",
+      "output_verdict": "uncertain",
+      "pair_verdict": "uncertain",
+      "verdict": "uncertain",
+      "critique": "The tentative 'i wanted to ask if you could maybe keep the music lower' became the direct 'could you please keep the music lower'. The writer's softening hedge is removed."
+    },
+    {
+      "id": "arka-v2-polish-18",
+      "row_sha256": "82da168258185667c1a769d896086103a147e6a9d4c98016f3c33ada84794ca9",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Already polished and stays unchanged."
+    },
+    {
+      "id": "arka-v2-polish-19",
+      "row_sha256": "1bd2891498b8ad19a4eec22848d6dab4660c840c8f8073778a15b6cd5899627d",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Accepted, rejected, and open items are kept, with nothing added. The paragraph breaks are helpful."
+    },
+    {
+      "id": "arka-v2-polish-20",
+      "row_sha256": "a0c903fdac4fd9480b5370ea7379a042975bd40b05bda3d0065340d7e284bffd",
+      "input_verdict": "pass",
+      "output_verdict": "pass",
+      "pair_verdict": "pass",
+      "verdict": "pass",
+      "critique": "Limits (14/20/32), dates (May 6/8/9/10/13/17/24, June 3), the fourteen-string breakdown 6+4+4, and every open decision are kept."
+    }
+  ]
+}

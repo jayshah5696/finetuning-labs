@@ -1,10 +1,17 @@
 # Finetuning Labs
 
-The reviewed v2 release has 65 training, 17 development and 84 validation pairs. Every released
-input, output and pair has an Opus pass tied to its exact contents. Arka's native generation
+The reviewed v3 release has 1,000 training, 100 development and 84 frozen validation pairs.
+Each mode has 250 training and 25 development pairs. Every released input, output and pair
+retains an Opus pass tied to its exact contents. Arka's native generation
 and decision stages use clean commit `5d353740ae1dd34742841071752814028db1489a`.
 These are model judgments, not human gold labels. The old 219-pair pilot failed independent
 data review and is retired for training.
+
+Open [the L4 training notebook](notebooks/rewriter_train_l4.ipynb) in Google Colab.
+Add a read-only HF_TOKEN in Colab Secrets and follow [COLAB_TRAINING.md](COLAB_TRAINING.md).
+GPT-6.1 Sol approved the exact runtime script and notebook after the user changed the remaining
+review loop to Sol. The release includes its passing report and the CPU recovery evidence.
+Actual 230M training, L4 memory use, BF16 execution and tuned quality remain unmeasured.
 
 The user accepted the 68 cases as development validation on 27 October 2026. The acceptance and
 immutable file hashes are in `data/rewriter/validation-freeze.json`. These cases, their output
@@ -12,12 +19,19 @@ fixtures, and their source families are excluded from training. Existing failure
 This acceptance does not establish independent human judgments or an unseen final test.
 
 Read [TRAINING_DATA.md](TRAINING_DATA.md) for sources, exact checks, review findings and commands.
-Use [the reviewed Colab data notebook](notebooks/rewriter_reviewed_data_check.ipynb).
-Training uses new fictional scenarios. The v2 validation bundle includes the original cases
+The older [reviewed data notebook](notebooks/rewriter_reviewed_data_check.ipynb) checks v2.
+Training uses new fictional scenarios. The frozen validation bundle includes the original cases
 with two versioned corrections and 16 new pairs. Historical v1 files and scores remain unchanged.
 
-The [private reviewed dataset](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/tree/70715437e3d6b67ef47eb89c83ccb1a66038082e/reviewed-v2)
-is uploaded. All 69 files were downloaded at the immutable revision and compared byte for byte.
+Use the [private 1,000-example dataset](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/tree/f3e97879e6a8006e5dd8fedf2c99379c0d097671/reviewed-v3-1000).
+Versioned data and the publication receipt are under `data/rewriter/reviewed-v3-1000/` and
+`data/rewriter/releases/reviewed-v3-1000.json`. Reviewed v2 remains available at its original
+immutable revision `70715437e3d6b67ef47eb89c83ccb1a66038082e`.
+All 331 uploaded files were downloaded and compared byte for byte. All 397 historical files
+other than the intentionally updated root dataset card kept the same Hub blob IDs.
+The actual uploaded notebook's download and readiness cells ran locally against this revision.
+Colab authentication and Drive were replaced with cached authentication and local storage for
+that check. No GPU training cells ran.
 
 The [Luna Decisions audit](DECISION_VALIDATION.md) now adds blind criterion probabilities through
 Arka. It found disagreements and a known false approval. The current scores prioritize review;

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "anthropic/claude-opus-5.5",
+    "max_tokens": 6000,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-v3-train-prompt-0315\", \"row_sha256\": \"088b89743ffad3d3c7bbe86f77736e1b653c799f2332b910c1f7c9091641fe15\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"could you draft a short note for the costume sewing team about the moth costume fitting? notes: the left sleeve still pulls when Mira reaches forward; hem is pinned 3 cm above floor in boots; Jo said, “I can bring the spare blue thread on Thursday.” ask people to bring the costume and boots to the fitting, and mention that no one has checked the snap at the collar yet. keep it friendly, don't say the sleeve is fixed.\", \"output\": \"Draft a short, friendly note for the costume sewing team about the moth costume fitting. Mention that the left sleeve still pulls when Mira reaches forward, the hem is pinned 3 cm above the floor when she wears boots, and Jo said, “I can bring the spare blue thread on Thursday.” Ask everyone to bring the costume and boots to the fitting, and note that no one has checked the collar snap yet. Do not say the sleeve is fixed.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-v3-train-prompt-0315"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "088b89743ffad3d3c7bbe86f77736e1b653c799f2332b910c1f7c9091641fe15"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "c301337b72e232dea093b0c4ca0b570e9e62a32122541f3892b4b0916900178a",
+  "started_at": "2026-10-28T03:37:53.015130+00:00",
+  "result": {
+    "id": "gen-1793158673-Q9sMlkh3Nrw9nCqoiHCi",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-v3-train-prompt-0315\",\"row_sha256\":\"088b89743ffad3d3c7bbe86f77736e1b653c799f2332b910c1f7c9091641fe15\",\"critique\":\"The input is a natural, self-contained request with clear notes and constraints. The output reorganizes it into a clean prompt without performing the task. It preserves every supplied item: the left sleeve still pulling when Mira reaches forward, the hem pinned 3 cm above the floor in boots, Jo's quotation verbatim, the request to bring the costume and boots, the unchecked collar snap, the friendly tone, and the prohibition on saying the sleeve is fixed. 'Ask people' becoming 'Ask everyone' is harmless. The one small change is that 'in boots' becomes 'when she wears boots', which attributes the boots to Mira. That reading is the natural one in a fitting context and does not alter the measurement or the instruction, so it is not a material defect. No context or requirements are invented.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "I'm checking whether attributing the boots-wearing to \"she\" is a safe inference or an unsupported addition, since the original left it ambiguous whose boots the hem was pinned for.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "I'm checking whether attributing the boots-wearing to \"she\" is a safe inference or an unsupported addition, since the original left it ambiguous whose boots the hem was pinned for.\n\n",
+              "format": "anthropic-claude-v1",
+              "index": 0,
+              "signature": "CAQSmQkKEAgTGAI4AUIIdGhpbmtpbmcSDEX20+yAcaZLuADmDBoMHnVRYoZ+70bO6pwgIjBq23KjLr8nOlykeMFJh42E4Jq5ma8DvKNQuFVD+/KFwkZEgBNwVAnZucFPm9QLZvoqtgg11PT/yi8M3loupDXBRGF1xhbnMrYnn87obZaKOMkTGT388yLKjW7e/iR1KKDUsyeB1Ptp3LI/Y9XK0OqYsLvTUNZJZfJHZgAJxYhW9JybCE6Mv1Dx3z/puvfz5oIauX9KnpNrPHY+Y6QRGThU2uSedspZmiivIsYIGJjzSiqCuwOAgpMUJaUMDBgvlKYa85KhK7kSzH/ifwYaAJfmD42ayFBSq5LW3ODvhQ4tONmRMcJannE6Mc8CkkJbkF0+n79mi6xPy6U8b0LnRtlWm9TgYWB//HPXR82/NUYV1mVWejpS92X1uU7l0Ysw7ryl/gBp0ea0TXvONX3/KrrS6AnmRyfgjYvfAHfopQGlcPI4PJfydfMpv0wOvWLBLW44jB1RjXllnAI1SlnJj6I1gcbsIAP0kVLys1jsN5dgpfUxaLMx4h+k3WTIfiyy6sPYgwSgFyWf7TqVtoLeG9mhnbF7Qw3lBas4emBUEFixoyotDdzD31Q2L0TtclZCaJ6MGj7vRMuacbgWcQ4Z5fErbrA/i4tyB3znRQSJkxXWPDYz6asIe3fohrzQ1MBWWYV0OHXc0AIaXqYTHZFabVPJ2c7PYvbywfuj/ik0pRysJohWARYhMxwruDXLi5NtTDCqQG4blVM1RMjtnuLOAPumrhWuI7yGCqKRM3yUzNKSHRWB4iiFfYzyCVQ9gPaBLUramVO/cmWap/GfJhZqvwuK7zgB2Z+U5/YCTMxNTFKf2098nk2uGeM5nZfMEBqYNVltaMpjGOC+txJ/bcrRmHzPbOwsL4eDZEGJRSfFMer+yNPxLZX1XWH7k0hnnaMQuItOOx/IbxzmrQzZ/ZBRhz60+eiXtDEb8FJWBuHR6vCaxc1eNRnPFy5OYOIs8rI+s8dEkHqR7b8zL0V0nFn8ATOhGejDqqQ617Exbq9zKGay19alMtI3sawsGGBAXCLq58J2JX5qWs8xq6f/qpaudrkLqMKHnTE+NaVxUTdX9EdrKMthIwr7GRbOiXxtvRWEPokSR0eIOAixqpkP3IdnvQ8YB/w45YtE1vSmZTWT6t46LzWn/Za6teKf7osRWgB9weL0NVpI9Iu1BCFq18WrdrzmpCamvxDlAqyqaCzeEmwpmPvuowVjABChP5G71VEjDzhEx8CdLHzRum4XxHUN0WkfBmIvT+oKfzkUCT4cxeTS2MPZJsOgmlrpaCQ6D/Cn+29a6DraXlsUjWAOyA7f1EFAT1H+BF3QYJCzTIRdIe0P2PR7CSr80eMYxjlyI2+xEdvd3JTrXyNOKOUql3yxK20Jzl4qY906zScn7dRHzV2spGobenRDAdheBzKOEDjnvfR1PsGsSXFQuPTNS1N7gvGGxU7QOOk9Bmb93mF8MFuCpxjIvmL0vaZ5hEFBPAvT8txRt2UetsgFKsQXd/4HZNKkCvqlkbNO0AZhGAE=.eyJlbmRwb2ludF9zbHVnIjoiYW50aHJvcGljL2NsYXVkZS1vcHVzLTUuNS0yMDI2MDkyMXxjbGF1ZGUtb24tYXdzIn0"
+            }
+          ]
+        },
+        "native_finish_reason": "end_turn"
+      }
+    ],
+    "created": 1793158673,
+    "model": "anthropic/claude-opus-5.5",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 608,
+      "prompt_tokens": 1643,
+      "total_tokens": 2251,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 223,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0.018732,
+      "is_byok": false,
+      "cost_details": {
+        "upstream_inference_cost": 0.018732,
+        "upstream_inference_prompt_cost": 0.006572,
+        "upstream_inference_completions_cost": 0.01216
+      }
+    },
+    "provider": "Claude Platform on AWS"
+  },
+  "result_sha256": "d0692ca44b43a11953da9f3adfa8aee24d4b3ed878b0314d9ecef52835a90e86",
+  "elapsed_ms": 9821
+}

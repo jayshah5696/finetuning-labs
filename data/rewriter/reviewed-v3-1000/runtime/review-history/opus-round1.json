@@ -1,0 +1,111 @@
+{
+  "reviewer_model": "Opus 5.5",
+  "scope": "Colab training script, notebook, and data scaling implementation",
+  "verdict": "fail",
+  "script_sha256": "8d92d14d538f9852b2ca6a655101e49dab3b7921b09b25b118a5d5f8a61f9e06",
+  "notebook_sha256": "6dbd47183db744e617ccc49bf02daa110397aff56b185948e1703acd3a81d719",
+  "reviewed_files": {
+    "src/finetuning_labs/rewriter/colab_training.py": "8d92d14d538f9852b2ca6a655101e49dab3b7921b09b25b118a5d5f8a61f9e06",
+    "notebooks/rewriter_train_l4.ipynb": "6dbd47183db744e617ccc49bf02daa110397aff56b185948e1703acd3a81d719",
+    "src/finetuning_labs/rewriter/scale_data.py": "e1c5c64a502468d67a2e1c73f868de527be16560d334bb4d53401c19c82f2ab9",
+    "scripts/release_scaled_data.py": "f5ce1614d39a4ca3ec85d8cf37344c86839684093069764e5db6f26c1f47f363",
+    "src/finetuning_labs/rewriter/reviewed_publication.py": "0d0996099ca67218e265ee62b67a7ab489e3b5b21d4afb011f2352a7b1f19d7f",
+    "tests/test_colab_training.py": "9c3fa212056e461f1c447e42133164578c351a0fc11b0945410b1db1d91ae23e",
+    "tests/test_scale_data.py": "db5f0f73474e2894d4f631b411adabb65306536b44e7818ed5a2e400bfc2b5d4",
+    "tests/test_scale_snapshot.py": "3c9a4ee4e1635cef181991ad57327e0cf32defbc419052b4fced93cb8abb027b",
+    "scripts/check_training_cpu.py": "72e33b32447eb600e0e04e8fc2e943fe584ea7a4397e9d2bc517f918b346751d",
+    "artifacts/training-cpu-integration-v2/verification.json": "3964c7cf62cd81e7f7d9e43e8dee9a93f180d2ebafb0a85d3e3de6cd4cf5a154",
+    "src/finetuning_labs/rewriter/reviewed_release.py": "50b54053037bb215b097cdb4d316d3ee6cdfb7d969075023891b78a960f880ae",
+    "src/finetuning_labs/rewriter/arka_pipeline.py": "ce64092a86e797f6794887c68ebb65a22336a8168a6282ebdf9a47038d8f5c99",
+    "src/finetuning_labs/rewriter/training.py": "fef99163fc828282bc4765d72a60c3477243e0e4a4973dd958f71a9b5d3ef6ee",
+    "src/finetuning_labs/rewriter/evaluation.py": "bbe29afd20bd902fc75392332c41c33ea44a899552345a05127a82d860bfc38e"
+  },
+  "findings": [
+    {
+      "severity": "high",
+      "file": "src/finetuning_labs/rewriter/colab_training.py",
+      "issue": "Checkpoint storage can exhaust Google Drive and break training. The model loads in FP32 (about 235M parameters, about 0.94 GB of weights), and every epoch checkpoint also saves AdamW state (save_only_model is False). Each checkpoint is about 2.8 GB. With save_total_limit=2 the proof keeps 2 of 5 checkpoints plus selected-model (about 6.5 GB), and full training keeps 2 of 3 plus selected-model (about 6.5 GB). That is about 13 GB live. Files that rotation deletes through the Colab Drive mount go to Drive trash, which still counts toward quota (4 rotated checkpoints, about 11 GB more). This is more than a free 15 GB Drive, and the notebook writes to Drive by default. A full Drive during torch.save or a safetensors write leaves a partial checkpoint. get_last_checkpoint can then choose that checkpoint on resume. The proof checkpoints are never used after the proof.",
+      "suggested_fix": "For the proof stage, do not save to Drive. Use save_strategy='no' with load_best_model_at_end=False and keep only the metrics, or write the proof to local /content. For full training, set save_only_model=False only on the latest checkpoint, or set save_total_limit=1 (load_best_model_at_end still keeps the best). Before training starts, check free space with shutil.disk_usage and stop if it is less than about 10 GB. Document that deleted Drive files go to trash. Write each checkpoint completely before it becomes resumable, or verify the checkpoint files before resume."
+    },
+    {
+      "severity": "medium",
+      "file": "src/finetuning_labs/rewriter/colab_training.py",
+      "issue": "An interruption before the first checkpoint leaves a training run that can neither resume nor restart. bind_run writes run.json before training. save_strategy='epoch' writes the first checkpoint only after about 63 optimizer steps (1,000 sequences). If Colab disconnects before that, the notebook passes --resume because run.json exists, and get_last_checkpoint returns None ('No saved checkpoint to resume'). Without --resume, bind_run raises FileExistsError. The user must delete Drive files by hand.",
+      "suggested_fix": "On --resume with a matching binding and no checkpoint, start training from the pinned base in the same directory, and record that the restart was from step 0. Also save checkpoints by step (for example save_strategy='steps', save_steps=20, model and optimizer only on the latest), keep eval_strategy='epoch', and keep selection on dev loss. If you do this, check that load_best_model_at_end still selects by dev eval_loss: load_best_model_at_end needs eval and save steps to match, so you can also evaluate every save_steps on dev."
+    },
+    {
+      "severity": "medium",
+      "file": "notebooks/rewriter_train_l4.ipynb",
+      "issue": "Resume runs completed training stages again and overwrites their results. With RESUME_RUN set, every flag stays True, and run() adds --resume for each stage that has run.json. A proof or train stage that already finished calls trainer.train(resume_from_checkpoint=<final checkpoint>) again. Then training-result.json, trainer_state.json and selected-model are written again with the metrics of a resumed run that does no steps. The file then no longer reports the original training metrics. selected-model is also rewritten while tuned/run.json binds its hashes. If the bytes differ, tuned resume then refuses.",
+      "suggested_fix": "In colab_training.main, return before training if training-result.json and selected-model already exist and the binding matches. Or write training-result.json only once, with exclusive create ('x' mode). In the notebook, skip a stage whose completion marker exists."
+    },
+    {
+      "severity": "medium",
+      "file": "src/finetuning_labs/rewriter/colab_training.py",
+      "issue": "The base model's generation_config.json is not checked, recorded or hashed. Transformers 5.21 runs GenerationConfig.validate(strict=True) in save_pretrained, so it raises if the inherited config contains sampling-only flags (for example temperature or top_k) without do_sample=True. That error would happen when the first checkpoint is saved. The CPU integration check used from_config, so it did not exercise this path. Generation also inherits every flag that generate() does not override, for example repetition_penalty and no_repeat_ngram_size. The outputs do not record the effective decoding settings. tuned checkpoint_hashes also leave out generation_config.json, so a changed decoding config on resume is not detected.",
+      "suggested_fix": "Pass one explicit GenerationConfig(do_sample=False, max_new_tokens=2048, eos_token_id, pad_token_id, repetition_penalty=1.0, use_cache=True) to both baseline and tuned generate calls. Record its to_dict() in run.json and in each output record. Hash generation_config.json and the tokenizer files in checkpoint_hashes. Before training, call model.generation_config.validate(strict=True), or replace the config with a clean greedy config, so that checkpoint saving cannot fail. In the CPU check, load the pinned config and generation config (no weights) and save once."
+    },
+    {
+      "severity": "low",
+      "file": "src/finetuning_labs/rewriter/colab_training.py",
+      "issue": "The tuned-stage weight check does nothing. checkpoint_hashes always contains config.json, so the test 'if not binding[\"checkpoint_hashes\"]' can never find that safetensors weights are missing.",
+      "suggested_fix": "Collect the *.safetensors files separately and raise if that list is empty. Then add config.json, generation_config.json and the tokenizer files to the hashes."
+    },
+    {
+      "severity": "low",
+      "file": "src/finetuning_labs/rewriter/colab_training.py",
+      "issue": "load_release accepts any 84 validation rows that pass the internal checks. It does not check that they are the frozen reviewed-v2 validation bytes. Only release_scaled_data.py enforces this. audit_publication and the runtime do not.",
+      "suggested_fix": "Add the SHA256 values of reviewed-v2 data/validation.jsonl and sft/validation.jsonl as constants. Compare them in load_release and in audit_publication for the v3 prefix."
+    },
+    {
+      "severity": "low",
+      "file": "src/finetuning_labs/rewriter/colab_training.py",
+      "issue": "A partial last line in outputs.jsonl (for example, if the runtime stops during a write to Drive) raises JSONDecodeError on every resume. This keeps the run safe, but the user can only recover by editing the file by hand.",
+      "suggested_fix": "Allow only a final line that has no trailing newline. Move it to a quarantine file with its hash, and regenerate that case. Keep the edit and duplicate checks for complete lines."
+    },
+    {
+      "severity": "low",
+      "file": "src/finetuning_labs/rewriter/colab_training.py",
+      "issue": "The run binding includes the torch and CUDA versions. A Colab image update between sessions therefore blocks resume of the same run. proof_indices raises StopIteration, not ValueError, when a mode has no short identity or short non-identity example.",
+      "suggested_fix": "Record the environment for each session in a separate log, and bind only versions that affect the results, such as transformers and the pinned packages. Replace next(...) with an explicit check that raises ValueError."
+    },
+    {
+      "severity": "low",
+      "file": "notebooks/rewriter_train_l4.ipynb",
+      "issue": "The install cell pins transformers, accelerate, huggingface_hub and jinja2. It does not pin tokenizers, safetensors or torch (torch must only be at least 2.6). The report zip collects every .json file below RUN_DIR, including the tokenizer.json and config copies in every checkpoint directory.",
+      "suggested_fix": "Pin tokenizers and safetensors, and record pip freeze in the run directory. In the zip, include only the run.json, readiness, training-result, trainer_state and outputs files."
+    },
+    {
+      "severity": "low",
+      "file": "src/finetuning_labs/rewriter/scale_data.py",
+      "issue": "In review_ready, the source indices are claimed before review finishes. If the process stops after source-indices.json is written but before summary.json, those sources can never be reviewed again, and release_scaled_data refuses the whole release ('Review shard incomplete'). Opus batches that fail or are cut off (finish_reason != 'stop') return [] silently, so their rows stay unreviewed for good. This fails closed but reduces the number of passing rows without warning.",
+      "suggested_fix": "Allow an explicit resume of an incomplete shard that reuses the saved calls. Record the failed batch indices in summary.json. Optionally, retry failed batches through a new saved-call path."
+    },
+    {
+      "severity": "low",
+      "file": "src/finetuning_labs/rewriter/reviewed_publication.py",
+      "issue": "Publication also writes the repository root README.md, which changes the default dataset configs for later revisions to the new prefix. Versioned prefixes are not overwritten, so frozen data stays safe. This was the behavior before this change too.",
+      "suggested_fix": "Say in the receipt and the commit message that the root README is replaced. Or publish the root README in a separate, explicit step."
+    }
+  ],
+  "checks_run": [
+    "Read all ten requested files completely, and the relevant parts of reviewed_release.py, arka_pipeline.py, training.py, evaluation.py and benchmark.Case.user_message.",
+    "uv run --locked pytest -q tests/test_colab_training.py tests/test_scale_data.py tests/test_scale_snapshot.py with HF_HUB_OFFLINE=1: 16 passed. Full suite: 81 passed. These are unit checks only.",
+    "Inspected the installed transformers 5.21.0 source (/tmp/rewriter-training-check venv): TrainingArguments.warmup_steps accepts a float ratio (get_warmup_steps(189)=10). Lfm2ForCausalLM supports gradient checkpointing, eager/sdpa attention, and a native torch causal conv fallback that masks padding states. GenerationConfig.save_pretrained validates strictly.",
+    "Built TrainingArguments with the exact full-training parameters (CPU variant) under transformers 5.21.0. Construction succeeded.",
+    "Encoded every reviewed-v2 SFT row (train, dev, validation) with encode_example and the cached pinned tokenizer (revision 40cb2ad, pad id 0, eos <|im_end|> id 7, right padding). All rows passed. The maximum chat length is 4029 tokens. The labels start after '<|im_start|>assistant\\n' and end at <|im_end|>, and the trailing newline is masked.",
+    "Ran load_release against a temporary copy of reviewed-v2 with a mocked hf_hub_download. It rejected the wrong split counts, a flipped pair_verdict and changed context. With relaxed counts, the structural load succeeded.",
+    "Ran generate with a fake model and tokenizer. No assistant message entered the request. The decoding kwargs were do_sample=False, max_new_tokens=2048, explicit eos and pad. Resume skipped the completed cases. Edited records and partial lines were rejected.",
+    "Reviewed the pinned base config.json and chat_template.jinja (Lfm2ForCausalLM, tied embeddings, 14 layers, vocab 65536).",
+    "Computed SHA256 values of the exact reviewed file bytes."
+  ],
+  "limitations": [
+    "No GPU, Colab, Drive or BF16 autocast execution was verified. The CPU integration used a random 2M-parameter Lfm2 model with bf16=False, so it did not exercise BF16 AMP, L4 memory or throughput, or the real 230M weights.",
+    "The base model's generation_config.json at the pinned revision was not available offline. Its effect on checkpoint saving and on greedy decoding was not verified.",
+    "The full train, proof, tuned and main paths, Trainer resume from a real checkpoint, and load_best_model_at_end with real dev evaluation were not run.",
+    "release_scaled_data.prepare, review_ready, review_candidates and the Hub publication were not executed. The v3-1000 data, the Opus data reviews and the Hub prefix do not exist yet, so the 1,000/100/84 counts, per-mode balance, target uniqueness and leakage results are not verified against real data.",
+    "Deterministic checks and tests do not establish the semantic quality of the rows or of the model outputs. The Opus row verdicts are model judgments, not human labels.",
+    "The notebook gate checks the downloaded script against the release manifest and this review. It cannot prove that the notebook a user opens is the reviewed notebook.",
+    "The Drive quota and trash behavior is estimated from checkpoint composition and Colab behavior. It was not measured."
+  ]
+}

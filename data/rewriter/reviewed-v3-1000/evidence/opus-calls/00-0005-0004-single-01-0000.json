@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "anthropic/claude-opus-5.5",
+    "max_tokens": 6000,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-v3-train-polish-0012\", \"row_sha256\": \"507371a3edd0d771dd8e282a5a43df3d0f5c520bd92dcaa2527decf3e0470224\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"the dust collector in the west room at cedar bench makerspace is going to be unavailable tuesday, may 14, from 9 a.m. to noon, because its filter is being replaced. people can still use the main room benches and hand tools. i think this is a good window to work on carving projects instead.\", \"output\": \"The dust collector in the west room at Cedar Bench Makerspace will be unavailable Tuesday, May 14, from 9 a.m. to noon while its filter is being replaced. Members can still use the main room benches and hand tools. I think this is a good time to work on carving projects instead.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-v3-train-polish-0012"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "507371a3edd0d771dd8e282a5a43df3d0f5c520bd92dcaa2527decf3e0470224"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "bc63bfd6cfe3539cf6bfa43f1ec911a9a1fd535ff9cf888303e91e868eabaf03",
+  "started_at": "2026-10-28T03:44:33.289883+00:00",
+  "result": {
+    "id": "gen-1793159073-dUZp4d7qODKXF0JMLhks",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-v3-train-polish-0012\",\"row_sha256\":\"507371a3edd0d771dd8e282a5a43df3d0f5c520bd92dcaa2527decf3e0470224\",\"critique\":\"The input is a plausible lowercase draft with clear intent and no leaked instructions or fake noise. The output is natural, correctly capitalized prose that keeps everything else intact: the date (Tuesday, May 14), the time (9 a.m. to noon), the location (west room, Cedar Bench Makerspace), the filter replacement as the reason, the available main room benches and hand tools, and the hedged suggestion 'I think'. Changing 'because' to 'while' and 'window' to 'time' keeps the meaning. The one questionable edit is 'people' becoming 'Members'. This narrows who may use the space and implies a membership status the input never stated. It is minor, but it may add an unsupplied fact, so the pair is uncertain rather than a clear pass.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"uncertain\",\"verdict\":\"uncertain\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "I'm weighing whether swapping \"people\" for \"Members\" introduces an unsupported assumption—narrowing the audience at a makerspace where non-members could also be present. It's a subtle specification not in the original, so I'm uncertain whether strict grading would flag it as a material defect.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "I'm weighing whether swapping \"people\" for \"Members\" introduces an unsupported assumption—narrowing the audience at a makerspace where non-members could also be present. It's a subtle specification not in the original, so I'm uncertain whether strict grading would flag it as a material defect.\n\n",
+              "format": "anthropic-claude-v1",
+              "index": 0,
+              "signature": "CAQS3AkKEAgTGAI4AUIIdGhpbmtpbmcSDC2gslNCVq7aWzpoOxoMhZUY64caqZnMeM+aIjDS9j7Hq7UJPa50x2gP9WcZEuve6jNd2Z7rrw2tF/SnN3nqQ6RHOz6l81FS7I/WXmUq+Qj87pumSU268HmvPjumOwk953DnVTmNfyKibsPo54mOpZeGoUqf4tyyx/E8WaEZZpZm74C41SSPFlULMmk2Fh4Hku4LRAV0sKj8J7TkAQLox3i0gKyfzWRwEPnzI9LsUBIPkGlE/sl9EGNbf11Ad9M2gvKLkBrdMB2qjWUv+diVYzwmAFQT27j90HdOhC/tPkQrCl1ZTvFj+bY+V+K7epjyL6VpLWyjxV0doFm2XsaXUuHo/dksYj6xU6zHdIf2MNd5OIGakqEggO3coyMtkUBbwfC5UAo2hknhv5ok9rIiy5HvCMmBcHbEeMIWRkD4fyFSfw77+nKpQo9aXT+4linjxj6gJ91s/gOzx9LTtn8TczO+eLTAlUosWy8ftD+GqNpdYE0aVNBnM43C4+Zc88ssr49xZYjj7gk2DNWmvQfOykTmmvYbo6ZhCTE1tFLA7BMvm7cIS1qwACqgkfKnwlmzXrkPpPzOLxL+NInQHwfuVXyNV8JG7SuigaG+wd7Y/PHeVgZKXtFg+pw3knKACf7fZWrTlF+6UR/aosn0MZ5vFLhkZKcKAfEnEwcxILDkm51ZWsSXheRIzsEXjC9pHAdt8oEaoQF+e4Sis77bST/JBX7vAb6Y2rewdJYyHL9tz/1M1MuDYKqj6MlEathk2IyZQwhYkrQ3UbRSSF/tjyvqSy987CUG1CW2ppth0umVMpwiZRj4BB/3QPCRyxPUx1rYM5OplghB8KyNguY+MnB7STEipzOiXt+Ltt4DgQFmyx/olPMqfRJg2tFOKD4F3Zl4l1+9/mz2VeqhsiXYorhxlAaf6VxcP02O9WVTjpv0n1qt9yqn31gJbnjPpsY32lkwo87iNLzvqFIYo+czITmV6rv/TzKQcBa4at7faz1pOlvlG8lO505DB/SSTMSVvphrRQLumKbbu0dUvODFAB5sv4Ch6veguHQTGl+iCnvofKIkf08ZSdgkbPt93i2tW2HEmtcnTfwpHKcbUZfSxxLIkHQyVw41d2WSMHuKgBDMxO0vddJXgMiMro9eNkqI8Dr1RZvCzPB4b+4C+ZFnMy1TaPZ/AejKeBJCIF0iMswkSSxnRYvm2XkHusw34qhXtxOA5YVI5RFXjwm/eaSKAx/SDS76XlKNrflhoTm+5Hv8EisZ9BUpRhlSLJSegI5leI1lVdrRYsvJ3zCljbfGTqG4LleOq2VOt5MU5kJjPi+6bH2NsFepSgiHVxYfWkcabBQagK0yBtdDMPgkKcvK9dJkzylx8yhWbdZ6PIMRwJK2ApjdpAYbJ+FszdUoZZ19MftiuKA+9WmcTZ56izSnegAIwemyrNfbgKdXnrjKZeUCeSeABtQRsWk3IbqHF8awBZUmhRtb+nUoOjP2MSDeD67AFBqYDFqBfUSSJ9dmRveYLCY18X3QcSxqoHV7D4LrhPMQBlJwq3mQoAstxPQYJIdIbsXS0LHM0nj+ZkmVvxyLFixiOdC2HQ/8LGGAQ83Zj1IkzUM/9aiceF9xkH7LdKeqIyBCSgGRXKzDhRgB.eyJlbmRwb2ludF9zbHVnIjoiYW50aHJvcGljL2NsYXVkZS1vcHVzLTUuNS0yMDI2MDkyMXxjbGF1ZGUtb24tYXdzIn0"
+            }
+          ]
+        },
+        "native_finish_reason": "end_turn"
+      }
+    ],
+    "created": 1793159073,
+    "model": "anthropic/claude-opus-5.5",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 593,
+      "prompt_tokens": 1554,
+      "total_tokens": 2147,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 215,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0.018076,
+      "is_byok": false,
+      "cost_details": {
+        "upstream_inference_cost": 0.018076,
+        "upstream_inference_prompt_cost": 0.006216,
+        "upstream_inference_completions_cost": 0.01186
+      }
+    },
+    "provider": "Claude Platform on AWS"
+  },
+  "result_sha256": "b8213aefddf47ffe74a63948db7e3f3b58db33c31d738dfbc969f762b873aeeb",
+  "elapsed_ms": 9800
+}
