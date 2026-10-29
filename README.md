@@ -5,13 +5,16 @@ Code and notebooks stay in Git. Hugging Face hosts the public data and trained a
 
 ## Latest trained adapter
 
-The [230M LoRA](https://huggingface.co/jayshah5696/lfm2.5-230m-rewriter-lora) is trained and uploaded.
-On the frozen 84-case diagnostic, stock passes 4/84 and the LoRA passes 48/84. The LoRA preserves
-all eight explicit identity cases, but has 25 judge-flagged critical errors and passes only
-3/13 long cases. It is not ready for acceptance under the current targets.
-[Read the findings](data/rewriter/evals/lora-validation-20261028-a10g/FINDINGS.md) and
-[the full report](data/rewriter/evals/lora-validation-20261028-a10g/comparison/REPORT.md).
-Both arms used the same A10 runtime and Sol rubric. These are development-validation model judgments.
+The [230M LoRA](https://huggingface.co/jayshah5696/lfm2.5-230m-rewriter-lora) was retrained on all
+1,500 examples. The checked revision is `ba71856780e4d2398218fe76756b3390556437ea`.
+On the frozen 84-case diagnostic, stock passes 4/84 and the updated LoRA passes 53/84, compared
+with 48/84 for the previous adapter. Long passes improve from 3/13 to 4/13, but identity falls
+from 8/8 to 7/8. It has 18 judge-flagged critical-error outputs among 83 complete outputs and
+one truncation. It is not ready for acceptance under the current targets.
+[Read the findings](data/rewriter/evals/lora-1500-validation-20261029-a10g/FINDINGS.md) and
+[the full report](data/rewriter/evals/lora-1500-validation-20261029-a10g/comparison/REPORT.md).
+Both arms ran on the same A10 with the unchanged Sol rubric. Exact judgments are reused only
+for unchanged packets. These are development-validation model judgments, not human gold labels.
 
 ## Data
 

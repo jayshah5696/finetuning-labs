@@ -1,5 +1,25 @@
 # Status
 
+## Updated adapter evaluation, 29 October 2026 UTC
+
+The newly uploaded adapter `ba71856780e4d2398218fe76756b3390556437ea` has different weights
+and records the 1,500-row dataset commit. All 164 tensors are finite and differ from the older
+adapter. Its matched A10 evaluation passes 53/84 cases, up from 48/84. The equal-mode score
+is 64.1%, compared with 58.1%. Six cases newly pass and one previous pass regresses.
+
+Mode passes are Slack 15/16, transcribe 21/35, prompt 7/16 and polish 10/17. Long passes are
+4/13, up from 3/13. Identity preservation regresses from 8/8 to 7/8. There are 18 judge-flagged
+critical-error outputs among 83 complete outputs and one truncated long prompt. On the same
+83 complete cases, the earlier adapter had 24 critical-error outputs. The model remains below
+the acceptance targets. No new training, dataset changes or notebook changes occurred in this run.
+
+All 168 generation records were collected from Modal. All 84 stock outputs match the previous
+run. Exact matching packets reuse 125 prior Sol calls; 42 changed complete outputs receive
+fresh Sol calls. There are no judge errors or uncertain verdicts. The unchanged 2,048-token
+budget remains enforced. Reports, raw records, runtime checks, reproduction commands and
+before/after transitions are in data/rewriter/evals/lora-1500-validation-20261029-a10g.
+Human calibration and an independent final test remain pending.
+
 ## Targeted training-data update, 28 October 2026
 
 The current dataset is `data/rewriter/current/`. It retains the original training rows and

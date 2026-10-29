@@ -1,10 +1,13 @@
 # Validation contract
 
 This contract defines what a rewriter should do. The current trained-adapter diagnostic uses
-the 84 frozen reviewed-v2 cases. Stock passes 4/84; the LoRA passes 48/84. Both arms used the
-same A10 runtime and unchanged Sol rubric. All 168 generations and assessments completed.
-The LoRA still has 25 judge-flagged critical errors and only 3/13 long-case passes.
-See [the full report](data/rewriter/evals/lora-validation-20261028-a10g/comparison/REPORT.md).
+the 84 frozen reviewed-v2 cases. Stock passes 4/84; the updated 1,500-example LoRA passes 53/84,
+compared with 48/84 for the earlier adapter. Both arms used the same A10 and unchanged Sol rubric.
+All 168 generation records returned; one LoRA output truncated. The 167 eligible semantic
+judgments completed, with exact cached judgments retained for unchanged packets.
+The updated LoRA has 18 judge-flagged critical-error outputs among 83 reviewed outputs,
+4/13 long passes and 7/8 exact identities. The truncation remains a failure, not a semantic pass.
+See [the full report](data/rewriter/evals/lora-1500-validation-20261029-a10g/comparison/REPORT.md).
 The historical 68-case results below remain separate. Human calibration and a final test are pending.
 
 ## What can fail

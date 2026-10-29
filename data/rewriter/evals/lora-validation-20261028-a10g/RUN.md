@@ -10,13 +10,15 @@ The submit step checks all 84 SFT rows against the public frozen validation Parq
 
 ```sh
 uv run --locked --group data --group remote modal run --detach \
-  scripts/modal_eval.py::submit_lora --run-id NEW_RUN_ID --gpu A10G
+  scripts/modal_eval.py::submit_lora --run-id NEW_RUN_ID --gpu A10G \
+  --adapter-revision 034d54e5b7c291fea1f8fcacba77fc8dad543bc4 \
+  --dataset-revision bbcdb7692445a4310296060606b8a6dcce439f47
 uv run --locked --group data --group remote modal run \
   scripts/modal_eval.py::collect --run-id NEW_RUN_ID
 ```
 
 Use --gpu L4 when an L4 is available. Both arms run on the same requested device. The trained
-adapter, base and dataset commits are pinned in submit_lora and copied into modal.json.
+adapter and dataset commits are explicit above; the base is pinned in the config. They are copied into modal.json.
 This run used app ap-hDqAPHepNc3tT01B1r0tpL and call fc-01M628A8KA2V4PYCTSTZS5C3FP.
 The volume is finetuning-labs-evals. Its root for this run is lora-validation-20261028-a10g.
 
