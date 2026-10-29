@@ -68,7 +68,12 @@ def execute_lora(run_id: str, config: dict, adapter: dict):
 
 
 @app.local_entrypoint()
-def submit_lora(run_id: str = "lora-validation-20261028", gpu: str = "L4"):
+def submit_lora(
+    run_id: str = "lora-validation-20261028",
+    gpu: str = "L4",
+    adapter_revision: str = "ba71856780e4d2398218fe76756b3390556437ea",
+    dataset_revision: str = "139bb98b0500fa12ad43dc6c8c5cd4d17645eb86",
+):
     import hashlib
 
     import pyarrow.parquet as pq
@@ -81,11 +86,13 @@ def submit_lora(run_id: str = "lora-validation-20261028", gpu: str = "L4"):
     devices = {"L4": "L4", "A10G": "A10"}
     if gpu not in devices:
         raise ValueError("Use L4 or A10G for matched BF16 evaluation")
+    for revision in [adapter_revision, dataset_revision]:
+        if len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
+            raise ValueError("Pin adapter and dataset to immutable 40-character Hub commits")
     destination = PROJECT / "data/rewriter/evals" / run_id
     receipt_path = destination / "modal.json"
     if receipt_path.exists():
         raise FileExistsError("A run receipt exists; collect it instead of resubmitting")
-    dataset_revision = "bbcdb7692445a4310296060606b8a6dcce439f47"
     data = Path(
         hf_hub_download(
             "jayshah5696/finetuning-labs-rewriter-training",
@@ -116,7 +123,7 @@ def submit_lora(run_id: str = "lora-validation-20261028", gpu: str = "L4"):
     )
     adapter = {
         "adapter_model": "jayshah5696/lfm2.5-230m-rewriter-lora",
-        "adapter_revision": "034d54e5b7c291fea1f8fcacba77fc8dad543bc4",
+        "adapter_revision": adapter_revision,
     }
     destination.mkdir(parents=True, exist_ok=True)
     receipt = {
