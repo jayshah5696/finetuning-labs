@@ -2,7 +2,9 @@
 
 Use `uv` and the project Makefile. Keep this project independent of the root uv workspace.
 
-The current dataset is data/rewriter/current with 1,500 training, 100 development and 84 validation pairs.
+The source dataset is data/rewriter/current. Preserve all earlier training rows and the complete
+100-row dev and 84-row validation files. The active public export selects English only, with
+frozen 89-row dev and 81-row validation views. English additions append only to training.
 Update the existing public dataset in place. Do not introduce a new dataset version or repository.
 The public Hub repositories now contain Parquet data, dataset cards and source-license notices
 only. Code, notebooks, configs, review reports and run logs belong in Git. Do not upload those
@@ -16,7 +18,9 @@ into data releases. The builder embeds the canonical lora_training.py helpers, a
 compares their ASTs. Public data and base-model downloads use token=False. Old notebooks and
 runtime bundles are available in Git history. Data review must not depend on those code bundles.
 Keep all v2 validation rows and source families out of future training expansions. The student
-is `LiquidAI/LFM2.5-230M`. Comparisons use GPT-6 Luna as the cloud baseline and teacher,
+models are `LiquidAI/LFM2.5-230M` and `LiquidAI/LFM2.5-350M`. Use the same notebook with its
+model preset; each base needs its own adapter repository. The user will run training in Colab.
+Do not launch Modal training. Comparisons use GPT-6 Luna as the cloud baseline and teacher,
 and GPT-6.1 Sol as the historical baseline evaluator. Replacement data uses the latest clean Arka
 pipeline with Luna Decisions, followed by GPT-6.1 Sol verification. GPU work targets Google Colab L4.
 

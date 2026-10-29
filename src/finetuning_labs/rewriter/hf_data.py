@@ -17,6 +17,20 @@ TRAIN_REPO = "jayshah5696/finetuning-labs-rewriter-training"
 BENCHMARK_REPO = "jayshah5696/finetuning-labs-rewriter"
 
 
+def english_splits(rows, guides, support):
+    selected_rows, selected_guides = {}, {}
+    for split in rows:
+        metadata = [m for m in support if m["split"] == split]
+        selected_rows[split], selected_guides[split] = [], []
+        for row, guide, meta in zip(rows[split], guides[split], metadata, strict=True):
+            if guide["user"].splitlines()[1] != "LANGUAGE: " + meta["language"]:
+                raise ValueError("Verified language and SFT header differ")
+            if meta["language"] == "en":
+                selected_rows[split].append(row)
+                selected_guides[split].append(guide)
+    return selected_rows, selected_guides
+
+
 def _parquet(rows, columns):
     import pyarrow as pa
     import pyarrow.parquet as pq
@@ -34,7 +48,9 @@ def _parquet(rows, columns):
     return data
 
 
-def build_dataset(rows, guides, *, title, description, license_text, source_license):
+def build_dataset(
+    rows, guides, *, title, description, license_text, source_license, languages=None
+):
     import yaml
 
     if set(rows) != set(guides) or not set(rows).issubset(SPLITS):
@@ -62,7 +78,7 @@ def build_dataset(rows, guides, *, title, description, license_text, source_lice
         configs.append(item)
     metadata = {
         "pretty_name": title,
-        "language": ["en", "de", "pt"],
+        "language": languages or ["en", "de", "pt"],
         "license": "other",
         "task_categories": ["text-generation"],
         "tags": ["text-rewriting", "synthetic"],
@@ -133,6 +149,21 @@ def _sources():
     counts = {s: len(v) for s, v in rows.items()}
     if counts["train"] < 1000 or counts["dev"] != 100 or counts["validation"] != 84:
         raise ValueError("Keep at least 1000 train rows and the frozen 100/84 holdouts")
+    support = json.loads((release / "supporting.json").read_text())
+    rows, guides = english_splits(rows, guides, support)
+    from .evaluation import digest
+
+    freeze = json.loads((PROJECT / "data/rewriter/english-holdout-freeze.json").read_text())
+    for split, expected in freeze.items():
+        ids = [m["id"] for m in support if m["split"] == split and m["language"] == "en"]
+        if (
+            len(rows[split]) != expected["count"]
+            or digest(rows[split]) != expected["data_sha256"]
+            or digest(guides[split]) != expected["sft_sha256"]
+            or ids != expected["case_ids"]
+        ):
+            raise ValueError("Frozen English holdout view changed")
+    counts = {s: len(v) for s, v in rows.items()}
     bundle = load_bundle()
     old_rows = [{k: getattr(case, k) for k in PAIR_COLUMNS} for case in bundle.cases]
     old_guides = [
@@ -147,9 +178,10 @@ def _sources():
                 TRAIN_REPO,
                 rows,
                 guides,
-                "Rewriter training data",
+                "English rewriter training data",
                 (
-                    f"{counts['train']:,} training pairs, 100 development pairs and 84 frozen development-validation pairs. "
+                    f"English only: {counts['train']:,} training pairs, {counts['dev']} development pairs and {counts['validation']} frozen development-validation pairs. "
+                    "The English holdout cases retain their original texts and order. The full multilingual source holdouts remain in Git and historical Hub commits. "
                     "Use dev for checkpoint selection and "
                     "validation for the later comparison. All selected pairs retain exact-row model reviews."
                 ),
@@ -161,7 +193,7 @@ def _sources():
                 "Rewriter calibration benchmark",
                 "The original 68 authored calibration cases. "
                 "These historical references are preserved. The current training dataset has the "
-                "separate frozen 84-case validation split: "
+                "separate frozen English validation view: "
                 "[rewriter-training](https://huggingface.co/datasets/" + TRAIN_REPO + ").",
             ),
         ],
@@ -204,6 +236,7 @@ def main():
             description=description,
             license_text=license_text,
             source_license=source_license,
+            languages=["en"] if repo == TRAIN_REPO else None,
         )
         output = args.output / repo.split("/")[1]
         output.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-transcribe-short-0164\", \"row_sha256\": \"992415f41164821983723c35948ee875b2d35392a15b04968adf73ddca0dc163\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"um can you reserve room 204 for the film society's friday screening actually the projector in our usual room is still being repaired\", \"output\": \"Can you reserve room 204 for the film society's Friday screening? Actually, the projector in our usual room is still being repaired.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-transcribe-short-0164"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "992415f41164821983723c35948ee875b2d35392a15b04968adf73ddca0dc163"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e11e39fb1488d333e675b356a6fd642f668d284ebd4fae6c3f342e31461fa8f6",
+  "started_at": "2026-10-29T15:01:47.243296+00:00",
+  "result": {
+    "id": "gen-1793286107-nS92RzkZ6AgJo0UUVwXP",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-transcribe-short-0164\",\"row_sha256\":\"992415f41164821983723c35948ee875b2d35392a15b04968adf73ddca0dc163\",\"critique\":\"The input is plausible dictation with a clear reservation request and explanatory follow-up. The output appropriately removes the initial hesitation “um,” adds punctuation and capitalization, and preserves all meaningful wording, including “actually,” room 204, Friday’s screening, and the projector’s ongoing repair. No material defects under /transcribe.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq41_erCF-WmKEK0J_4Fv5ohlAbxc2tQ0fnKZZ8D3UVCLUkiJ6mYKVgE6RSLybWlPNyT42U4BoMQbCEleBH_Szfa_99rXvOpD_NaqZ4RJ3-eZuhJUQpAhy7YwlQ602eGDD_HQG8VAEis3RYsxvpr1Ug8Gz6lhVqW0t1gAf-gMvyMldoVyd50TXjgH-yBE8c6oTApeEHuuk9KF34sGK4mSVTxMsQwkiwMe8JyWCmjiNGISIctuG1rzV3zDgE8m2EmjLGifRrdEQaZDRfQ-I_TpfkhpwSN1-SWsOyY8OMovPVf2kcUBRK540Kkc7cSeI1iE2ZX-CFeZqM7z04cxVVKVlzcQH74TGo644eRJfZQ6XhvZbqi2QH7AT7XsjGElITlyHgr-u2ufrS-vB1Wh6woZJGYc0XBWCBJdr8AmCCU310g7JViDT_0ImiN3UJDhs31sx4uucscJJVpH1ERGcm7GY05Nveq1oT7qWv4dHnTPmVD1DhoJPi5Rml2EVjcxu6GFo7aoaRRf_a5Qbdm4ixxK8nfj-kkaZLMZBz6ltAoKn-f_D0-vLxOFIfyzkVyyK3iyatSLug4ECgMMXcevhwa7zmV8GLy97x2Nt7rLFj_uUMWUu6alHmN3NgkdLfX2n40IxHEgA_zTzZdb5dkGzL423XME5VlZrvi1AmeXfooNkqUIbNkVynIYLGGGTtCuRpHC8XDhTf9N5BRMnnC7X3bgbEWs9VZlewXZYod4_ya9BIZWuZK_kFRiFrPFoFjjwtKyI79jV7dv-Lz2DqAc4QDRwlqmgFTvUNTKDsgsw0sc2ciq5SvitS-XtVIpykKiR4GUec02htO_C9vkJwhyt4FBYJMLRE90FEUyr9pEqLeOKkf-jqs16kGIntg4jsm6F5pD5sUpcry9qYrG_jTNR6xdVpgwPkysZq6Vr90FGYv27UKpkJkGiHxyl8o4HFNUxpMtLuHynd4l_vCNH7lxVKZY1Q0ecMNskj_CL8OE5DcuoOyx2-6OBALFnz1cSPBEgraHGTthwYXvVImaue9-cjXIt_dpwN6nNFgyk0VOS41SMgRjvPK208q6cdkUV_wyVZhliy1hD4wVdrRg17tWtIqX82IH8kw6zMfU1IK2nwA8GbEQUdMcE-wERb3wpnFsQvC2Isn82spimyGsqcaZCqddB3Cs6mUeRj1X0t__GFbWgL-t_4zLwOCtZHG5vMQd4tENPrdSZ7j1b9nZDwSEbvsTtGIL0kC7G5cW8TfBrV7eCNrZ0Kf3u6BFgq4Km9LJm36gyWWyRc8er1wt-v8NE2HdKvMgZ3Up-tp0e_qM-e9HtWUg4sNd-zKoZvex7QDux3l3Nu1L0cYOSqmqaVt2v7o9sbEwEBanYNwIlawkb6DEqqWU-iltm4IN-D8v2AdElCwY51tWWjVrwosOJ-0s38MC08bX1PXqzc2YJ82e0DUwpWOIprRlKHan7Y1OCm2-IatoHMYk-V4h5TtcTk7tzzhz3tLNxkU4asXZRiPJM0ZgIs7VCDgo_u4HqO2PF9uUV2vV4yftrHIB-5_COnXpCVv_L5SJ3S6mTVIk7UlfYGq3-UirR8nI8uI5ryOOyIo4MUpDjeyahmwCf_Dalq2BYMUe2OsgAcHhbp4E1T7--Xv_amXzvOVqMB8-xQ-bBW2ohw1qdZqOZX1R4E0k4cKRQRNHFsNFnRfVeuDeitHv2QiFmix-Dh99KXo7wLo64PCJ2uCVTMwp4b9NUDrBpCNqoHQXFzenlpjnYhBPSumGU0Pavlfdq7TRQ0EIQL7yLan9We1f6gASJ3nzwu3uufSF3RyXUy6TeLtG6-L5YJhmGT-uFH4CylU6qM7kIyprIc8_Ky4XgLpu5DmYHlpgLlz85PcrUr_whpQ==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_035bf743478336c3016ae35fdcc9f887d0803969f3d05fe35c",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793286107,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 177,
+      "prompt_tokens": 659,
+      "total_tokens": 836,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 21,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003088,
+        "upstream_inference_prompt_cost": 0.001318,
+        "upstream_inference_completions_cost": 0.00177
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "d75a02a86b3ac5d8c02e5fd4be378e49683cf58db8d9d0460747eb77c3a72387",
+  "elapsed_ms": 3705
+}

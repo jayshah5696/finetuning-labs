@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-slack-long-0032\", \"row_sha256\": \"35143b9d8e20b5e62130f7f1e20017f94d096b20d5761d3aeafa317818254592\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"Maya — 9:12\\nmorning, quick update on the Linux desktop shortcut for Atlas Search. we're testing Ctrl+Alt+Space as the default launcher, since the old Super+N binding was already taken on a few of the laptops. the change is in branch desktop-shortcut-test, not in the packaged build yet. on my Fedora 41 machine it opens the search box in about a second, and it doesn't steal focus when the app is already open. i'll add the Ubuntu notes after the stand-up.\\n\\nJon — 9:19\\nthanks. i tried the same build on Ubuntu 24.04 with GNOME on Wayland. first press worked after login, but after i closed the lid and came back, the shortcut did nothing until i clicked the Atlas tray icon once. after that it worked normally. i haven't seen it on X11, and i don't know if the resume detail is related to the shortcut or just the app not waking up cleanly. can you leave that as an open question for now?\\n\\nMaya — 9:27\\nyep, keeping it open. one thing i noticed: the desktop file still says StartupNotify=true, and Atlas takes a few seconds to finish loading its index on a fresh session. the shortcut itself is registered by the settings helper, not by the search window, so i'm checking whether the helper reconnects when the session resumes. no need to change the binding yet. the old Super+N one will stay available in the test profile while we compare them.\\n\\nRavi — 9:41\\ni can check the config side. on my Pop!_OS 22.04 laptop, the helper wrote the new binding to ~/.config/atlas/shortcuts.json, but the file had the old value until i quit Atlas from the tray and started it again. relaunching just the search window didn't reload it. fyi, this is a local profile; the managed lab profile is read-only, so it may behave differently there. i'll test that separately and post the exact steps.\\n\\nMaya — 10:02\\nfor repro, i used a clean user profile and installed the current test package from the shared folder. steps were: 1) open Atlas once and finish the welcome screen, 2) set Ctrl+Alt+Space in Preferences, 3) close the window but leave the tray process running, and 4) press the shortcut from the desktop. it opens the search field for me each time. if you use the first-run session before finishing welcome, the Preferences page isn't there yet, so that isn't the same test.\\n\\nElena — 10:16\\nsmall UI note: the preference label currently reads “Global hotkey,” but the help text says the shortcut is available only while the Atlas background helper is running. that sounds a bit broader than what we support. could we change the label to “Desktop shortcut” and keep the existing help text for this test? also, please don't make it sound like the shortcut works on every Linux desktop; the screen reader and keyboard settings vary, and we only checked GNOME so far.\\n\\nMaya — 10:30\\ni agree about the label. i'll update the test build, but i'm not changing the help text until we've got the KDE result. one person on Plasma 6 said Ctrl+Alt+Space opens KRunner on their setup, though they had remapped it before testing Atlas. that means we shouldn't describe the combination as free by default. our preference lets people pick a different key, but it doesn't warn them when another desktop action already uses it.\\n\\nJon — 10:48\\ni checked the resume issue again. with the laptop on battery saver, waking after about 20 minutes left the helper in the tray but the keyboard event wasn't reaching Atlas. logging out and back in restored it; restarting Atlas alone didn't. when i repeated it plugged in, it worked after wake. that's just two tries on one machine, so i wouldn't call it a battery-saver bug yet. logs are in the thread folder, with the username removed.\\n\\nRavi — 11:03\\nmanaged lab profile test is done on the spare Dell. policy blocks edits to shortcuts.json, and Preferences shows the field disabled with “managed by your administrator.” the desktop shortcut still launches using the value supplied by the policy, which is Ctrl+Alt+A on that machine. i couldn't test changing the binding there, obviously. the admin policy doc doesn't mention resume behavior, so i'll ask IT whether those laptops use the same power setting as Jon's.\\n\\nElena — 11:25\\nfor the release note draft, i have: “Atlas Search can be opened with a configurable desktop shortcut on supported GNOME sessions.” i haven't added a default key combination because the desktop may already use it, and the test notes aren't broad enough to claim KDE support. if the wording is too cautious, let me know, but please keep “configurable” in there; users can set it in Preferences when the setting isn't managed.\\n\\nMaya — 11:46\\nnumbered checks for today's package: 1) launch after a normal login on Fedora 41, passed here; 2) launch after wake on Ubuntu 24.04, inconsistent in Jon's battery-saver test; 3) change the key in a local profile, requires a full Atlas restart before the helper picks it up; 4) launch under the managed lab policy, works with the administrator-provided binding, but editing is disabled. i've added the package hash and machine details to the test sheet, not the release note.\\n\\nMaya — 12:10\\ncurrent assessment is limited to the test package and the machines we've listed: the shortcut launches Atlas Search on the tested GNOME sessions when the helper is active, while wake-from-suspend behavior is still uncertain for the battery-saver case. local changes may need a full app restart, and managed profiles can only use the administrator's binding. we haven't established behavior across other Linux desktops or confirmed that the chosen key is unused on a user's system; please keep those limits in the tracker when you update the status. the open item is still whether the helper reconnects reliably after resume.\", \"output\": \"Maya — 9:12\\nMorning, quick update on the Linux desktop shortcut for Atlas Search. We're testing Ctrl+Alt+Space as the default launcher, since the old Super+N binding was already taken on a few of the laptops. The change is in branch desktop-shortcut-test, not in the packaged build yet. On my Fedora 41 machine, it opens the search box in about a second, and it doesn't steal focus when the app is already open. I'll add the Ubuntu notes after the stand-up.\\n\\nJon — 9:19\\nThanks. I tried the same build on Ubuntu 24.04 with GNOME on Wayland. The first press worked after login, but after I closed the lid and came back, the shortcut did nothing until I clicked the Atlas tray icon once. After that, it worked normally. I haven't seen it on X11, and I don't know if the resume detail is related to the shortcut or just the app not waking up cleanly. Can you leave that as an open question for now?\\n\\nMaya — 9:27\\nYep, keeping it open. One thing I noticed: the desktop file still says StartupNotify=true, and Atlas takes a few seconds to finish loading its index on a fresh session. The shortcut itself is registered by the settings helper, not by the search window, so I'm checking whether the helper reconnects when the session resumes. No need to change the binding yet. The old Super+N one will stay available in the test profile while we compare them.\\n\\nRavi — 9:41\\nI can check the config side. On my Pop!_OS 22.04 laptop, the helper wrote the new binding to ~/.config/atlas/shortcuts.json, but the file had the old value until I quit Atlas from the tray and started it again. Relaunching just the search window didn't reload it. FYI, this is a local profile; the managed lab profile is read-only, so it may behave differently there. I'll test that separately and post the exact steps.\\n\\nMaya — 10:02\\nFor repro, I used a clean user profile and installed the current test package from the shared folder. Steps were: 1) open Atlas once and finish the welcome screen, 2) set Ctrl+Alt+Space in Preferences, 3) close the window but leave the tray process running, and 4) press the shortcut from the desktop. It opens the search field for me each time. If you use the first-run session before finishing welcome, the Preferences page isn't there yet, so that isn't the same test.\\n\\nElena — 10:16\\nSmall UI note: the preference label currently reads “Global hotkey,” but the help text says the shortcut is available only while the Atlas background helper is running. That sounds a bit broader than what we support. Could we change the label to “Desktop shortcut” and keep the existing help text for this test? Also, please don't make it sound like the shortcut works on every Linux desktop; the screen reader and keyboard settings vary, and we only checked GNOME so far.\\n\\nMaya — 10:30\\nI agree about the label. I'll update the test build, but I'm not changing the help text until we've got the KDE result. One person on Plasma 6 said Ctrl+Alt+Space opens KRunner on their setup, though they had remapped it before testing Atlas. That means we shouldn't describe the combination as free by default. Our preference lets people pick a different key, but it doesn't warn them when another desktop action already uses it.\\n\\nJon — 10:48\\nI checked the resume issue again. With the laptop on battery saver, waking after about 20 minutes left the helper in the tray, but the keyboard event wasn't reaching Atlas. Logging out and back in restored it; restarting Atlas alone didn't. When I repeated it plugged in, it worked after wake. That's just two tries on one machine, so I wouldn't call it a battery-saver bug yet. Logs are in the thread folder, with the username removed.\\n\\nRavi — 11:03\\nThe managed lab profile test is done on the spare Dell. Policy blocks edits to shortcuts.json, and Preferences shows the field disabled with “managed by your administrator.” The desktop shortcut still launches using the value supplied by the policy, which is Ctrl+Alt+A on that machine. I couldn't test changing the binding there, obviously. The admin policy doc doesn't mention resume behavior, so I'll ask IT whether those laptops use the same power setting as Jon's.\\n\\nElena — 11:25\\nFor the release note draft, I have: “Atlas Search can be opened with a configurable desktop shortcut on supported GNOME sessions.” I haven't added a default key combination because the desktop may already use it, and the test notes aren't broad enough to claim KDE support. If the wording is too cautious, let me know, but please keep “configurable” in there; users can set it in Preferences when the setting isn't managed.\\n\\nMaya — 11:46\\nNumbered checks for today's package: 1) launch after a normal login on Fedora 41, passed here; 2) launch after wake on Ubuntu 24.04, inconsistent in Jon's battery-saver test; 3) change the key in a local profile, requires a full Atlas restart before the helper picks it up; 4) launch under the managed lab policy, works with the administrator-provided binding, but editing is disabled. I've added the package hash and machine details to the test sheet, not the release note.\\n\\nMaya — 12:10\\nThe current assessment is limited to the test package and the machines we've listed: the shortcut launches Atlas Search on the tested GNOME sessions when the helper is active, while wake-from-suspend behavior is still uncertain for the battery-saver case. Local changes may need a full app restart, and managed profiles can only use the administrator's binding. We haven't established behavior across other Linux desktops or confirmed that the chosen key is unused on a user's system; please keep those limits in the tracker when you update the status. The open item is still whether the helper reconnects reliably after resume.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-slack-long-0032"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "35143b9d8e20b5e62130f7f1e20017f94d096b20d5761d3aeafa317818254592"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "ec45d93555398079ab3f1475b03e5dcff7e9f32250fe8206ed2db8283ecc3cd9",
+  "started_at": "2026-10-29T15:18:41.942251+00:00",
+  "result": {
+    "id": "gen-1793287121-wv3zDQ0tcooH53fqZCxp",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-slack-long-0032\",\"row_sha256\":\"35143b9d8e20b5e62130f7f1e20017f94d096b20d5761d3aeafa317818254592\",\"critique\":\"The input is a plausible pasted Slack testing thread with recoverable intent and no material contradictions or authoring noise. The output makes only minimal capitalization, punctuation, and article corrections while preserving the casual tone and thread structure. All speakers, timestamps, versions, shortcuts, paths, quoted labels, test steps, and results remain intact. It also preserves the tentative battery-saver finding, restart requirements, managed-profile restrictions, GNOME-only testing limits, and the request to keep helper reconnection after resume open.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42PVyELick1j1d3GZZG2jhknk1WyL5VpOfSI7EwYBQu_ix0pzmlT5NGr1Xemf_wzuMvs4Rj2zs09g-MikVntCZ4vtDs1Ot5Zv4NIiLLyWyH3_zO3BcNSLDY2XEyUeuOOiIb-c-Y_VDgr4jdjvWzOygjJ-59sxaSu4N8ZlYiqWCx0vN9G8h2SEg15ldOOKQnKcvu8kHTY2xx2FptnbhS1gFbMwgkMl6wGyfmfRV_-WuZXUAvIAkMdY9r3r8LV1HK6LDmla2DlIKPaYlq30DHqWXPJwdPdlm7tHBwNVTJ_XiRueM29NjZDyknoDKMyH0JoKGlUCbsEXxQAJqsB5f75acxDe2HpLX0CIchlFNP-rIME_HOvi137o9wgBT7mpDRHc9T64WidTMVXVxd-Y_Ntu6klAv09TZg5Qn0ADqXeKTLCHtH5mnueCxv58C7TDg9GxJioVP45JvBVJMIIlBgIgPKauGluUG0nKobFbhrWwq3DUFhDbzPTCDRm8znfSObf9Wr6SjZlWy8_YEpQivosrGKwBmQDNwCFE7FmNcw0weGib4UMlFvxypTFk9Igi-N0EY2uPjWgs7buOze7k_SDgWTJW0AiFRDr0Ho2HjdrRn-a0l-obDd9pAuig25A9g1eABcNJeEopBkjjN0DoNhBYnfD0R2AukGW07qFuwOQJHMIbLX0C9Tc5_RcH7sS0kC2uq7o2L3wKt310Wz3_QZXnkbNwQdFdnJ1pOrPP3h3WeV4Eb160EU7etsT3xUcoNx6UX3Zyh7n9KDSb7ABUhmC2xGbC-nVZqn0o5oED30dWc_qv6GElIziKzcSedC5ke4Mhzzd5F36oA8pcX63G8F9_T1NzCEJ2GDNtPhyqLhMHvMUNSLSxBiY6OW8aHvzPSXSYsz6_iWC5KVlZGuCB3GfNXDrk9__glWlVTTM_hqgr-GfL3S7-O-N_5g_9JJ_mORLH0yfODzV3mUenJHQNotZFoDCrosYDNZ8Rk53RfoBP71QNczWAa7UBuNr7IzGkbKuVSJ4v47TgjytZg0ET6OAj9DGByGa5La9guUvP2AZ8GXxMKaNRqPSwe3q6SGC70rbUGIl5vTHf0C9EXaqF-Da2CMar7VZ_Hv_94T9V-X4w8A61tHDVj4FOaLJ3Nsjb6P80EM-mD-MedRRp00ERKgf2cZiAMYfMrc2KZjvxfR9iGlCqhVrsj8ELHh4_r0r45rxlj0hZ4pAvhcM0UkAbQNtTrVHWq5BHkj-Ec4Hmz068fVCU8ChY9JeaSlewHFfegMLWzM73r9-IIBYPrdAyi-CewsewC_L_iOB7vzNuLraB96RH_09J1NJcb0YVF_hJNEEUBwc8bohJxBaZnQH2iikvC_vgpIFeR5vyvOxI5y4TfhrJTb50mmK27Ggg90OsaWHIVYwPhjdxcNU8Dif26aGD1735P3H8e2Y4bgj5cKdZROKQX2vLP_nSfM7BCOPXU5UMqNKA2yKGLnyW-2yUv2kp1rkrWqZ3xBaoJWxhYvNYtW4ExPULzskEsuzlsUEAX3_4JXOguw-RgYmZrZKnX4JrCPJBBtx3gpfW2uYEK3I2ls2Ddg7Mm3NG6W326KVHb6CwYuJJWBaGwtlOnkuTZ9NQTNoRR7SfiEDvb1GaiNCcIWpPLMVg2uE_zv2h_wrijt9uJRucMHPCSdOZXt5s1owSCoI1Q4yDMKbH1dYaAYCbiU61nNFcOXhAEkMafZVBu2vqQrVTky44mkxS8OhI86CVADJjTwRECn8hgcaEqKsw6Ic0pPyqmhZx2BIuYDzzexpAslgttah_5XSgyk-KGQHhV8CcCNT053fi3wTk2roRb9SWmvV2DvkTkRzIJW9t_Dfu-6B62phjgw6IyySxkMmOwdO6UsjeJwucWdtLrxMDTX9QV3BZSpEuL7o5fjkcyZ8Rz-R6iXx3QL1eTLIIZh_8xxF3DL8VvRAKqY_zeFgteNsDWX352qeHty_eJlbSYI_hK19bq41gzgET57ZsIlmX7oqo72wXA4oHw6zRL0Pj9tdLo3A7gLLlIJ-xNcUAOyLLV9hA1OEdxXfAvwr1xH_Bv2WRORcggluBBqnONu0IMa35xMXWJE4y47T7X0sK9n2OW_YGD_Ln9uMZLqR0V1qrLdMVC6O46bNuyCZGt5l7EYpWcA=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0cb4517bff3fb4eb016ae363d330e887d08817d5aa3789e7a0",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793287121,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 238,
+      "prompt_tokens": 3176,
+      "total_tokens": 3414,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 40,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 3173,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0027033,
+        "upstream_inference_prompt_cost": 0.0003233,
+        "upstream_inference_completions_cost": 0.00238
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "300935eb64ae5c153c791ad0d3e6b46630a59e5ddff608126e4b309ff66c9daf",
+  "elapsed_ms": 4823
+}

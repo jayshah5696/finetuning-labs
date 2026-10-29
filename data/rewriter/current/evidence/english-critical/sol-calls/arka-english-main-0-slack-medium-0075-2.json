@@ -1,0 +1,157 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-slack-medium-0075\", \"row_sha256\": \"4c714f5c948c2bd1413a3639babe25584e24b0f820d380a26a2c1e3ce721f73a\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"maya 9:12 am: hey, i pulled the neighborhood garden survey export for the april recap. it’s got the usual response fields plus email addresses, and the sheet has 238 rows, but some might be test submissions. can you check the completed-response count before editing it?\\n\\nleon 9:18 am: yep. do you want the emails removed either way, or only if we hit the cutoff?\\n\\nmaya 9:20 am: only if there are at least 200 completed responses, please remove the email column from the export and send me the anonymized csv. if there are fewer than 200, don’t edit the export; send me a separate csv with just the completed-response count instead. we only need one attachment, no extra summary in the message. thanks!\\n\\nleon 9:24 am: got it, i’ll use the completed count, not the row total.\", \"output\": \"Maya, 9:12 a.m.: Hey, I pulled the neighborhood garden survey export for the April recap. It’s got the usual response fields plus email addresses, and the sheet has 238 rows, but some might be test submissions. Can you check the completed-response count before editing it?\\n\\nLeon, 9:18 a.m.: Yep. Do you want the emails removed either way, or only if we hit the cutoff?\\n\\nMaya, 9:20 a.m.: Only if there are at least 200 completed responses, please remove the email column from the export and send me the anonymized CSV. If there are fewer than 200, don’t edit the export; send me a separate CSV with just the completed-response count instead. We only need one attachment, no extra summary in the message. Thanks!\\n\\nLeon, 9:24 a.m.: Got it, I’ll use the completed count, not the row total.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-slack-medium-0075"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "4c714f5c948c2bd1413a3639babe25584e24b0f820d380a26a2c1e3ce721f73a"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "a966b0298359d6899420d4f15565a2f2733c82959909a0514dfaeaded025c6f4",
+  "started_at": "2026-10-29T15:25:37.300604+00:00",
+  "result": {
+    "id": "gen-1793287537-ryekydnqCPeZXuAtmf2N",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-slack-medium-0075\",\"row_sha256\":\"4c714f5c948c2bd1413a3639babe25584e24b0f820d380a26a2c1e3ce721f73a\",\"critique\":\"The input is a plausible pasted Slack thread with clear, consistent intent. The output makes only capitalization and punctuation edits, retaining the casual tone and all four messages. It preserves the 238-row total, uncertainty about test submissions, the completed-response threshold of at least 200, both conditional CSV requests, the prohibition on editing below the threshold, and the one-attachment/no-summary constraints. No material defects.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793287537,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 180,
+      "prompt_tokens": 1002,
+      "total_tokens": 1182,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003804,
+        "upstream_inference_prompt_cost": 0.002004,
+        "upstream_inference_completions_cost": 0.0018
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "deb84a7229b2ee5ceddba5301e4a8979223e7e22dd0aeac51a47ce2a620d797d",
+  "elapsed_ms": 4158
+}

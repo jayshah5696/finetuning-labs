@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-prompt-medium-0141\", \"row_sha256\": \"6f608c9a968b31129c89c5a68d47b3f2c90dc91b5858995a3897701735ac778a\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"could you prepare the payroll export for the april 1–15 pay period from the records i provide? please make it a csv with employee name, employee id, gross pay, deductions, and net pay as separate columns, and save it in the payroll team's shared folder. if any of those fields are missing from the records, flag the missing information instead of filling it in yourself. we also need a brief staff notice saying the export is available and where the payroll team saved it. keep that notice factual, and do not publish photos. i haven't settled on a subject line, so suggest one when you draft the notice. please don't calculate or change pay amounts beyond what is needed to put the supplied figures into the export. make the export and notice as separate items so the payroll team can review them independently. use plain language in the notice; it doesn't need to explain payroll policy or summarize individual employees' pay. that's all i need for this pay run, and please leave the staff notice unpublished for now.\", \"output\": \"Prepare two separate items for the April 1–15 pay period using the records provided:\\n\\n1. **Payroll export:** Create a CSV with separate columns for employee name, employee ID, gross pay, deductions, and net pay. Save it in the payroll team's shared folder. If any fields are missing from the records, flag them rather than filling them in. Do not calculate or change pay amounts beyond what is needed to put the supplied figures into the export.\\n\\n2. **Staff notice:** Draft a brief, factual notice in plain language stating that the export is available and where the payroll team saved it. Suggest a subject line. Do not publish photos, and leave the notice unpublished for now. Do not explain payroll policy or summarize individual employees' pay.\\n\\nKeep the export and notice separate so the payroll team can review them independently.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-prompt-medium-0141"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "6f608c9a968b31129c89c5a68d47b3f2c90dc91b5858995a3897701735ac778a"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e72856aa963eac0a6a951560eb9f59dcf25817287ecff27577dfd352bc293bf4",
+  "started_at": "2026-10-29T15:34:42.876698+00:00",
+  "result": {
+    "id": "gen-1793288083-vzAf34u3BLjJOE7PEN65",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-prompt-medium-0141\",\"row_sha256\":\"6f608c9a968b31129c89c5a68d47b3f2c90dc91b5858995a3897701735ac778a\",\"critique\":\"The input is a natural, self-contained request, and the output is a clear prompt that does not perform the task. However, it changes “it doesn't need to explain payroll policy or summarize individual employees' pay” into “Do not explain payroll policy or summarize individual employees' pay.” This turns optional omissions into explicit prohibitions, adding a stronger constraint than the user supplied. The remaining scope, CSV fields, missing-data handling, pay-calculation limits, separate review, and publication restrictions are preserved.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42eZqsvqshtxKNvtj32nO6fa-c9K-6BIyHXypZI-lo8McUmJI-07T-4wUR20crqXv-Iult1JDsYSRq038_mzsC9nuo9kMWfh3GoQ_8pgT3TYwive_jwe-vIpd61qmZsaeQOwUnSD7tUIZOPVGvUW4SIlj3bWBe-beprweulw5udTwb3R2VcJHLjfadekAvIao4a_K5j3FtM4Ce-NXDFxtihW2TbfzSgktEkZvcNPW1jWY3AuKI4nkWhZ5DdlJzSEbL4nMPhvujhvQ8xnxGlXspuircl-FGdJZxjHFBt7YJ7unvMuj1cSWRR8Lkw8D-HQxCjpihkF1SmsSOmAG_sCjN2clkjc3RGftb7NrIGOvpbzw5XvsjRKkdD5Jwtm3EvU7tDUxcnYEcdySIklttlCZntI5C3dreRim4PhGzQMAwktZwElr0bchvrYu4x9S0Q3wuysxuenqRYi8zvNuzadRH15fkVvntPdPCcZHGJEVcK-ckfWHRXCWa4EXj6LcCP5vAvZ96VFXIUGZh_M2l54R3vd0JpWWdL7vz6gwgQ8osdnL7S83TNQG25MqMr4bHFR919ax5EkeKN5pzlTbqeGGMxB3w66nflnoUn4SYwRHEUxA4NL7dziYUF8B7_RZ-5VmJKuzs73G7wbilMnzee0VQaPWQ6S6XKiHAJhhxmaKFPzIBWVID9Nmn-8VWTRqe3J7cQLPNVEZOSa5NRFzNmW4PihHBHcwSw3nAguk1uHWpE_8aIhYxLkL6gKUzMCJ7wjxntO-pBQ_iBzoqAP5CK5vT1lGJ7oTfxL6FrqlD1HzMLzlXmd-lCxoo-d89UFTvy9LHs2VUDb4lveDe8lqGxB2uaE-YjmPKeWBisknvRVd8Jmu8gu5NOJ1Zv-lRm40QHICMTmEB7yHWhSR6pZ9YPnxxyErgUEGliJnY18REHEcrNo69E_1mZx34W7U3KKVFAeqK6vtvu9g-X-D0c1WaNEXz84Mtr8cXqBaOvQM4ng0A7bKA2W4ilyRYdxXCxTDx_Yjd26vlxKmoGkFTSYQUt-YqO0hoVcPEYo42AIWdCAkFDJ-_QC3CxSF-WXkYUdoH3fMxt0PDlYtGwovJ0y4rpJYeGLOO1UGWg_Jo0b_x7lfxvT-Zdw0aLvTbbsTkTw-Eh4fzECcttspBBjP723dpfI3eodA8Fv90r-qhRXJ-NwAb2D3vhao607fjcc4NNYf41r8RH8uV2tWziXcc3BODoCxfIhnBt9Aq-U1HOfG34lLA-OPzl7v6GpN8tIDgR7KmrmlrynSiI4MMDZdDFHISNssJE2wUNNkqTszagmAVbhIGoSciXVMNi_fcpgJO0ByB--HNdo1-tJpjc6_eIf_oq_btSSbFBzIPSPRN7E7X_LOQ3FRAREb1XUTuYpL19T3OW4Sfkl_dHWxrIktj4zodJ_uOBZepy7AiJLnVwMGyZhJozfCTLFJQnykMZUzKEWkTkUSc1baR9AGRkP4DgeMoaUE0ryvB-86Ys1ZmLmbsSdxsKJf3_ZGfv1F9YxUU9dJCGhbmsav3XbHWqqb7h2ULszOu8Dbv5aE7PB4g3_0Mm-Zqv3IMCaUMRhkJndgINYlQFH-0aSIKiR61fXsbKtL8ZepSOYehSqyl83zNQEy4deQuX71kt-0XC9yshaVRzENp81nacuQ_n64weE1t95ALhDYj-fnRV-5mcZ2KkU9vmSD2l68u7hHh24G1W1kBiWSDopyZBs9DQOmHJly-PLJtyQoCosBWbBQSImPQZeYDuHz4_60M3ALDgYIps3OgfI44lBB11Xcu-yKR9YgPfZlMVDfVub-LE-nD3vqDXzsp-oPrDWwrgP_RGDiaUkIUlVUDUAqzM_SUrrL5ZfMpqrNUZZkecYiR7IoWfBZ7Qt_QqIvyx3nSn4ZCmfefSr0-L1ODAhYhE0E-JiFjGkE-B28X_kdXtXhPU98z1TcQS8o1PPXi5IlpGLGpvqbrNgSV0DOjYS4N95VjJyQNdBTlCgQJRrs3_IDGltCw7wLQCIczWA8BQo6v7ft6VL3op5jvtKQ9T8VfWJUo5bGG24uyV3aEvnuszqfqdWrj5XNwaHaRVptL6T6jS2SsWe8aGlr_52IVO0fwMq_6UTfmir-rshpoGB32BL3wFL46HaLZ1hyS4bgrIrtJZcz05-zM-5ygThjzZDHuYLITHyygKSYHvURWlHYQDMqKxX7QFrN4GNo2zPdRG8wFzOlNTZPRlBwycfOOd3eikmymR1jG7u-pQns7V-SIWzuxYRCrrLW_EyEmaQrSbFWIJdetKQu_Xqx4xffzb66B66z_Co1ughMujUc6iU_p2TMjP_NlbkG8EmbL4Sw6_GEkrQjcXcdgAlHCuCt8JIAasZDl0gFQJIohhYw0v8GVVq1JvuHROeBuqnWqhiupohK0qW0J5XlhOFhl0QJimmS38BugHHcrjjhSWheEAfsFwk1TNCGeP92X8-R6EC2PgV-gX_a77-6Rno6FoyHeZI_zO8Smwuvmmq3UHa7ZuUamAeKCYPKg-pZAY2vW85GPwoVkK4iKNVUAdxb6ytmwKZ6OJCunAKvftMS5QheLsDfCp3Qf3Qp99FiBnJJb5ztTYz_8o4fA0bzj3qNiTYyWNyEuuZRwHlU59g_-MF2NnZPwC6UxasAYnCDjnyAKLuRcto9xXYY8oZxoV3OGoEaHEipHFd_pDwAztiFAz0Ty5ClR9xwhYJSwQh9V2TC4_4YmesvLLcpBPTgjHS_8HWgpHsguP5yZibLAKk4SpS-vVSiayQEgGFzPZQtVLxPrzx80VJOJkbGHrhcfzkc2fwplNwQz7vR8yDd9-px9jP8LkuIUnfxuFxDquZ0ZLHCZvlQ8VMFAP3jpBDAPHbt1THqCzRLN73d3S3H-MbHUGIeItk62ugCQvsRlOjq4DAPa3zqzkYOIq10DYVfUIVa7X8YYv_knTfXKW5fh-5BHdbFN4Pf42XzKwGsonKhAfqX3jOUaqMPiiH4fqMmMiP5p1wfa2N0Qpdgijc6R0CoCzQDQWMkRkUmQhs6BlsOuxTX13HDP6E1SIquBS-54zSJWPDrL40PmphnKnEAN64gyvnIocKmPbEeF8LxSeUPsqLTkX6D8fGLIsF1jXVQW7Ko5gzU5aDsAU3dZKq7-AUyxZkleXtOIvHx4f5UNOLezH_u9Ora8kJs0XvaMbbTWX6LsR5EcVFwIGv7Zf38vLAa-8g0Of_YCU1yGtvGeGvTttTtaYdNCdDgT4colNiD69mnfPSPKgaiBYIEc5QSqMgUEqgS3aLgVmk_Oh0oQvARfKFuQG6kyCaTDWogjG4icpWWx0FRF3whvgjpAorQsa28eOmkkzoDLHjTH3WxwmLEXFQt-5lwmJcB3Z0qJ6T7NJfuGSI2wGCEv4l.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_080888e1abb50a13016ae36795212887d0bf080d0258f152fd",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793288083,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 322,
+      "prompt_tokens": 986,
+      "total_tokens": 1308,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 123,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.005192,
+        "upstream_inference_prompt_cost": 0.001972,
+        "upstream_inference_completions_cost": 0.00322
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "264bc29a8d741bbd2bc45b58941cea19cc7081037f9ea8a24f645ad90261da08",
+  "elapsed_ms": 9460
+}

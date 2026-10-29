@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-3-prompt-long-0142\", \"row_sha256\": \"6e53ba30ce3d2b472ebab6ccd33b0bdf5d5a14fb76e816f2f3c80832efd0c2fd\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"please turn this into a clear prompt for someone who can explain a small python example. i'm putting a question in beginner study notes, not asking for a rewrite of the function or a general lesson about python. i know what a function is, and i can follow a basic assignment, return statement, and if statement. what tends to slow me down is seeing how a value moves through a function when there is a lookup, a test for None, and then a conversion. i have not used record.get much, and i am not yet confident about what int(value) does in this particular flow. Keep the explanation tied to the snippet below rather than guessing what kind of application might use it. It should be understandable without assuming that i have studied exception handling or more advanced types.\\n\\n```python\\ndef read_minutes(record):\\n    value = record.get('minutes')\\n    if value is None:\\n        return 73\\n    return int(value)\\n```\\n\\nThe question i am trying to ask is why the function returns 73 in one case, but tries to convert value in the other case. Please explain what makes the two paths different, not just give me a one-line paraphrase of each line. In particular, i want to understand what the lookup produces when the 'minutes' entry is absent, what happens if that entry is present with None as its value, and why those situations reach the same return. Then compare that with the path for a value that is not None. I am not sure whether the function treats a missing entry differently from an explicitly empty one, so please be careful to describe only what this code shows.\\n\\nMy tutor said, \\\"Trace the two paths before comparing them,\\\" and that is the part i want help with. Please make the explanation walk through the code in order, starting with the function parameter and the assignment to value. Say what the condition checks, when its return ends the function, and when execution reaches the final return instead. A small verbal trace of the two paths would help me follow the branching. It can use ordinary words and does not need to turn into a line-by-line glossary; i mainly want the relationship between the lookup, the check, and the returned result to be clear.\\n\\nCould you address these points in a useful order?\\n1. Explain what record.get('minutes') is doing in this snippet, including the case where that entry is not available.\\n2. Explain why the test is specifically for None and how an absent entry and an entry whose value is None proceed here.\\n3. Explain the return of 73 on that path, then contrast it with int(value) on the other path.\\n4. State what the code does and does not establish about a value that is passed to int, without claiming that the function validates or repairs every possible input.\\n\\nI am asking because i first read the final line as though every value found by the lookup would be converted. Now i see an earlier return, but i am unsure how returning from inside the if changes what happens next. Please make that control-flow point explicit: if the condition is true, does the final return also run, or does the function finish at the earlier return? If the condition is false, why is the last line reached? This is the specific part of the example that i need to be able to explain to another beginner afterward.\\n\\nPlease keep the wording approachable and precise. Explain None as it matters to this condition, rather than expanding into a broad discussion of missing data, and do not infer that 73 has a special meaning or unit just from the function name. The snippet shows the literal returned value, but it does not tell me why that number was chosen. Likewise, do not assume what object record refers to beyond what is needed to explain its .get call. I want an account of the displayed code, not a proposed design review or a guess about the surrounding program.\\n\\nFor the conversion branch, please say that the code calls int(value) when the value is not None, and describe that operation at a beginner level. Do not promise that every possible value will convert successfully, and do not invent exception handling, validation, or a fallback that is not shown. I am not asking you to run the function on a made-up record, add examples of extra input formats, or supply a replacement implementation. A short explanation of the distinction between returning the literal 73 and returning the result of the conversion is enough, as long as the route to each is clear.\\n\\nPlease use only the supplied snippet as the basis for the answer. Keep the code intact in the prompt so the person answering can refer to the same example, but the requested response should be an explanation, not another version of the code. Don't add imports, tests, wrappers, or a second implementation. The study-note reader needs the reasoning in plain English and the exact question answered: why does this function return 73 when the lookup gives None, while using int(value) otherwise? Please make the two cases easy to compare without turning the explanation into a full Python tutorial.\\n\\nThe notes are meant to help me read this pattern the next time i encounter it, not to settle how a minutes field should be designed in some real product. Keep the final explanation focused on the behavior visible here, distinguish the condition from the conversion, and leave any purpose for the default unexplained unless the snippet itself establishes it. I want to come away understanding the order of execution and the two return paths, while still seeing clearly what the code leaves unspecified.\", \"output\": \"Explain the following Python snippet for a beginner. Focus on the specific question: why does the function return 73 when the lookup produces None, but call int(value) otherwise?\\n\\n```python\\ndef read_minutes(record):\\n    value = record.get('minutes')\\n    if value is None:\\n        return 73\\n    return int(value)\\n```\\n\\nI understand basic assignments, function calls, return statements, and if statements, but I am not familiar with record.get and am unsure how int(value) fits into this flow. As my tutor said, “Trace the two paths before comparing them.” Please explain the code in order, from the function parameter and lookup through the condition and the return that follows.\\n\\nPlease cover these points:\\n1. Explain what record.get('minutes') does here, including what happens when the entry is absent.\\n2. Explain what the condition checks and why an absent entry and an entry whose value is None reach the same path.\\n3. Explain why that path returns 73, and contrast it with the path that calls int(value) when value is not None.\\n4. Make clear that returning inside the if finishes the function, so the final return is not also run on that path; explain when execution reaches the final return instead.\\n5. Describe what the code does and does not establish about converting the value. Do not claim that every possible value will convert successfully or that the function validates, repairs, or catches errors.\\n\\nKeep the explanation approachable and precise, and base it only on the snippet. Do not infer what record represents beyond what is needed to explain the .get call, or assign a purpose or unit to 73 based on the function name. The code does not show why that number was chosen. Do not assume that an explicitly empty value is treated like None; describe only the condition shown.\\n\\nI first read the last line as though every value found by the lookup would be converted, so please make the two routes easy to compare. A short verbal trace is welcome, but do not run the function on a made-up record or expand into a general Python tutorial. The requested response should be an explanation, not a rewrite or design review. Keep the supplied code intact for reference, and do not add imports, tests, wrappers, a second implementation, or other code. Leave anything unspecified by the snippet unspecified.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-3-prompt-long-0142"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "6e53ba30ce3d2b472ebab6ccd33b0bdf5d5a14fb76e816f2f3c80832efd0c2fd"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e217e930696d724f51f68b08d37dbce78bc03c05c9090811ba9ac6bcf737d4a7",
+  "started_at": "2026-10-29T16:14:37.898246+00:00",
+  "result": {
+    "id": "gen-1793290477-Gysbutgpk3ly1ky4o0Fo",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-3-prompt-long-0142\",\"row_sha256\":\"6e53ba30ce3d2b472ebab6ccd33b0bdf5d5a14fb76e816f2f3c80832efd0c2fd\",\"critique\":\"The input is a coherent, recoverable request, and the output is a natural, organized prompt that preserves the code and most constraints without answering the question. However, it omits the explicit requirement that the explanation not assume prior study of exception handling or advanced types; describing the audience as a beginner does not fully preserve that prerequisite constraint. It also changes the learner’s stated background from knowing what a function is to understanding function calls, and strengthens limited experience with record.get into being unfamiliar with it.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq43D3jphTuo2spdvMv-BIdupdWAbWpnlCOk296Q2XFatMxaNTecULzgbBFFIDbJhM9pscqwRjaqaJvzuEHuMkLJXYr6UGB5jZg6f5PxmpJDApBXYwuWbbiQfJmMGB8e4RuLwfE2--ZMoIx6d49zdtc5LH89RhuF-0qyzX0uNBmWbc4v3GT-ibCAq-0qKt9p0kfB3DcsYi7QPz8p8hIsJbPTZtZymSr2Lc1wjAxLFZGxanGA3XyNqhYrJjEoEvyCCEHipLU15q6KwxdHBpLZjW5hAurMsDxjiNBhuch7Bn6gaWLHY4SO5ej4-qIExVTFYvrbltBMMWP8Btdqaioc0FJogpb4qgu-8d2C2tOPBdBJFkbF1H5ZTnPjZfSA4bKeTg-wVSBjli5dOcwBqt7inQ3InZMT941sQy_C_kger2NKbEe-wOOCsxCp8j7iRYYxM6Fjow40jFOODxqpkBOCyqTV2ZYXXT0r1eTdEWl8bZ08yirpg5uqdDqiY18pBgz0ol_IqKLKG5kw3-GgVLjulxGnzCUqIUiT9fLY3bj0J4vy03rW13NRVzIU7LvRYAfYc2AnNIoZblTSUuvoMXsAM7mNXic8jj8rpPrytWIRW6mceWR9hwlVh8V-qHdPJKXuJWiQW10Bpd6iynb5pansAn1e6r8hOXwwJB8xOyFhPf8GSXlqntu91wRO5QJvjSzfY4o521tkiX1B-ZWqmLEAH7CkwByGvDZZ2yEDebpcCmtMdQDrgjpLEDieZZpHWx__ULxO-Evf9GJ0EEMVMfRQhcLKSlKrfiTIGqoigc0o2ykzYhw1gS9Ae42ALFuH9-jD1OpWJTBAF8nFx3BROqx52ufwVM4HTFIR3dqnx2HrQen2P2HpOHoVpDd6fQ0Tef-0jr9P5Q_tBJ6XawC1GVxjjMt48LSGRWZ3fVGWr10ZDaNz5Tzgczv8w1fu8Mdj_nQQXVIj1YKQ4wr53dUniEhEmMqQjvYwdooYtmf8HMINMjWvh0tqhoneSmmFSSPI_8uSUSxOay9PMOrL83SLb-S_fMi6h3kYE6OcUxKVWL9cITary5OAnadBlrB7WktFyZdF6dSfV5lIizrgDV8W_JX7MsBIDjmb3iVDTCobYGBahZLRNWnSUjgqZTGBGVhvWwYypE6vXOg5LsN6eWzcftZRkm9Si7bqjTpMo5fXZfxk4csOtNYNITFi1wwjJTqpXRzSjBB3beY4cAWHBaxDitQbQnB5wLQr-WMTqbWvFdy84AFLw9f5ZAHfM_ewMK163zQHvjFq9EaNIUccY-7cxfTO9mwOxMge3cfLnntmWixi_XJY_s8aG18XHMwtQzY-ZiaORX_CkSexvFakOWVlEKXf5HZvfjTr4lTgPM5uBJiB2-Ztk2kxtMr4HwSem9ZB-JcreI262JTYU7mMpZL-ghZU9yZVuM1nF7XTb5Tb2s5nbQOzMQzoYfjDm4qdFV0JyA69qyn3GG03y6yWB6NIj0IONImz1JQbiNa-mSqchepHEmikaA6HSjVo8cGRzSiq3itLCeHrFYu4zsp2-xP6AvIMYxbxSLozOF11PtGO9Qpd960UhrpEa0lhHZdAGhDNAOGzRpmObqcRzEh6U5kIMqDLU7AfQ3XdiTCPuprvTP4Eu7rmRXjG6apxs42qqKu5agjtjEHTBH20NcKPrWsVLhE-t7GhckLoTWOsttt7VobXkTb23E1YiUNkprJCxPFUdCy9Gnxpa0IawA3kfFYFTZPzTSfx5BkhyG-fdhfFoXnoLZYb3SnmgTZjDRpUjZ4_tMWSAsgYt8XTy6wY9L7OCWK2dWLTj_MzJHyonZdVpvUL1CHg65Fq2Vw7V7UgZdfaD808O0YbckY04ZJFVb--i3LxQ4tnNVNDr0b4mNcUQoJNYHpBSonPlXOWt6hmY7FHJkSLM0_kImfMIf_Ro3rMdDfTifZaCbCfj-hfea4hbsC3yYNjhuvA9cs-8bkGfFB8QWRHJhNLLEAMwHnOM3c5Exd-gtI2X2_lk2tW5hPXHrLFIGOO3l2Tazp1loOy0LWjP44aEjvCtSvNKKQoO6ii3t-E5Vb-99C87XdNo96jyyLxLvbmz6bIC3l6W6ngNnB4WVYGstTwt6IRnwPIPw-mf1WWMP05cbdX6sy8XCZsbOIC6Dbv09KEdNpgfAPZkRQhTnDYUhuNrNk0XfJypR-mEIC7u-S8iA2pcefaAy5iqqlBClqUItYYUphbvl92wJRmNu8BW49JJk4fQQ2al-OkFZHAe8A_Ozd7kKx_BVsyNJRKbXBIeLqyZLQB5AvvTV4BvkDnpHrNRi8eQpSYD0-hlQx37ZPyCu9-wHo4kEzOQrKDCjnFtz4zBmyx3S2mhIO3ni5_q0Zo47Z4uDYy4nRSx5cLblZJtHLk6ngqSLS45tbIguAdM3bYlQ_k7860cIetti7HYeDBM8MRnBb1ei93bMirkD8TADr7SBQIZjQkdZHhXR5AyQ7eUjZDg8eZNYecrmf6BcSO6_VOCuVFCOwm6Dq0kxQMyppMUv1OjsDFWP7ZeoM0ry8JH4UsUkWrhaR04cF2xucHXxRceEawvf4089evzCc3kjmLDVHgM6ueEq5WgfCGFDcZCc4JnWxIiYl5QL64RN1RQzsspSl4czJO5TFq5xAh9HIcsedwYRMax0-aubJMhtbbyjqsYTr95LLq6cjC8nRC3imXr0w6QPMOd2RK_Wv8IIyuJQX8BcS2Xly9PLD8N-_X50MiI-GSq1DxN1ils7iEjBwSJK4sbjAaUni2Iv3any0FFKXZM_Yk0k6YFBfva6Qoz9zPik0s_RolMrqhwuYT09CHG_fcQuksrQHGePMIAwIDUrWqlsd_8zaxoaFswJ8nHTLN8imDhlOAvNuT1GP8w9Aay_MlkWszsOYTawiH8beYaBD7gnfEkp022LK71iyetpn2lYVLijTZYzGKFxBL-eQSThUsNqsB7g6wiJ5L8EoYMESjKiOqr3G_Z7Ny1dDQmpceJvvvhXc9PnsGkLP8K3icyn9D8pMidfM779pyJN1HQg8CObrWqI7_L5nx9KQrbriPp-vL8wF4DhEQvNRFBFt-rQI7G4U9fDMrBP8WnlZVz_ePDkvWXC0aasUaXSNwJESxfow38LqxkVt2shxChWL1qwPzYa4CFsQnd-GezbvYLt2XwIBToaC05x_NU43h4sdDv5_gnNqmBAZjF-xU-BB5jRwJw1Y44Gy_p8tk_F8GeBAwy-xa0XfRWGObYM2cjn2ly5hKG8yUcbUzdBFAfv2f2V0w80ecGjoSCotF-pDQwZxTBtIVzljMt64pkKgRoyHNUzmDaNxYc9Bf0cBslBis7zHsBfKyHR0WJkxPKMfEG7g7Gb9wKZCJa0dyK65ZnH_sfiVaKfmenwH97OordHzOHf_rv3Fimx1ckZ4bdjHLJrdOxQ7V1kNKP2J33BdNdGzlN6nWtJ6KbF2QGG4sMOblbGtHvRrifDubdIRmuHrhwzV_j8O-aAVZoj_Zkebt0PIa0ghwxaGkZcMi88HwBItpi9AeqCsoZVRdNu0M8I3IZLXMAvD6MEnMBc1fwsYclzLj-CHmpfsFtt3_gCQCLhb8SQDXimRvCu6f-ZM7MsIfcqEF-kehVfeTthZMMGw61QSIV3J_nlRZsGtGVpFvnYG0NNQ2p9mlJSqIkc_CiSNkAwjRD1gezvuud_9vZf0QSGP7bzj_fOlE0laNjgpkGOhkLyJCzeQ9h7LiKkN7SoqIaBYCkPyZ0q6K9iyQojSIshFLJbSqlwzn3HKoqHC_pxDq_4NGR-paufhHQH2XIRNDPkFnZtGw8aoSFZAd74zC-sPF7cqPbaorbErhT1bzpLuEZcWeNDj21K6ttS-VzHs6z8OeZOW8VwdxaLrtKhBdsmRTZlYqoOjxCv4J4lLw3IojabEPPf54OcgN3KVbGwRwTN499wfUbxjPTRlUa_eiOJAw67VGEmt0D5JnLMzfLpwi-jvV6F4Q-Q3vY8uNvK1mm13OnGgyaYZ6ng1hbWL6hE4lEQByru8gpxcoEWyq_cSKy-de6GxsEhllpSNm-VArNxqiVzyr4g94ColcNBzFNBW4VowqQQ6SI2OU6PWe_m4izl8ueoE6wjq6S7Kcrq7LiXE_GpZjS1gkmSrtkGevsgy-O1Tj7sGX8UJlJAOmFVFTvRPDrdgv4Qpflk2pH1jLNaIMMWuCTX9s3wglkQVEp2iANMx-GJvC3mNH4IDk11kskRgGz8N4j6EFwHeNhlrAV6-hrYHvKnM6YfEDKs4xvv9q2RvQSgXpdsoye0f2fChsFwlnreojfTx_vMmqhvX4CSkI48e2f8zdm-1q1LavCNMrSXUbBSglAm8N9M4YjmBH_USUW8DIRAPvE5DMjDuw_FY0sG061h6HtH_RHppR8RtWxHIHnGKSxhkSAiAQmd1yMnzb1Pje4Nvof-6g8vAfYjPECxQ9bK4ejT9OfPcId4Clc0gaQ2O4ktJ-5OxCoex0XuY4Cl6OHInaGaCsb9dDbJ9Z1vU8Mveef1GmtGMaH73BYWxSdRobluK4JH7lxK7QAUuaTyVELRoxPGxWxqN5Zget3zClzkNqlTeuxLbOo6HUQtceDGs8mv_fpaZSMt-3Fdr30V6hJCuaiY9-AnJ_-jSSWuf8Ric8jdN7jwo1g_DKpFY5T5SZrStvgVa7lEoC1nIKQ0VcaeEOz1HsP9BfOLgtTa6lF3C9pKYo5K1qF3huEMgFPmwzbkJZYnVdiZ799dY--E77ya2iq5ZEGvnU3Ow1JJDOke49xrBvbsGQbF-0mZyhn2ekM6IXOI-Mpkb1cyFR5X7W4VbQY9HDMISez0Xw7T5myqoETARp8PrWc0ECxVhymQ7i8vwH1F_OmEMgQBXsqDQLN-AdqlZ1XTKpOFyuJ8FLhuU6xcKs8esZKGwrIOMY-PpoK0gbOHAOjEaRsUlRQqXEij5TAiTUadpxfTFouIhNjMiTDxatEcO46qcOxxft67g4hkf45sk3utL1TMMyreFBgJzpZkX1fvWUrmwINLDxLxbk0wOLzSFzHXrR2fH5vJMLU3E3x4jMceemYc0CZ3Nj3BynMoNVuz5INdJaqcjgKDXO4vIEuYPZJLd-xxjsIvQcm2273Y_Z6lKWQi2lhSvfYJKMPnep0i1garrZPZEyho-6B6fyHYu3ilZxkH9itCweTz9pvVZ2w0xFvDZE_qsCVmuW7jN6-BemC6-X16ZFLANhsbjpDE_y66BhHmOUij2GEhT-BFLOGIKKNBRi_naqzOTJdZFCWR1iU87NrBdmglH1wHT7mA_wU1vgSL8vwX4sh3Ktfed2d8le5AT71daygjSzqhJpJENzwqlWm9t-sYEUQb8S9aGiE0eikwN_3rk19E_4mt-IialVAGr5WIPZgCxkM1o0PNgb4c8mowjtJVPXe3R3RFg0EedC0YZdN7E5Fd39vyyBhksGhkQXUXBgKVpmFZFDEjK39oEdAQ1s5iJBbnUP6tr3uOnrd6k8ovxNzzsE-77EwG2j0gDZOisqnX7E1tqbPcypFUOmj8bXlEvupB47yOPg4zVx9o1qTzLKzFcv-bykjY.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0f04bab7bddcff41016ae370ef426c87d09e83287bebe60968",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793290477,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 470,
+      "prompt_tokens": 2238,
+      "total_tokens": 2708,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 270,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2235,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0102935,
+        "upstream_inference_prompt_cost": 0.0055935,
+        "upstream_inference_completions_cost": 0.0047
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "7108dde8495955450a6584f8e0c06b3a266ffc552da58bc400cc6a0160eac57d",
+  "elapsed_ms": 12268
+}

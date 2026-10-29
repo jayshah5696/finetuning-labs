@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-3-prompt-long-0157\", \"row_sha256\": \"c71a1df1e03eb29385ca554c479a6643b68d72d5e7a25881545fba2994c62d49\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\ncould you help me understand this little python function, not change it or solve some bigger sorting problem. i'm learning to read code and i can work with a list and with dictionaries, but the built in sorting options still confuse me. i found this in a small example about rows that have a distance field. i don't have the surrounding program, so please keep your explanation tied to the snippet below, rather than assuming what the rows represent or where they came from. here is the whole thing i want to ask about:\\n```python\\ndef sort_distance(rows):\\n    return sorted(rows, key=lambda row: row.get('distance', 88), reverse=True)\\n```\\n\\nMy main question is what happens to rows that don't have a `distance` key. I can see the number 88 in the line, but I don't know whether it is a value used for missing entries, a special sorting option, or something else. Please explain what that part means in this particular call, and how it affects the order compared with rows that do have a distance. I'm not asking you to decide what a sensible default should be. I want to understand what the code as written asks Python to do.\\n\\nI am still new enough that a sentence saying “the key is a lambda” doesn't really help me unless you unpack the terms. I know that `rows` is the function's input name, and I recognize `return`, but I'm not yet comfortable reading an expression where one function call is inside another. Explain the line in manageable pieces, and connect each piece back to the whole line. Please don't assume I already know what `sorted` does just because I have seen a list before. At the same time, the question is about this small function, not a general introduction to Python collections.\\n\\nI think of a row as one dictionary-like item in a list, because of the `.get` call and the word `row`, but I may be reading too much into the names. If it helps, you can describe the expected shape of the input in ordinary terms, while making clear what is directly visible in the snippet and what the names merely suggest. I would like to know what value the sorting expression asks for from each row. In particular, does `.get` look up the field, and is its second argument used only in one circumstance? Please answer those questions in relation to this exact expression, not with a rewritten example.\\n\\nThere is another part I keep mixing up: the expression after `key=` and the `reverse=True` argument. I understand that these are arguments supplied to `sorted`, but I cannot yet tell which one says how to compare the rows and which one changes the direction of the result. Could you distinguish their roles without skipping over the `lambda row` part? It would help to say how a temporary row name is used in the key expression, and then what `sorted` does with the value produced by that expression. I don't need a lesson on writing anonymous functions generally.\\n\\nPlease also address the ordering question rather than just translating the syntax. Since the call has `reverse=True`, I want to know what direction that requests for the values used as keys. Then relate that to the 88 fallback for an item with no `distance` entry: what can be said about where such an item sorts relative to entries whose distance values are present? Please be careful to distinguish what follows from this code from anything that would depend on actual input values. I have not supplied a sample list, and I don't want you to make up a particular output order or claim the function was run.\\n\\nA classmate described the fallback by saying, “missing distances become 88 before sorting.” That sounds close, but I am unsure whether it is accurate, especially because the line returns a call to `sorted` rather than assigning anything to each row. Please tell me whether that wording is a useful way to think about the expression, and clarify its limits if needed. I would also like a brief explanation of what the function returns, based only on the visible code. I am not asking whether the original `rows` list is changed, or for a wider discussion of sorting stability, data validation, or performance; those are not the point I am stuck on.\\n\\n1. It may be easiest to organize the explanation in the order a beginner would read the function: the function header and input name, the returned call, then the key expression and its fallback, and finally the direction setting. Please make the relationship between those pieces explicit, so I can revisit the code and see where each explanation belongs. A short numbered breakdown is fine if that is clearer than one block of prose. Keep the wording direct, and define any Python term you need the first time you use it. I would rather have a precise, approachable explanation than a long tour of unrelated features.\\n\\nI am using this as a reading exercise, so please explain rather than edit the snippet. Use only the code shown here as the basis for claims, and leave the function exactly as supplied when referring to it. Don't add another version, imports, tests, or sample code; I only need the requested explanation in words. In the last part, please bring the answer back to my question about absent `distance` keys and the `88` value, without pretending the snippet tells us what the rows mean outside the function. I want to be able to read this one line more confidently afterward.\", \"output\": \"Please explain this small Python function for a beginner. I can work with lists and dictionaries, but I am still learning how sorting options work. Treat this as a reading exercise: explain the function as written, without changing it or assuming anything about a larger program or what the rows represent.\\n\\n```python\\ndef sort_distance(rows):\\n    return sorted(rows, key=lambda row: row.get('distance', 88), reverse=True)\\n```\\n\\nI understand that `rows` is the function's input name and recognize `return`, but I am not yet comfortable with a function call inside another function call. Please explain the line in manageable pieces, in the order a beginner might read it: the function header and input, the returned `sorted` call, the key expression and its fallback, and finally the direction setting. Connect each piece to the whole line and define any Python terms you use.\\n\\nI think each row may be a dictionary-like item in a list because of the `.get` call and the name `row`, but I may be reading too much into those names. Explain what shape of input the code appears to expect, distinguishing what the snippet shows from what the names only suggest. In particular, explain what value the key expression asks for from each row, whether `.get` looks up the field, and when its second argument is used. Please explain what `sorted` does here, including what the function returns, without turning this into a general introduction to Python collections.\\n\\nMy main question is what happens to a row without a `distance` key. I can see `88`, but I do not know whether it is a value used for missing entries or a special sorting option. Explain what it means in this call and how it affects ordering compared with rows that have a distance. Also distinguish the roles of `key=` and `reverse=True`: explain how `lambda row` uses a temporary row name, what value the key expression produces for sorting, and what direction `reverse=True` requests for those values.\\n\\nPlease relate that direction to the fallback: what can be said about where a row with no `distance` entry sorts relative to rows with distance values? Be clear about what follows from the code and what depends on the actual input values. I have not supplied a sample list, so do not make up an output order or claim that the function was run.\\n\\nA classmate described the fallback by saying, “missing distances become 88 before sorting.” Please say whether that is a useful way to understand the expression and clarify its limits, especially since the function returns a call to `sorted` rather than assigning anything to each row. Keep the explanation focused on this function. I am not asking about changing the original list, sorting stability, validation, performance, or writing anonymous functions generally.\\n\\nUse direct, approachable wording and explain rather than edit the snippet. Base claims only on the code shown, and leave it exactly as supplied when referring to it. Do not add another version, imports, tests, or sample code. End by returning to the question about absent `distance` keys and the value `88`, without assuming what the rows mean outside this function.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-3-prompt-long-0157"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "c71a1df1e03eb29385ca554c479a6643b68d72d5e7a25881545fba2994c62d49"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e66ffc316fe03a4c3437f355b9f2752683aa8aa757eadaeec13550f3a3006c90",
+  "started_at": "2026-10-29T16:15:02.151794+00:00",
+  "result": {
+    "id": "gen-1793290502-ADmhXxyYHs6SZ6Z3hABa",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-3-prompt-long-0157\",\"row_sha256\":\"c71a1df1e03eb29385ca554c479a6643b68d72d5e7a25881545fba2994c62d49\",\"critique\":\"The input is a coherent, plausible beginner request, and the output is natural, well organized, and correctly remains a prompt rather than answering the Python question. It preserves the snippet and most substantive requirements. However, it changes the optional suggestion “If it helps, you can describe the expected shape of the input” into the mandatory instruction “Explain what shape of input the code appears to expect.” It also weakens the explicit exclusion of discussing whether the original list is mutated: “not asking whether the original `rows` list is changed” becomes “not asking about changing the original list,” which can instead mean not requesting an edit. These changes do not fully preserve the supplied conditions and scope exclusions.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Clarifying instruction emphasis**\n\nI shouldn't become too zealous about turning optional prompts into mandatory ones. The original instruction, like \"If it helps, you can describe the expected shape,\" could be clearer as \"Explain what shape ... expects.\" I don't need to produce short numbered outputs if it’s not sensible. It's about ensuring the input shape is sufficient without losing clarity. If I adjust phrases to be more concrete, it should help convey the intent without overly complicating it.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Clarifying instruction emphasis**\n\nI shouldn't become too zealous about turning optional prompts into mandatory ones. The original instruction, like \"If it helps, you can describe the expected shape,\" could be clearer as \"Explain what shape ... expects.\" I don't need to produce short numbered outputs if it’s not sensible. It's about ensuring the input shape is sufficient without losing clarity. If I adjust phrases to be more concrete, it should help convey the intent without overly complicating it.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq43EUeEXwe68BCcjh_wYkgaT5hdfPkwuAFwTy2He4vtMHf46PrK62gGggKv8mYRyhc_6Chgw3jwnDsSE3p9H1fre9s6EdECMA-L5flDSWfk6hzPqh95r4Q1w2ALSmnPS9F1kfR00g87FX1sAHrrJ_JpwXc-zr7rhR-28LinPq4R8LIa91RrN6YABPplAlwIsv3rOWZEPEgBv-Ehd6FrQFqWgXzYN4JkQpjigcIMXWip6qNRwZ5zy-A7wC8j22nuE_yuKzecGo2-oVWAE1DYrr1KRA0m5AqpQA93UtWEX_6Ta1hInI6d5iG5R-R_mnnPAq35NtD-tmnejEt4r-hPmTVqtqn_rHwCjZHhKz2XwU0OlojPNlUZmny7_7VPylTxVgcyHqYJStdBTdgvxhe058V4tjGbfd-Y_Os3fT_WTp5zJpTXpbwb6CSnraJ2mJOaDWSLgGd5ccY1XhXhZyxWOpOzbAqzLuAtYq_Okf-6MEMKNsnAYZS04DXssyKhTQxKPe7ia0DACmjsiJftDm2_Irp03E3BREYlPxOjvdZv7oDW1FQ-UPilVhbRYSSgggHcMYrVuQUWVOAjfkrP5bxNoMIfOUvZDsOvfF9x4uANRSsiP-ZGitJQzI9CPmCUaFzyRq2O-w8tI_JiLAmA6LJcR2GMszY9PIWj8JNsXX9GEWlbK62fsLLf50dr6z_mza845q8bxIcNF4I2KY1aB2ylR3Uk4TqIww6zg_RiVluwchYzU06kvb8YuYAWmJ0rwcy7ZAFZpzkFGsBd31A_0dsKZiawSUFrw2-CxOv9CWFpsFca0EOFERhUuM84RMe_nJlLRAFdb_VyjsIWeP1ipxPZ8Wl9GbKJB6oOPTrVuJWVWB9rLnCD-hYPQ5hcKlCuAPrbxgN4aO6tU_rq-HUrd8cmE1uNNkeXJtUMuG-M_t5SnVc-ylTmhNpvfLYq7TN1FGTb0P1bhcytwNgGAlq1qzFrxo1z_fE_Jtrvl74toBb24C2c96mct7IuMg3oegQm_zhYyAEEXunASSPznEQFxw-x8kitkQjqDFCrT89NnFSY368EceK77IAGIBBGouoofKf4_8XuGTjcNs7V67Um9ZYaZdgNj-W3c6LyZyx5KdtTLBI77jkAPf08JGG1iS16mK0Z84isQf9G4vhLEJcMRHoWCSE4HwMCU_PJ3B-ncy144tbZJayLXyYRyjJxE-Td7Y9JbH9YQ_ZCBLJu36jJb4Byq-V9qApIZ1M_dt5nAhv7xFvY2sKkewtRJMgUAY1YFrkgkjpBhyH2Z-RM-M8RI2gHGBjRDxugjLntEVei4qUJtYh1wkbFes1tFTOtAQvj9amAvde0p9ZYKuTfB76EdOwLh9-DcMDla5kJnurZGEXwxdoreEFQHxUuhVmm9kDrsAVWnknCsi249JZgZuakTLHAaFNCsUT5zOU-iXl6V4-BxsBRl4aiJTvtZtahzpsQFPle5qoNifvZ90YbflO-jLkUCmpWSHi_q3uCYKjsNzXRTgdSC4sl1TbLj-zZKpgr4cAej_om3dJAnEx_uOrPq3lXh8jgg3X_EuL1Hm3wnPlRt2ssHmlUfwEy4hHYs5XlfRfvzhT-v7OhdUTIQ-YxeT0Wt1C6GVEvO3JrUaeqyBr1Rv1cNUCGTLSfD0RglRxwYrRGhb3tncrtum9ZrRi4mxkCji0SznFDXGy3BEBcFGQQBQi4OnDH2BpZAHQHxygSDnSlQUnjPh_nFVcLaF_swVLvPXYDqnTvn6O_JTk-b8ERoQwofyGW2JJy9PzfOcBpaxUu0GKR60NiZiu8YucXHMWa-dLjsadGugL66ijNHXHfTKyS1mAl6PBidK-oWPozTKmFFaWOy9LFDj_Df9xLW-GJIxmGHweYrWlEPkrpTRQmnp5xlJCHffAhcQMDBrGYwJoX3b4NjnbzHH6ahF-7fQnWP6ZcdiLToAh7HMhndCxc7NmhTcyn44mD8Otxr0u9rll0TTdVnLMyAbBeGjYS0P6j5kIt8osTFZV79m6s6fpQHhBCMdOELqxRh7AqsA0WBvP0X9x_1f2uLM82_hOOnhA60Rpt1_Un5cab5_H21GOhcsNoGxOvqQtBi0WJyt08-KlEx7HHkMiQqFNUC0m7ETxU5OIkBDnMn7Q6m3E9PrIUL4S0Krxugc0JQyt0gJNAjHUEfR6S2rOQKXnojY_24kEaL7pVitjlVEKo6Us97Cz2Hql1AWfFix1osZ0jV2HXJE32DoZNgegth9XjzDg2-sZ4GnSEzSu0CZAB_g7wLSR3dBRVXhkNp5Ef7j-Spf3MtL8yyzmI81-8zKE_ePrEGRhE8RkVKZJcG3STjfzMoCbv_agts-RVBsfNuOSHS4nuK8pthy_nlZq9smDiHRGGkrRqIoLrKhSrgSox1eNfzHgLObHY66aNGH86C3lhkbyRTCdyXbG8xVVPSreQIKF8okYtPSvE4RNyTl0WFlADY1x9rXaCDiiOXwa-1X7Tuf1VJAb2X7bJDH3pLH2y-7w_RjDiE6YrdsfpFuH0TXCwE7vLFELELAD8SwowlNlVsIC26jcY6uhr-BjhTvJ35L6kqecBZ1x1lTtmwvvZlCawjBiXzTnCgVvVoAp4LV2CEsTF_pjukAGpVSKiFIttLM6Wg2pnCz8mqbRxVYGWHPNs_VkB1DpyCAjO3MFWgwR9nKQFabX3JWYsGvt02MsSTKbWpY5Aaq0qJycVFeI1-x-vUSO8KDnWITm2TpIU3MgzTfoxo5qKNybDXl1KG6g5mNQN_IffV0TzHZiLCjwLfSG-m4K28vXPF1-1F2CScqvQkUB07EzY6LboonIUTLyhJVkU00RkgMz0XRpsJZE81NhL9I-07C4sGWZ5BR-ubX_pD7yMHfvT9KejwmTZQAVkSLS875UlFMKpgaemc6dlwzwpBqxlL-slAu4pCLaEVxewx8dprWbLN59OnkJvpcNTAvver4_c8M6LviT1Rhcbi2iMXT5YZzNFag7Ur9E_ZV37TMVH-K80uoXKkIIgDXf895iMHHCbR650jQQq7OsQOmSuZlX5GN_QVWz5snpzChgy1a_bg2R2Dj3FgYMxtUbwKGQRzB9YHsO2KtbPXsq3NpbSd4kQ45BIb9ol3rjhwiewy9WN4XHKksg5UAVJ8oLwzAX9Z4SqI_vcd2-4b3xf5S63SncQu9AQpe7Dal3vV_VejIo-3JM__UBURKRkAi6-_Sbr0BaAXTLjlJyx6tCePu_GuVXmNorbO45mjq-uWIJ2Ri2nnj7WznHP8eK2BtdTjLdmOp_RW2ljfIqvwOYiDO0KqLg98YVvjzvgewPi_yIDI1rb-0Linv5HdnpnBsiJQDzxbjbqQYyzREickRE6fHskTSxlC6XWFJ-WurqOQ97p31Ge97Ew1hVMBTU7LjklZ6Xp6OxcctxueGgYie6EGGb_51mrsSin-EQFZHUeKSDluSz-GML3gksJeRSHLHv8tjfEXNABAh3LawG6R_IPZj1tjMhqc2SC3-7j4F-5twPPZpVrEOvbxqtkF19NRXpqjHKxPm46qckZvo4AruSFCIe95jDcd0iahKC9aDOZAAMJb6hNNO5WUvJ0HlNkXtw7lvzhCFGKLwYJY05HRrzrmABKRd8vpUaD5qPy3J31s6HHDZHwdLb1l3P9ws7bTHHEpF-VqBmeTJF58UM7ajP6mZVbQcvaFFIrK4y_EpBkHODlFcCCCP-Ih71f5O1iiqvhtfuHLJVEr2W_2ZgNTM9fYThCaugtNKuLuhl9mU-1guKv8QtAUGityjcGOx7p0tWTcVIWUHU__CV_M_3rF8wRi2j3j_8gp9Yx2f_YCLWMnlSaf8e_NsiBGRDC4rL4zvlhozpqAsrqc-p2vT3Rqs5PimsswHO30ai-aujTR-F-6rlNKrvhip1fccbglzFOH05WWUWMpDjjjtO3Yyc_5K9CFjXhiDnDXBMjBFN8PvFzkRXQnyglrRhl57ZuMmgXhhlmi4Jq9hgwCwkyIFLT-478MX3q5BUOfuOGznTMnQ8ELmmS69TNTSUbCYv_coTMf2tJTFd-D_f3M566K9qm_JjGOtVvgXOJBzWHxxz0n5KZTUJ5uIzDisZhWT86CLZcS7QX7J2EQOBkvf4sNrL4FcSMJZsxoMUx5y0mr4mlPFaDzJHXpk9vya_1ErAK15qKOGAyR3vOIryfbxKrNaxyFu8E3HNUWkn8MS_yqUH3vQ7VlrKVIymNVxP1NV8CO2WQyvt_mgrUZo328vw86oYbWVrAdeAsT2rRakLtNEq32v3d2hvmHLfzxAaSqdsjVTsvOWJfyHVwJ5kRCtoJaeLQT_x2mYgd_kopMBWFqozNd7nJ3UswejkC9dS0h1wYHZxmp_JSMVTwFWbj6vK044zHqH5VQbRcWbNT75fEb4eI9DXLnEepy8mG0CEcFuZ0MOUglT-qc6giYZISPbVZLtmtfJCCEjq5lExEgy2HoVqqIIBcnBNan2hUkn39ZeMCzZJfqjW98tNyxyBwGpBhl_fAdpG8HmSUzTOwC6RDV4o03T6YduJDelSHjaoOS3grhNzIk99DR-aub8hGjYGaYqmcfErABFaYe2aqP1LgIhJZicQr5e7w4Qm6a3AF7_HmgdLRkR74v_x5Qz2ScZXe8QAQFqFBY9yOQEfSUjoYpqV4zYfmnTxF38AayYZwML_1aHucGmG3CCJmrDHzJhSHpgg60LdAK-nkmTMQcQSeydNKQDFMq2iRDllA6atPMBKzHedMvaLCd17NzosDuydzV75MXrmiWBOq2wILo6xcKFVbOFH9I-eSkOcVnT7wwaRY_w5st0MgplcJRNgmbVtsbjPakn2VIMJbG-QMzJB6AmDNMiB4Cv0TjLXrfFtHKEECIcQTnPwvAzL7sHtDdg_fa3qUal1QQummLG04paebGvEsiCzKpXLErgH4QyGtGscEXlVmCDmBd5AIPzbEd8wWb2WviT8Y2Og4H-QYkIsSonHAk-MhRL-ACBjyxH4qPJrtpD10gTO4YWpjAVp1aFGb6iiNQK7ixDfXMJvDuOAlZ5iyyUKQhku7WsMzcAxxQEY4wSdxO_71IOfGYnUYQlw_9qgq-E4C9TrAHlzEWjSMGrNuNbevWxp8XX872aZDyRiYOhEUFFF9vBy5exSnKon1BOxQqn_iVnLK89DIfQBwYifn4p9z3RmXgDRrLvBps4v1bc_yej14sUEec1HkCmOohRX8oehBxH4gY-Rf3W6lHqqi4WGWZCfvfQuZR1z4-Y-F3hzV5s7OjSuE-qZl44txiGYvMvarQrUhpGvmsbCujeoN0cROsLSt6uFRse2w6zwnQqKri9PLER1QPoQXAjsT_Ypjh_QpCYtSb3DVl2u4pHWI-iQmNOJx93MzOfC7j8AZY-GReOQtP4ia4aAnyU7P5ztJCXXgRTuo54pH5sqfPgzAnocbZLVZM_j7Wl7k_LfCpejHdrzg64q1QSnb9Q2rp3ebfuuZfrcCK3eU5pGn36vSwhVSgrWwcVlvXmFfDbXAVcGox1WzuN-_erOGmfa9kHERplwal7peIhrhOi9xf4Jt0x4ux7DtzDqHw6vC0q1v4sUh8vgnq-xKpCmr-90wpwet70P9I9t4uqH-e-nYLi-WHiWecqpzBuhVLjdO8Hv49_RRrEIsdHxKio5QCQaeEk2C_FQuOnAOykw37pTbq5KV_dZ-B4-wVlPQbPuB03u2AEP-4jI_r6eBIzyCQY2MwTdte60HppgDrBFmFXfUROmf5kVoVbUqMf7q1jDZBuVIgjQfhXxSRt1bn5FWXctFFT4phsFKQsTc7Pe1he3k-ujhAoJzdLquDd8o4IFexwYNJTIeGTBUGei4HrPnAl4nDFJmcvfrLrElzDg0ebW2d-Vk8UwcJQMMhMEOJz_OQx_KXtF1cWw3BMTiuVPr6pEpXrpqrVMqKjMeNbPCXKB3WDSi06imS8XgJ5kXTRm6yLqvF7evLUcJJN-3AcHxqsjIqZZ9eUkyuaPkCx7oX0U1kTo-8eXdWd92HnFQ-Y7CSQRJLlXjiCXNDOjYJkn27MEy4_w7ZVDOnbFzr6HsgSNtFd2h0qEJVLF0OEGDaeqYoBtN4f2g4MwlCuvJr75vjA8Z0UO2MfIZyxnGj_lOAfJ82zRpEXTanTqlAN44fSKCzPAwsZGYpR8yR3K2aza-OgeaDxMvh2YSjJ3W64lYXkCObd-8FTQHv__3FCaWygal4TPmnLcAxbACeBww4TXxDljcQSEPoYj0ioiR78celJFpXZdFGeaXsSOesVGqvXaSNM4Xj0lw1knNxSQn9xmWJgo9RiWxxM4VZgRJpJhzilSH4-QieMIDNF0Y-7u5lA-tDV4sqlClgfvKF5cDNy6GsKKFQxE_eXWfALy4NVmaNn09zZKJk5qclc1oS1XIm9JP8kZHzXIWDoo2NMC7V4K6r9mig52FYRFLxiBZ_1tH-e1OY4afQ7xmWWb03UbrUQMmMVZSYDVUbXMQIu6Zq4eIe0_s0jBx008t0YIJS-4nFFHmMSHmM=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_04fa28e05c05cbc9016ae37107a8b887d0b16df22413d52321",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793290502,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 573,
+      "prompt_tokens": 2371,
+      "total_tokens": 2944,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 335,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2368,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0059728,
+        "upstream_inference_prompt_cost": 0.0002428,
+        "upstream_inference_completions_cost": 0.00573
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "168dfc242b5b7791ba0d173cde608ce12ea94d7934385d7b63ee949fc85fe147",
+  "elapsed_ms": 16320
+}

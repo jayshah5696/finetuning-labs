@@ -17,14 +17,17 @@ Dataset, tokenizer and base-model downloads explicitly use `token=False`.
 
 ## Configure and run
 
-CONFIG contains the model, dataset revision, adapter destination, W&B project and LoRA settings.
-When you change the base model, update both `model_id` and `model_revision`.
-The defaults are LiquidAI/LFM2.5-230M, rank 16, alpha 32, dropout 0.05, three epochs,
+Use the same notebook. CONFIG contains the model, dataset revision, adapter destination,
+W&B project and LoRA settings. Set `MODEL_SIZE = "350m"` for the larger trial, or `"230m"`
+to measure the data change on the previous base. The preset changes the model revision and
+adapter destination together. Both presets use rank 16, alpha 32, dropout 0.05, three epochs,
 learning rate 0.0002, batch size 1 and gradient accumulation 16. The context limit is 4,096.
 Colab's CUDA PyTorch stays installed. The notebook installs the tested training libraries.
 
-Change `hub_model_id` if another account owns your token. The default destination is
-`jayshah5696/lfm2.5-230m-rewriter-lora`. The `hub_private` setting controls new-repository visibility.
+Change `hub_model_id` if another account owns your token. The default 350M destination is
+`jayshah5696/lfm2.5-350m-rewriter-lora`. The 230M preset uses
+`jayshah5696/lfm2.5-230m-rewriter-lora`. An adapter cannot be moved between those bases.
+The `hub_private` setting controls new-repository visibility.
 
 Run the cells in order:
 
@@ -35,14 +38,33 @@ Run the cells in order:
 
 Only adapter parameters receive updates. System and user tokens are masked in the training
 loss. Assistant text and its EOS are supervised. Oversized examples raise an error instead of
-being truncated. Train has 1,500 rows, dev has 100 and validation has 84. Checkpoint selection
+being truncated. The English export has 1,864 train, 89 dev and 81 validation rows. Checkpoint selection
 uses dev loss. The final validation pass does not select a checkpoint.
 
 Use a fresh runtime for this rerun. The notebook starts from the pinned base model and trains
-a fresh adapter on all 1,500 examples. It does not continue the previous adapter. The data and
-model repository names stay the same. The last cell uploads the replacement adapter to the
-configured model repository; earlier weights remain available in Hub commit history.
+a fresh adapter on all 1,864 English examples. It does not continue the previous adapter.
+The dataset repository and split names stay the same. The last cell uploads the replacement
+adapter to the configured model repository; earlier weights remain available in Hub commit history.
 The notebook pins the updated data commit and checks its published split counts.
+
+If you already have the earlier notebook open, keep that copy and update its existing CONFIG
+after the original dictionary definition. The training helpers and train/upload cells are unchanged:
+
+```python
+CONFIG.update(
+    model_id="LiquidAI/LFM2.5-350M",
+    model_revision="9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
+    dataset_revision="00d59dda95867fe5bcb147b1b1c5a34b5ad7f071",
+    expected_split_counts={"train": 1864, "dev": 89, "validation": 81},
+    hub_model_id="jayshah5696/lfm2.5-350m-rewriter-lora",
+    run_name="lfm2.5-350m-rewriter-english",
+    output_dir="/content/rewriter-lora-350m",
+)
+```
+
+For 230M, use the 230M model, revision and destination from `configs/training-models.json`.
+Keep the same updated dataset revision and split counts. Run from a fresh runtime after
+changing these parameters.
 
 ## Output
 
@@ -64,10 +86,10 @@ the same Sol rubric on stock and adapted outputs for the later quality compariso
 ## Verification boundary
 
 The CPU integration executes the notebook's data, training, save and upload cells using public
-Hub data. It substitutes a tiny random native LFM for the 230M model, runs W&B offline and mocks
+Hub data. It substitutes a tiny random native LFM for the selected student, runs W&B offline and mocks
 the final Hub model upload. It checks real adapter updates, unchanged base weights, adapter-only
 serialization and exact adapter reload. It does not establish L4 memory use, BF16 execution,
-online W&B authentication or the quality of a trained 230M model.
+online W&B authentication or the quality of a trained 230M or 350M model.
 
 ```sh
 uv run --no-project --python /tmp/rewriter-training-check/bin/python python \

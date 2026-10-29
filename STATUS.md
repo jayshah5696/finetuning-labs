@@ -1,5 +1,47 @@
 # Status
 
+## English retraining data, 29 October 2026
+
+The source pool now has 2,000 train, 100 dev and 84 validation pairs. All earlier training
+rows, support records and evidence are preserved. The English export selects 1,864 train,
+89 dev and 81 fixed validation pairs. The original source holdouts and English holdout
+texts and order remain unchanged. The same public dataset repository is updated in place.
+
+The latest 500 independent Arka episodes target the remaining English critical errors.
+They include 100 long inputs, 125 exact identity pairs and 33 supplied-code pairs.
+Long inputs contain 1,003 to 1,558 pinned Liquid tokens. All 100 long targets have paragraphs,
+70 have numbered sections and 93 have quotes. Fifty-two declared domains are represented.
+There are 58 native-strong single-Sol passes and 442 double-Sol passes, with 942 saved calls.
+Sixty fresh reverse-direction episodes remove fixed amount, location and recipient shortcuts.
+
+The final targeted Sol review compared all 33 supplied-code pairs and all 49 correction or
+unfinished transcription pairs. It found two contradictory explanation requests and one
+unapplied correction that earlier per-row reviews missed. Those three rows are excluded and
+replaced with separately verified pairs. Both selections, original verdicts and new findings
+are retained. The corrected release passed the complete staged audit before replacement.
+These are model reviews, not human gold labels.
+
+Both pinned model tokenizers encode all 2,034 English rows identically. Every supervised target
+decodes exactly, with a maximum full chat of 4,029 tokens. The real 350M base loaded on CPU,
+accepted the existing LoRA setup and returned finite logits. It received zero optimizer steps.
+The public training revision is `00d59dda95867fe5bcb147b1b1c5a34b5ad7f071`.
+All eight public dataset/config/split combinations return HTTP 200 without authentication.
+All downloaded rows and file hashes match Git, and the three backfilled rows also match at
+their exact Viewer offsets in both configurations. The Hub trees contain data and notices only.
+
+The same notebook defaults to 350M and also supports 230M through one model preset. Its
+helpers, train cell and upload cell are unchanged from the earlier notebook. The documented
+CONFIG update matches every training setting in the rebuilt notebook, and the builder
+reproduces its bytes exactly. Its actual public-data CPU check encodes all 2,034 rows and
+completes four tiny-model optimizer steps, with changed adapters, frozen base weights and
+exact saved-adapter reload. W&B is offline and upload is mocked. All 160 tests, Ruff checks,
+formatting and package build pass. Receipts are in `data/rewriter/releases/english-*.json`.
+
+The user will run training in Colab L4. No new 230M or 350M student has been trained by this
+preparation run. The existing English comparison remains 51/81 passes, 17 critical-error
+outputs among 80 reviewed outputs and one truncation. Compare the next adapter on those same
+81 cases. A 350M trial also needs its own stock-model arm; it changes both data and base size.
+
 ## Updated adapter evaluation, 29 October 2026 UTC
 
 The newly uploaded adapter `ba71856780e4d2398218fe76756b3390556437ea` has different weights

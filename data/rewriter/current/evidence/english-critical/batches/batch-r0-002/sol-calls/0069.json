@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-polish-short-0031\", \"row_sha256\": \"80acee7c9d1d08891181f67991982e7c8b7bdd3de4b27e4474f6d338b414aada\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"the log-file cleanup utility came to $86.30, not $151.57, which was what i had first written down\", \"output\": \"The log-file cleanup utility cost $86.30, not $151.57, the amount I first wrote down.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-polish-short-0031"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "80acee7c9d1d08891181f67991982e7c8b7bdd3de4b27e4474f6d338b414aada"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "09442eefa8bbf8b321df0d0eb5e5c3b2b2d956cd0f49f361c7ffd5c1ccdf44b0",
+  "started_at": "2026-10-29T15:10:02.475161+00:00",
+  "result": {
+    "id": "gen-1793286602-XrDNSeyvIs8kiKg8WcPC",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-polish-short-0031\",\"row_sha256\":\"80acee7c9d1d08891181f67991982e7c8b7bdd3de4b27e4474f6d338b414aada\",\"critique\":\"The input is a natural draft with clear intent. The output appropriately polishes capitalization and phrasing while preserving the utility description, the actual cost of $86.30, and the correction of the initially recorded $151.57. No facts or certainty are changed.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42HYgkSbnrO7k-GRgucsF1Up-KXddK5FsNHMIExAzI8S9I9xuBGRF0l_AkD4fGyy5TsEcOHu7dJVNd9H970dA6wOILDtWngnU3_dl-BNze4v7S88CvAA_ixeoCZ2lrjyjXNyvfXfmxeVJzZZSTFlbaJ7v6xGSlttzkMBdSJDaXZM6R-6ezU9sYgHOs-l4triueZNbAjdRH23V_yHUTluk0YZmcSMsaO0qXfZ6CZvXrFOjIhcBfij4REv6UXYhiQwXUnS37fMh6svvhESwORfDLl2MN2E_-MUvRvkSN_TRqlXqriODlWJi6QGARpt9XMqNJC-rD-IVfAD9f4pJkvYWNHjwSyT2VBJubxeCZC1XwrO-Y8k7OuNiKiolf24phIQWdlUNGIIVyhZmG_x7qJHuCQPaYKF_MVg-lBL3J98gq9UXd2ZLFeNW-x9Qk-W7gWSKZ18fFBMPVHW4jCepJ4FoMf7s9C_M1daePieMebHC9oUyGZGXWOX8MfqYjjqee6P4sYbQaJRCujvmSn2pcdkSLVn6kLHDR0hLItxeKG2siIEQE12bLI0i7PF6JM0LvY4uDVoJDaj_xslx3qwggMFcYyHR3sHsm20mJKdqSmqAKy_tq-INdv9hay8zFYftr2ulNPxHjGVFOSbO6RP4JRWXEQaaLJzFo1N33cjA4CkzwxvKJPRyxdqTGE_WsveHh76ofbIlHwhutwl8e8nsfBosYLGGrgoHEMXon_M_9e3unUnlLzhjXZsdz5_gcFcWZnnBbPd3j_kdgEfKylYJ0X0YtQV15-HUxexs7xRqmyoBS_I3S958Nf1ZDLMrknD284vxBzW_stc9XLiOvPKBNbITCXXbGCeQbL35LHF9k_OSHmvG6rHopRlixpvtS_5uFbl-wHUJAaO1yzrYm1EBOVWmL1H_eZ3NYgXeYy5Vyag4Gx2S9hUiRnwEwsu7zlV4e9qj3-9F1y4K_PlFEa5DV__Yg93SgLvzHIon-6f4SuOIET0gOo06iJgLC0JR2U1ISXHMnveza2Xk-pfJBwgtCnLAENiQiTQaa39olZwM2e2tDLE_chP2L_I_b59EQBfBVMXSOUUcFsdJI0j7dGLHIRq0uYfEn4yaGMbI9K8LrH45VpUzit4KIp_-YYSMzPBqmeebzbJA9zzQ6r-HNJ-eQ-T--OL9TIb4n13urL7yBzhOb_YsXLbDMfcKn2GutKcLkGnmDC9QJ8IGbghiiy1F5s2lnbQmzUR33h4DKjJ6NkQB6qUGGVWa4KrTwgRh1KpJ5Bk_UvDT8keBMi1b0KG4c0_wAyvSolegd2BQaafWO3wMS6JJJCmeALVQdO-gogwQ0es36vC_icwWWEfJNoqtJ_qcpGqAALOLlmnqXkRPeNtXbcrpbObMHteoIR10xGxqNIVgrJnPMVan_Lvh_s-t69V6CNZC0GD46ayYgkitlJU8ZhrjII5kw6Z6nUqg2tqWa1KNruk11eX5rPWb5vI2ZlqHNMmH3c0VSPrec7HAJi6rs5-410p0297ztKpOGMDE2Cq-anRfKgxaTeQ5pEhhDxzEnJEJKPsB6A9xx5yuG-NWjwjavD_2whhz0yd4Xy5WZhQQg7Uq33tggo51ftUSh-MU7pZNy7pevWLxmJLfH9haYEjqlVH42JHiUvEzzl_xPauDvv_QW5JcFdyiJKJaIyW70AC3lHGNgq7dN64SgHK1Cj-harR36i4WxFO7bm1nYGczMX8kCh041qjqFarEM7HDpRkU5EuMj5G8qte4Q-z_y3mnEx0fAzp_rgpmMRDT8o7zqMI3gLb7NnysmP3V2VTYqrmB9dYoM_8CAOfyR1efQlOaZM8PdAJZohPfd-zfPlDR1PNyqeKhQPRcMCFgbyD-OyMLrR8Ya5DFM89Wx5GQM6cHjw9MOTOG21tcZF7ZVOgKjuHkB3zhSt4ZvRZIrHjF_CM_plXQl-Dw55d9R8uVJrY-JM=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_089398b8f436b426016ae361d79b3887d083e3347bcb5d3493",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793286602,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 182,
+      "prompt_tokens": 680,
+      "total_tokens": 862,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 29,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.00318,
+        "upstream_inference_prompt_cost": 0.00136,
+        "upstream_inference_completions_cost": 0.00182
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "87523509cf5846c25588b4572b7bda06a2423b658d7fe5a9a36d58761c4681fb",
+  "elapsed_ms": 16415
+}

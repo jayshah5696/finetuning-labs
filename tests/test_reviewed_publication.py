@@ -182,8 +182,9 @@ def test_data_audit_does_not_require_retired_runtime_artifacts(release, name):
     assert json.loads(verified["data/train.jsonl"])["output"] == "Can we meet?"
 
 
-@pytest.mark.parametrize("change", ["review", "native_export"])
-def test_sol_verified_addition_must_bind_to_its_actual_provider_call(release, change):
+@pytest.mark.parametrize("change", ["review", "native_export", "plan"])
+@pytest.mark.parametrize("namespace", ["boost", "english-critical"])
+def test_sol_verified_addition_must_bind_to_its_actual_provider_call(release, change, namespace):
     from finetuning_labs.rewriter.boost_data import SOL, review_packet
     from finetuning_labs.rewriter.evaluation import saved_call
     from finetuning_labs.rewriter.scale_data import VERIFY_SYSTEM
@@ -200,6 +201,14 @@ def test_sol_verified_addition_must_bind_to_its_actual_provider_call(release, ch
     item["adjudication_review"] = None
     item["native_evidence"] = "evidence/native.json"
     item["native_exports"] = "evidence/native-exports.json"
+    item["overlap_evidence"] = f"evidence/{namespace}/final-overlap-check.json"
+    item["critical_checks"] = {"keep": ["Can"]}
+    item["generation_plan"] = f"evidence/{namespace}/source-plan.json"
+    save(
+        release,
+        item["generation_plan"],
+        {"plans": [{"id": item["id"], "critical_checks": item["critical_checks"]}]},
+    )
     report = json.loads((release / "reviews/one.json").read_text())
     report["reviewer_model"] = SOL
     save(release, "reviews/one.json", report)
@@ -235,13 +244,20 @@ def test_sol_verified_addition_must_bind_to_its_actual_provider_call(release, ch
     save(release, "evidence/native.json", native)
     save(
         release,
-        "evidence/boost/final-overlap-check.json",
+        item["overlap_evidence"],
         {"rows": 1, "new_to_new_overlap": 0, "rows_sha256": digest([row])},
     )
     save(release, "evidence/native-exports.json", [digest(native[item["id"]]["payload"])])
     save(release, "supporting.json", meta)
     seal(release)
     assert "data/train.jsonl" in audit_publication(release)
+    if change == "plan":
+        item["critical_checks"] = {}
+        save(release, "supporting.json", meta)
+        seal(release)
+        with pytest.raises(ValueError, match="plan"):
+            audit_publication(release)
+        return
     if change == "native_export":
         save(release, "evidence/native-exports.json", [])
         seal(release)

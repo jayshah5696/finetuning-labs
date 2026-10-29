@@ -20,6 +20,25 @@ from finetuning_labs.rewriter.scale_data import VERIFY_SYSTEM
 from finetuning_labs.rewriter.training import LeakageIndex
 
 
+def test_interrupted_generation_attempts_are_preserved_but_not_admitted(tmp_path):
+    import json
+
+    from finetuning_labs.rewriter.boost_data import preserve_batch_evidence
+
+    batch = tmp_path / "batch-interrupted"
+    raw = batch / "generation/runs/author/stages/02_generate/raw_responses.jsonl"
+    raw.parent.mkdir(parents=True)
+    raw.write_text('{"seed_id":"unfinished","generated_text":"partial attempt"}\n')
+    (batch / "generation/source-plan.json").write_text('{"plans":[{"id":"unfinished"}]}')
+    destination = tmp_path / "release/evidence/batches/batch-interrupted"
+    preserve_batch_evidence(batch, destination)
+    assert (destination / raw.relative_to(batch)).read_bytes() == raw.read_bytes()
+    assert (destination / "generation/source-plan.json").exists()
+    status = json.loads((destination / "incomplete-excluded.json").read_text())
+    assert status["eligible_for_selection"] is False
+    assert status["reason"] == "generation_export_incomplete"
+
+
 def pair():
     row = {
         "input": "um forward the sketch to Odel",
@@ -148,6 +167,14 @@ def test_release_requires_complete_quotas_and_unique_verified_sources():
         validate_selection([entry])
     with pytest.raises(ValueError, match="duplicate"):
         validate_selection([entry, entry])
+
+
+def test_append_can_use_new_quota_cells_without_changing_the_legacy_defaults():
+    from finetuning_labs.rewriter.boost_data import validate_selection
+
+    row, meta, review = pair()
+    entry = {"row": row, "meta": meta | {"length": "short"}, "review": review}
+    validate_selection([entry], quotas={"/transcribe": {"short": 1}})
 
 
 def test_interrupted_directory_swap_restores_the_original_dataset(tmp_path, monkeypatch):

@@ -115,6 +115,11 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
     if not review_names.issubset(contents):
         raise ValueError("missing exact review report")
     reviews = load_reviews([root / name for name in sorted(review_names)])
+    review_documents = {name: json.loads(contents[name]) for name in review_names}
+    plan_documents = {
+        name: json.loads(contents[name])["plans"]
+        for name in {m["generation_plan"] for m in support if "generation_plan" in m}
+    }
     native_documents = {
         name: json.loads(contents[name])
         for name in {m["native_evidence"] for m in support if "data_review" in m}
@@ -131,7 +136,7 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
         LeakageIndex([*validation_index().texts, *heldout_texts]) if native_documents else None
     )
     ids, groups, total = set(), {}, 0
-    new_rows, new_texts = [], []
+    new_rows, new_texts, overlap_groups, expansion_groups = [], [], {}, {}
     for split in ["train", "dev", "validation"]:
         rows = [json.loads(x) for x in contents[f"data/{split}.jsonl"].splitlines()]
         guides = [json.loads(x) for x in contents[f"sft/{split}.jsonl"].splitlines()]
@@ -168,9 +173,19 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
             if "data_review" in item:
                 from .boost_data import SOL, boost_issues, verified_pair, verify_saved_review
 
-                report = json.loads(contents[item["data_review"]["report"]])
+                report_name = item["data_review"]["report"]
+                report = review_documents[report_name]
                 if report.get("reviewer_model") != SOL:
                     raise ValueError("Unexpected data verification model")
+                if "critical_checks" in item or report.get("data_policy") == "english-critical":
+                    plans = plan_documents.get(item.get("generation_plan"), [])
+                    matching = [p for p in plans if p["id"] == item["id"]]
+                    if len(matching) != 1 or any(item.get(k) != v for k, v in matching[0].items()):
+                        raise ValueError("Generation plan differs from critical-check metadata")
+                    if report.get("data_policy") == "english-critical" and (
+                        item["language"] != "en" or "critical_checks" not in item
+                    ):
+                        raise ValueError("English generation plan is incomplete")
                 paths = item.get("verification_calls", [])
                 if len(paths) not in {1, 2} or len(set(paths)) != len(paths):
                     raise ValueError("Missing distinct data verification calls")
@@ -205,12 +220,46 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
                     raise ValueError("New-to-new text overlap in publication")
                 new_rows.append(row)
                 new_texts.extend([row["input"], row["output"]])
+                overlap_name = item.get(
+                    "overlap_evidence", "evidence/boost/final-overlap-check.json"
+                )
+                overlap_groups.setdefault(overlap_name, []).append(row)
+                expansion_groups.setdefault(report_name, []).append(
+                    {"row": row, "meta": item, "review": saved}
+                )
     if new_rows:
         from .boost_data import verify_overlap_report
 
-        verify_overlap_report(
-            new_rows, json.loads(contents["evidence/boost/final-overlap-check.json"])
-        )
+        for name, rows in overlap_groups.items():
+            verify_overlap_report(rows, json.loads(contents[name]))
+        from .boost_data import validate_selection, verify_holdouts
+
+        for name, entries in expansion_groups.items():
+            report = review_documents[name]
+            if "source_spec" not in report:
+                continue
+            spec = json.loads(contents[report["source_spec"]])
+            validate_selection(entries, quotas=spec["quotas"])
+            if report.get("data_policy") == "english-critical":
+                from .english_critical import verify_direction_balance
+
+                balance_path = str(Path(report["source_spec"]).with_name("direction-balance.json"))
+                verify_direction_balance(entries, json.loads(contents[balance_path]))
+            if (
+                "identity_target" in spec
+                and sum(e["meta"]["identity"] for e in entries) != spec["identity_target"]
+            ):
+                raise ValueError("Published identity quota differs from source plan")
+            if "base_counts" in spec:
+                parent = {}
+                for filename in spec["base_files"]:
+                    data = contents[filename]
+                    if filename.endswith("/train.jsonl"):
+                        data = b"".join(
+                            data.splitlines(keepends=True)[: spec["base_counts"]["train"]]
+                        )
+                    parent[filename] = data
+                verify_holdouts(parent, spec["base_files"])
     if total != len(support) or Counter(x["split"] for x in support) != quality["splits"]:
         raise ValueError("publication contains foreign split metadata")
     return contents

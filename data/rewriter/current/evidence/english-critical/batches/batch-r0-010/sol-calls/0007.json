@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-transcribe-long-0027\", \"row_sha256\": \"b1e9160901b5e7a2ffa3955ee7fe8de84b0fa2e76e19d7888e6857a3d6e7bc66\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {}, \"identity\": true, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"The cleanup utility called Bracken began as a small weekend tool for the North Quay Library’s systems room, where nightly application logs had outgrown the storage volume twice in one winter. Mara Venn, the library’s infrastructure engineer, wrote the first version to remove dated files without touching the records staff needed for incident reviews. The utility now runs on three Linux hosts, one for the public catalog, one for the digitization desk, and one for the building access service. Each host writes to a separate directory, and Bracken reads a short TOML file that names those directories, the retention period, and the account permitted to run cleanup. The utility does not receive credentials for the applications that produce the logs.\\n\\nThe library keeps active logs for twenty-one days and compressed logs for a further seventy days. Bracken checks the date in each filename against the host’s local calendar, then compares that date with the retention settings. Files with an unrecognized date remain in place and appear in the daily report rather than being guessed at. The catalog uses names such as catalog-2025-02-14.log, but an older scanner service includes a site code between the date and the suffix. Mara added a separate filename pattern for that service after a test run showed that the original rule could not distinguish its files from temporary exports. The patterns are stored as configuration values, not compiled into the executable.\\n\\nDisk use is part of the decision, but it does not override retention. A configured minimum free-space amount can trigger an additional pass through files that are already older than the normal retention period; it cannot make a recent file eligible. On the access host, the minimum is 18 gigabytes, because badge events arrive steadily and the local volume is small. The public catalog host uses 42 gigabytes, while the digitization machine has no emergency threshold at all. Bracken checks available space before listing candidates and again after each removal. If the filesystem reports less free space than the configured amount, the report records the shortfall and the utility continues only with files that meet the age rule. A file’s size is reported in bytes, while the dashboard displays a rounded value in mebibytes.\\n\\n1. During a routine pass, Bracken reads the configuration and verifies that every listed directory exists, is a directory, and is readable by the service account. It builds a candidate list from regular files only; symbolic links and subdirectories are recorded as skipped entries. For each candidate, it stores the path, filename date, last modification time, byte count, and reason for inclusion or exclusion. Before removal, it rechecks the file’s date and size so a file replaced after the initial scan does not inherit the eligibility of the earlier file. The utility writes the report to a staging file, flushes it to disk, and renames it only after the pass completes. A failed rename leaves the previous report available for the morning check.\\n\\nMara described the purpose during a meeting with the digitization staff: “If the date is unclear, leave the file where it is and tell us what you found; a quiet guess is harder to investigate than a full disk.” That instruction shaped the handling of malformed names and missing timestamps. The report includes the literal filename, the directory, and a short reason such as “date not recognized” or “outside retention window.” It does not print file contents, user names found inside messages, or the configured service account’s home directory. Reports remain on the host for fourteen days and are copied to the library’s internal monitoring share each morning. Staff can compare the local and copied versions by checksum if a transfer appears incomplete.\\n\\nOne unusual issue came from the digitization desk, where an operator sometimes moved a large unfinished scan into the log directory while troubleshooting an export. Those files had a .part suffix and could be several gigabytes, but their names contained no valid log date. Bracken therefore left them untouched and raised a warning with their sizes. The desk now stores unfinished scans in a separate work directory, although the warning remains useful if a file is moved back accidentally. The utility also ignores files owned by the backup account, even when their names look like ordinary logs. That check is based on numeric user ID rather than the account name, since the host image can assign a different name to the same service identity after a rebuild.\\n\\nThe systemd timer starts Bracken at 02:20, after the library’s scheduled backup window and before the catalog’s early-morning index job. Each host has its own timer, so a problem on one machine does not block cleanup elsewhere. The service has a fifteen-minute timeout and runs with a restricted filesystem view; it can write only to the log directories and the report location. A nonzero exit status sends a message to the infrastructure channel, but skipped files alone do not count as a failure. If the configuration is invalid, the service exits before changing files and reports the line number and setting name. The on-call engineer can run a dry pass by adding the --check option, which lists possible actions without deleting anything.\\n\\nMara’s test set includes a recent file, an expired compressed file, a file dated exactly on the retention boundary, an invalid date, a symbolic link, and a candidate whose size changes between scanning and rechecking. A separate test fills a temporary filesystem to exercise the minimum-free-space setting without using a production volume. The boundary test checks the host’s local date and time zone, because midnight on the server may not coincide with the calendar date displayed in the report share. Test reports use a temporary directory and a fixed clock, making the expected candidate list repeatable. When the filename rules changed for the scanner service, Mara added examples of both valid site codes and near-matches that must remain in place.\\n\\nThe operations notebook lists the most recent configuration review as 6 February, with the access-host threshold still at 18 gigabytes and the catalog retention period unchanged. Its next review is scheduled for 6 May, when the library expects to replace the public catalog host and move its logs to a larger volume. The infrastructure team has recorded the new host’s planned mount point but has not added it to Bracken’s configuration. Until the migration date is confirmed, the existing timer continues to use the current directory. The digitization lead also requested a monthly count of files left untouched because their dates could not be read; Bracken includes that count in its report, alongside the individual entries, starting with the next scheduled run.\", \"output\": \"The cleanup utility called Bracken began as a small weekend tool for the North Quay Library’s systems room, where nightly application logs had outgrown the storage volume twice in one winter. Mara Venn, the library’s infrastructure engineer, wrote the first version to remove dated files without touching the records staff needed for incident reviews. The utility now runs on three Linux hosts, one for the public catalog, one for the digitization desk, and one for the building access service. Each host writes to a separate directory, and Bracken reads a short TOML file that names those directories, the retention period, and the account permitted to run cleanup. The utility does not receive credentials for the applications that produce the logs.\\n\\nThe library keeps active logs for twenty-one days and compressed logs for a further seventy days. Bracken checks the date in each filename against the host’s local calendar, then compares that date with the retention settings. Files with an unrecognized date remain in place and appear in the daily report rather than being guessed at. The catalog uses names such as catalog-2025-02-14.log, but an older scanner service includes a site code between the date and the suffix. Mara added a separate filename pattern for that service after a test run showed that the original rule could not distinguish its files from temporary exports. The patterns are stored as configuration values, not compiled into the executable.\\n\\nDisk use is part of the decision, but it does not override retention. A configured minimum free-space amount can trigger an additional pass through files that are already older than the normal retention period; it cannot make a recent file eligible. On the access host, the minimum is 18 gigabytes, because badge events arrive steadily and the local volume is small. The public catalog host uses 42 gigabytes, while the digitization machine has no emergency threshold at all. Bracken checks available space before listing candidates and again after each removal. If the filesystem reports less free space than the configured amount, the report records the shortfall and the utility continues only with files that meet the age rule. A file’s size is reported in bytes, while the dashboard displays a rounded value in mebibytes.\\n\\n1. During a routine pass, Bracken reads the configuration and verifies that every listed directory exists, is a directory, and is readable by the service account. It builds a candidate list from regular files only; symbolic links and subdirectories are recorded as skipped entries. For each candidate, it stores the path, filename date, last modification time, byte count, and reason for inclusion or exclusion. Before removal, it rechecks the file’s date and size so a file replaced after the initial scan does not inherit the eligibility of the earlier file. The utility writes the report to a staging file, flushes it to disk, and renames it only after the pass completes. A failed rename leaves the previous report available for the morning check.\\n\\nMara described the purpose during a meeting with the digitization staff: “If the date is unclear, leave the file where it is and tell us what you found; a quiet guess is harder to investigate than a full disk.” That instruction shaped the handling of malformed names and missing timestamps. The report includes the literal filename, the directory, and a short reason such as “date not recognized” or “outside retention window.” It does not print file contents, user names found inside messages, or the configured service account’s home directory. Reports remain on the host for fourteen days and are copied to the library’s internal monitoring share each morning. Staff can compare the local and copied versions by checksum if a transfer appears incomplete.\\n\\nOne unusual issue came from the digitization desk, where an operator sometimes moved a large unfinished scan into the log directory while troubleshooting an export. Those files had a .part suffix and could be several gigabytes, but their names contained no valid log date. Bracken therefore left them untouched and raised a warning with their sizes. The desk now stores unfinished scans in a separate work directory, although the warning remains useful if a file is moved back accidentally. The utility also ignores files owned by the backup account, even when their names look like ordinary logs. That check is based on numeric user ID rather than the account name, since the host image can assign a different name to the same service identity after a rebuild.\\n\\nThe systemd timer starts Bracken at 02:20, after the library’s scheduled backup window and before the catalog’s early-morning index job. Each host has its own timer, so a problem on one machine does not block cleanup elsewhere. The service has a fifteen-minute timeout and runs with a restricted filesystem view; it can write only to the log directories and the report location. A nonzero exit status sends a message to the infrastructure channel, but skipped files alone do not count as a failure. If the configuration is invalid, the service exits before changing files and reports the line number and setting name. The on-call engineer can run a dry pass by adding the --check option, which lists possible actions without deleting anything.\\n\\nMara’s test set includes a recent file, an expired compressed file, a file dated exactly on the retention boundary, an invalid date, a symbolic link, and a candidate whose size changes between scanning and rechecking. A separate test fills a temporary filesystem to exercise the minimum-free-space setting without using a production volume. The boundary test checks the host’s local date and time zone, because midnight on the server may not coincide with the calendar date displayed in the report share. Test reports use a temporary directory and a fixed clock, making the expected candidate list repeatable. When the filename rules changed for the scanner service, Mara added examples of both valid site codes and near-matches that must remain in place.\\n\\nThe operations notebook lists the most recent configuration review as 6 February, with the access-host threshold still at 18 gigabytes and the catalog retention period unchanged. Its next review is scheduled for 6 May, when the library expects to replace the public catalog host and move its logs to a larger volume. The infrastructure team has recorded the new host’s planned mount point but has not added it to Bracken’s configuration. Until the migration date is confirmed, the existing timer continues to use the current directory. The digitization lead also requested a monthly count of files left untouched because their dates could not be read; Bracken includes that count in its report, alongside the individual entries, starting with the next scheduled run.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-transcribe-long-0027"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "b1e9160901b5e7a2ffa3955ee7fe8de84b0fa2e76e19d7888e6857a3d6e7bc66"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "6b9aff5bbafc61ebea9f9325e0f97c27b63f68a644598d294e6c62e0ec1b7f06",
+  "started_at": "2026-10-29T15:34:37.573859+00:00",
+  "result": {
+    "id": "gen-1793288077-BztrZOh4ak76fjxxWiMR",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-transcribe-long-0027\",\"row_sha256\":\"b1e9160901b5e7a2ffa3955ee7fe8de84b0fa2e76e19d7888e6857a3d6e7bc66\",\"critique\":\"The input is a coherent technical draft with recoverable intent and no apparent padding, leaked instructions, or material contradictions. The output is byte-identical to the input, satisfying the identity requirement and /transcribe mode. All paragraphs, the numbered item, quotations, filename and command literals, retention periods, thresholds, conditions, negations, and future plans are preserved. The language and formatting remain appropriate.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Reviewing draft processes**\n\nI recognize I need to review the draft thoroughly to ensure everything is correct. The input feels a bit technical and might come off as odd, so I want to make sure I don't overlook anything. I need to maintain the identity and cite everything appropriately while keeping values intact. It’s important to have succinct outputs without any defects, so I’ll focus on achieving clarity and precision in my revisions.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Reviewing draft processes**\n\nI recognize I need to review the draft thoroughly to ensure everything is correct. The input feels a bit technical and might come off as odd, so I want to make sure I don't overlook anything. I need to maintain the identity and cite everything appropriately while keeping values intact. It’s important to have succinct outputs without any defects, so I’ll focus on achieving clarity and precision in my revisions.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42eRma_nwyCXXO004FYnDLZcCFU2ks9yDOze2VZcqRpzMhDdcnfAryfGJlw4urtT30BAMX0vmu4UFekRgNAZ2ZtOhn_TnOEnFaiKJnfcw4-JVG6jEVYrjAfSLjW6kB4nWEG3jBE-Y57KH45xsFQJgyQiWNG93XuftptrmDoI67Je4DG9XIk2jijicvlhV1Bq1KSkoP7SRo3MryMWFf3Gzz4mvRsX9z3mJgOcOvc8MboP5m6WLbXcAUWSq0LSOVYUb9qJNUEwSgG3aMyWPtox0C4z5jvZ8APlq2-3o8bCqILEMRupb7AkfLrP57hpl5Oy8hHswRWikXMNAXxEVHBBPcHOKiVikBgnfPmOneqMAyh6XnPW--dzvpge_oIBjGrQo7LdmwI_WkJIum5tfrGvWwceZ19rtcGSAOPp2lII-NVKTiATvg5aOB2g-M2gv5XalUBXB0Q7vCnksXoKvt3Bmk2ZkfcytAoRqDhzs4lP-XHXc5MN2LE6gA1g8cV3Cl6xIPMltaCqaa_2GWgQLWNpuoAIzTr9h2MswnAGUv6k6qdYQkw8lqs105TnajyVWn_h5BU7dIcjcHPdsrs51N-zh-Du_XPXuIPl0JQSclKPr92kg7NWbzvUvW5EiK_4LFFhtNDVkH9647mMi32qMQzr2mtOSF6RfVYcpjd1YN0Jb_tDM1cdXYjEqJVlNlsGnCK-aeUKWCxgH-VJ9eLY7cnapdaGg2nsObUPv2cUICV_Zk6k6pYcPOzGk16DtXvPZ_6W1B-DojPm_yK5YONtvvd-P6WTdemobcTN8efASg7VVlRibpuPvRLOCEhEJWVh9x2yfEclJ24HJ0wkL3OZ6d_uI041admDbNBchq4NMgJZPvioYFmZojw-SxWY25VBdDurwX_jkr__IDvAuSUkc6GDBnod8_FVhVY4Zy_b7VZJG2Y5___KjuOEfA6auGzH50jTYOvc4IzerSCdM0GlCdeyFLmS5wYjDyLWYDNJnwDBplXfqnxxEwiAAg7lnrs812UA0P9949YQELVr-fy4Csgzp5Kot6IdogoDIUvDlT3_td9EK14m6lPeVvWIeumZALvD89OqhcjeRGVdGJEilNNn85vG29G09dOXjLITEBhh7-j3Ou0rQR51ibWh6pVBGRF8q-8CdhvBmJL_rxlI7-U-sUEKjS56IUOi-Ive6oP2Jez3AvO7I-npXWqfWZ_HtpwAH0L7v_r9Z-Olh0h5wV_65AXpjrRdNCgGGTHrMPVRahsmlVvNuf_tJdmdKr99jLoEHcg_8i-joMXsusZ6iPH3O6m5_Ra7zf7IwxiAM8eyBpFsCWdes_B_XPoyO1IHwC7F39R_e3xVXiR7I0d-1HIeSOi5tGSO0m_HIZb0r4oismJsZmCXzi1s6DflHVYr6NcGCTQ01dDPLo9lYIpVsax2DqhnFyie8YFW4uKYfxIJsj_kIi8EjO6lgMm_-82OJY2SCXm0fzokteIfursZ-SyDEy_urBp2096zVNC6nSKEJZwb64Hjg7uW9wyahp7UjBmvFprepIMiDGlUI0GMC7sAlp4ct9Y4-oRbHH6ckLL9zC50cwkJ9VOauezf0xthutTAczV2iPs4iu7nuUUksMuuefuO5IR22EjOUArGKREg2QrZxy0BlQh9R61QXah0E6Hya35E2YF0ClCO4WypYjdTTQRmxhXfMuryNbEnBRLyS9CheF1Z3XUEmHEKZGw8IC2TyvTrTNbB5sDkv02L5w-3yCpW7TRsND3uWPCsHLxhEXArfdhxiGizoGvSiG6yqvidsULaXI-ci8VdsnEfzp9zP4qrBasWdLBPXGQeB3oBUrfICYH3cmaDk2WypzJp0pQyV6VIq7WCk_1jBwbyvfk-IO7q8siYxKb18OI4C3t2eYntSGGH6MoZ02TjEyRlM1vaIN7LwdADQbV3LvT3PlwEEKC3TmZD3v84EofcAHoJM8hFICziI7dq4hLHl1OBlPhHWQcZQGePIvc2hq4KYthcb_N2s354p9dkITzAFuKvhaYAHIlPit1DmtYfyotLkYrAVEJJjBTiyUrlnHjxnpHBrXGjFcNIr5JdXGe3gmZIXefX50c2hUyJYWmOd9WG-cd8MhrA.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01a22eba491cae4c016ae3678f4e3887d08dc459ed0144667b",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793288077,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 225,
+      "prompt_tokens": 3272,
+      "total_tokens": 3497,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 41,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3269,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0104285,
+        "upstream_inference_prompt_cost": 0.0081785,
+        "upstream_inference_completions_cost": 0.00225
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "11969f205b96dc6189f953566f69d3c3551f7a636ac68363d1f84a93f372e0b2",
+  "elapsed_ms": 5640
+}

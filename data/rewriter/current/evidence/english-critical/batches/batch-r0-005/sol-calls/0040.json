@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-slack-long-0033\", \"row_sha256\": \"965da2fddf5364dcde383bf71cbd9f11a646f4f84e5e8826eebd8b018ba64422\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"Mira — 9:12\\nhey folks, we need a desktop shortcut for Archive Desk on the two linux laptops in the oral-history room. right now volunteers open a terminal and run it, which is fine for me but not for the saturday intake shift. can we sort out the launcher this week?\\n\\nDev — 9:16\\nyeah, the app is installed at /opt/archive-desk/bin/archive-desk on both machines. the shortcut should open the existing project chooser, not jump straight into the last interview someone touched. that would be confusing when the next person sits down.\\n\\nAmaya — 9:20\\nI checked the launcher settings on the west laptop. it starts in the right working directory if we set it to /srv/archive/current, but the recordings are mounted read-only there. the app can still browse them, so i don't think we need a write permission change.\\n\\nBram — 9:24\\nsmall catch, the icon in the app folder is an old blue waveform and looks like the retired player. i found a newer square icon in /usr/share/pixmaps/archive-desk.png. can whoever makes the file use that one, and leave the old icon alone?\\n\\nMira — 9:29\\nplease make the shortcut for both laptops, and send the final .desktop file to Amaya, not Bram. Amaya is checking the accessibility labels for the volunteer guide. Bram's handling the room schedule, so he doesn't need another copy to review.\\n\\nDev — 9:34\\nI can draft the launcher. my notes for it are:\\n1. name it Archive Desk\\n2. use the installed executable, with no extra arguments\\n3. show it in the education category so it turns up in the room's app menu\\nI haven't copied anything to the laptops yet.\\n\\nAmaya — 9:40\\ncould we also set the name the screen reader announces to “Archive Desk, oral history”? the menu can just say Archive Desk, but the longer spoken name helps distinguish it from the public listening station app. that's the only label change i had in mind.\\n\\nBram — 9:45\\nthat seems useful. just to flag it, the room laptops use the same login for the morning shifts, but each volunteer has a separate folder under /home/intake. the shortcut shouldn't point at any one of those folders.\\n\\nMira — 9:51\\nright, keep it system-wide and don't add a personal path. also, the shortcut should launch the chooser even if the project folder isn't mounted yet. we get there before facilities some days, and volunteers need to see the app open rather than a blank error.\\n\\nDev — 9:58\\nI looked at the desktop entry spec. there's a TryExec field we could use, but it would hide the menu item when the mount is missing if we point it at the project folder. I'll leave that out and use the executable path Amaya confirmed.\\n\\nAmaya — 10:04\\nthanks. one more detail from the guide: it says “choose a collection before opening a recording.” the chooser is where that happens, so launching directly into a recording would skip a step we ask volunteers to follow. please keep the default behavior.\\n\\nMira — 10:11\\nfor the icon, the file Bram found is 256 by 256 and has a transparent edge. the older one is 48 by 48 and gets blurry in the app grid. no need to resize the new image unless the desktop does that automatically.\\n\\nDev — 10:18\\nI made a draft on my test account. the menu entry shows up under Education, and clicking it opens the project chooser. I used the spoken label Amaya requested in the accessibility name; the visible menu label is still shorter.\\n\\nAmaya — 10:24\\nI can check the labels after the file is on a laptop, but I haven't reviewed Dev's draft yet. please don't mark the guide as updated until I've checked how the screen reader says it in the actual menu.\\n\\nBram — 10:31\\nthe west laptop has GNOME 45 and the east one is still on GNOME 44 until the maintenance window. both show the Education category, but the menu spacing is a little different, so it'd be good to check the icon on each screen.\\n\\nMira — 10:38\\ncan we keep the test limited to opening and closing the chooser? the archive team asked us not to open real recordings during setup, and we don't need sample audio to confirm the launcher is pointing to the right app.\\n\\nDev — 10:46\\nyep. I can use the empty training collection to test it, without opening an interview. i'll also check that the shortcut doesn't ask for a password and that closing the chooser returns to the desktop normally.\\n\\nAmaya — 10:53\\nplease check the keyboard route too. on the current menu, pressing the Super key and typing “Archive Desk” finds the old player first because its name starts with Archive. the new entry should still be identifiable from the icon and spoken label.\\n\\nMira — 11:02\\nmaybe the old player should stay installed for now, since the listening station still uses it. don't remove or rename that entry as part of this; the two laptops share the same image as the station cart, and we haven't checked that setup.\\n\\nDev — 11:10\\ngot it, only add the new launcher on the two room laptops. i'll compare the desktop file against the draft after copying it, and note which machine i checked. i'm waiting on Amaya's label review before sending the file around.\\n\\nBram — 11:17\\nfor the room schedule, the laptops are free from 1 to 2 tomorrow. the oral-history team has them booked after that, so if testing takes longer, let's leave the second check for thursday rather than interrupt their intake session.\\n\\nAmaya — 11:23\\nI can review the spoken label at 1 tomorrow. I won't be able to check the east laptop in person, though; if its screen reader sounds different, send me the exact wording it announces and the GNOME version.\\n\\nMira — 11:30\\nseparate thing for whoever is in the room: the USB headset stays in the labeled drawer, not plugged into the west laptop. facilities is replacing its cable this week, and we don't want a launcher test mistaken for an audio check.\", \"output\": \"Mira — 9:12\\nHey, folks, we need a desktop shortcut for Archive Desk on the two Linux laptops in the oral-history room. Right now, volunteers open a terminal and run it, which is fine for me but not for the Saturday intake shift. Can we sort out the launcher this week?\\n\\nDev — 9:16\\nYeah, the app is installed at /opt/archive-desk/bin/archive-desk on both machines. The shortcut should open the existing project chooser, not jump straight into the last interview someone touched. That would be confusing when the next person sits down.\\n\\nAmaya — 9:20\\nI checked the launcher settings on the west laptop. It starts in the right working directory if we set it to /srv/archive/current, but the recordings are mounted read-only there. The app can still browse them, so I don't think we need a write permission change.\\n\\nBram — 9:24\\nSmall catch: the icon in the app folder is an old blue waveform and looks like the retired player. I found a newer square icon in /usr/share/pixmaps/archive-desk.png. Can whoever makes the file use that one and leave the old icon alone?\\n\\nMira — 9:29\\nPlease make the shortcut for both laptops, and send the final .desktop file to Amaya, not Bram. Amaya is checking the accessibility labels for the volunteer guide. Bram's handling the room schedule, so he doesn't need another copy to review.\\n\\nDev — 9:34\\nI can draft the launcher. My notes for it are:\\n1. Name it Archive Desk.\\n2. Use the installed executable, with no extra arguments.\\n3. Show it in the Education category so it turns up in the room's app menu.\\nI haven't copied anything to the laptops yet.\\n\\nAmaya — 9:40\\nCould we also set the name the screen reader announces to “Archive Desk, oral history”? The menu can just say Archive Desk, but the longer spoken name helps distinguish it from the public listening station app. That's the only label change I had in mind.\\n\\nBram — 9:45\\nThat seems useful. Just to flag it, the room laptops use the same login for the morning shifts, but each volunteer has a separate folder under /home/intake. The shortcut shouldn't point at any one of those folders.\\n\\nMira — 9:51\\nRight, keep it system-wide and don't add a personal path. Also, the shortcut should launch the chooser even if the project folder isn't mounted yet. We get there before facilities some days, and volunteers need to see the app open rather than a blank error.\\n\\nDev — 9:58\\nI looked at the desktop entry spec. There's a TryExec field we could use, but it would hide the menu item when the mount is missing if we point it at the project folder. I'll leave that out and use the executable path Amaya confirmed.\\n\\nAmaya — 10:04\\nThanks. One more detail from the guide: it says, “Choose a collection before opening a recording.” The chooser is where that happens, so launching directly into a recording would skip a step we ask volunteers to follow. Please keep the default behavior.\\n\\nMira — 10:11\\nFor the icon, the file Bram found is 256 by 256 and has a transparent edge. The older one is 48 by 48 and gets blurry in the app grid. No need to resize the new image unless the desktop does that automatically.\\n\\nDev — 10:18\\nI made a draft on my test account. The menu entry shows up under Education, and clicking it opens the project chooser. I used the spoken label Amaya requested in the accessibility name; the visible menu label is still shorter.\\n\\nAmaya — 10:24\\nI can check the labels after the file is on a laptop, but I haven't reviewed Dev's draft yet. Please don't mark the guide as updated until I've checked how the screen reader says it in the actual menu.\\n\\nBram — 10:31\\nThe west laptop has GNOME 45, and the east one is still on GNOME 44 until the maintenance window. Both show the Education category, but the menu spacing is a little different, so it'd be good to check the icon on each screen.\\n\\nMira — 10:38\\nCan we keep the test limited to opening and closing the chooser? The archive team asked us not to open real recordings during setup, and we don't need sample audio to confirm the launcher is pointing to the right app.\\n\\nDev — 10:46\\nYep. I can use the empty training collection to test it, without opening an interview. I'll also check that the shortcut doesn't ask for a password and that closing the chooser returns to the desktop normally.\\n\\nAmaya — 10:53\\nPlease check the keyboard route too. On the current menu, pressing the Super key and typing “Archive Desk” finds the old player first because its name starts with Archive. The new entry should still be identifiable from the icon and spoken label.\\n\\nMira — 11:02\\nMaybe the old player should stay installed for now, since the listening station still uses it. Don't remove or rename that entry as part of this; the two laptops share the same image as the station cart, and we haven't checked that setup.\\n\\nDev — 11:10\\nGot it, only add the new launcher on the two room laptops. I'll compare the desktop file against the draft after copying it, and note which machine I checked. I'm waiting on Amaya's label review before sending the file around.\\n\\nBram — 11:17\\nFor the room schedule, the laptops are free from 1 to 2 tomorrow. The oral-history team has them booked after that, so if testing takes longer, let's leave the second check for Thursday rather than interrupt their intake session.\\n\\nAmaya — 11:23\\nI can review the spoken label at 1 tomorrow. I won't be able to check the east laptop in person, though; if its screen reader sounds different, send me the exact wording it announces and the GNOME version.\\n\\nMira — 11:30\\nSeparate thing for whoever is in the room: the USB headset stays in the labeled drawer, not plugged into the west laptop. Facilities is replacing its cable this week, and we don't want a launcher test mistaken for an audio check.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-slack-long-0033"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "965da2fddf5364dcde383bf71cbd9f11a646f4f84e5e8826eebd8b018ba64422"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "61c14b419f2942146cac2a22f29a417fbb06e231943b4084ce8e011f0fc47ae1",
+  "started_at": "2026-10-29T15:22:27.120784+00:00",
+  "result": {
+    "id": "gen-1793287347-gdu3sO2cWhgZuYYb9yHu",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-slack-long-0033\",\"row_sha256\":\"965da2fddf5364dcde383bf71cbd9f11a646f4f84e5e8826eebd8b018ba64422\",\"critique\":\"The input is a plausible pasted Slack thread with recoverable intent and no authoring instructions or artificial padding. The output makes minimal capitalization and punctuation corrections while retaining the casual tone and thread formatting. All messages, speakers, timestamps, paths, labels, dimensions, GNOME versions, scheduling details, uncertainties, and restrictions are preserved, including sending the file to Amaya rather than Bram and not opening real recordings during testing. No material defects found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42S23OmAc67VeQpi7wggr9uZ_GKcztJmDVW9FirW9sXlJnw38aHivRYWVtwaxY3aKPEHhjQEWQhjC08pQ6DeWmS_n0lYDKy9v7spCqu_k_wJG-nl_QnB8dhsE0s7EIQvYv92wELNUWKxat4hLEyQmlVu4vdv5vF86mJ6SMBUsx0kTq_uzi4F7K8R5Wp5R-t5-t6tEkTirjsV_4Rfgu7PBacU9PaYnbwaWMp0AUyFguIh_RaFghrbPvp_qI5mXJCNWMaNtKPnP96tPnRpIP2SOPOfBzJgwrNe5GrKBo4XNSyqMiWM1uK06nIjUFgTvy4mg_VJ1UKOml-gAT9jPTbyNgahRXQy93cGzaUn9btULDzzcScWc3Z-J2Z-bEBn6JkHgf-h4mOFx_hvWmx7Yu55q-KqFdCh4f-Hnv382LUFAcUPGFIQi7Kzq9ErIuVK3x1HJox5Onc1w0QciJoCaVlkMQP3mTxQJ2l7WzVDsPyK-yomw_h1cyIi-hnGcMLz7yhPFkGq2M1nxeSNLscniPqLrOvrdvLpgmTVZH8UQC-M8goLfpzLmoi_V0lnOOAVTN0fy-hxmQSQWDEQr9JIsZSk20N_tBslZEzGoP59BMgW3FxzoT1NZw4f83UJnKAPnr7X3YFyfa5-OkQC8A4FqViwjf-bZVsdFwUQZmS7ryijIUUtnSLyxWBPL_FTCQ52w8_YqX2OR2BtJQRRWHsTheA89sELqO2j67vUzBLz9rO-I2h20UJO-YdxbCbzuk6MCY2YNKWWMd8lEsjKL_C65dq846vcGrHKmLXfFt3Lr0Qmeyb-_KdheQrd-TYiypyLgkyHILudZl3fqwscNMmsPuxdXGPeT_zsiXPJgpw8TCo3iatoVIVmGiJKk1lE7wstYFGWGOzCO-8snr8J14Xx5UCe49MjvAlGhASDDkN09smeu4i74PayaE_S8sUa24WUp51yaimSHY1dTIWJnKE75wqSFkryayNRcxi9fX6zJ6zpzAE75ey-ILO51IrhQDiGPKDUskAEDpQfoWST7IX3Ami7fYyGMNgQmDElpE3Lzct70X1tO-tlKazz3pLWwjCS0ZGoq3TQiAuUoraXLJ0RB60bHCJ8Ec8DYe-kUK9Keu8EoyharwAhl8-sU28cw_EwV4BWpNoAIr9LrlOWMywsYfpIIBGTmdnkk8foY8t4ih1lVEThUbJQYKPh0fpQM2A9PaT_pBSEIwG0SuhGiTNQmnF6Cio__d7bT3Q-KVybdYvSCmuPDA6iyoAeNDSaj8a-V5WdBh_bmHiHjn4OEABG_G83IbufT9KF7ZN3ZMUUERHQjZxmLQAsGS_fisvpP7lsDQUuUIzxjWo0evkqevFxspPKJNbhFQDrAzw-DqpfK8t7vL8sOYP9UcViZT1J8ddKAkmDTMbvHe6puQkYZSeVW2qnvzmyzcEHaMwMJbpvOG5AmJVmLZmg3NgUexAn1PtrJZRlnraEyZCSH8Cs1VbzoeOHl35W_mQeHk3qtjylByIW6HnRGKsVK0cBqVqe-4YXTBjGU-csbb_JqISnGv-CTSkabd6mteAz16rvmoDFLujpqPtQqhsC92Ty4Y0LJJ99W6dMFfH0NP9aC7kr8HnDPNaBy5trQ-HbA0RAgnFcHzb0EaHCbH_Z6AItQhs0h8YL_1PrKrSnUQKswLkttUwKk5i6XKDzWS1JRwhH96Q_2qmJ_E0FpkjpCcCYthUZKWHY-ALzXNXIU0M53aJhFyJBQpooYUwQdq5Sst-vg3rtXW10slrnSNTZiiBkjBoO0P4T-sBPHvBozDXuslyaWFdxK7umq1DIQH3-glGvmWq6Ey_aYlGtI0ZXbZCkffRyYdSWhanWeFqtXJWLTKtbpOg8uH4PVO9D326D2c9p_7SBMcAo2HfewmpEhpBHY4m8q-8T6kRdE1bUcxh-aOy5ioeezFBbUlaDHq5n9A3E4cBO0y2Vi7Z5gHsW8r_uJ1OwHa__ZB6Vc8ypqgik1Jbp_TqzjbvYJfOmpNaDsk_E-9Djo-2rgrbZ9mk-w-vy83-SGmD6nfDABfQ4mO-6OGQ7_gSBxjBG0vBvhtUK-sDGwEDJZeqTGQADTU1lC5PnzWkUHbisoWP1HQTdobaSe3ea3cE8A5GJRz1z4DgoGsxK89pQzctt0X60sCSD2MMPFuFsYhgdD_5-stXbkRn4z7AC6LpNpQ-3n35fIFCvvdG5YK_ZTvj-fKOijroF78t0UOuNRJpHFHJN6bCPDeZe8SSr3hgQORuYQu9z-aAxp1D4yIxMTqDG3eSlvgk7K7Ug4UX2cscSioLgvvEc-fHtrywxAc2UxhhTen85IFT08pnQ7_rso3IbV519sG4=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_00c047c3d1e94d31016ae364b4188087d080fad277da9e443c",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793287347,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 236,
+      "prompt_tokens": 3317,
+      "total_tokens": 3553,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 49,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3314,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.010651,
+        "upstream_inference_prompt_cost": 0.008291,
+        "upstream_inference_completions_cost": 0.00236
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "ddd952cf078f35ddd39199a31421cddb3bde413a5921ef5d10f0666f7bb7919e",
+  "elapsed_ms": 6764
+}

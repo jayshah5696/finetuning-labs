@@ -1,13 +1,99 @@
 # Rewriter training data
 
-## Current dataset, 1,500 training examples
+## Current English export, 1,864 training examples
 
-Use `data/rewriter/current/` and the single [L4 notebook](notebooks/rewriter_train_l4.ipynb).
-The existing public Hugging Face repository is updated in place. It has 1,500 train, 100 dev
+The public dataset now selects English only. It has 1,864 train, 89 dev and 81 validation
+pairs. The English dev and validation cases keep their original text and order, bound by
+`data/rewriter/english-holdout-freeze.json`. The complete multilingual 100/84 source holdouts
+remain byte-identical in Git, alongside all earlier training examples. The source training
+pool has 2,000 rows. Filtering the public view does not rewrite those sources.
+
+The latest 500 fictional English episodes target failures in the uploaded 1,500-example
+adapter. They include recipient and amount exclusions, explicit spoken corrections with
+surrounding context, meaningful transcription words, deliberately unfinished thoughts,
+prohibitions, conditional alternatives, supplied code and complete long sections.
+New cases are independent analogues rather than copies of validation inputs.
+
+| New examples | Short | Medium | Long | Total |
+| --- | ---: | ---: | ---: | ---: |
+| /slack | 20 | 20 | 10 | 50 |
+| /transcribe | 100 | 80 | 20 | 200 |
+| /prompt | 50 | 60 | 40 | 150 |
+| /polish | 30 | 40 | 30 | 100 |
+
+There are 125 exact identity pairs across the new set. Long inputs contain at least 1,000
+tokens under the pinned Liquid tokenizer. Fresh reverse-direction episodes balance which
+person, amount or corrected location is intended. Existing reviewed pairs are never edited
+to create these reversals. The exact final selection and balance report are bound by row hashes.
+
+The additions have 500 distinct targets across 52 declared domains. Of 375 nonidentity inputs,
+368 start lowercase. All 100 long targets have paragraph breaks, 70 have numbered sections
+and 93 contain quoted text. Their input lengths are 1,003 to 1,558 tokens. The 33 supplied-code
+pairs pass exact-block and added-code checks. These measurements describe coverage, not meaning.
+
+The native Arka pipeline uses the pinned latest clean commit, GPT-6 Luna generation and six
+Luna Decisions checks. The admission policy below remains unchanged. Each retained exact pair
+has either one strong native result and a Sol pass, or two separate Sol passes for a complete,
+non-vetoed native result. Rejected and uncertain Sol verdicts cannot be promoted by retrying.
+Plans, raw Sol calls and reviews are in `current/evidence/english-critical/`. Previous boost
+evidence remains intact. These are synthetic data and model judgments. They do not establish
+how well the inputs represent recordings or replace human quality labels.
+
+The final selection has 58 native-strong pairs with one Sol pass and 442 pairs with two separate
+Sol passes, for 942 saved exact-row verification calls. Direction counts are 19 larger versus
+24 smaller intended amounts, 14 A versus 16 B final locations, and 27 reverse versus 31 forward
+recipient cases. The full English training view has 407 long inputs and 361 exact identity pairs.
+See the measured reports in `data/rewriter/releases/english-*-distribution.json` and
+`english-expansion-check.json`.
+
+The final Sol audit read all 33 supplied-code pairs and all 49 nonidentity correction and
+unfinished transcription pairs. It found two contradictory explanation requests and one
+unapplied spoken correction that the earlier per-row passes missed. Those three pairs are
+excluded. Replacements retain their own native decisions and exact Sol passes, and also
+passed the targeted audit. Original verdicts and both selections remain in the evidence.
+This is a known limit of automatic judging, not a reason to relabel the original passes.
+The findings are in `data/rewriter/reviews/sol-english-quality-findings-round1.json`.
+
+Use the same Colab notebook, with `MODEL_SIZE` set to `350m` or `230m`. The user runs training.
+The 350M adapter uses a different model repository because it requires a different base.
+After upload, compare both models on the same frozen 81 English cases with the same Sol
+rubric. The current 230M baseline passes 51/81, with 17 critical-error outputs among 80
+reviewed outputs and one truncation. Neither lower dev loss nor a larger model proves improvement.
+
+The recorded preparation commands below ran against the original 1,500-row source snapshot.
+They produce new stochastic examples, not a byte-identical regeneration. Resume uses saved
+plans and completed responses. A supplemental source pool adds fresh long requests; it never
+relabels failed pairs. Do not rerun authoring against the already appended current release.
+Use the audit commands below to verify the existing data without new model calls.
+
+```sh
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.english_critical \
+  --run artifacts/english-critical
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.english_critical \
+  --run artifacts/english-critical --complete
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.english_critical \
+  --run artifacts/english-critical --complete --complete-pool fidelity-long
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.english_critical \
+  --run artifacts/english-critical --balance
+uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.english_critical \
+  --run artifacts/english-critical --apply
+```
+
+Run completion only when the main selection is short. The final append requires all 500
+verified pairs, the exact identity quota and a valid direction-balance report. Use
+`make reviewed-audit` to verify committed data and review evidence without new model calls.
+
+```sh
+uv run --locked --group data --group hosted python scripts/check_english_release.py --tokenizers
+```
+
+## Previous 1,500-example source pool
+
+The previous source pool, retained inside `data/rewriter/current/`, had 1,500 train, 100 dev
 and 84 validation pairs. The original 1,000 training pairs are an unchanged prefix. Dev and
 validation data and SFT files retain their exact original bytes.
 
-The 500 new fictional episodes target failure categories observed in the original adapter:
+Its 500 added fictional episodes targeted failure categories observed in the original adapter:
 changed main actions, mishandled spoken corrections, missing conditional branches, lost supplied
 code or quotes, changed actors or hedges, and missing final sections in long documents.
 They do not copy the validation cases. Training has 300 Slack, 450 transcription, 400 prompt

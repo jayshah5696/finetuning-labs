@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-prompt-medium-0178\", \"row_sha256\": \"278329df5bd6ef8be432f5736c72c49f1796882ec8b0fd26be37f71b067d0a64\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm updating the pickup section of our bakery's preorder form and need help with just that part, not a rewrite of the whole form. Please look at the form I provide and rewrite its existing pickup instructions in plain English, but only if it has both a pickup-date field and a pickup-time field. Keep the instructions about when customers should collect their orders focused on the information already in the form. If either of those two fields is missing, don't rewrite the pickup instructions; instead, list which of the pickup-date and pickup-time fields is missing. I need to know whether customers can actually select both details before I send this to the person updating the form. Give me only the revised pickup instructions when both fields are present, or only the list of missing fields otherwise. No intro or extra explanation, please.\", \"output\": \"Review the bakery preorder form and work only on its pickup section, not the entire form. If it includes both a pickup-date field and a pickup-time field, rewrite the existing pickup instructions in plain English, using only information already in the form. If either field is missing, do not rewrite the instructions; instead, list which of the two fields is missing. Output only the revised pickup instructions if both fields are present, or only the list of missing fields otherwise.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-prompt-medium-0178"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "278329df5bd6ef8be432f5736c72c49f1796882ec8b0fd26be37f71b067d0a64"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "a5c324f2fc185b119b90f780a9671e6551647abad8971776a4e00e6fd697a4c5",
+  "started_at": "2026-10-29T15:38:11.901049+00:00",
+  "result": {
+    "id": "gen-1793288292-otT8Q8RAmZgvuJx9rlIy",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-prompt-medium-0178\",\"row_sha256\":\"278329df5bd6ef8be432f5736c72c49f1796882ec8b0fd26be37f71b067d0a64\",\"critique\":\"The input is a natural, coherent request with a clear conditional workflow. The output is a self-contained prompt, not an answer to the task. It preserves the pickup-only scope, the requirement that both date and time fields be present before rewriting, plain-English wording based only on the form, and the missing-fields-only fallback. Its output-only restriction also preserves the prohibition on introductions or explanations. No material defect found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating form selection rationale**\n\nI need to evaluate slight omissions regarding why customers may choose both options or different fields. It's essential to ensure that input and output pass together without missing anything. I want to confirm if there's a rationale for omitting supplied material, especially since the purpose of selecting both could affect their decision. The input should explicitly include only what's necessary if specific fields are present. It seems fine, but I want to be sure about everything.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating form selection rationale**\n\nI need to evaluate slight omissions regarding why customers may choose both options or different fields. It's essential to ensure that input and output pass together without missing anything. I want to confirm if there's a rationale for omitting supplied material, especially since the purpose of selecting both could affect their decision. The input should explicitly include only what's necessary if specific fields are present. It seems fine, but I want to be sure about everything.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42hpe2MHHPAw3VdVJKSZzXYz-kmtsQJ4SRvCezJda4Tny_Fr8699Ee3VrGixfp2JPthkYZSkPhcsyEaWrS-sJKnLyCoMzE-PvvinlhHeO6speUd9Iwux3xr1yfZttmIze9Yxa_R9hiDYG7bhGHJ5efRRixM59_YXxO7hIcP4WJMttoi0zS6vRFsJ02aUBFHxj0VrIn4ohmOgrV9XrbiOaYgofhQQBQHWobMaiA3bRTGBa6iDk9QN5Te9kNS7cJCbqNZL-XnESMbAL5L5ACfBINvf2OelTWnEura56xQjIFNxG4nrKp7lcp80KeY-FWt7b1E0YNLYI0X4DXA7zA-w5C0lZRKUACGqafGUWc1Rz_yN8O5EXkgnBgkdDMyw81J9QWgB8aQfeNYPDAstSwNJqI7MJVLYLQb-M71LeaAmDU9axhaJIiD7sFjOsvObRlZtiQ4lC5iImsAw2udrhP1Wp4E17j4c0ZglfwtA5P_RGqR48qo02QAGaTYEbbV397hxkKCZ80cYfkXiTP1rdGX4Ce4bUVvoGuzMxbm-Fni_eV3aF8livVAngOVpZYQDimGUbqHNAHmK70mATK_oCq841cDwWtW0-wmKfVDe_qxmOzpMMaS-RNBc99r2cbn8BSZxm_ZMBXYcDYs6TBcAjgNo2c3mPYOWko5UOgWJt2YJkcmA6o8ijc-0DPHgwmAwKYnQQJGrZ-XvwNuz7tUNA4TQwPkmH1th8pYQlwOCwalScp6uqdcaADsvDJv9p2k2jn2vHB8MCVvSLGvqrONHIPkHyVdydRERwJgxWlvKygNdfhVyrWB79qXeodavq-x-6nxPq0tSnFy77-aJ5oLbPeIno_hHFVxAtnu1G1USvQCdGYrioYde8KtfFMJvwGimRZgNYlqm9niA0SkrmmHBmWX3-VyP4HhOPYX251Lf87uQ6B1f_Xi0gTFOw1BB0FK3j144GVJXVd3MNDEIkvEz6Cj5bgZMJvDmS72c4LzL8OiK96rK9xSH0cR9yGZ1lYLbmowJaarmtgy-a6P6ABaCKM-szeWrSxCDWoZ4UwBC7xyBOCgtXM4nwfVokseBUyK7V8c27248lN2wgpfOV2uqh3NebooaHa7MvY_hNThDUhIzHz5y5kaorU29O2smj9_sx4i3KK7avCIz40V9NAnWIpioHmU0DBOCKl39VAj2tSNKEc2Zj19-CT18u50sYp1JvEw8p5GuT4vW3RqA1Wcl2LjF7pXZArwo0gMLOd9Y-fXFvg76KmkG4rt2wfzPHYXP9956ObsPezM4pMG-jx_jIPgpYtmYnrNkU-v52xByCmuZV-V6p5JOLd3qmdQQalpkmi3FXi3bq4vH2nBJpFM9F2XnJSpxfJGik-3SxsJS2tMVZxU67ppJJ8uhENHfZm3LBYKO-FgkDb0uzncaO-8vVs-D3aBf9OvD6_g0AT-j_DTJVNDaVGZZ5a6cyEgY7RGjTlNWr-IWNet2wxcLRXGvUx8apVslY1ur6lq53_E5-6wSDHfUHrWj8UBvnLkT-OSUO1fz86vowYMMaCwXKVOCc23yEv6-mDXW5bY5erFSKVghhUTPw_ZFXZMzTyYtYUZUCNw_a8SWJxNowlevHVTdJXoAGT1xt01vrdbuEeCZJFDnkuzzh4AFay6IVpHS5INtG9Bf1sZij4h-kZwa3wbEc3VcWQdRfIwjjZDrj8FrwdFARG-SmBxfgNR8Wr5EP5IVpgfajJtt04Uk1UkD4sIzcMNFzb6vXikZSiU7ouuKsW51K1bppZF5ILpSi8D5P4WVnJBgefyLTm4vv6D7FBvuaW-0bb-MXbwAhHa0mvhYLttpO4CEi_RlVzBdw7v76mEVNCCu_tueJzJJZHp3vNFDgtXtt1vx4tDO83iGxQi2dz1qI5C38XjPQulS7E0J8qWKtLADjXnGU7BOHkqPUJ1v7pxd90-ABclHfJtzU3rZc27eNerMFZDVpSP_VS6s02LDz94I6bh6Hiz2X-qxgMi5Sea7VfyTrKs5ak2Jd4Mqloae6Ty28skOVXOjmRN-JeXpILkF6L6IOxf78UhswBdSsjJi33BSLLpY_X2PBfLhts8krZ3s_ml4y3RntbtHB0mTe5xQG2ZTVqZzTX4rTYe2tarjQ_GoLJoaWMfhtai38f0EyvlgME5UCaj7vsTmyAdKMC3ytruM479Myzkhle-TcGXagqBH3k3UyHbttwqipW2aNA2m7VBF5EmaR7tTfO1HVZhY8Elot5AYA0nURmFSAmhCR99UhW-t-SvFR8Y8XKBt5elFlXlOQQYWRtbPvm1nT-zJxOdX4KFiu1K2hMyENdWxRGJU7ZoTmN_QqRPkZFeVC0gsAt6yNkenygJdNKb_v-VUvoLt2vGWCW6wYNhVS5S5kpFcGxCA0rgJ0uaYZCWjoWLSRv1U1G9XOckpNiMPMeyU_uJXfaqXfPGh78KcVLYDyLS23WsVSIm--NnGrL_Aq3_IREAEuaLciYED9_dEAh9GteTFTaOUNFws3LdzhXUYR-s74MsUUJ6YaRqnVV1u8V0fJ6waXhOhUZYGcWdFYQe8yZeH1aKifvjhu7d8eaRmiC6ebSnbp6BAdJrwTS-UGzcvXCcSM8nM1AH2yvLGJmUn-0vP8RABI8Ss8bInBEJSaIYnSL6_4i55TaihWw4HbEY_yXOzmv0PdJZCucU-S_V7V2ytYwDCy2Bs8TLWlgQZQ8Kg3t0vn8Dr4KnprnCSHCXzEjOs5rzhVY4a4jaS1z-i0tKh3o2f7kvsIo_ru0UxMqx6mlNPKSCIaCNbMyKgeKc0C4uEvB8ixdP72RyrqVbee3qyK6PFaVizWgjCWOfg4vsOK2ivycXSE2RDj1w5vmMKJb4Ot_6EVeJXCn9Xaud49tS3.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0182926d091197db016ae36865dd3c87d086e3e5915200ff76",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793288292,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 270,
+      "prompt_tokens": 865,
+      "total_tokens": 1135,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 89,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.00443,
+        "upstream_inference_prompt_cost": 0.00173,
+        "upstream_inference_completions_cost": 0.0027
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "e1412867eb6e9c801c279fd44a673375efb566943aaafe1c171c493ec4258590",
+  "elapsed_ms": 7231
+}

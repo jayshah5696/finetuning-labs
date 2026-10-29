@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-fidelity-4-prompt-long-0118\", \"row_sha256\": \"f22f8ac6eea8f0f9705102e1dd42bed0e2efcf8ddefc1725c6b410704bc81614\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"please write a clear request for a log file cleanup utility that is being added to the maintenance tools on a small records server the utility is called hearthlog in the command menu and the person who will run it is usually on call after the evening import the request should ask for one specific action on the rotated log files under /srv/records/logs and should make clear that the action is conditional rather than automatic the utility currently sees files from the nightly import the access gateway and the monthly reconciliation job so the request needs to keep those sources distinct where that matters the oldest files are not necessarily the least useful files because an incident review can remain open for weeks\\n\\nthe main request should ask hearthlog to delete rotated log files older than 45 days only if the utility has first verified that each candidate is outside the active incident hold list and that the hold list was read successfully during this run if either check fails for a candidate or the hold list cannot be read the utility must not delete that candidate do not turn the age rule into permission by itself and do not describe a failed hold check as proof that a file is safe the operator wants this specific condition because a gateway log from 52 days ago is still needed for an open review while an unrelated import log from the same night may be eligible the request should say that the date is measured from the file's last rotation time rather than its last access time\\n\\nbefore deleting anything the utility should make a candidate list and show the path the source label the rotation date and the reason it passed the condition the list should be limited to files that meet the age rule and have cleared both hold checks files that are younger than 45 days or appear on the hold list should not be presented as deletion candidates the person on call needs to compare the list with the nightly import record before confirming because the server sometimes receives a delayed import with an earlier event date but a newer rotation date the request should not ask hearthlog to infer a source from a filename when the source label is missing it should explain that the unknown source stays visible for review and does not qualify for deletion\\n\\nthe ordinary run should stop before deletion and wait for a person to confirm the displayed candidate list this is not a request for a background schedule or a silent cleanup job the on call person may be handling another alert and needs to see what the utility found the utility should not treat a previous confirmation as permission for a later run since the hold list and candidate files can change between runs if confirmation is given the deletion should apply only to the displayed paths and only while the original checks still hold if a file changes after the list is shown the utility should skip that file rather than assume its earlier status remains current the request should keep this confirmation step separate from the condition for appearing on the list\\n\\nif the hold list is unavailable or any candidate check cannot be completed the useful alternative is to produce a review report instead of deleting files the report should include the affected path and say which check could not be completed where that is known it should also include the age of the file and its source label when those values are available this alternative is for the failed condition and not an additional cleanup mode do not move files to another directory as a substitute and do not delete all the other candidates while reporting one failed check the request should leave the files unchanged whenever the utility cannot establish that the required condition holds the operator can investigate the hold list and run the command again later\\n\\nfor the command options use this numbered section 1 preview should display the eligible candidate list and the reason for each file without deleting anything 2 apply should request confirmation for that displayed list and then delete only the confirmed paths that still pass the condition the request should say that preview is the default when no option is supplied and that apply is not a way to bypass a failed check these names are the option names already used in the maintenance menu so keep them exactly as written do not add an option for choosing a different age limit or turning off the hold list check because those settings belong to a separate retention policy tool the requested age threshold for hearthlog remains 45 days\\n\\nthe output from a run should contain only the candidate list or the review report as appropriate plus the confirmation question when apply is used do not ask the utility to print a general explanation of the cleanup policy or a welcome message alongside that output if there are no eligible files the output should say that no files met the deletion condition rather than implying that files were deleted if files were skipped after confirmation the output should identify those paths and state that they were not deleted do not claim that every file was checked if the utility stopped before checking all of them the request should keep the wording factual and distinguish a completed check from a check that could not be completed\\n\\nthe operator said \\\"the archive is not a trash can\\\" after finding a reconciliation log in an earlier cleanup, so make the request clear that retained files are left in their current location and that this command does not compress, rename, or relocate them the utility must not follow a symlink out of /srv/records/logs and should not act on files in the neighboring /srv/records/export directory even if their names look like rotated logs these are boundaries on the requested cleanup, not suggestions for a future maintenance task the server uses local time in its maintenance display, but file rotation timestamps are recorded in UTC, so show the stored rotation date with its time zone instead of silently converting it\\n\\nthere is a maintenance window on Tuesday between 01:00 and 02:00 local time when the records server is usually quiet but this request is for a command that an operator runs when needed and should not turn that window into a scheduled execution time the nightly import normally finishes by 00:40 though on month end it can run later and the reconciliation job may still be writing a log after the import completes the utility should therefore check that a candidate is no longer being written immediately before deletion and skip it if it is active the final output should distinguish an active file from a file that failed the hold list check and should not imply that either one was deleted this last check applies to deletion, while the review report should remain available if the needed checks cannot be completed\", \"output\": \"Please write a clear request for a log-file cleanup utility that is being added to the maintenance tools on a small records server. The utility is called Hearthlog in the command menu, and the person who will run it is usually on call after the evening import. The request should ask for one specific action on the rotated log files under /srv/records/logs and should make clear that the action is conditional rather than automatic. The utility currently sees files from the nightly import, the access gateway, and the monthly reconciliation job, so the request needs to keep those sources distinct where that matters. The oldest files are not necessarily the least useful files because an incident review can remain open for weeks.\\n\\nThe main request should ask Hearthlog to delete rotated log files older than 45 days only if the utility has first verified that each candidate is outside the active incident hold list and that the hold list was read successfully during this run. If either check fails for a candidate or the hold list cannot be read, the utility must not delete that candidate. Do not turn the age rule into permission by itself, and do not describe a failed hold check as proof that a file is safe. The operator wants this specific condition because a gateway log from 52 days ago is still needed for an open review, while an unrelated import log from the same night may be eligible. The request should say that the date is measured from the file's last rotation time rather than its last access time.\\n\\nBefore deleting anything, the utility should make a candidate list and show the path, the source label, the rotation date, and the reason it passed the condition. The list should be limited to files that meet the age rule and have cleared both hold checks. Files that are younger than 45 days or appear on the hold list should not be presented as deletion candidates. The person on call needs to compare the list with the nightly import record before confirming because the server sometimes receives a delayed import with an earlier event date but a newer rotation date. The request should not ask Hearthlog to infer a source from a filename when the source label is missing. It should explain that the unknown source stays visible for review and does not qualify for deletion.\\n\\nThe ordinary run should stop before deletion and wait for a person to confirm the displayed candidate list. This is not a request for a background schedule or a silent cleanup job. The on-call person may be handling another alert and needs to see what the utility found. The utility should not treat a previous confirmation as permission for a later run, since the hold list and candidate files can change between runs. If confirmation is given, the deletion should apply only to the displayed paths and only while the original checks still hold. If a file changes after the list is shown, the utility should skip that file rather than assume its earlier status remains current. The request should keep this confirmation step separate from the condition for appearing on the list.\\n\\nIf the hold list is unavailable or any candidate check cannot be completed, the useful alternative is to produce a review report instead of deleting files. The report should include the affected path and say which check could not be completed, where that is known. It should also include the age of the file and its source label when those values are available. This alternative is for the failed condition and not an additional cleanup mode. Do not move files to another directory as a substitute, and do not delete all the other candidates while reporting one failed check. The request should leave the files unchanged whenever the utility cannot establish that the required condition holds. The operator can investigate the hold list and run the command again later.\\n\\nFor the command options, use this numbered section:\\n1. Preview should display the eligible candidate list and the reason for each file without deleting anything.\\n2. Apply should request confirmation for that displayed list and then delete only the confirmed paths that still pass the condition.\\nThe request should say that preview is the default when no option is supplied and that apply is not a way to bypass a failed check. These names are the option names already used in the maintenance menu, so keep them exactly as written. Do not add an option for choosing a different age limit or turning off the hold list check because those settings belong to a separate retention policy tool. The requested age threshold for Hearthlog remains 45 days.\\n\\nThe output from a run should contain only the candidate list or the review report, as appropriate, plus the confirmation question when apply is used. Do not ask the utility to print a general explanation of the cleanup policy or a welcome message alongside that output. If there are no eligible files, the output should say that no files met the deletion condition rather than implying that files were deleted. If files were skipped after confirmation, the output should identify those paths and state that they were not deleted. Do not claim that every file was checked if the utility stopped before checking all of them. The request should keep the wording factual and distinguish a completed check from a check that could not be completed.\\n\\nThe operator said, \\\"the archive is not a trash can,\\\" after finding a reconciliation log in an earlier cleanup, so make the request clear that retained files are left in their current location and that this command does not compress, rename, or relocate them. The utility must not follow a symlink out of /srv/records/logs and should not act on files in the neighboring /srv/records/export directory, even if their names look like rotated logs. These are boundaries on the requested cleanup, not suggestions for a future maintenance task. The server uses local time in its maintenance display, but file rotation timestamps are recorded in UTC, so show the stored rotation date with its time zone instead of silently converting it.\\n\\nThere is a maintenance window on Tuesday between 01:00 and 02:00 local time when the records server is usually quiet, but this request is for a command that an operator runs when needed and should not turn that window into a scheduled execution time. The nightly import normally finishes by 00:40, though on month end it can run later, and the reconciliation job may still be writing a log after the import completes. The utility should therefore check that a candidate is no longer being written immediately before deletion and skip it if it is active. The final output should distinguish an active file from a file that failed the hold list check and should not imply that either one was deleted. This last check applies to deletion, while the review report should remain available if the needed checks cannot be completed.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-fidelity-4-prompt-long-0118"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "f22f8ac6eea8f0f9705102e1dd42bed0e2efcf8ddefc1725c6b410704bc81614"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "3ccc9df52f70e23c4146554383584c671b44c7c8f6e41d5f6416e1693c4011d3",
+  "started_at": "2026-10-29T16:10:04.175047+00:00",
+  "result": {
+    "id": "gen-1793290204-ZJsu6OTSZzOJYH4bNRYA",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-fidelity-4-prompt-long-0118\",\"row_sha256\":\"f22f8ac6eea8f0f9705102e1dd42bed0e2efcf8ddefc1725c6b410704bc81614\",\"critique\":\"The input is a coherent, recoverable request, and the output is readable and remains a prompt rather than performing the task. However, the rewrite changes the command-menu name from 'hearthlog' to 'Hearthlog' throughout and changes the numbered option names from 'preview' and 'apply' to 'Preview' and 'Apply', despite the explicit requirement to keep the option names exactly as written. These are supplied command identifiers, not ordinary prose to capitalize. The remaining operational conditions, boundaries, quantities, and reporting requirements are preserved.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42_hNSBqQ51YY7t_kmTkXwVon3a9wAfwPVcHwHCfi7XEAoUjft4RxSUy_XrvxeTl6HPvS_QgUlNNK1K_vdJqwGoQ5_5XZA2bdu5IrscKOhh3bFecolxUudPVrD4o-j7wSh3YhhF3pzfFoUK_Z1IH9F1Z0tKinXX3nY6paNlIPsbtOdecu61pZVTc7zLLWuFK5aeXjje9HY0sB1OAurI0-9YyzsClGfQhQUxOek0xck5jPH0PjOv7jNXaIMSwjYFgqAFxM8toW4wx7uNPCMJkTiItEbR1Ly-ZpMLQkCfhRBc4iec1UHlFhC1aX-S87gMc0FXPvf4IbkZUPYeK63GD26kw1staPvzqmf6fjXOq82EFM57vp72bAI0yLNvSwqZxdLkfqvfCk_YYfUikuImHkEKVrdMb2QfldZCXA3BIyW4OWsxqv8wBqriO882ow68TzEJavRtp-pUZd9YRUiXNt0AW3pEQNcsxcar8RJYMBz8UvuDLHAs-Y49nHq3YsT_LE--cjkP4JOqHuFnR1d1Z9YRId2DPkRa6RwWX7UM6rNPOvlTMMdoPu2yNrdQdzfK_WMK2PwAQ-WBC9Zrk9WotmI5IviYN0ZEE0AuGM6gtm6mZu_Qd_aMEfziipdUHwvMrtL5jlvTc5ibwik4ZT3h-zP6cpHjjFV3QcX4mZpPORmtoJndR58XMER8yuPVXf3qryO0s-DYwpKQQnzBKw06MUjg_m83B5vMCmWAWxLMw-RjaHiPUjcEK2EonDbgCCSz3F51eTXMSFTAmxiSY4HVKEos9AllBIpVEIc5Dlnt254-ZrNennmraaLjqa4FYQKKMvGQpiAp5_x3JISDbazC1d3wlDmfLvGid6M77UpdeT7NMOYs4Qz3JcKVhxlZkI8eeDZWREpVssEbnJNS7yw5UgDEaXsGkUeIpns8-qpLT8rG6SKb5gyFokDqVZaYQwb7vec8eU3ZVNkzct5uPspZ8yvP1N9fu4VHYC8OIJ4b1T6bBe7JWeZvqwgnYPUIweBRXIp8YXYGXibvjD4n19e8OS_lzdsBTBkC8Qo8CyLurKSknMXp9JFOMRNnWHhVARvXpPW4_SQ70msDI165NhCkMxSkYzutbEa-sJ7-SQf3HXyQEckb2ngbzq8MhmSkH_zsvgc0bZfPDAWx6X-2-EdczW4M4-L1JxoXU-7xj4HAslYxF9tzfQr3Ril4I9cNzBxvZiJkpkV33iFgOAHqAnmJiurV_B2CFGPQoYFshCbw-i6gM-HmBky_BbUE8sROJYYqsgALIPvURYs76clctl_6nthTsQqnWYV1nZGdzjH_PiIHk8rUbVRkmQrmLoC57t7zh9DEEOcA1t2LDkpTRXMK8RshxTUNpmO5LNpN2s-ibEC-OikHRi43REx4HdbrnfylSDOKZN2cEhkFHOi0Y3ri0HOVpcfs7rGBfxrcjjr1oxHBtovAEWz5IG854sZkdPzsAZFokiIyVBWwh_buNPMyNevHylULyO7D8TSURC6wuHbNVBtj2YI3PIaO95M4tkh8whnhBkEyyV7V4rehNd2CVNZwfzbH6s1SoNlu47hvunl9rGvDuPQCNAt0J-4W33P70RHJJm4zk2PaNe6rPEz9ppauigjTT1OLFHD2fcgMPq_2ZdGnVL3kyXHWDHmhVWlJQxbEwso5Li0W6lr0OY_go_2JE8l74NM0V_TFLN1BDSt7Zb0nUJJq7RrirAsX1IjzE76yDgpuuUEAsJTdLZYHov76-ZZ3j7K88DnuWQoaLxd91SGNQgTfHvLWd0TcaTeHnlzbhlG85TDShjEU_F_8I6TOCV2c6dTI3KGin2PHfk17pMsVYcxh0_J1Hsn5ZOoUZQwL-Yg8g9KJpEuNNovhEivXrqm5MdoM_WZQ6jSmJ2DVEQZ0LLYYHggIT7wvadl1dAlQVOyr_reH9AlIB6NYKPu1LAbHgtpmLBNzvvU0yIpgdLJwLB_x4XJuxt2OmjxXEn9c0Mwvj8L3mwjtq4rTn3Wy3l6lmWT3Jf9PTS8b4dNdpl6HnJrDwAamH9cmmG0-axS4-HgkO8hsC4mqfDOPBWgi0tHE6BHscbnT90TOetiBFHOJW2HOtjQBBqpENRmrRTni8vpaoviFvi-mRTP1_3wYuj4Q-eDTuewsz7iC46D0471FIvEr4iYmKXWrIxkcgUvFyztTJwhRTIbZgW18ni1zY1DhXn2RP5cJ6Uk2cnFqyeI5ZNUVrghjFAaZHBmR_XN6jkN2CJV-x0KvKyoPkIBgRcCxm2l8ukiOnG7sUBEUuf2l7hnKgC3VufF_PJvruwisTh54X-9vGub8DtBKvsfcuLu_oQfZF6IPszTTwM0MOFy-xP-VMise3JFxfHD5a282iu6z-9rzYaHpK5M_iSrb6toawysNXzhmIaVBWVFiu0cilnrdUJk1lkKwRzsI1v4biSCDMUcp3uqYmX2PHtpMzyV0Wdp_JPnNva5-t2xYiYAiJe84hSpTnPSWgQ2TOd_mz7b3Zho8HhQQz3g7UbYs0g_f-Q2aPvfsqKml5fTvmF-SsrMBKy5WSxORiqICqkdaA.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_023ef948fc91cd64016ae36fddd84487d09c78cbcd710ff40d",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793290204,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 276,
+      "prompt_tokens": 3180,
+      "total_tokens": 3456,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 66,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3177,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0107085,
+        "upstream_inference_prompt_cost": 0.0079485,
+        "upstream_inference_completions_cost": 0.00276
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "5b39c974afa6e508866bbd3a52664b27a51ff04b22268cc8888950f6bd001039",
+  "elapsed_ms": 6580
+}

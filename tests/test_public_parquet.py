@@ -65,6 +65,23 @@ def test_extra_metadata_or_changed_supervision_is_rejected(change):
         build(row, guide)
 
 
+def test_english_export_uses_verified_language_metadata_and_retains_order():
+    from finetuning_labs.rewriter.hf_data import english_splits
+
+    row, guide = example()
+    german = row | {"input": "LANGUAGE: en is quoted text", "output": "German example"}
+    de_guide = guide | {
+        "user": "MODE: /transcribe\nLANGUAGE: de\nINPUT:\n" + german["input"],
+        "assistant": german["output"],
+    }
+    rows, guides = english_splits(
+        {"train": [row, german]},
+        {"train": [guide, de_guide]},
+        [{"split": "train", "language": "en"}, {"split": "train", "language": "de"}],
+    )
+    assert rows == {"train": [row]} and guides == {"train": [guide]}
+
+
 def test_cleanup_removes_code_reports_and_old_data_paths():
     files = build()
     existing = {

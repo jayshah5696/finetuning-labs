@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-prompt-medium-0026\", \"row_sha256\": \"1b475563bd215c51f71bb865e80d4090ac7e634b7a07f84eae275c870cbf2225\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"can you make this into a clear prompt for the person helping with the repair cafe's shared photo folder? we have pictures from recent drop-in sessions, and some are already grouped into folders named for the work tables: small appliances, clothing, bikes, and electronics. a few pictures are still loose in the main folder, and the filenames have dates and short descriptions that volunteers use to find them later. ask the helper to sort those loose pictures into the matching existing table folders when the picture makes the match clear. if a picture could fit more than one table, leave it in the main folder rather than guessing. do not rename files. it's fine to move a picture into one of those folders, but don't ask the helper to edit the photos, delete anything, or make new folders. i only need the prompt, not the folder work itself, and it should be straightforward enough for a new volunteer to follow without extra explanation.\", \"output\": \"Sort the loose pictures in the repair cafe’s shared photo folder into the matching existing folders: small appliances, clothing, bikes, or electronics. Move a picture only when its contents clearly match one of these work tables. If it could fit more than one, leave it in the main folder. do not rename files. Do not edit or delete pictures, or create new folders.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-prompt-medium-0026"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "1b475563bd215c51f71bb865e80d4090ac7e634b7a07f84eae275c870cbf2225"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "ea7430c7461b84fad804813d31566c6fd419b4fe2112541d845aacf08c8543ae",
+  "started_at": "2026-10-29T15:09:24.176134+00:00",
+  "result": {
+    "id": "gen-1793286564-UrisNTQln8jeeEXoxDWX",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-prompt-medium-0026\",\"row_sha256\":\"1b475563bd215c51f71bb865e80d4090ac7e634b7a07f84eae275c870cbf2225\",\"critique\":\"The input is a coherent, natural request, and the output is a clear, usable prompt rather than an execution of the task. It preserves the folder names, clear-match condition, ambiguity rule, and prohibition on renaming. However, it omits supplied context that the photos are from recent drop-in sessions and that filenames contain dates and short descriptions volunteers use to find photos later. It also narrows “don't … delete anything” to “Do not … delete pictures,” leaving other folder contents outside the explicit prohibition. These are preservation defects under /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating material omissions**\n\nI need to assess omitted materials by inputting context from recent sessions, including filenames, dates, and short descriptions for future reference. I have to ensure that anything deleted is meaningful and has a straightforward output in lowercase. It seems I need to focus on the recent sessions and the significance of omitted filenames. I can’t be too picky but can't overlook the instruction to retain supplied material. I'll make sure to cite any omissions and maintain clarity.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating material omissions**\n\nI need to assess omitted materials by inputting context from recent sessions, including filenames, dates, and short descriptions for future reference. I have to ensure that anything deleted is meaningful and has a straightforward output in lowercase. It seems I need to focus on the recent sessions and the significance of omitted filenames. I can’t be too picky but can't overlook the instruction to retain supplied material. I'll make sure to cite any omissions and maintain clarity.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42Gplnvj9yOvo4XYTX3sTMH9kAeMg7aVVqc49_5Ft-fWaEg2szGdgqT4X14uXDNfosnmfCcwiVsctgf4IdsLgW2A9-Plee1cZ2jOZaSLF5fLKE2BpxX1g-kDm6xt5rU5PHxiqlh5AHD8AKBSqW-cHb0yA3tgikpcOXYvTC-0hL6SCk5_nUotFt5ye-yNWqnQo2tQokax_ADVOY07hdQ2-CHRZxqBfjMvaS1L0RTv2VpNcAmZoePxJ86iBb552MohQMUQ0FGHGbV1xA_vUZ2ARcYSDHHKvjcWMJo_I-QCEaiPSQFK8CajaBO2lPyflZTXECJrZN-u4y9jvrRVzY9j_dl0FSDccHsZIgQWbShlf8L_7m6x3MMoPtmEDORq7__ihCEfStYdDmENjTn1JMReTGazTd9lz26YkOOZzKd3c-T0RlB_gluyGiFyoWyZYkLNUfrbdwkG2QSatDaWCbPOt3kLeSiO1De3W76vY_9O0UTrOe87xvxIzbtv3noo1Lr3FXjMdzBYmGHMpLt_tv5y96El2gGbabQYRIpFbiMyjDShkQmNhQGK2iheLvojAasgOjkM3XFMJpb67AI_zOLZj8Fb0cjcFhvE02QHkVI_O8XhcTsd-IgFZ91nn8hBkgCLpGfisf_bBN79cv60B7mLHFbZK0VTg10l6nwu7iVTPl66pyLx4WjKq7rNK54YgNnYTHzG5RO0HJjxrzXEobHc0US39JQwdqXHrZLRqV-kixIiFKQKM5ByES0trJiIKpASU9XG5WJGPABQ4EowHlr_8exnMSN03kxrS5DYky5KDQZYCAQzEZqNKwlzLinsGN3cSS-IiPFYk09xiBDTL8tJmjqAxPCQ63Hgli3AuT6gINo5sAnEuSKeQqEBH9FaUVlmP_MU9jIABMkd3wqTckQXA9UHJZWTOSvvVtie48BHndOIRKl6-Ohx2H30e3UT1Ne2kHAd_cuSYLUPpkxq3U_3wQLBRZ8dat2g3N_Coe_yY2MHN-vkOfuhBhhg-PE3qLdgciKzPz4P0rr8Dpm20i_WF84h3d7QdrE2FqihDpZBkQ0aVeuPz-PKRVo0d2wIzJAAJ_jGmGF1NUl3tx0hCcU_k6FgmW_ECH_v9e0ydwT9LQv4jXhobFp58cXm6pJPcv-oCODCRgrahiBdIQHUCfcYmOjhSQ4f7zIFDsZwOSV6hinqcrsrqsJ791WeHSQ7_keVFv8BCoHeFEeQZUVWec58WGkDghAtjB-MQ3h-_JkpI91txdQwy40Urjpnz9HDqH2S62-9AvJZoFpQKHOidBkgl-sbAnA8hMxFoXaooc9bWowHvYqkkW-85gl1GiodRtm0OrN-kHdtLfIGbPJwqxHr_RmLl5gEvPvdbRRbF9dcNzsz2ajFrZ8ll7rfSzMl4g1Kn2qAgMZCon1tj9uOF-XxibLdgAC5FMcmwalJzMC6XKPytpVLHBEiGCImDQWs0slCt1UTVMR_VJfCd_JNVkZYCAboC_fRoSf-ZqcglUI3hu9j3Zsi6C01hNptXL0OkymWPTUVW1yr0Y9JLAMuKhAzIwFUUKBNeWIupiW8t_AZ17V1VUEYUItpynbw0ZR5K5Zi0QhOHIvhSoIvg_YmVlUZ-GVGhN7Q9nlvms-72ZoqL9TuNVWaTQCvuKS0oh14mevW_5k4OFfK6hBOMwwbHpaXOf01-eID6wxnh-BYJ74uBdK2ikn8hQYrrJcsxi5kEKxeOsyCZKgcHu8Y5CndUX8xERBZxwZNMqBB0IPar9cIdclZZA4fTZZ37S8tCOC6949k0WhRQDI-pw2I8h4GzFqGZSYVIUvfQrn8rpicRvSGB3hrciKfCkLzd5IUxb9MeJDNwfmtKmg3qNVCmpvTFpqseLMJjkJvSZXR0-d1BfckFok4iFQDo9kWwtydm8jAqmdC3P7f4T6EzZpMPZ0OK4xB0VofvJrgvacS2jWHHFmFXD4owA0w1Oc45ul21MvdK7TOOn7gRuIl9sHZPeVtWMn9RxSDBYym8sHNx8J64MEuz_OFwnyJh4RhV-rfEFcXmxvAqQCMzShdGO-2ldxdYonpvVpM7gKy8ce2n0PNV7scik11JCd51K001B8vjXaNiP3Cj8JQzNnNM5ecL5S-Rc5gHdh0xkEk8qO0X4A4nd-oFu_b3bL7_dSIkniF3OoY0n1anleOfh7mvWIg53TPequ6G3p0y6sWyldWnJsHKbAI6-F7zM4eTFm-f83L84DXLppSV_pDiRzNfCZxche9b-NxBlI_6vLd6S-1gAsUi-qnqwGQS4tOh_bKeNzjU841iWyTD754Ew6_-QDfcgKH89n5ISzausboA3B3qvcEpR_UC0N8P8lU9k3dhdu2krB6DjQAsyIceydxfABGnAJ717t6c0i8USV-f7_uF1l0lida152nPvRMIR6ZzDLPDthkdd1pUhvmM7sfibJziau_vNoOCYPTuAqngPrXN0qyWV0iBEETl4IluyCGOcfkfZj92zBW-eXzRbtKhUqtmWkwcLXANZvKdHnClxNqADNkUUWLD_izHDjL5TyimgNGGclPooO1I1IPpFBoGk78WJzeHNeftggaghSYa9cjGb5GyRzPjDJ6stwqcsmzWBWCJPU9xljx0GrH0oMcxLyBJSaq6cqpNo6tasMDbN9PfE4VheOYFls11ubS_MgvcESQ72wQoaM3YJ-auIyivkCMW1VLthyEH7ts6T72yiECLCVk9z4N1a9V1wc60MrMjJtnUoFqcmjsW2AYXRWDv_X8DeXmcA0zKSFHca_1o_ZcikiIC-B8MM_kpe9PHHX4W2JYzHqC9jdTAjP3JIXCzOp5Gd8MFHmUV7831imi3oc7IIvKm0sghv9z2KXamSWp9SvIWZLJhaMwyPXJ6RcFgt-vL0-K67MV6d2gty07WPRTEbiPehL26w5hYVMf13fDXKQTz8TP5xGhJrT-t4HGBh_lztIcXkT3e4uBhn0kSlV3OOx6k7RfKmX1fLhWm_5GEXMhTyCkgE9zAjepQ-A0WBZuaJ_SHYQXQFf4Nw==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0579f3c740f1f178016ae361a54ab487d0b88b23dff1d4f27c",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793286564,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 303,
+      "prompt_tokens": 868,
+      "total_tokens": 1171,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 95,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004766,
+        "upstream_inference_prompt_cost": 0.001736,
+        "upstream_inference_completions_cost": 0.00303
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "82547a5f9df2e6afea567eed5bbdd1bca031329bbd7e9c2dafa06fa9460dd55b",
+  "elapsed_ms": 7094
+}

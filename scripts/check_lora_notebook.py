@@ -1,6 +1,6 @@
 """Exercise the actual notebook cells with public Hub data and a tiny random CPU LFM.
 
-The auth/install cells are skipped. W&B uses offline mode. The 230M weight loader
+The auth/install cells are skipped. W&B uses offline mode. The student weight loader
 and final Hub model upload are replaced explicitly; adapter training/save/reload is real.
 """
 
@@ -161,7 +161,9 @@ def main():
         "encoded_split_counts": original_counts,
         "max_chat_tokens": max_tokens,
         "tiny_random_native_lfm": True,
-        "student_230m_weights_loaded": False,
+        "student_model_id": config["model_id"],
+        "student_model_revision": config["model_revision"],
+        "student_weights_loaded": False,
         "gpu_run": False,
         "optimizer_steps": scope["trainer"].state.global_step,
         "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad),

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-prompt-long-0009\", \"row_sha256\": \"26566ce017c1ee92fa87ea467210160a2a9c2a2b95ce1b3f1eadcc8789db0ce5\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i need an export prompt for the Cedar Ward Mobility Check, the community survey about walking routes, crossings, lighting and bus stops around the library and market. the survey was open from March 4 through April 18, 2025, and the neighborhood working group meets April 29. we need a usable file before that meeting, not a report about what people think. please make the task clear enough that the person preparing it does not have to guess which records or columns we mean. This is for the working group’s preparation, not for public release. The response is supposed to be an export of survey responses and a short field guide, no charts or analysis. I need the actual prompt to ask for both, in a way that keeps the export and the guide tied to the same survey and date range.\\n\\nuse the submitted survey data, with one row per submitted response. include responses from the four survey areas, the library, market, north footbridge and bus loop, and don’t make a separate file for each place. Only responses marked as consent to share are eligible. If the consent field says no or is blank, leave that response out. Test submissions marked test=true should also be left out. There are duplicate submissions, so use the response ID to identify duplicates and keep the one with the latest submitted timestamp. If two duplicate entries have the same timestamp, keep the one that appears later in the source file. please say those rules plainly. Do not remove a response just because an answer is incomplete; a person may have skipped a question and their other answers still belong in the export. keep the original survey wording in any answer labels rather than renaming them for readability.\\n\\nfor the columns i think this should be the sequence, so it lines up with the sheet the group already uses. first response_id, submitted_at, survey_area, consent_to_share, then walking_route, crossing_safety, lighting, bus_stop_access, and open_comment. use those field names exactly and keep that order. the four experience questions are already categorical answers, please retain their existing answer labels and don’t turn them into scores or combine categories. some people could choose more than one answer on a question, and for those put the selected labels in one cell separated by semicolons, keeping the order they selected them in. If a question was skipped, leave its cell empty, not “unknown”, zero, or a guessed answer. Blank values should remain blank in the other fields too. This is a practical handoff, so please don’t add a calculated column, row number, or a new interpretation of an answer.\\n\\nexport as a UTF-8 CSV that opens cleanly in a spreadsheet. use ISO dates and times for submitted_at, including the time and the timezone if those are present in the source; do not invent a timezone if it is absent. Keep response_id as text so leading zeroes, if any, are not lost. preserve the text people typed in open_comment, including spelling and punctuation. don’t edit a comment to make it sound more formal. The coordinator told me, “The south entrance is open again, but the ramp work is not finished.” That’s useful background about the site, but it isn’t a survey answer or a reason to alter the records. Keep the survey export limited to what respondents submitted in the listed fields.\\n\\nthere should be a short field guide alongside the csv. explain what each of the nine columns contains, with the field names written exactly as they appear in the file, and describe the date format, how multiple selections are represented, and what an empty cell means. The guide should also state the inclusion and exclusion rules, including consent, test submissions and duplicate handling, so the working group can tell how the row set was prepared. Please don’t add descriptions of survey findings or recommendations. If the source data doesn’t contain enough information to explain a field, mark that limitation instead of guessing what it means. The question labels and values should stay faithful to the survey, not get replaced with new terminology in the guide.\\n\\n1. Before delivery, check that every exported row has a response_id, that response IDs are not duplicated in the final CSV, and that the field order matches the list above. Check that the number of exported rows agrees with the inclusion rules. In the guide, report the total submitted responses reviewed, the number excluded for each of these reasons—no or blank consent, test=true, and duplicate—and the final number of exported rows. Use counts calculated from the source data; don’t estimate them. A response may meet more than one exclusion rule, so explain how the counts are assigned: apply the rules in the order consent, test, then duplicate, and count each response only under the first rule that excludes it. That should make the totals understandable without mixing exclusions.\\n\\n2. If a required source field is missing or the data do not allow one of the rules to be applied, do not silently substitute a value or change the rule. Note the specific issue in the field guide and provide the export only to the extent the available data support it. Don’t resolve uncertain records by guessing. the field guide is meant to let the group understand the handoff, not to make a decision about survey results.\\n\\nPlease save the files as Cedar_Ward_Mobility_Check_export.csv and Cedar_Ward_Mobility_Check_field_guide.txt. The export and guide should both refer to the March 4–April 18, 2025 survey period, and the guide should give the April 29 working group meeting as the intended use date. Send the completed CSV and field guide to Nadia, not Otis. If anything must be flagged about the source data, put that note in the guide and keep it specific to the affected field or rule; don’t add a separate report or a general conclusion about the survey.\", \"output\": \"Prepare a CSV export and a short field guide for the Cedar Ward Mobility Check, a community survey about walking routes, crossings, lighting, and bus stops around the library and market. The survey ran from March 4 through April 18, 2025. The neighborhood working group meets on April 29, and the files are for its preparation, not for public release. Provide survey responses and a field guide only; do not create charts, analyze findings, or make recommendations.\\n\\nUse the submitted survey data and include one row per eligible submitted response. Include responses from all four survey areas—the library, market, north footbridge, and bus loop—in a single file. Apply these eligibility and duplicate rules in order:\\n1. Exclude responses with consent_to_share marked “no” or left blank.\\n2. Exclude test submissions marked test=true.\\n3. For duplicate response IDs, keep the entry with the latest submitted timestamp. If duplicate entries have the same timestamp, keep the one that appears later in the source file.\\n\\nDo not exclude a response solely because an answer is incomplete. Retain its other answers and leave skipped answers blank. Keep the original survey wording in answer labels; do not rename labels for readability.\\n\\nUse these columns in this exact order and with these exact field names: response_id, submitted_at, survey_area, consent_to_share, walking_route, crossing_safety, lighting, bus_stop_access, open_comment. Preserve the existing categorical labels for the four experience questions. Do not score answers or combine categories. When a question allows multiple selections, put the selected labels in one cell separated by semicolons, preserving the respondent’s selection order. Leave skipped answers and other blank values empty; do not substitute “unknown,” zero, or a guessed answer. Do not add calculated columns, row numbers, or interpretations.\\n\\nSave the export as a UTF-8 CSV that opens cleanly in a spreadsheet. Format submitted_at as an ISO date and time, including the timezone if one is present in the source; do not invent a timezone if it is absent. Keep response_id as text so any leading zeroes are preserved. Preserve respondents’ open_comment text, including spelling and punctuation, without editing it. The coordinator told me, “The south entrance is open again, but the ramp work is not finished.” This is background about the site, not a survey answer or a reason to alter the records. Limit the export to respondent submissions in the listed fields.\\n\\nCreate a short field guide alongside the CSV. Explain what each of the nine columns contains, using the exact field names from the file. Describe the date format, representation of multiple selections, and meaning of an empty cell. State the inclusion and exclusion rules, including consent, test submissions, and duplicate handling. Do not describe survey findings or make recommendations. If the source data do not provide enough information to explain a field, identify that limitation rather than guessing. Keep question labels and values faithful to the survey.\\n\\nBefore delivery, check that every exported row has a response_id, that no response_id is duplicated in the final CSV, and that the column order matches the list above. Check the exported row count against the inclusion rules. In the guide, report the total submitted responses reviewed, the number excluded for each reason, and the final number of exported rows. Calculate counts from the source data; do not estimate. A response may meet more than one exclusion rule, so assign each exclusion to the first applicable rule in this order: consent, test, then duplicate. This will keep the counts distinct.\\n\\nIf a required source field is missing or the data do not allow a rule to be applied, do not substitute a value or change the rule. Note the specific issue in the field guide and provide the export only to the extent supported by the available data. Do not resolve uncertain records by guessing. The guide should explain the handoff, not make a decision about survey results.\\n\\nName the files Cedar_Ward_Mobility_Check_export.csv and Cedar_Ward_Mobility_Check_field_guide.txt. Both should refer to the March 4–April 18, 2025 survey period; the guide should identify the April 29 working group meeting as the intended use date. Send the completed CSV and field guide to Nadia, not Otis. Put any source-data note in the guide and make it specific to the affected field or rule; do not add a separate report or a general conclusion about the survey.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-prompt-long-0009"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "26566ce017c1ee92fa87ea467210160a2a9c2a2b95ce1b3f1eadcc8789db0ce5"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "d6f074654518acafc54f4e38f122c75ab6c2a748ecf23c736496931f28f76d43",
+  "started_at": "2026-10-29T15:45:46.813282+00:00",
+  "result": {
+    "id": "gen-1793288746-LUHCYLFfqK7lMTvG1Lft",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-prompt-long-0009\",\"row_sha256\":\"26566ce017c1ee92fa87ea467210160a2a9c2a2b95ce1b3f1eadcc8789db0ce5\",\"critique\":\"The input is a coherent, natural request, and the output is a well-formatted prompt that does not perform the task. However, it drops the explicit requirement for a usable file before the April 29 meeting; identifying the meeting as the intended use date does not preserve that deadline. It also changes the conditional timestamp instruction: the input says to include time and timezone if present in the source, while the output requires an ISO date and time and makes only the timezone conditional. Finally, the input explicitly limits eligibility to responses marked as consenting to share, whereas the output only excludes consent marked “no” or blank, leaving other non-affirmative values unaddressed.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42o0K9ApmCkWEpY9GHs6gl7cQIsBbfXZD4WOvldkO83ov8uAc-9whOBYJxWRi7CJB3OF_1TYS7CoaKpOFT9PVAuILiO96y-KkxV-0Z3lCPg3M7Noy5zalrVj88n8txZRJPoVlTVNAAkSx8mB61jK92AlsF-Z4E1cFTMCj-5qa4zcpv4hHJAtAf6-d87NnwfLDQdR2spobfsICAd6xW5J5kKm7EK1BDAGCShHe7lePqFDdJGWBNplzgWFPyJx-t0AvVlfDg7zrdndbUXZSBAVNATYPxx7AvjYiD7NJ2g_kSDiTbpgqHEKnMhnVIwaHPkcnfwqjIkBFtK0zSRqVXoeKHLSIFncKSstSqGT6COdXUidZ_b9tQ1V7eD2Y-cUW9YDyVJNzh-rhbbTUaYPm5aU42su1nefaiXSfrsy83Jhj72iHdgburckxSmrwx76Rng9ocwO7z9fiWXYHtM6ynjNp2MMeWJdxcAltDLPukdsh0G4tlZTK1Evwy68juInYalugcWEENecO5rPYkpVilnN90Rjw387M6lNdPlVgRKk_lMFDp4goUBrH1ODrGGOdkap1v7GOUU4sQwIGx387hemyDyff8XlkYGR7LQU1I8Q2Q84Tee5vafikS41d63-wY8ksxIZGuaE4aMvf0NYUOBnlMZPqr6tHM-3nTx-qSZtWKeDBlgnlnTu8lz3TSPrdzaORwxeTCmTtUsOh04r31EYcAt2pxHC7o8rJKMHFEBRwi6TxvJuhdJIxfPTpwr70lSXHSnpTseZEwz7ONXv_YPdPJx-ISk8W2o-HkVXKJAu2i1WOkmeYAg3DYV5r1XNGxRjlppopo_C_ILNjxoWUCZLXLcOHg1QDcKTCCIt_9N2ZCwXnJEEIQVlWFpmuxOtFhRtGLRg_gM_2hx_KXmgZi5BU2Yr8qPtueaNtwBtIGiJiOEcbCA_2L0o_6orNF26FShNe9Zrecs6lKEt0kChTcUWahDNJPKrnSss1yXFT-xmYuaNJVfVv_gpnCMKQyHK60Ve0Id4iTh0h1iTDSd4tVzzMmWYJ-QeMx2JIA4BKBu9HJFSK5VR0MLGv-z0i7ts7oYrPUWUMLL-xYQ0EYgjlIytHwk7Fkel8To1bWO4yVexX698WmL9tyN2J162iLvDLqrmpEqo2vlfhe3AfdSOy-E6Q5UdC9wBWgy1F3ildGv1Bl1TMBiWOoZgCiRy3zD6Y9KOl3QZQ62qIhmODoky6axfCp6xuZVAz69rteAO6M4Rnj0Xir3cHw79ruRgwNGdFIU5qDMDKOEmesMeYKpI33U2aiY3kk-J1fTJXA5k7ubLCIN9BHgkE2j3Vxss3zpm9mrpKV4Inqyi0KSa7v7XZF6Q3oOE43SJKqZFbmtjlerU5ERaaPrZk6ZBXTAmz73dPO-tlgFohUlwwse5yASB3Ngn11-Hip4hN5pLzgGIk3B4Tutnl0nQ_yGgPoJ-vzY9kBBj1_Mw2uOXivoC0nDM-4Tatd0Wef0_DgXbui4oBtD3tPoytPehY0VBqfAY2wUJ6NEzSBcX-RAt-7lm1ffVzez7Y7Ca-u-D5mWSeilcHjHdLyPMcN9mozek4ou9DscQhHvppWLWUMuk3bhNNoXF3hDu6JmFzI0JiRyDNaS-RgMipCxK6I0AfOoMSEc_SOiSbssSZFxeYSpg7KIfQhRCdqfJNLUraKdWMqAHlIhS72Do_IJW4hgB5vuxsXe5ypKoObfdZ8BA0U6a7mtwJnkR0J33ohSyAb_952JDDUhlJlhTRAiGtRIDksxXFjVQlBDIPUqiBkiub-C2Q_gcE3dCqkQqOf5QXGP3r3K0uqZ4OSeO-wngO2T3ADb6DRLfWkfniBbQyWZs65p4mJdAbTi-jVDVMudx9dwAgyVhrqmfgWawcxSoY1Eott4KLqHmuJ5u25vngU1Kqgw8tEY0xXLLKpfzmCXN3oCvFL-Jrjbzr4756unEMt_uDjBjn3rzEx9pa3kBDAhF86mAQS5sdH4Sa2OAJTxvQYQVKwBsDxNjWl1oUU3cMmkOcebiNfilPWTvIieh6DfIc9FPr-oT-nU7M-RiSmfq3X2zVyoOdoQSeQrk7mirDmSTvGFMpwzPi6UiUaJm3jZalUWnBZlSlYwOBlCQKENwL3p1u9L-wHl8wOxS16vI8BCse9cpR-ALnzH91yatxo-tyA64hGkLOQ8hvkxLitxxsz078f7Nob-EwqqPPV-fFgq_VJdBlLqqA9Gqae7N8H4vNRym-mMCukegxPGJTSJrRA6fPDI_CQvIPhKGTAgHr0eydcUDrDK_A1H3iu4hbeQyCqN1tGZK9ld-0FzXO45-YxQkxBNoomfATKB1n4KYRLzP4yxV4FvF62Ww-8FfhDgO9tm43Jp-FZtA29E_8J_WL_WVUSajdc11sHeZfDJdyOe7TzR7P8za8ZfhmH3jF68-n12MPuZpUaJPHC8VMGwtLCX1dQVKLbFTDvCSFspH1BJ82Q5uvfF2wqpPXLI8uD6-oeZH67eua5wIJfH8vwXfLwKugys_y2FYQkqwLMONrDWsxMyxrZlHmWp99hi7yti6z2DHnq9PlfUVO1gL0EWArB8oIFe_80QcNM44r_uj02-KY6x4b7E-JNzJhWHax-Dc9SnR1cxlP_1_lx8PzESrKq5M5ly-XmXjsRxau-ghLA2jh2_A0tatT5uwOxNPYLK7TLVt3d6B1sQhzp98NSb92sT9M3p-rDa_SbSRX6YVBhV1musZ254PnL4FCeSEx6X2tV2Mk3PASqCr2IlMEl-DE-sW3ptU7MR12CFmfDvErsAXMAgQwPQDyPj-R_N-qNPq9PBKIkciZAQ0bXbIHXlXFrcVKnTLrmTBq88Iez_KJlTH8JO-VHgreuOh92FJlPoyIpDZbwDEQtYsfsbgBQtU2JjbkaVucrdo3vPWPBDhsIkjHQyrSshsxByTkjPK_WCrCo8FBXGgJEmRdCLrLXTmng==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0489345fd2de2a27016ae36a2f533887d0a31e122c641664c1",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793288746,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 327,
+      "prompt_tokens": 2722,
+      "total_tokens": 3049,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 94,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2719,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0100735,
+        "upstream_inference_prompt_cost": 0.0068035,
+        "upstream_inference_completions_cost": 0.00327
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "0923e88dd0e9e8cd5f128dee812e9a24f7b470f329419874bd1da02c468ce3eb",
+  "elapsed_ms": 10614
+}

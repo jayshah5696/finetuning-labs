@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-polish-long-0091\", \"row_sha256\": \"aa91daaaa8a06d24fc2dae1383850ed0b033d5e09bff9ea3fe05b8f07688b6a6\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"the records team at Alder Street Archive began looking at its log cleanup process after a staging worker filled most of the small disk set aside for tests. This happened during a replay of a week of catalog imports, not during a live service incident. The old shell job ran once each night and removed files using a broad name match. It had been written when the worker produced only one kind of log, and later changes meant that it could also match files that were still being written. Nobody reported lost catalog records, but the team could not explain from the old job's output exactly which files it had selected. The team wanted a utility with a preview that could be checked before anything was removed.\\n\\nThey called the new Python utility Siftline. It runs on the staging host, which uses Debian 12 and Python 3.11, and it reads its settings from a TOML file kept beside the deployment notes. The configured directory is /srv/harbor/worker/logs. Siftline uses each file's modification time in UTC to decide whether it is older than the 21-day retention period; it does not infer age from a date written into the file name. Files with the .keep suffix are excluded regardless of age. Symbolic links are skipped, rather than followed, and current.log is excluded by name so the active worker log is not treated as an old rotated file. Gzip files are eligible under the same age rule as uncompressed logs.\\n\\nThe team also changed what happens after a file is selected. Siftline first makes a manifest that includes each selected path, its recorded modification time, its size, and the reason it qualified. In preview mode it prints the manifest and leaves the files where they are. In apply mode it moves the selected files into /srv/harbor/worker/logs-quarantine, which is outside the directory being scanned. The files stay there for seven days before a separate scheduled step removes them. If a move fails, Siftline records the failure and continues with the next candidate; it does not claim that the failed file was moved. The manifest is written to the run's dated folder so the records team can compare a preview with an applied run.\\n\\nThe runbook has a short numbered section because the operator uses the same sequence at each run. It says:\\n1. Run Siftline with --preview and check the manifest count, paths, ages, and total size.\\n2. If the list is expected, run it with --apply, then check the move report and the quarantine folder.\\nThe preview is not an approval by itself, and the apply command does not repeat the operator's review. The two commands use the same configuration file, so the operator does not have to copy the candidate list from one run into another. The runbook calls out that a changed retention value or directory must be reviewed in the TOML file before either command is run. It also notes that the quarantine folder must have enough free space for the selected files, because a move within the same filesystem is expected but the team does not assume that every mount is configured that way.\\n\\nFor the first trial, the team used a snapshot of the staging log directory taken on March 11, 2025. The preview found 184 files in total, with 37 meeting the age rule, amounting to 6.2 GB. The printed list included several compressed import logs and excluded current.log, two .keep files, and a symbolic link named previous-week.log. The team compared the preview paths with the directory listing and the import schedule. They then ran apply on the same snapshot and checked that the 37 eligible files appeared under quarantine. The output showed one file that could not be moved because its permissions did not allow the service account to rename it. That file remained in the scanned directory, and the report marked the move as failed; the other 36 moves were reported separately. The team did not count the failed file as cleared space.\\n\\nThere was also a cost question because the trial snapshot and its manifest were copied to object storage for review. The actual cost of storage and transfer for that test bundle was $48.70, not $175.97. The larger number appeared in an early spreadsheet as a projected amount based on a full month of retention, but it was not the charge for this trial. The team kept the invoice detail with the run notes and recorded that the snapshot was a test copy, not an ongoing export. Siftline itself does not upload logs or manifests; the copy was made separately by the records team, using the archive's existing object-storage account.\\n\\nJo Alvarez, who maintains the staging worker, described the reason for making the preview visible: “I want to see the exact paths before the job moves anything, especially when an import is still running.” That comment led the team to keep the full paths and per-file reasons in the manifest instead of displaying only a total. The utility also writes a brief status line with the run identifier, start time, mode, and number of successful moves. It does not print the contents of the log files, and the manifest contains no catalog entries from inside them. Those details mattered in the review because the staging logs can include internal job identifiers even when they contain no customer records.\\n\\nThe deployment notes identify the service account as siftline-runner and specify that it can read the scanned directory and write to the quarantine directory, but it cannot edit the TOML file. The records team keeps that file under version control and records changes to the retention period there. The dated manifest folder is readable by the team and writable by the service account. Times are displayed in UTC in both the run output and the manifest, while the host's system journal continues to use its existing local-time display. These details are listed separately from the cleanup sequence so an operator can check permissions and timestamps without mistaking them for additional eligibility rules.\", \"output\": \"The records team at Alder Street Archive reviewed its log-cleanup process after a staging worker filled most of the small disk reserved for tests. This occurred during a replay of a week of catalog imports, not during a live-service incident. The old shell job ran nightly and removed files using a broad name match. It had been written when the worker produced only one kind of log, but later changes meant it could also match files that were still being written. Nobody reported lost catalog records, but the team could not determine from the job's output exactly which files it had selected. The team wanted a utility with a preview that operators could check before removing anything.\\n\\nThey named the new Python utility Siftline. It runs on the staging host, which uses Debian 12 and Python 3.11, and reads its settings from a TOML file kept alongside the deployment notes. The configured directory is /srv/harbor/worker/logs. Siftline uses each file's modification time in UTC to determine whether it is older than the 21-day retention period; it does not infer age from a date in the file name. Files with the .keep suffix are excluded regardless of age. Symbolic links are skipped rather than followed, and current.log is excluded by name so the active worker log is not treated as an old rotated file. Gzip files are eligible under the same age rule as uncompressed logs.\\n\\nThe team also changed what happens after a file is selected. Siftline first creates a manifest listing each selected path, its recorded modification time, its size, and the reason it qualified. In preview mode, it prints the manifest and leaves the files in place. In apply mode, it moves selected files to /srv/harbor/worker/logs-quarantine, outside the scanned directory. The files remain there for seven days before a separate scheduled step removes them. If a move fails, Siftline records the failure and continues to the next candidate; it does not report that the failed file was moved. The manifest is written to the run's dated folder so the records team can compare a preview with an applied run.\\n\\nThe runbook has a short numbered section because operators follow the same sequence each time:\\n1. Run Siftline with --preview and check the manifest count, paths, ages, and total size.\\n2. If the list is expected, run it with --apply, then check the move report and the quarantine folder.\\nA preview is not, by itself, an approval, and the apply command does not repeat the operator's review. Both commands use the same configuration file, so the operator does not have to copy the candidate list from one run to another. The runbook says that any change to the retention value or directory must be reviewed in the TOML file before either command is run. It also notes that the quarantine folder must have enough free space for the selected files. A move within the same filesystem is expected, but the team does not assume every mount is configured that way.\\n\\nFor the first trial, the team used a snapshot of the staging log directory taken on March 11, 2025. The preview found 184 files in total, of which 37 met the age rule, amounting to 6.2 GB. The list included several compressed import logs and excluded current.log, two .keep files, and a symbolic link named previous-week.log. The team compared the preview paths with the directory listing and the import schedule. It then ran apply on the same snapshot and checked that the eligible files appeared in quarantine. The output showed that one file could not be moved because its permissions did not allow the service account to rename it. That file remained in the scanned directory, and the report marked the move as failed; it reported the other 36 moves separately. The team did not count the failed file as cleared space.\\n\\nThere was also a cost question because the trial snapshot and its manifest were copied to object storage for review. The actual cost of storage and transfer for that test bundle was $48.70, not $175.97. The larger amount appeared in an early spreadsheet as a projection based on a full month of retention, but it was not the charge for this trial. The team kept the invoice detail with the run notes and recorded that the snapshot was a test copy, not an ongoing export. Siftline itself does not upload logs or manifests; the records team made the copy separately, using the archive's existing object-storage account.\\n\\nJo Alvarez, who maintains the staging worker, explained why the team wanted a visible preview: “I want to see the exact paths before the job moves anything, especially when an import is still running.” That comment led the team to include full paths and per-file reasons in the manifest rather than displaying only a total. The utility also writes a brief status line with the run identifier, start time, mode, and number of successful moves. It does not print log contents, and the manifest contains no catalog entries from inside the logs. These details mattered in the review because the staging logs can include internal job identifiers, even when they contain no customer records.\\n\\nThe deployment notes identify the service account as siftline-runner and specify that it can read the scanned directory and write to the quarantine directory, but cannot edit the TOML file. The records team keeps that file under version control and records changes to the retention period there. The dated manifest folder is readable by the team and writable by the service account. Times appear in UTC in both the run output and the manifest, while the host's system journal continues to use its existing local-time display. These details are listed separately from the cleanup sequence so an operator can check permissions and timestamps without mistaking them for additional eligibility rules.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-polish-long-0091"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "aa91daaaa8a06d24fc2dae1383850ed0b033d5e09bff9ea3fe05b8f07688b6a6"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "ab17890b71c11953c12f648b211b8dd3a014c0b6b2205cd265c29316dba9b36d",
+  "started_at": "2026-10-29T15:22:25.906353+00:00",
+  "result": {
+    "id": "gen-1793287345-euRZ2tH1AbsblBcgSEqj",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-polish-long-0091\",\"row_sha256\":\"aa91daaaa8a06d24fc2dae1383850ed0b033d5e09bff9ea3fe05b8f07688b6a6\",\"critique\":\"The input contains a concrete contradiction in the trial paragraph: the team checked that all 37 eligible files appeared in quarantine, yet one file remained in the scanned directory and only 36 moves succeeded. The output is natural, appropriately formatted prose and otherwise preserves the supplied details, constraints, quotation, and certainty. Removing the repeated number from “checked that the eligible files appeared” does not resolve the inherited contradiction, but does not materially change the stated check either.\",\"input_verdict\":\"fail\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42S7UUytEg_Ab7_D3e7bd5Bw8eYiOSu2Lq39pZwOA1kONV_IyaglX9U6uWSmVGrtPJNVrmVMrbdFXb10GhKeeS8iyKsZIXS3Eo7WAS0MFKBFrbfqlE-8rZCgFUvedQb0JSkxliJMk5z8xmwYkFcBhSDH2o91f4JflmGniMzlR4zVk0lUPWr70jcp4ZyXpLPUdQtdo32Mui-SSbaNSJQdoMaMvSKxrEf2t4rt4mZhqew1k-5iB2Gd7-nozYmIpb3LZn7YZKMDct8x6bJoHVBDVsUDWsSkxAgt5ncsMU1o4N1hxixX7LKcOsrhA19kDAdo6WATGCJXvferlZS3U37h8KcWiym3GV2ryiOvjBKXLAOoxaG6QyDzo-z-FPMS4sJVHRcrRLCfrZAsj8GxyEiAe3ktpG-0WJumjx6t1JoaxhfTw215Qigx-eWkVRnqz9Jd_GLv6eV7rFus61kbt5qMPfyjdYDzqZPkZDUbraxqvZ8_CMvhrONwXzq7HQSijhxIroOVqMY_G8XIZ4XrTMFfRC4JbhMKhRDeZAQRs2ubukYsXU5RoBxWbddsF7b4mpCb7Y0DLF3D_9o3nGNY5_ZbdmZBdoBZEH3f3-IKtji7gzBY31Gtz6S8-QtE21KbLk5biz0xWQjtsni_QgnHa8QiXWlR8-ZsZ3gDHr1jlVCSe3ts33zJpUCe7_qcOwBk6VHer7uevBZMN4d9MYx0Ru4H1w1WHT56xtxjg5-pbbnPPQFsTlwQKzcy3e9bEvmSm_lFC_GDD2cGXEclbn1f5R9hJ51PVf-bqLo4aQlx6ATKPy2mvjBVQrrSdbgyVEcTP3bsdKIebA_HmY8GTYtS75MdIhrVeAOnibkH1UKEM9OMfN7S_JWFVZMRoVlgYhnfWtsLT-695emGHKmKlmTbwB595Rr45QDOeh1zhcQFDWg6ccX2--fWzoPDmqRv9vMfWIO6MQmP1sw4o5_aiksjB9nGAp8yF5hGzoLQwyiGY0h8e8HT1fA7NqtYoFGAcoZvga-iGdHLWlw2qU5huCjqjJ49NaSmYXO001ddLnGLDOIYGd3lcox8EcKk14ylnXst8ObFlHvxvMhTmkHsRLGhTf-9kbOr2JHmjmiBfsmajagQel4LsLdV7i0h_VupSuaS0-AOop6g1vofjv9WMGIKf-hZH4PfRgFoxWYYQmfY0J69wfx3PHyCHId34BMW8NZO0SggRbH2BISbfEHjqKrwjTm8j7abPCXUZI38br6vOkN0lWi5JDYJS59fG9MFEW39CDLZgzXFSQTgRgwaMA0IQTaeerjsnfNGby0Q2QeUiaCVcR07g7mqQo5VoeIhFp4x-AZvwsquzckxSuIPoYLlZYD-F0MkCMmfx2_Uu3P3SBepla_PIs3PJGBNoyrYp5Ei_khBKWMGQ2lYOCmyjpFg5NgCJ1nZq5hLAjlI2yzMKTsggrtJUYywI-qyLZNUrTEz4XdqIageGy0pffgbQaKsRGTAaW_v2G6yDlwl3CzJTIlUdT3-l6BFqCBLsSgmsr7COr81mlKeTde3Uyc2g5Piqedfa_VzRv5FcuY1mDT8YNowBYwfbRTKX_HQ6Msuy7PPvVHCvnRqUm0ix9wjBkMdUKzQ4HGy6Gmq7FZy_bdycgjwsqPdKb4kExvg1dF5i_q-bi0M7NgkZQQu6I7mWwc36HBmuw0kAwKkyMgrWXUY-Rfioj1P5bO1AK0gPBsgp0_7us4np6p4r_1DBhF_mlNlLW95F2chCZvBJxfsBjcDX7JM8uksy5ZN9cRHhS9SISX5ScusnM6MbSXN6f4_JVVp8IA503YnZW_yH-VHEyTv1krm0gPsWqSZgK60kH9aU9iDVz5xGFT4owSn5byv6n7suY0B9dVrxUBRFbXE9cw7q2xNVFwOYti7nAzj8dMz0Z2E5R1Op3_Ivw7l1s4hGvhkjxSHDCHNEcLJbEV1XU4HqjPgY4Rl6tqY4iIMFxmbNi867pSpFbcDCPx_ICb-i7_4y1bsNUs6LDYLNiEEWjHT6eS33bZfoDH-Lkmz6NEBBeWbzqwgMrMZKPZjkZhi-MaS086unvIAoH-1aG28jQo_i74kZWJ9MkLrDHGO6z9MUr0vZDbkv08paQPdcdkry64yZQqEKNK61AD1UWDfY52G24kiqjbxklYcSF8R3YODbD2vX7ZWyfJDxBQMjVYG5Lz8Jvp2qUoCzT1OBprjsVFZH4RAka8FPc-Pzm9hwGlvdkzE1VHFF8VlCLFvoQKeVq9W1g7hl7DsGJG6bbOeRcL8sHMxMnvQgaNdxHaXQI-C93QQGhBQ__zDx1v7fQuUaZyRlvuUZM5T-dKrTx4L-U9zQv2D70pacEgmWZp2DhXaZudA5Av-3KEsj04y7R0WDm_hUclJPS3HeVVpxe-IO94CyIxBZelA9hrZC98J6jF52Xa7ypTkthF9FfHLebZgAjIGV8x8cnq_wD2TucZyZopK96u8MP6GnbfeAPTaFT0eFBlgb2FruZXynFy6npAKxfRV6XEHQdzyk0c9alq5xye1xP-KGH9U59oQTolGV2Ins9YHC_rMb0ra4hUsL2gCqGwr3brysYuPx28KAk-E4dxzn6IMh5SODVdOy3M44fWbQEaK9dac6SPZih400zPe9FvPztnu1-cXkDO8GLy3HhDu_tg1HOr1MvyBulD4KKehK-9sUNuguaz45SxU06OAU9GdDElSn6Btu2dHNSX98K3sTdinJyxqBpaQ674sYWAD-uJSBKSxKYt85JKElMPWbkeGCxjFXEzd8m9-qTKObKdQ0g_p66j12OTitSMk5Vvrk5EPh1zJE9ZGpX-kPUoayGymZ-gT4bppgnymxLgUVfUg5qbzdSa3t4L7NseZoYnEkvVzJr2hT5ZB905s1Q6gTLRv5NO7P3a6r152PrMNTb4v7-cRM7hcx1qHkBhR5vVgb5RnYdLGQ6Hil-dbOTXNRv27TfcNJfWyVzK2A7pgT5uVOWSLwddsxGodFc9FqxXIceYRdDjQIOWyBY016dyOp5SruXGUgClUcG5lSgiB3SqKTcJdNg4qqEStxjE4Bl_OQCiiX8fshF0mVocw9ycSG-GTZLJ373qtlEHa2iUWYWSlqw5yFMo-F-ZMKP0AX7Y7Sn3udj0zEML4bp8RX7AuzKVmC3XaP9HPZRlsDQyuvcWwilrM-eKZXAtAMFc4BnGeGwE-LnO_gL-yCFQOgeq70s1pno4chrhs-_HPxxNNem37_xMFgBC08CIWip5qMh8wUFj_MPb_I9Q81jG7jBR9MyINC3C5KHYSn49n_xeqZQk9I78JYz01UAEYEpC4waYdrDve60r1ayStJ4GQAHtPVM6eqNYLG7cI0iVbPgLOU-3oyKXsKHLSLqPJcb5-uqBUHN0CLmUQp7AmE9T3S4ABfln8kxPlI-k-MJaZwJVGfOQNz-EdeVERWi37-qyIk336povRG2TC0mA34fYY1RM6cU8Hh2IXoUh6mQ2WFdeMiQg_7LdbyuDVIIzQkS3foyRSkVfP-i_Geyc4e5ZAItrgw_vqTjMPi4Ole2rXlo-rHeRX7-oXTgbI4EsA1xCv-WQQf66fJD4dTopUmjkOUMlETl1sJmy2l-CCBd1061taCkjgK_621G7D6RFDjc2RTqUciin1SK-lhEHcmINxED0oLS60rIoZmnbzP9gEg97igC5FiWkIUuAHqZ6OyYd9WTNGMB7cBltcZR607Dj0-00AeBs-1FXa9oGHCoKvVglNhKS7DOwc7xgOAbLxADw3PJdX4FC-0x92iNVeOB95ebKhEnBSGr0OFOxmYXm0BX-SUchKnE52L0xSMYBzZbZifzf7h7ggBMxKHMrtcJ9xmgazbPyQufIkz4Hlwb3xVeEc0c-9j6xKJcwpScsuMP9ryIdT_Pkkc3-cKoq1gViaXNFVV2XziAULSxmJPRQnB3x-d4tgdVCB0w1x9KUV1K8SEKr0cOIdvLgc8t4QCZVwkgHwDveKhr5G3IAsv-4nU0DxhZ9Gd7LLJFi68YH1C24QcjogZJ4BEHbo5CJ__5w5Qqxu_gw5EAbWpAT16TwFBNmMUGV24tpBLfXOkvT6ShPaETAh03bB98LVTYc2SrrPv7gRZcWXmTRgGpmhkybk3JtzCgRU7UL_zKEkt2AaC2aTcg2S8s3CsyAPPY12OHBdive8J8LzKyLjdC1qm8vxEy92ClqPf2u1EACgr0SPWjrFiYLrdlh_mbmt7eVrHfn89uMXUcs6-YJev1jTN4Er5dg_SsrOoo8iUDzh1lgN-X_wfF3JFKa0eUh2EaM3ZQhjGNfh8UOLIBSViDbEmWT95gTkd4DH1sH9knZuVzk5q9Kn1kUExAB-XvLFtYrIcPCxd-sv8ImTc9KA98Nr22OfZnVqdiqxf3HEptvi79PoQTLmKU1rjciN6PtXtiMU_lcMpECJSBq3L_6vZHUeuaJnruTo0biLpZc97DeKWCOOYswPFplRW9vdjR-WrfoT1075KKWykABoOL5Woubg5GS046PyBYqj2HaQNZ6c4Rce2J4AMzJ3u-f275p2YeFapoL1bt7YPHXtoWwT7WvnRvqQydiDqBReEs6939oFyJelqXXCvBLcLlNea59LAokfo0KAB4iKXYeaq0btvliHugEn23T_pLXWRFwC3oBqaoRqoXK0EHR5r4aSZFvWWdOL8mwQQRtjPBWvB1GSDx-b2f6x0u_nec92kNnsMXMlc1D9nz6agNconkoeuGKCRdlEImyzDtI7vgQTZhx1PGtLk40BOkxSKZFoXbtRzybyfhy5bBbmReLqpjI5SkN638IixaF_Fgq1IsKbLPPiNKYyTy-SKEMMDekNLpq0uSNmvT3yr3mlDvq0ZqDioEjRjr2kSr5BDJclQivUoxuQSqe6tHw8HImZg8LWJ4a8P6Yy6cNxWalvraKInI6lRYQYMH2iGbXbC65BiKevVoSBGCACayu13oI5obFfJug_cHhqYRczqjCEa81m5bkqSX_8zGQYZ3JtVIVJsulYwNERHjbnBz5VZXjOQvpErJsP-lWEobAcwOI2giKkOSOeMnSHx_T0-jJgiZ0NrO0eFKiPTWoPNZSCfvTrkaxigwdcW79soGjKdR8tjwv4PMpWkiqiOdQ_ilIWy8wJcJhkYePjjJLR__lEWBpNRKtOTpl3pFv74r0XL1DaeLG04Ty0Lf6LpGiRrblNw1mT5z24PiqJ5fihy0zQf4Lk2jLH-Cky_jXaDvstA8FljazJ1J6qTbEdMs0LIWeOvTJrYoQX98UV2uHClkfyLoGs1Ej1FAvU2_6YkjAnfLjgDSS9pCfRG0RqBOtz4pRUmIaOXVaW1z_a_JnszNj7v4WBW1-kgxMhGJbvxrLsAGOZ36uTpSXrN2C2XZGATxyW1gwjWGJT2B83gvOkxxfBTeWBHdXpwzWFfPxblbjb65eYk4Q7sgIxY_L7JLQ5dTev0QKyNMZzIGCkDmMrWjlbR3zuHlVNsc4A3xP6z61sSDU0AtK_ZKKmSQf9h41SXP5BzyG8cyC-Kl4lfj7nu_ZVi8sdSGeiwlkADx6MDe9inwtt_0GZxjnX8KXOeDIWyl1FdZyKjQ4BPaDy6YjfFzZgBel0_F3t4n74bhhXyue-sI174UqZazfiM-sOk0bIqkRzBlwpAS0OBKSoAuUuNKey1ZDDes0SA7x6qaLkQLE1GNa5a3eXOWNf812yM4g78TMnzaeu2zyndFWkyyDApjmGQojk0WNPVXugL8XUiZ9SuBLobb56J1G_G01cLykmt-XXoE5J80iqkMfShcvMZK3WT3Pko9DNg0Ml5hQeg-A=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0f61989372d078e9016ae364b319cc87d0a9411baa1cb2a89d",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793287345,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 479,
+      "prompt_tokens": 3009,
+      "total_tokens": 3488,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 288,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3006,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.012311,
+        "upstream_inference_prompt_cost": 0.007521,
+        "upstream_inference_completions_cost": 0.00479
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "2f6ae64b20249b093cb0f1f0c10839304c307446c95f6926aa32ce3f3f5fa637",
+  "elapsed_ms": 12281
+}

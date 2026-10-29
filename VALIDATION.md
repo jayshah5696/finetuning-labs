@@ -10,6 +10,16 @@ The updated LoRA has 18 judge-flagged critical-error outputs among 83 reviewed o
 See [the full report](data/rewriter/evals/lora-1500-validation-20261029-a10g/comparison/REPORT.md).
 The historical 68-case results below remain separate. Human calibration and a final test are pending.
 
+The next training and comparison scope is English only. Use the fixed 81-case English view,
+not a newly sampled validation set. Its current 230M baseline is 51/81 passes, with 17
+critical-error outputs among 80 reviewed outputs and one truncation. The same cases, prompts,
+decoding settings and Sol rubric must be used for the next 230M or 350M adapter. Report each
+base and adapter revision. Training-data additions do not change the English holdout texts.
+Keep the full 84-case results above as historical multilingual evidence.
+For a 350M run, evaluate stock 350M beside its adapter. A comparison with the previous 230M
+adapter changes both data and model size. Use a fresh 230M run on the new data if the goal
+is to measure the data change alone.
+
 ## What can fail
 
 - A row has missing text, an unknown mode, or extra metadata mixed into the visible benchmark.

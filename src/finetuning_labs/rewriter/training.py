@@ -361,12 +361,15 @@ class LeakageIndex:
                 len(shingles & other) / min(len(shingles), len(other)) >= 0.60
             ):
                 return True
-            if (
-                40 <= min(len(candidate), len(blocked))
-                and max(len(candidate), len(blocked)) < 600
-                and SequenceMatcher(None, candidate, blocked, autojunk=False).ratio() >= 0.92
-            ):
-                return True
+            if 40 <= min(len(candidate), len(blocked)) and max(len(candidate), len(blocked)) < 600:
+                matcher = SequenceMatcher(None, candidate, blocked, autojunk=False)
+                # Both quick ratios are upper bounds, so they cannot discard a real match.
+                if (
+                    matcher.real_quick_ratio() >= 0.92
+                    and matcher.quick_ratio() >= 0.92
+                    and matcher.ratio() >= 0.92
+                ):
+                    return True
         return False
 
 

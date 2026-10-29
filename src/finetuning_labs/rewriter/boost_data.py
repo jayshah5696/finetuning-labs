@@ -247,7 +247,10 @@ def verified_pair(row, meta, review, *, second_review=None):
 
 
 def boost_issues(plan, row, blocked):
+    from .english_critical import critical_issues
+
     issues = candidate_issues(plan, row)
+    issues.extend(critical_issues(plan, row))
     if blocked.matches(row["input"]) or blocked.matches(row["output"]):
         issues.append("protected_overlap")
     if any(
@@ -449,7 +452,7 @@ Scenario:
     return selected
 
 
-def validate_selection(entries):
+def validate_selection(entries, *, quotas=QUOTAS):
     ids, targets, counts = set(), set(), Counter()
     for entry in entries:
         row, meta, review = entry["row"], entry["meta"], entry["review"]
@@ -462,7 +465,7 @@ def validate_selection(entries):
         if not verified_pair(row, meta, review, second_review=meta.get("adjudication_review")):
             raise ValueError("Addition lacks exact passing verification")
     if counts != Counter(
-        {(m, length): n for m, cells in QUOTAS.items() for length, n in cells.items()}
+        {(m, length): n for m, cells in quotas.items() for length, n in cells.items()}
     ):
         raise ValueError("Addition quotas are incomplete")
 
@@ -587,6 +590,37 @@ def replace_dataset(prepared, current):
     shutil.rmtree(backup)
 
 
+def preserve_batch_evidence(batch, destination):
+    """Keep unfinished attempts for audit; only exact verified rows can enter selection."""
+    if not (batch / "generation/source-plan.json").exists():
+        return
+    complete = (batch / "generation/supporting.json").exists()
+    names = [
+        "summary.json",
+        "sol-reviews.json",
+        "adjudication/sol-reviews.json",
+        "generation/source-plan.json",
+        "generation/pipeline.yaml",
+        "generation/rubric.yaml",
+        "generation/candidates.jsonl",
+        "generation/scored-supporting.json",
+        "generation/rejected.json",
+    ]
+    if not complete:
+        names.append("generation/runs/author/stages/02_generate/raw_responses.jsonl")
+        write_json(
+            destination / "incomplete-excluded.json",
+            {"eligible_for_selection": False, "reason": "generation_export_incomplete"},
+        )
+    sources = [batch / name for name in names]
+    sources.extend(batch.glob("**/sol-calls/*.json"))
+    for source in sources:
+        if source.exists():
+            target = destination / source.relative_to(batch)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, target)
+
+
 def apply_boost(run):
     """Audit a complete append in staging before updating the existing local dataset."""
     from arka.pipeline.output import OutputWriter
@@ -595,23 +629,38 @@ def apply_boost(run):
     from .reviewed_publication import audit_publication
 
     run = run.resolve()
+    spec = json.loads((run / "spec.json").read_text())
+    namespace = spec.get("evidence_namespace", "boost")
+    if not re.fullmatch(r"[a-z0-9-]+", namespace):
+        raise ValueError("Invalid evidence namespace")
+    evidence_name = f"evidence/{namespace}"
+    review_name = f"reviews/sol-{namespace}.json"
     backup = CURRENT.with_name(CURRENT.name + "-before-boost")
     if not CURRENT.exists() and backup.exists():
         os.replace(backup, CURRENT)
-    if (CURRENT / "evidence/boost/spec.json").exists() and (
-        CURRENT / "evidence/boost/spec.json"
-    ).read_bytes() == (run / "spec.json").read_bytes():
+    existing = CURRENT / evidence_name / "spec.json"
+    if existing.exists() and existing.read_bytes() == (run / "spec.json").read_bytes():
         audit_publication(CURRENT)
         if backup.exists():
             shutil.rmtree(backup)
         print(json.dumps({"already_applied": True}))
         return
+    if existing.exists():
+        raise ValueError("Existing generation evidence must not be overwritten")
     entries = json.loads((run / "retained.json").read_text())
-    validate_selection(entries)
+    validate_selection(entries, quotas=spec.get("quotas", QUOTAS))
+    if namespace == "english-critical":
+        from .english_critical import verify_direction_balance
+
+        verify_direction_balance(entries, json.loads((run / "direction-balance.json").read_text()))
+    if (
+        "identity_target" in spec
+        and sum(e["meta"]["identity"] for e in entries) != spec["identity_target"]
+    ):
+        raise ValueError("Identity quota is incomplete")
     verify_overlap_report(
         [e["row"] for e in entries], json.loads((run / "final-overlap-check.json").read_text())
     )
-    spec = json.loads((run / "spec.json").read_text())
     verify_holdouts(
         {name: (CURRENT / name).read_bytes() for name in spec["base_files"]}, spec["base_files"]
     )
@@ -619,7 +668,7 @@ def apply_boost(run):
     if staging.exists():
         shutil.rmtree(staging)
     shutil.copytree(CURRENT, staging)
-    evidence = staging / "evidence/boost"
+    evidence = staging / evidence_name
     evidence.mkdir(parents=True, exist_ok=True)
     support = json.loads((staging / "supporting.json").read_text())
     blocked = protected_index()
@@ -639,7 +688,7 @@ def apply_boost(run):
             batch_cache[entry["batch"]] = scored
         native[meta["id"]] = batch_cache[entry["batch"]][meta["record_id"]]
         meta["native_exports"] = (
-            f"evidence/boost/batches/{batch.name}/generation/native-export-hashes.json"
+            f"{evidence_name}/batches/{batch.name}/generation/native-export-hashes.json"
         )
         exports = [
             digest(json.loads(line))
@@ -670,7 +719,7 @@ def apply_boost(run):
                     found.append(path)
             if len(found) != 1:
                 raise ValueError(f"Expected one exact saved verification call: {meta['id']}")
-            name = f"evidence/boost/sol-calls/{meta['id']}-{attempt + 1}.json"
+            name = f"{evidence_name}/sol-calls/{meta['id']}-{attempt + 1}.json"
             destination = staging / name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(found[0], destination)
@@ -678,8 +727,10 @@ def apply_boost(run):
         if boost_issues(meta, row, blocked):
             raise ValueError(f"Addition failed final checks: {meta['id']}")
         meta.update(
-            data_review=review | {"report": "reviews/sol-boost.json"},
-            native_evidence="evidence/boost/native-records.json",
+            data_review=review | {"report": review_name},
+            native_evidence=f"{evidence_name}/native-records.json",
+            overlap_evidence=f"{evidence_name}/final-overlap-check.json",
+            generation_plan=f"{evidence_name}/batches/{batch.name}/generation/source-plan.json",
             human_reviewed=False,
             review_status="sol_verified_machine",
         )
@@ -700,44 +751,41 @@ def apply_boost(run):
         "plans.json",
         "overlap-exclusions.json",
         "final-overlap-check.json",
+        "direction-balance.json",
+        "pre-balance-retained.json",
+        "before-quality-backfill-retained.json",
+        "quality-backfills.json",
         *[p.name for p in run.glob("extra-plans-*.json")],
     ]:
         if not (run / name).exists():
             continue
         shutil.copyfile(run / name, evidence / name)
     for batch in sorted(run.glob("batch-*")):
-        if not (batch / "generation/supporting.json").exists():
-            continue
-        for name in [
-            "summary.json",
-            "sol-reviews.json",
-            "adjudication/sol-reviews.json",
-            "generation/source-plan.json",
-            "generation/pipeline.yaml",
-            "generation/rubric.yaml",
-            "generation/candidates.jsonl",
-            "generation/scored-supporting.json",
-            "generation/rejected.json",
-        ]:
-            source = batch / name
-            if source.exists():
-                target = evidence / "batches" / batch.name / name
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(source, target)
-        for source in batch.glob("**/sol-calls/*.json"):
-            target = evidence / "batches" / batch.name / source.relative_to(batch)
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source, target)
+        preserve_batch_evidence(batch, evidence / "batches" / batch.name)
     write_json(evidence / "native-records.json", native)
     write_json(staging / "supporting.json", support)
     write_json(
-        staging / "reviews/sol-boost.json",
-        {"reviewer_model": SOL, "human_reviewed": False, "reviews": reviews},
+        staging / review_name,
+        {
+            "reviewer_model": SOL,
+            "human_reviewed": False,
+            "reviews": reviews,
+            "data_policy": namespace,
+            "source_spec": f"{evidence_name}/spec.json",
+        },
     )
     quality = json.loads((staging / "quality.json").read_text())
-    quality["historical_selection"] = {
-        name: quality.pop(name) for name in ["excluded_rows", "unused_passing_candidates"]
-    }
+    if "excluded_rows" in quality:
+        quality["historical_selection"] = {
+            name: quality.pop(name) for name in ["excluded_rows", "unused_passing_candidates"]
+        }
+    quality.setdefault("expansion_history", []).append(
+        {
+            "previous_source_splits": quality["splits"],
+            "previous_first_reviews": quality.get("expansion_first_reviews"),
+            "new_namespace": namespace,
+        }
+    )
     expansion_reviews = [
         review
         for batch in sorted(run.glob("batch-*"))
@@ -772,12 +820,12 @@ def apply_boost(run):
         new_review_model=SOL,
         new_native_strong=sum(strong_decisions(e["meta"]) for e in entries),
         new_native_uncertain_two_sol_passes=sum(not strong_decisions(e["meta"]) for e in entries),
-        new_quotas=QUOTAS,
+        new_quotas=spec.get("quotas", QUOTAS),
         holdouts_byte_identical=True,
     )
     write_json(staging / "quality.json", quality)
     (staging / "README.md").write_text(
-        "# Current rewriter training data\n\n1,500 train, 100 dev and 84 frozen validation pairs. The original 1,000 training rows remain unchanged; 500 independently generated Arka episodes target observed fidelity failure types. Dev and validation bytes are unchanged.\n\nNew pairs use Luna generation and six Luna Decisions checks. Complete uncertain native scores require two separate exact-row GPT-6.1 Sol passes. Strong native decisions require one. Confident native rejection cannot be overridden. Each verification checks the input, output and pair. These are model judgments; human calibration remains pending.\n\nHugging Face contains only public Parquet splits, a dataset card and licenses. Code, notebook and exact review evidence stay in Git. Use the single notebook at `../../../notebooks/rewriter_train_l4.ipynb`.\n"
+        f"# Current rewriter training sources\n\n{quality['splits']['train']:,} source training pairs, 100 dev and 84 frozen validation pairs. This append adds {len(entries)} independently generated Arka episodes. All earlier training rows remain unchanged; dev and validation source bytes are unchanged. The active public export selects English only.\n\nNew pairs use Luna generation and six Luna Decisions checks. Complete uncertain native scores require two separate exact-row GPT-6.1 Sol passes. Strong native decisions require one. Confident native rejection cannot be overridden. Each verification checks the input, output and pair. These are model judgments; human calibration remains pending.\n\nHugging Face contains only public Parquet splits, a dataset card and licenses. Code, notebook and exact review evidence stay in Git. Use the single notebook at `../../../notebooks/rewriter_train_l4.ipynb`.\n"
     )
     write_json(
         staging / "manifest.json",

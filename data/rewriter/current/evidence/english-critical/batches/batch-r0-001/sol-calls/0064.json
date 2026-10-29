@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-prompt-short-0001\", \"row_sha256\": \"6e79a4f5b4d42759fb6ca0d328cb4aea638e15b02d0508506076b81c4c8084a6\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"can you sort the family photo catalogue by year and flag the ones with missing dates, and do not modify records\", \"output\": \"Sort the family photo catalogue by year and flag the photos with missing dates; do not modify records.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-prompt-short-0001"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "6e79a4f5b4d42759fb6ca0d328cb4aea638e15b02d0508506076b81c4c8084a6"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "a0892e4949e20f72fc8a49e5f712a4405e55f8b7cfd986d8cbe8f4f1e8bff635",
+  "started_at": "2026-10-29T15:05:04.879681+00:00",
+  "result": {
+    "id": "gen-1793286304-2XwFTmMq3MBI7P5CeJuF",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-prompt-short-0001\",\"row_sha256\":\"6e79a4f5b4d42759fb6ca0d328cb4aea638e15b02d0508506076b81c4c8084a6\",\"critique\":\"The input is a natural, recoverable request. The output clearly organizes it as a prompt, preserving sorting by year, flagging photos with missing dates, and the prohibition on modifying records. It neither adds requirements nor performs the task.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42CkjKuAbnJkn6Y3IdRGWrAPoFbaD5v7ltri8Aw6U0vjjlpQUUwUmz5TqVZtKWeAkHGGOPltdcAhu_uSP6WJ11E1DgpmW-UXdUjk29KsHpvVHTLk9E7YADGUYQT0eLNp7imI4U2J1GPVW4uEu6tFbxtJIjed8aawVoOw7lyCYOggLp946aG9bVSn9o8XXVlpgziyoluLrnX7lLUtbgt_O3LFfh29AhE9XYBJ_HSIAF0LuZIFTn2_fyaqR01423EBNm7Giz916LGYttLbXZfRoSgf45enyJvJsJQ83moTD-B7ZbNSu76dSlTytoe1231-HgVg5NZiL3-ziaih-owFTGYaHqgzX9v67ii1cce2DZBDjZQTW3OGqNFRdPfuY0XK1hV8TZtJgKDtBGe5Y3LcaPVXzWuUpOc1-HI4PyaDJswgZm2rA62xLWLiNjSvu01Rp8nuQuenll0ggCPfUW1mHmZL4bQpTUdvOBlRY242RaROYBN_TcHBQchQKxAgEM0Gz1-JlganZoUWZC9etAIBpy2GkfinZ5GeEouBp1o56sKJCIt77xGP0MCfhg9vwy--O_FGo7CmOWjgdaex6GdwZ7w9cnEY44VnrSwmFM68VSspFGz9ohhbUtMTw0guvg1br4arfm-h1ZApGrmhg9YL6jLDk__jXe6Y-wnvtFhQTbHnPk7dqutSgcRbExWstdGDOvl12hkJSyJkz_k_PjDh76XcDQLpWIniwYRTn9CM9ZnNvKSu6Q-g9PkTtPNtowATurqmV75qtt-xsYc54UwRtDxGdrdAu3RiJ177iW23seh0QjOIQhl3wCjsC9B0gZkg82ysYDBgO2OcMuLb8SAu5DMSOuHY3V85Gh6tz-Ho_JVTi0uz5CklKejpGGdEHZ6fnKYCYS8C8nR-HO8l2SiEdAuVwFrkuvQghR0cRaqj7ZOq3ZAm2htjrID5ffdh732jvBHxvErFAU4Y5MIbbM2A8YrJu_Fu1BHcQ8t8x1nILx9mUDNoED-62XdMS4bBYTpEh77q2tQIAHNXen7tdMQVk4cGAs_-09ZZG7L03dB8IMBMK0SsWxAfDLIW5qF1PYwxY23R1EuflF8pIIocbnD7ZCTKlvDhL63NO1VW2qZcr8KJo66XsdC3ohVwTa84l4YY-HAptZ4QEEvccjqtaHSfo6hEkvtRFtbi3BzaJDbETfMks-xAyPDsHaMtP-u7wom0TYrxEEoP9bW_FvQr-VMDD24bDKFUl6UITSf_hmjN7gs_0TSuOe4oFDUa_jEhWSOpq4d113nhSBMx64U_1iBDXU09YK6P2-3Q5eVBQ18KbFiE7Jf7x35jl2W7WSqPdgH4XTIoyn9g6Kt2ymIXkjTVmsjg-DrHLNwqvUnzbmuri7kNXw0IlLFiVHAtUbpHDIvFbDR14_kHyJg62-TN4fekvGr9N46UPOPYLIIPeD6jxq6jbu5wQYJ5xCsflnAOjphYWCXl5ul0Ao6CkYYwwG9XOhfTXmf-k_DB_xzDrGtSwIGeNS0SpK4VIkiJtIeZGVza9c3pvzQvPx0GvVV9TFy07ks6ZOdyL73hZ2i4xwd_A3mLvOXqyZOfDO1MKBsRJdc9XgAhytCt238IhrEsb_Iipx5t8h1jlDQV7WAf1Lby0Hxg3bdjG4kWxGam02lA_5UmtbvsoOThI3HMVCcsQScCunDycrntsDmiV-WrFPF3JVUbriCCxUAkLWGhTy-IPXM9UHXa8XYxGEKzmvDM8cV3CrSOjPPmSFX230F_3IwGB--qVVIWtiB8vrNL93lOCMT8zFQfNpycf3x9POOPfSABDPF7At7Sh-SLxe6monTm0kTVuKgRjcY0Lg7Tj4iUpy7-znwaOdA6VToEBNmORvjNLgqAnqL1FipniEgvWYv2pE3d9EY11-HVJzZaKCT0SzBKn533hdJdRnJyyUbWMM4s_vCbifsYJmKsFaEpz3kjpws68gLo_55Gp_yOb57rpMXRtLhPR8kuUUJGzxWsQFHE96ZOXQ==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0d9a3653ab13e801016ae360a2290c87d0af8a1e8b9cda9272",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793286304,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 179,
+      "prompt_tokens": 659,
+      "total_tokens": 838,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 31,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003108,
+        "upstream_inference_prompt_cost": 0.001318,
+        "upstream_inference_completions_cost": 0.00179
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "80ec2bb81eca90ef64eab6eeec9498d8ae3e1195106b6bd684f99b6e111f4a2c",
+  "elapsed_ms": 4417
+}

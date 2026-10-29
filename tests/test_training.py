@@ -173,3 +173,37 @@ def test_export_is_simple_checked_and_refuses_overwrite(tmp_path):
             [item], reviews, LeakageIndex([item.case.output]), Tokenizer(), tmp_path / "bad"
         )
     assert not (tmp_path / "bad").exists()
+
+
+def test_overlap_screen_matches_original_rules_for_close_and_unrelated_text():
+    from difflib import SequenceMatcher
+
+    from finetuning_labs.rewriter.training import LeakageIndex, normalized
+
+    sources = [
+        "Please return the sealed parcel to Amaya before the workshop closes on Thursday.",
+        "Keep the original documents in the east drawer and send the scanned copies to Milo.",
+        "Do not rename the archive files until the review is complete.",
+        "The invoice is 63.40, not 36.40, and the recipient is Tess.",
+    ]
+    index = LeakageIndex(sources)
+    candidates = (
+        sources
+        + [s.replace("Thursday", "Friday").replace("Milo", "Mila") for s in sources]
+        + ["A different short message.", "A substantially longer unrelated report. " * 20]
+    )
+    for raw in candidates:
+        text = normalized(raw)
+        shingles = index._shingles(text)
+        expected = any(
+            text == other
+            or min(len(text), len(other)) >= 60
+            and (text in other or other in text)
+            or min(len(shingles), len(grams)) >= 5
+            and len(shingles & grams) / min(len(shingles), len(grams)) >= 0.60
+            or 40 <= min(len(text), len(other))
+            and max(len(text), len(other)) < 600
+            and SequenceMatcher(None, text, other, autojunk=False).ratio() >= 0.92
+            for other, grams in zip(index.texts, index.shingles, strict=True)
+        )
+        assert index.matches(raw) == expected

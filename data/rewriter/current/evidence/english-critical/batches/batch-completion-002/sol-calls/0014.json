@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-2-prompt-long-0088\", \"row_sha256\": \"b06b114dda9f6bc08a4658c92ed1e755c6a08098ba5665451f7efd3de135f722\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"please help me turn the request below into a clear prompt for working with one community survey export. we are preparing the spring 2025 Harborview Community Listening Survey summary from a file called harborview_listening_survey_spring_2025.csv. the file is a respondent-level export, and the job is to decide whether it can support a neighborhood-level summary under the checks i describe. don't write the summary now; i need a prompt that tells someone what to do with the export when they have it.\\n\\nThe export has these fields: respondent_id, neighborhood_code, completed_status, park_access, primary_concern, and comment. The neighborhood codes are NTH for Northbank, ELM for Elm Terrace, QRY for Quarry Hill, RIV for Riverside, and WST for West Market. Those are the only recognized codes, and please use the neighborhood names in any neighborhood-level output rather than the short codes. The primary_concern field uses Transit, Trees, Lighting, Sidewalks, and Other as its listed choices. park_access is expected to contain Yes, No, or Unsure. Some fields can be blank, and the export may have incomplete as well as completed responses.\\n\\nFor this request, treat a record as completed only when completed_status is exactly Y. Ignore all records with any other completion value for both the checks and the summary. The main task is conditional, not something to attempt in every case: create the neighborhood-level CSV only if every completed record has one of the five recognized neighborhood codes and each of the five named neighborhoods has at least 20 completed records. All five neighborhoods need to meet the minimum; it isn't enough that the neighborhoods present in the file meet it. A blank or unfamiliar neighborhood code on a completed record means the first check fails. Please check both parts before making the CSV.\\n\\nIf both checks pass, make one CSV with one row for each of the five neighborhoods, in this order: Northbank, Elm Terrace, Quarry Hill, Riverside, West Market. Use this exact column order: neighborhood, completed_responses, park_access_yes_count, park_access_yes_percent, transit_count, trees_count, lighting_count, sidewalks_count, other_count. completed_responses is the number of completed records for that neighborhood. park_access_yes_count is the count whose park_access value is exactly Yes. Calculate park_access_yes_percent using all completed records in that neighborhood as the denominator, not only records with a Yes, No, or Unsure value, and show it to one decimal place. So a blank or Unsure answer is not counted as Yes, but its completed record is still part of the denominator.\\n\\nFor the five concern count columns, count records whose primary_concern value exactly matches the column's listed choice. Don't recode or infer an answer from the comment field. A blank or unlisted value should not be added to any of those five counts, though the record remains included in completed_responses and in the park-access percentage denominator. Keep the CSV neighborhood-level: don't include respondent IDs, individual comments, or any row-level records. Please don't add a total row, extra columns, a prose introduction, or explanations around the CSV.\\n\\nIf either check fails, do not make or partially make the neighborhood CSV. Instead provide a short data-quality note as the one output. The note should identify every one of the five neighborhoods that has fewer than 20 completed records and give its completed-record count. It should also identify each unrecognized neighborhood code found on a completed record and give the number of completed records with that code. If a completed record's code is blank, report it as a blank code and give its count. Include whichever kinds of issue apply: a file could have a neighborhood below the minimum, an unrecognized or blank code, or both. The note is the useful alternative to the CSV, not an additional section alongside it.\\n\\nPlease output only one thing: the CSV if and only if both checks pass, or the data-quality note if either check fails. Don't include a separate status message, recommendations, a discussion of the survey, or the contents of the comment field. The comments are present in the export but are not part of this task, and respondent-level details should not appear in either output. As the project coordinator put it, “we need a dependable neighborhood snapshot, not a bundle of individual responses.”\\n\\nKeep the requested action limited to this export and these five neighborhoods. If there are fewer than 20 completed records for even one named neighborhood, use the note route even if the other four have large counts; likewise, one completed record with an unknown code prevents the CSV route even when the five mapped neighborhoods all meet the minimum. In the note, counts should make clear why the check did not pass, without turning the note into a substitute summary. Use the source filename above to identify the export in the prompt, but don't assume any data values that aren't supplied in the file.\", \"output\": \"## Task\\n\\nUse the respondent-level export `harborview_listening_survey_spring_2025.csv` for the spring 2025 Harborview Community Listening Survey. Produce exactly one output: either the neighborhood-level CSV described below, or a data-quality note. Do not produce the survey summary now or include a separate status message, recommendations, discussion, or prose around the CSV.\\n\\nThe export contains `respondent_id`, `neighborhood_code`, `completed_status`, `park_access`, `primary_concern`, and `comment`. Treat a record as completed only when `completed_status` is exactly `Y`; ignore all other records for both validation and summary calculations.\\n\\n## 1. Check whether the CSV is allowed\\n\\nCreate the CSV **only if both conditions are met**:\\n\\n- Every completed record has one of these recognized neighborhood codes: `NTH` (Northbank), `ELM` (Elm Terrace), `QRY` (Quarry Hill), `RIV` (Riverside), or `WST` (West Market).\\n- Each of the five named neighborhoods has at least 20 completed records. All five must meet the minimum, whether or not they would otherwise appear in the file.\\n\\nA blank or unfamiliar code on any completed record fails the first condition. Check both conditions before creating the CSV.\\n\\n## 2. If both conditions pass, create the CSV\\n\\nCreate one CSV row for each neighborhood, in this order: Northbank, Elm Terrace, Quarry Hill, Riverside, West Market. Use neighborhood names rather than codes and use this exact column order:\\n\\n`neighborhood, completed_responses, park_access_yes_count, park_access_yes_percent, transit_count, trees_count, lighting_count, sidewalks_count, other_count`\\n\\n- `completed_responses`: number of completed records for that neighborhood.\\n- `park_access_yes_count`: number with `park_access` exactly equal to `Yes`.\\n- `park_access_yes_percent`: Yes count divided by all completed records for that neighborhood, shown to one decimal place. Blank, `No`, and `Unsure` answers are not counted as Yes, but their completed records remain in the denominator.\\n- Each concern count column: number of records whose `primary_concern` exactly matches that column’s choice: `Transit`, `Trees`, `Lighting`, `Sidewalks`, or `Other`. Do not infer or recode values from `comment`. Blank or unlisted values do not count in any concern column, but those records remain in `completed_responses` and the park-access percentage denominator.\\n\\nKeep this output aggregated at neighborhood level. Do not include respondent IDs, comments, individual records, a total row, extra columns, an introduction, or explanations.\\n\\n## 3. If either condition fails, provide a data-quality note instead\\n\\nDo not create a CSV, even a partial one. Provide a short note that:\\n\\n- identifies each of the five neighborhoods with fewer than 20 completed records and gives its count; and\\n- identifies each unrecognized code on a completed record and gives its count. Report a blank code as a blank code, with its count.\\n\\nInclude whichever types of issue apply. A neighborhood can be below the minimum, a completed record can have an unrecognized or blank code, or both. The note is the alternative to the CSV, not an additional section alongside it. Keep it limited to the counts that explain why the check failed; do not include respondent-level details, comments, or a substitute survey summary.\\n\\nUse only values present in the supplied export. Do not assume any data values that are not in the file.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-2-prompt-long-0088"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "b06b114dda9f6bc08a4658c92ed1e755c6a08098ba5665451f7efd3de135f722"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "8fd216963ac61f5d3967956d7271fa520c749ac0d02f585e1aa2e53e9dca0692",
+  "started_at": "2026-10-29T16:14:14.081034+00:00",
+  "result": {
+    "id": "gen-1793290454-chhnu4K0K9SHE6Xbcfpk",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-2-prompt-long-0088\",\"row_sha256\":\"b06b114dda9f6bc08a4658c92ed1e755c6a08098ba5665451f7efd3de135f722\",\"critique\":\"The input is a coherent, natural request, and the output is clearly formatted as a prompt rather than performing the survey analysis. It preserves the validation gates, neighborhood mappings, count rules, and mutually exclusive outputs. However, it omits the supplied project-coordinator attribution and quotation: “we need a dependable neighborhood snapshot, not a bundle of individual responses.” Although the aggregation requirement remains, dropping this supplied quotation violates the /prompt requirement to preserve supplied material.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq43Dc8FDstASsrE2imNb3OGuhXIxXWUkSMOeAwsy3RWSQYNfJ0Zu0OZukz-iD-X3FMXdEGO8EjGjyPXQTOQIaRgG8kjMAktjeNFf1HpiJzqR3yPmf9gjLR7Kbp2v2tNLH9Gem1FOearA8Vvy0MDkqxEvwURVC1RTPspR-wpAKs2ZKriJbrghCJparj7aDZ_LDgWTMzC0kbVzNwdYKP8XU5ZT-VMFfCd8ofZ9zxU-aWk5Pt2LsnFN8PfUBJTGmUh3IY14MxxoWdwXNK4WK0lT0osmNMlbvqo6GVLPmw2wzTk620xwg0M3ec_nWgEo-Rhq1D82DOGA9odfPTp_S6NkSdzXvijcmAQjs1R4jsC5UW6vsCmiwOhqiIjfuuXeVVnPVtc_CIfVUtVip7fkx7UuZWdW0FBd-9mPFcPQLEXF5sXlas1dTa45ujiNXRAdDeqStQCf_Amo0emD5eaL475iy0NQFKzp_0BrjLl5kpjarK8XLyMfgp1vixiiZjkWq4SG7uBWh8RvfxUB3Yi2aUKpTd-pvE2NXLN4tmAXOC2b96_v26_lS8Ip_EFSoEYD1OgQm0F7dtZSTrM7HdIgowVa44mr7x91AmY5NLpYEGRGnyYa1_cUDpzTMdT0YCUjP2mcfEFyt_En8HXe3EegsFQoTPCLT7iIDB1Ea65iRoM38B31T_6yA7F9CsfkB8TgxktMDcvbfPSxTiQVUYWP6aPXXbb5gUXQPcW7fMVPDzzC3Es0xTav3m28JUf63sjdT0wZKcSnY3z0bBuY-orA1c6dlPnZWxhC0FFmb4CrePqFecuVlLnaU5rB2eBHXdjFNeCtBRDWOc762Cnqzoh6tdlOtTnR021WQ_IyCm9Tp1TXSS8dOUNAuwnezmiyG3TNGpOpXCPywLG0MRRRL9AKMpI4Sss8o2bNPjT9UtJTw0jQ2T3kU0AejqKAJCJ8ERywjGA41-8GDYr6Cvk-5fYhFBI9DoG40FHkvmg7le2xOQjO_PgmjkXn4RhluHpbCfE_Qg4LyFOxffhMLDRffcuyoVVM3aOklH1XyyaNoD6g6Qa0cQOk2X8Go_cUdup6hoOSEBT6FDqpd8XknTYtDa6cvlaqo1WIgGaojXLg8cxtsKL3zxEvxpLoDTnbu67uh9S58X02BFd80LmoHT1_QD4GwC85PGiIJyGfozkkSJ2K5gnI6k_fElD8zXsTYL94iXBAVzYoAyQipj6XCn81zRDnwWJXFmkdEeO6lRZ9yzMFBVp9eKZEkGZGUs5ECKkzgY1U3KITxc8JyuyYYhX09UfY448x_XfAygrJfYN9p9nIzzJ2Y1i7qAP6lFRad5gljwurHllcpaS6LyqGSw02Xz5JYo6Ga5fgmmWmyYZZAuU2fzv8ftOo3rFh48ofVWTaAIsIshioiTG9QAVFQ5ZRizo1zSCxbE-lOWhmHbDchNQtlcE7bqsEbpaypI29KfJtflwdgHZ6vNnYeAo00FeBPbf4vtDArwKPBbmqbCNlAgvoW0caAXR6RYx1oeLadHRKkGsnOnt5JldxMAByx2FnJiX0JVPAjSzxX1ZpGasweLT14oCkJn4qVuGPkvFl9abMmZmVAnFNYvCJXonCRuGOi8K7xC3tFMRVmxYiBoYR24JvKtvpHxqFJTPHWzaXFxwJW-XmbXgOfMKmXD4xtRHOuejGBrnn8uS4Hn2DhPax3dN8KjbIrfeMqUhQHHwYlGM7DFl4VJQXTqMkHKNHP1NcAnVaZbtYbApKVVYfD1tgnrIA91g5m0ryIXEsEUEWKK0P5L4_uPs7k53MU36GVreji6evbZRLjdXHmDfWfv9fmB-Xts3xsCAw6ZtEWhMByb3BxddYKt8XqLO7D1IJ232qivDlLqN30hPjZsuJwNqQqLELtMVm8oeCgFWzUZfyLnK11Ow9TzqLfF-yo8t1yzkUKe-KJDZFCfJdeumoj0Th-GfsZmz2QNSZCvfRN_ZxRerG_O5QdOpfGaXKjNwD_sp6_BIuoISC86yh0X5uKpVQ5M_81LuplRl-cIkMfaLAVGqGt7adYu_AnkbBkfK4HJN0ZQwVCa91PzLFRzCKETKn1Ka3S7Loc0Qh6rvpUAYoLicsNmrM3ht_u5i6Jq_CmBPbpzSTUxyjKowAzITLcLlkaJwgSkP7_8lefNJRLIX8_C1S12pivb3d3H1QBe2PjPVrR01pkdFKTkWoIR6uwanabMNcGDQjC2rIP1pU0YFbg5466xksQMhmCAoCr6Q3emhDzVHYTIuXAS4uR2WT8u8WqFtR25iKS1vR-PvULN_sdvcbp5T_Y63-LTjC_1D87_NEjnIx5-S6umOjEgHNxAZGaW4bTKWzRh72np7xadw5UXH_SU5sh3qT3MZM68C1rXkYwuzFjosafn2DFqgSer8ZPcfTPGSHQ0kSSXSomIOlDB95knkj8dsoRqP9YWlDvk8KHPtQFzC8FIdCVY4mkLHKK4ybkjpm_kUJA_qxyA__y7GEPqHX48lIW5A2l7z5ikDgHMpVp3jNhytNPdIwikMySM2Kwtl0RzRkhe9fnDLrrugTUNNJh-mz1S_e3fZMtqgK7L3MvoMsAeWFJLKaz1ELnPhlfFuZI6-9ZxmGM7D4ogK61cqxAfAjKXr02bvHqnFfOrmr2Ydw-AbqGdLJD5F4dJVAphBJb4V57WJJyp_ZYvcG2Vk5RB9QwSwLsmOH5l6UWL3UatL3Vy6f8YfxXBAOZ4aYg5hKkzCnYo_39Ie0r0lN0LOl-NSWnTziJ17xmNsHxrTtvAFOxsiFHZSIMNKRv8VDzqHNVGbW2g3gRvaSymWHPlDOTzwlMg24eTidQPuGT6qXoJbHVQZcEgvnJa6w2OJ11tBeYdtYlilerokLP4Pp8Ez57TdeBUMBMmn5GcLYBmdrCXX4lySn8eX1UYs--nAox1_wMGv6VynJcBpHMecnhMqjLdl63kHbONYNgXp8yv2ml7Ds07eafgIFqUprxCk3dbVuOKydFUul9tMJg1Qso0yHx4Z0OHwWYj7JXpvymywQIVhucznurW-mnPWwUzraMkIXyiw4ybcHoqPK7Yg8IJ8Sl_BeEtkhgNwZyqsT-w-qc2chd-W4cncMOZWq3gkZ2zjCazOwcAgIUTyP7el72BxxIyZ3lTfBoJLbxGL4JWmcZXhLITyocbG2gebVHSB9EK-VnOBlabJiz3BcXbGM1lCFv1krqVnngDO-xVFmnIt4ZbYijoVwes4NVNIwNtM1y5Ylyk1PE9RT26iM5tuzB68ZoffsrP0j_G43lLhmYXKvlwVSDifoQUNhhFcjn-lOYs7OmWuK0GsH3kxddp51oou_AW2or_yOcX-VpfeRohnTFUC_p0yHshH_RGeSX69kFjPp1IUm9XUBXbk5c8M-KePJlnGfpyWyZsIqPWjCeBqEDPCEcdVfDBycZjkjYPg549c7UevYG8MGG5VTKljB9IWKi7qCf51hGjyS0cVaqJlbzG7AS5VZv9b2YErkSw-ArtQs7MwWHRIlA5RuY7gx2d-yPEWeeGHaOLHgBenhkVWShmH7cpt9p82KCKCgBIv02122GjiyJ5-tYHAI_tkYmGz9qdos2XtaX_tyezkMy70XPZMy4BXrVJJSHmEOfyCSiTbtlT5SNBHmMOAPE4DRugFKp7O3NPF10aBUzo_XXjrmclmB8Q8fNvdjGZ1Neypt3-MXBlRQw7JvhEX0vIdqvupw0gZASZpY9golBLvlbo_R3VVDyId4xZ6eiyR5Hjd3UeNvHq0eqDibpmPRA8xvAL3W38Z3uoIa3VbuTSUTs5cOURTlGOWcGb1arJ4_9tVMbjvAnAHtY3srqETrXH2te-lgrbY2e6CT-1JVuVBmGRaSLs_cf0G7xtU4EojsHxXtXQZkdYmlv3t-rs2HU0KksHjla7BZwLOpcd8SeRV_WdaqNgxz1Ttm17-eIWEXcI_f6GzGv96Z93_txDWge6w6DhwtxEjPLZvahR24Bd5zaJkEQCrwofQKuj96aorqsXr-ogte7XMQcOcCuZe773kB3j_vo10B7ZpHWdrMXYN8uyq7LfFr2nJZjocKBYeqQig4qvlDaOZO4ATai8oKqnyxLUa2BQaZceWCkHINKUX_MGxycAwNFk55twpNcNPIHOUkAodEyei1I94fmf1dhciKwJAhua6rxfqZlvEaINWErXVMI0NKjSwiHDbAD7z_6uAoBVNydjQC2ZXrK7WVFhIJcMrdWz8Eja9djvMUSFGfy5Jur07ljMhKDCsj6mdzSsMtK3Vq84fCwbWE=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0a7baf3046020685016ae370d7751487d082f71748674314a7",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793290454,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 368,
+      "prompt_tokens": 2374,
+      "total_tokens": 2742,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 180,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2371,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0096135,
+        "upstream_inference_prompt_cost": 0.0059335,
+        "upstream_inference_completions_cost": 0.00368
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "94c89ebd998c3f3f76af4f5e33cf2fcc6d31a3d2db044a0dc36ed8bad620d02b",
+  "elapsed_ms": 9188
+}

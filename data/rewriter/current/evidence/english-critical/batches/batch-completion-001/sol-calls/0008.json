@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-1-prompt-long-0042\", \"row_sha256\": \"c87a18ce048743ea6fa65b22d77fed990810218f0954a22e8cbab7d4b2bd8264\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm putting together a very small Python helper for a personal reading queue, and I want to understand one function before I use it. The queue is meant to keep books and long articles in one place; I jot down a page count when I have one, but some entries in my working list don't have that field yet. I’m new enough to Python that I can read ordinary assignments and function calls, but the compact parts of this example are still hard for me. Please turn this into a clear request for an explanation, not an explanation itself.\\n\\nHere is the whole utility I’m asking about. Please base the explanation on this snippet only. I don't want an imagined surrounding application or assumptions about what other fields the rows contain. The part I keep staring at is the function passed to `sorted`, and I can't tell which part is choosing the sort value and which part controls the direction.\\n\\n```python\\ndef sort_pages(rows):\\n    return sorted(rows, key=lambda row: row.get('pages', 16), reverse=True)\\n```\\n\\nMy main question is how the pieces work together: what `sorted` receives, what the `key` argument does, what the lambda is taking as its input, and what `row.get('pages', 16)` means for a row that has a `pages` value or one that doesn't. I have seen dictionary lookup written with square brackets, so it would help to distinguish this use of `.get` without going off into a general dictionary tutorial. In particular, does `16` mean every missing page count is treated as 16 for this sort, or does the function add that field to the row? I suspect those are different things, but I’d like the explanation to make the distinction clear from the code.\\n\\nPlease also answer the direction part of the question. I read `reverse=True` as changing the ordering, but I don't know how to describe the resulting order in plain English, especially alongside the key value from the lambda. Could you connect that setting to the page-count value rather than discussing sorting in the abstract? I’m trying to picture where a row with a larger page count would end up relative to a row with a smaller one, while remembering that a missing value uses the stated fallback for this operation.\\n\\nA friend glanced at the function and said, “It looks like the list gets rearranged in place.” That sentence is why I want a careful explanation of the return expression, too. Please say whether this function sorts the supplied list itself or returns a sorted result, using only what can be inferred from this code. I don't need a claim about what a caller later does with the result. If the snippet does not establish some detail, please keep the explanation within what it does establish rather than filling in a story about the rest of my project.\\n\\nI’m a beginner, so define the Python terms briefly when they first matter. I know that `rows` is the function parameter, but I’m not confident about lambdas, keyword arguments, or the difference between the objects being ordered and the values used to order them. Explain those terms in relation to this exact function, without replacing the code with a different implementation or giving me a second version to compare. A plain-language walkthrough of the one return line is more useful to me than a broad overview of Python sorting.\\n\\nIt would help if the explanation were organized so I can check my understanding in stages. Maybe use a short numbered section for these two points: first, how a row supplies its sort value, including the missing-`pages` case; second, how `reverse=True` affects the order of those values. Before or after that, describe the function’s overall input and return behavior. Please don’t turn the numbered points into a checklist of unrelated Python features; they should follow the actual flow of this snippet.\\n\\nPlease keep the answer approachable and reasonably focused. I am not asking for test data, sample output, imports, performance comparisons, alternative sorting approaches, or a rewrite of the utility. No additional code is needed. If you mention a consequence, tie it to the shown function rather than claiming how the complete reading queue behaves. I want to come away understanding the single expression, not thinking the snippet guarantees more than it says.\\n\\nOne other detail: the number 16 is a deliberate fallback in the code I am learning from, not a typo I want silently corrected. Explain its role as written, and don't suggest a different default. I haven't decided what values my eventual entries will contain beyond the page-count field mentioned above, so avoid assumptions about their types or about how equal values are handled. Please keep any explanation of those cases limited to what this function itself makes clear.\\n\\nThe useful result for me would be a self-contained explanation prompt that preserves my beginner background, the exact question about the key and direction, and the concern about whether the input is changed. Keep the supplied function as the sole code example, and finish by emphasizing that the explanation should stay grounded in this snippet. I want the explanation request to be clear enough that someone can respond directly without first asking me what I meant.\", \"output\": \"Please explain this small Python function for a beginner who is learning to manage a personal reading queue of books and long articles. I can follow ordinary assignments and function calls, but lambdas, keyword arguments, and the difference between items being sorted and values used to sort them are still unfamiliar. Use only the snippet below; don’t assume what other fields the rows contain or invent a surrounding application.\\n\\n```python\\ndef sort_pages(rows):\\n    return sorted(rows, key=lambda row: row.get('pages', 16), reverse=True)\\n```\\n\\nMy main question is how the parts of the return expression work together. Briefly explain what `sorted` receives and returns, what the `key` argument does, and what the lambda takes as input. Explain how `row.get('pages', 16)` works when a row has a `pages` value and when it does not. I know dictionary lookup can also use square brackets, so distinguish this use of `.get` without giving a general dictionary tutorial. In particular, clarify whether `16` is used as the missing value for this sort or added to the row.\\n\\nPlease organize the explanation in two short numbered points:\\n1. How each row supplies its sort value, including the missing-`pages` case.\\n2. How `reverse=True` affects the order of those values, especially where a row with a larger page count appears relative to one with a smaller count.\\n\\nAlso describe the function’s overall input and return behavior. A friend said, “It looks like the list gets rearranged in place.” Explain whether the shown function sorts the supplied list itself or returns a sorted result, based only on this code. Don’t make claims about what a caller later does with the result.\\n\\nKeep the explanation approachable and focused on this one return line. Don’t replace the function, provide a second implementation, add code, or broaden the response into a general overview of Python sorting. I’m not requesting test data, sample output, imports, performance comparisons, or alternative approaches. The number 16 is deliberate; explain it as written rather than correcting it or proposing another default.\\n\\nI haven’t specified the types of the eventual entries or how equal values should be handled, so don’t make assumptions about those cases. If the snippet doesn’t establish a detail, leave it open rather than inventing project behavior. Keep any consequences tied to this function, and finish with an explanation grounded in the supplied snippet.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-1-prompt-long-0042"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "c87a18ce048743ea6fa65b22d77fed990810218f0954a22e8cbab7d4b2bd8264"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "1274d1f005831ba4e5faf3e56e8cb9a2102941c13d30547ce1f09acc5aa2ea82",
+  "started_at": "2026-10-29T15:57:53.138673+00:00",
+  "result": {
+    "id": "gen-1793289473-hntadFl8SgbgpzUcbBPm",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-1-prompt-long-0042\",\"row_sha256\":\"c87a18ce048743ea6fa65b22d77fed990810218f0954a22e8cbab7d4b2bd8264\",\"critique\":\"The input is a coherent, recoverable request, and the output is a natural explanation prompt rather than an answer. It preserves the exact code, fallback value, direction question, mutation concern, and most scope restrictions. However, it omits the explicit requirement to define Python terms briefly when they first matter, notably keyword arguments: merely describing them as unfamiliar does not preserve that instruction. It also turns the tentative formatting suggestion, “Maybe use a short numbered section,” into the mandatory “Please organize the explanation in two short numbered points.” These are concrete losses of an instructional constraint and a supplied hedge.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating output clarity**\n\nI need to assess if my output is missing key material. It's mostly good, but I should define terms briefly when they first come up, especially the unfamiliar ones. I notice I didn’t explicitly define keyword arguments, which could lead to confusion. Also, I need to clarify that I’m emphasizing the need for a grounded explanation at the end. I should avoid assumptions about the user's knowledge and keep the information as concrete as possible.**Reflecting on output completeness**\n\nI think I need to focus on defining key terms clearly since some users might not be familiar with them. While my output flows mostly well, I should ensure that there are no unrelated checklists and directly address any missing content for beginners. It’s important that I make my explanations both concise and detailed, so they don’t fail to convey the necessary information. I want to be sure everything is clear and easy to understand!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating output clarity**\n\nI need to assess if my output is missing key material. It's mostly good, but I should define terms briefly when they first come up, especially the unfamiliar ones. I notice I didn’t explicitly define keyword arguments, which could lead to confusion. Also, I need to clarify that I’m emphasizing the need for a grounded explanation at the end. I should avoid assumptions about the user's knowledge and keep the information as concrete as possible.**Reflecting on output completeness**\n\nI think I need to focus on defining key terms clearly since some users might not be familiar with them. While my output flows mostly well, I should ensure that there are no unrelated checklists and directly address any missing content for beginners. It’s important that I make my explanations both concise and detailed, so they don’t fail to convey the necessary information. I want to be sure everything is clear and easy to understand!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq420Kxx4Z8e5wAu4H_FIhEsy2bExv2JuA8oOi4urr_xFP_nyxvbOZ6tdyG7ep5XFzBMo__bxQajvbTFsdQVZ8eSX5ZxEYa5pMg6OeokzLh35TwETIiqaXY_t4a40hjlTqEXe9H6G1G3SBEeDBtcA1c4szcPTQKUy3JhGykJ4r72qjtIkmqi_3nWcB_oYvRAnmYGqUnQ-ZV6-ZtjPLrY-Iec7ot3Wejb3wXaGTrLuz1pB_8F_sigllGB4jpNSOkZjpgzE-kZZwzyNXjvyMMblBae2dCjI_GFbsxRxlw9H3wA73tjs6WY9my0X8FapB4_FtAhkYkv3ffBEskrrzKzE_kFFlZde3OzF2qXjrDkuZTMINNQj-kVAgzrnxzlTNdMv_9hR0AhcJXkg-6L7WnAgUrXnnPC5TLON3UCh2JDkvOl-lAj71w2p7NqZR3VfKHmQgXr1hNsIYRW9F2alI7TSCgeOuJHs0zUrAnnZnh_xMUtookJdQ6weCXLRF7S3ZO_yU15GWqKgwFdp-xmiI3l2bDTeapDDzrg-v_ZCRFBeuzq_5hspXnrYTL99cD0-nw-88Zc0o7aWj01xvow5UdmM2ymmGMkX-g_qUjm-WCjgJZRj5NG_4P1FNvHFOGxfd6BS9StVAAg16SlgxPx0ZlUNJKxLe_WbkpFZ6znymjAhAd5HnimqKVafsq5HJy0YqxE8n1nGTO2uRkHAt3vHeUvMum9BvD179WORynzMaj4JF6jVGCga_nhVTo7yNU1h_dYN7pFTnXcCl1Sbo0svw9-CYsKqz4R-dRShYUCTUokMCM7O640TJkm8tUmJunD0GGO5_Y8GPVEQCmFY48CVmw6MbJ8UDXSUFkpW22UGrBob_aD7vAUNHGeyM4H4mBBH1UdFWEbW8QalN9-Eafwp6KY0bQnYK1SFXSjUmdKJfXedGARHaqXClQ-vd-7AMRestXEHuA6ajVPiQ_LpHBc61s92ejpZHunMu-3NGbQl8Df-h2RWYlxqSTiHukLublh1gblBZWMqrokxKUCINCgUY74DT2QbsYJiONqfZ_17ou5lIiRNrSBideadawh0g1Q1Qhfsap-qc3hFJwFeHaCZpvp9C6tolvDH_FMGLHdcRylc7MXLDkwbrdU8csgbCeAkKvasb0_Oik_OKlhRkxeZTfXKYt3-w7FNvycVyxwWOkz09DNh0-xb5dNHqaI2pH15dcUX0ZyZCK6Un5tUg2075FX9R9JFSKu07KBUBdYTsmmqK_Ef1S4-3I4vp__0LfHjXixlmga5KVTu6j1dWlLM5pktXN19hPkg9BcZpc_tSzaZr8b8vW5ioKkUcKMTX1H2Z4Plo1A5gSJpOXfmKrfYv9gOHQRyTm3pNdNqWL86ufqURGZs9r6-LxVSogoCvjUI20hEp3lMInU3la0WhfZWDEvTdEOZ5_lmqmsF30gJTWbpOcvyjxGBjAg3XHI2lUBsDIzpe2YC0PL7tKErJ7DLdiDtR5w6xvoOy2AAlYSdgDnL7weuC6Ea6vxZHdyKuIGsstvPEwL-tY_mGoqDbrc0vSBpOiushIVADfzJWmcSXupxK76Jt1VVOd5V6t0dz9qukJZXVInRHTK80dtldgiym2WfO1D77QCB8kU1n0WDgelmnrygBfs4h97oR8qojeMkOEugyH5z_yjg37tp_98jBSQR8UL2ay8AR3VARUPcN_45IRPuuvz1LTwnPOwNaAwfk_LSR50CZnwEJZFVY7dSGQI4xyOhtySN4tdymWmQfOHG6Xpg1bo699Lsv-zsEMDfFMc2MmwqcCDbx_sNVJiD7z8Flz-OQJ4Cse0iV3oKtSnQHkPcYsfR14UEgrvnm38ivxt2CruqW_H6PrLFb51fOHv_oIUiPGCUS8gd2wKM7HzeAgz_B0HiYc_9Z4of20bTCJfJKnth_hKdnS3oWoHqwxoDxRxgULLLS9R6nff8bPf6hcLeiCOvig2PYSwn-BRPoZHh96O13eJvFeGqpjQw6kwn1xBxsQp6qmPMfvRtE49xMEkWAy0-fBdZCuQ1FJM4LK_1Z3iZfNtNs6m3uw1-aLv13-16D1YVd3uVgb5mjANAP8XD3Z8DNPRIGmX2fYLXjB22C_s9ELuryx8rNIMcHyHGCb470c8NxNEDvWkGtpH_XVN2nxPNyuMr1bESAz_18sRYm3F_rFnzK4ls1Y9fUr7jiUYAGWHdQhJzMP5BNswn2ylyAEjWe-D01bfUzR8s1HJHsk5MQSIEzx2KD8DbPxFpzvhqwMWkkU04Zs9iG36iVK1Z4sGIr2GGiCTe0rJLIJL43JDYNZRec83GHbGEQ4ZvoYEtVj0rA0rfPLAMP8Bhdn0YobGDi8p1G97y1IapuvcM98EC1H5PrJuBMv2ZrOogsrE8QO5AgO8Ztbv3izDEXMSbgbR1pWrQG_x70zUZ_-m9ombV6PoJcrjDA3xNckhjUZuKRmF3mkB-ld8CPTeUoicVf0Ry9r_xHcwDSM8iKfz2syPsAM-mCu7rfrOeLgDGrxogtKYS3E6vtbt0FIbZ_VJSFExwxjAIUG1hykLILZ41BGqKGyK4tTvYEfjKGoQNxSmGCyKzqL_QPUFcMIyy00QkiwgeEnmxxveUnFe94h29Gpl055aunVkiqOIOdBMKq0sFtQVVuY4LqczzKF03-ZWqLyryZMShI6mIzosn2RwUt5bMVT4ycg5-Ezm3kmPRKhCzY6_K9JTyVHXF2u3_2Kl0sNxe3GeZeu-5Tz0MU7zg7lKIWHguzWaTMHdaDR5HOaI_Z2AWX79Y4ClbkmOjaV2k3EMZGR8JOMLmMx1qvAI224X4u-nlKAP_6cxGgq5OhOwSooRuLMjHRCSsN_c-UifQbiCVGybawCv_bpBN_MEHiCnZdNbfjgtjo2Wz94wNqbWpNvExcDS8FKHpT81NC5AFq-N75u9OQ6AYGPOsO222Ia3zNXDeWsdTgVoofCzyUTn87xkYxZY-Tso3bRXZ4KZrSjSACthc6mFjHS7dbzeWsyQDaCqSozP4fGpdVk-oSwZK2Qgr997pHUJsHMoyu2LaUIdF2sk7ag7hyQJzMKH2sEjD-94M9kQudvrYysHZLVxXy-GBb9o_O6fmHorQwf8xLojWeLzph2KlwI6zXRETCOO_eENEgL250wl3EVSsusqwUvrq52jja0tDki1ntpJtJwYYe2Vvbz2LWeIbcpd62vEynGMm1FiU9Zvu8HF8dLcJj-TaZuNbuOw7eGBN_qB9xaAiiIIgwhn-tk9cRfqkiuDdQSba0zxPJCNmkFB3Q47JUbkU9-e9avT4JhjTuB62HsvS8mTjARnp1NyWKYY0w_hwvtim5w1N-gGYvKXVnIomci6OUyqxOXQoK1L68NNTaWmJGFDhLzuVB0V31WsTIvUdjfLtXdNRs68-gDM2ImktsCUvbckC9hdLM3xV2GDYutQGLHM4TdgQhM9BwOGJ6RX3kXXSLvC1UWQfOs_DRlm36e8G7uOjamd73wGCSGJWML2lByoLQ66tddSAIN3AbsvLq1VPDdUZZfVzL3kU3S9dE4ffQPB1DOBECTX0a_H6wO8kRnoyFEUjqGzlo6JxZMfeaGdG3mRrWsrHiL1K0aRsC2WzwdAjKWclmUNU0OjNXeCJp0dq5jV7bYfHujWwAxlDmuYiq2-DpgjGh81ncl0jTUmwz_Me6DC_psdSKV7TgHmyuk_kZBPTtiGZvlrWJOdUSQnZLztEP0YhJdthHYNt47mTvz-AWL6JvfTqjEK2-CJpYFbduUlaxUB4MchnMSsgGtBR-1FQZu3aPM4onEgGbYMfjesIzhRU8XYJYCtg3ebHsLO8S7tkbFmglD2O_oROqYd1VIJyB8LMDK0v-JtuzN2YYXgiXnM55QBkQs2u7oHTjwUjT04vYECZgaPzphnyQsaqzYgQO73i2X2UlGbREGVN13GmKlFJrrE5nGMal1ZxuvPlx4KtWAkKl3yDip5wvwaMMseqPjaky-X7u-1G_bbpmZhVH924MCylI4kfsIrl_rX1Ya5YqyiEApm09GisQp6oGCJ-DgxCKtE-4Qw8l4IFUEK-bZW1NieYSqB9Jdwef0Ej3_ikV2802XmUBXZlpeo1k2RBfHqzCI7F4jshf_uKvMqVtuSJHMn19R6K2DSC2yD145alqcDOvZkCML6p4RyGgRiL75r7af38V0fxtgZ7T_Ej33dC0LDZK_5GS4o7fGeF7xJvOrGYUhfuDoKLUuv-lxLYUr3HW9Izzdnbcw1FpLLP7snM3wQoG0tuId-ZUAR4aav7rIDCMxF_RNWNJLuA0XURyh2VDLZ_s5nMR3BEtgdWiQXrwKA4J5yDZi88TQ6-IHwUc1Ae4cVwMicf2Fw2HQFQ_2kaawColwCJQw57o8C-FXYrwcNP4g-YZd6M88zMGShkEGBA1cs9nAMt7P7G8tpfwchTu8uBrezhQ8virnIj29FrXWlEIIwW3eubf0OnUQHrKAOXGvdjp7Q7paZLlqi1DbzxSaSXeHg9glwuBwry07A-BrK5qmh_vgpQ0mUr4gkSlL8CTyEPrSbAQrxH40yjrSOVbK9v4CpxqnJRUp6FbduXKP1fLPNGZBjvpzmRuh5YZlN6KOCI6Wx6pWllPoFwx2bqWPeUYNde9EhI2EuGkyFL2h3P-RuZJAAEJiNhuHhq7rqKMLKg74tjTk2K15FZXxLkdZ0lulnuRHq0FPvFK-Jtw7R10sMvYVdU=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0c40c98ac5ebe309016ae36d02d33087d0ab480c95e00027f7",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793289473,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 421,
+      "prompt_tokens": 2162,
+      "total_tokens": 2583,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 205,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2159,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0096135,
+        "upstream_inference_prompt_cost": 0.0054035,
+        "upstream_inference_completions_cost": 0.00421
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "762d3ecf28b13d5ca721974826b1de22e7788e6e50324638d572c7fb9c0cd6e9",
+  "elapsed_ms": 10587
+}

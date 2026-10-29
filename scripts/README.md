@@ -11,6 +11,11 @@ data and source notices. Model repositories receive the trained adapter and toke
 - `check_public_hub.py` verifies public file hashes, all downloaded rows and every Viewer split
   without authentication. It compares them with the unchanged Git source rows.
 - `data_distribution.py` measures wording repetition and coverage. It does not assign meaning quality.
+- `check_english_release.py` checks the exact 500 additions, anchors, code and exclusion mapping.
+  With `--tokenizers`, it encodes every English row with both pinned model tokenizers.
+- `backfill_english_quality.py` records the three exclusions found by the final targeted review.
+  It uses saved Arka artifacts and a pristine Git baseline, audits a rebuilt release and swaps it
+  into place. It makes no new model calls and is not part of Colab training.
 
 Publish the public data with the dataset-only module:
 
@@ -27,7 +32,17 @@ Rebuild the notebook using the current public-data revision:
 
 ```sh
 uv run --locked python scripts/build_lora_notebook.py \
-  --dataset-revision bbcdb7692445a4310296060606b8a6dcce439f47
+  --dataset-revision 00d59dda95867fe5bcb147b1b1c5a34b5ad7f071 --model-size 350m
+```
+
+This rebuilds the same notebook. Both model presets select their base revision and adapter
+destination together. Use `230m` for the data-only comparison on the previous base.
+
+Verify the local English data without generating examples:
+
+```sh
+uv run --locked --group data --group hosted python scripts/check_english_release.py --tokenizers
+make reviewed-audit
 ```
 
 See [the run guide](../COLAB_TRAINING.md) for the two Colab Secrets and upload configuration.

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-prompt-long-0088\", \"row_sha256\": \"1afd30ad7c9384b1d1707340220ce9e80688656ab40135ed824860c3ebcd90b1\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i need a usable prompt for this dye log job, not the finished entry. the paperwork is for batch 24-071 at the north room dye line, on the evening shift of 14 may. the cloth is 48 metres of cotton twill, lot CT-882, in a muted indigo shade called Harbor Blue. the recipe card calls for 6.4 kilograms of navy reactive dye, 1.1 kilograms of black reactive dye, 18 kilograms of salt, and 2.4 kilograms of soda ash. use those names and quantities as written. the log page has a space for the batch number, fabric, shade, operator, start and finish times, bath temperature readings, additions, and remarks. the prompt should deal with the log entry for this batch, not rewrite the recipe card or prepare instructions for a new dye run.\\n\\nthe operator listed is Mara Ellis. the line began at 18:10 and the cloth entered the bath at 18:22. the dye additions are recorded as navy at 18:14, black at 18:16, and salt at 18:18; the soda ash went in at 18:31. the card says the hold began at 18:36 and ended at 18:48. the three temperatures written beside the hold are 63.1 C at 18:36, 62.8 C at 18:42, and 63.4 C at 18:48. don't convert the temperature unit or round the values. there is no separate instrument calibration note on this page. the line's posted operating range for this shade is 62 to 64 C during the hold, and the specific check i care about is whether every recorded hold reading falls in that range.\\n\\nthe rest of the page has details that should stay available in the prompt because they help identify the right entry. the rinse started at 19:02 and ended at 19:11. the operator wrote the final shade check as “slightly cooler than the lab swatch under the north lights.” there is no numeric color reading and no signed-off comparison with a second swatch. don't turn that wording into a claim that the batch passed or failed, and don't supply a missing color measurement. the drying rack number is R-3, and the cloth was moved there at 19:26. a separate dispatch ticket is mentioned in the remarks, but its number is not on the dye log page.\\n\\nthere are two notes in the margin. one says “pump sounded rough for a few seconds before the salt went in.” the other says “no visible streaks at unload.” keep the quote wording if either note is included; the first is only what the operator reported and doesn't say the pump stopped or that the batch was damaged. the page does not say whether maintenance inspected the pump. the shift handover box says the next operator took over at 20:00, but it does not record any further work on this cloth. please don't fill that gap with an assumed event.\\n\\nwhat i need the model to do is conditional. only if every temperature reading recorded during the stated 18:36–18:48 hold is within the posted 62–64 C range, draft one clean replacement entry for the textile dye log for batch 24-071, using the information above. if that condition is not met, do not draft a replacement dye-log entry; instead write one short maintenance note for the supervisor about checking the dye-line pump, using only the recorded information. the maintenance note is the alternative, not an extra item to include alongside the entry. the prompt should make that choice clear, and it shouldn't imply that a check or inspection already happened.\\n\\nplease preserve the distinction between the times when ingredients were added and the later hold period. don't treat the 18:14, 18:16, or 18:18 entries as hold temperatures, and don't infer temperatures for times that have no reading. keep the exact batch and fabric identifiers, operator name, shade name, amounts, times, temperatures, rack number, and quoted remarks available. where the page has no fact, leave it out rather than completing it from what usually happens in a dye room. the line start and cloth-entry times are different, and the rinse times are also separate from the hold, so the prompt should not collapse those into a single processing interval.\\n\\n1. for a replacement entry, ask for a concise, readable log entry that fits the listed fields and retains the order of events. it may clean up the presentation, but it should not change what the source page says. the shade observation should remain a qualitative observation, not a pass/fail statement. include the pump note only as a reported remark, if it is used; do not turn it into a diagnosis. the “no visible streaks at unload” note is also an observation, not proof of a laboratory result. don't invent a log author, approval, missing ticket number, calibration result, inspection, or additional reading.\\n\\n2. for the other branch, ask for just a brief maintenance note to the supervisor about checking the dye-line pump. Keep the note tied to the rough-sounding-pump remark and don't claim there was a failure, stoppage, repair, inspection, or damage. It is not a request to investigate color, change the recipe, or decide whether the fabric can ship. if the condition does not hold, the note should be the only output; it should not include a replacement entry as well.\\n\\nmake this into a clear prompt with the source record and the conditional task easy to find. The final model output must be only the one item selected by the temperature condition, with no explanation, heading about which branch was chosen, or extra commentary. do not answer the dye-log task in the prompt itself. retain the exact quote “slightly cooler than the lab swatch under the north lights,” and the pump wording “pump sounded rough for a few seconds before the salt went in” wherever relevant. The last part of the prompt should keep the output-only rule visible, not add a recommendation about the batch.\", \"output\": \"## Task\\n\\nUsing the source record below, produce exactly one output, selected by this condition:\\n\\n- **If every recorded temperature during the 18:36–18:48 hold is within the posted range of 62 to 64 C:** draft one concise replacement entry for the textile dye log for batch 24-071.\\n- **If any recorded hold temperature is outside that range:** do not draft a replacement entry. Write one short maintenance note to the supervisor about checking the dye-line pump, based only on the recorded information.\\n\\nThe maintenance note is an alternative to the replacement entry, not an additional item. Do not imply that a pump check or inspection has already taken place.\\n\\n## Source record\\n\\nThe paperwork is for batch 24-071, processed on the evening shift of 14 May on the north room dye line. The fabric is 48 metres of cotton twill, lot CT-882, in the muted indigo shade Harbor Blue. The recipe card lists 6.4 kilograms of navy reactive dye, 1.1 kilograms of black reactive dye, 18 kilograms of salt, and 2.4 kilograms of soda ash. Use those names and quantities as written. This task concerns the log entry, not the recipe card or instructions for another dye run.\\n\\nThe listed operator is Mara Ellis. The line began at 18:10, and the cloth entered the bath at 18:22. The log records navy added at 18:14, black at 18:16, salt at 18:18, and soda ash at 18:31. The hold began at 18:36 and ended at 18:48. Its recorded temperatures are 63.1 C at 18:36, 62.8 C at 18:42, and 63.4 C at 18:48. The posted operating range for this shade during the hold is 62 to 64 C. A separate instrument calibration note is not present on this page.\\n\\nThe rinse began at 19:02 and ended at 19:11. The operator recorded the final shade check as “slightly cooler than the lab swatch under the north lights.” No numeric color reading or signed-off comparison with a second swatch is recorded. The drying rack is R-3, and the cloth was moved there at 19:26. A dispatch ticket is mentioned in the remarks, but its number is not on the dye log page.\\n\\nThe margin notes read “pump sounded rough for a few seconds before the salt went in” and “no visible streaks at unload.” The first is an operator report; it does not say the pump stopped or that the batch was damaged. The page does not say whether maintenance inspected the pump. The shift handover box says the next operator took over at 20:00, but records no further work on the cloth.\\n\\n## Instructions for the selected output\\n\\nFor a replacement log entry, retain the listed identifiers and recorded details, and present the events in their recorded order. Keep the ingredient additions distinct from the hold period: 18:14, 18:16, and 18:18 are addition times, not temperature readings. Do not infer readings for times without one, convert the temperature unit, or round the values. Keep the line-start, cloth-entry, hold, and rinse times distinct. The shade wording must remain a qualitative observation, not a pass/fail claim. The pump remark may be included only as a reported observation, not a diagnosis. “No visible streaks at unload” is an observation, not proof of a laboratory result.\\n\\nDo not invent a log author, approval, ticket number, calibration result, inspection, additional reading, or any other missing fact. Leave out information the page does not provide rather than supplying what might normally happen in a dye room. Do not conclude that the batch passed or failed, or recommend whether it can ship.\\n\\nFor the alternative maintenance note, keep it brief and tied to the recorded pump remark. Do not claim a failure, stoppage, repair, inspection, or damage. The note is not a request to investigate color, change the recipe, or decide whether the fabric can ship.\\n\\nReturn only the single item selected by the temperature condition. Do not include an explanation, a heading identifying the selected branch, or extra commentary.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-prompt-long-0088"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "1afd30ad7c9384b1d1707340220ce9e80688656ab40135ed824860c3ebcd90b1"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "36d6e0bfea058635c1d34ee0d141c01edd0e1dc04b74b041794721adda8b75dd",
+  "started_at": "2026-10-29T15:43:19.772620+00:00",
+  "result": {
+    "id": "gen-1793288600-AhOAmlmC1m2pFrUNdXqr",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-prompt-long-0088\",\"row_sha256\":\"1afd30ad7c9384b1d1707340220ce9e80688656ab40135ed824860c3ebcd90b1\",\"critique\":\"The input is a plausible, detailed prompt-writing request, and the output is readable and appropriately organized without performing the dye-log task. However, the rewrite omits the supplied log-page field list—batch number, fabric, shade, operator, start and finish times, bath temperature readings, additions, and remarks—and the requirement that the replacement entry fit those fields. Its reference to retaining 'listed identifiers and recorded details' does not preserve that formatting constraint. It also retains the source quotations but drops the explicit instruction to preserve their exact wording when used. These are concrete omissions under /prompt, despite otherwise preserving the source facts and conditional output rule.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42me9IMOSiecOUPvDvEaV3RbpLeDAtAP6dzJJzr5_PSbvkOhz9vpwK2ACuH7sDLNeqaiC-stj7AKq2kXFjR7PyXuHFFK-7c6-XAuurhKyVi6GMT5cdlN1HzscqfHGwfiDXhNUqaGXlQeX8UPp0JSk23rvfrzv2xRRXCRWBO6UAe25tmcgkDn7-Sz1NFJ2pzD5m5uyUZe69Xq1wRffV6u92cPYX039rkoz_Dk0yIzyL2s6S1AKDdNcvbzxVc2GlV0aE-E0WNW-jw77NI2a1tAodfvKbKv2cDhfboS4mw-JxNiN5qgSuA546okubxxywGnYOXX2J1WoqM_Ud_TUWR9_9jy_uVPJhZ8Sb9y3kq9M6DqdK4OlruQ0l4OKBbvfhTn7mt6_a2NodnWv_1_zKUMzfIxHIYD-tGf8apFDrMiIUH8iWns2voOLJ2Z_4ld7cZANcCQcKyPBj2TvRFWuZ63mduEk7thTnHuGiuwo_pqE6YtTfjz6ukgshK5KN0QlJrz9cdNDejsKSwxvrIJtjLm6ODHSzG0BYINfF4F8rNJst8v1B7l7dz8Jdg6b9jk43AyleY3EHg_Q48k9B1vJ9DQeJmKFdTZWjriVOkEKvaM4Aca7Di-vI0am3joUfMEzkEYXlyD2YMut2kzXHsNNPjeP8j8k7IunE84OcNVy9Nyq_dHAp-pruZiSm7bmoBxiPvD0kBYVmTTDMSHnRj_ptEYv1ErkDXiqd20kZKSLZdFRwbiri2_FMlWcEY8t3ruc9-fE9jTHLFqZCmDf6s8VBZQHsj4QceaOp7FifY0c7n9-okaEHaGWPV6gXn-Is_EY0aePH3FG4-DqEKE3VgwoMEAz32c8uFpm9_RtN2dzxu0bAWlRBQ_X0rk7xY-aPpbeOLG7nsGhDNt9LaHfo4KJib7f5b0ZrFts9hfIWQ2oDFP8OHGmiLWgqNkxpTPwMVREhIJ0NbPjF3aV0hjTzCwMNevNSD8a9Ofi8An50X8BoNn81QI3aUeFyz7V5w-meIjqL7ptqARK3-WVUG8v9i40cxw71XQJriXqIy5guLRD3Duwe34vJbl0ogmZiOCL3gK9u4MU1D5dUwB8W_NuGPVDJmlo40TNdiBJfrqDFxRVdyhdKogPZO5tuugaj-kg_7o2zgvD18eBCWT5drKrMgZVRkprHqbWUoJh-3XACb-lpvzCizX8DJ0m2TzzG_UgIlUd1UTYmmvNcDBayn9VSEVUl878ghn6KUz4eathmuhP_ULNyiQaNIFRuCuEl4FVqBdAHDTFq1YMQuaWJPj2IBKU1jSLvJobvGXXuY3BSfkUqJjMh_S50fQhV4vx14pT-WQA10BboHrc78sKIn19Dv6na8dH9lrUAPo8sDrvEz8viYJBejr6-eDpITtc6jnKs-h-nU2Uu5e_yNkb6HDdmBOfjEqWUCrDGKJKqOvwbJj-vmicdXzMjNdrknX6r3si-hoPJrRi8vNQTR2LrJ1udljeAyC2hrbfX33ZRroRNSqEIOKVx00V4C2YBV32es3wcvIXryMPJ674qVvAMJgr_InOk3_2VlKABY5Wboh7tHkCid1n-Ql93OxvvFyw3SZkz2Zug1JrLivh6tadJPvY31sfgrzjYNCGNSg-zsw-jZWJShYNEKs6PWldXVziNOmhr6FOwsAenPYMSKxxtGwkexR5qW3XSSBzzdX-tsIYreYgrcDGDTPzxkELfIMAViQMEMx0f2ZhgDcsoslevONZMpRVWkveKS3RtXneIDOKcRDKoXFCLHLiPRFk3CZzisgJxNXZuq4NGnE7fTF4pCFocZpyP_8xXcBDe5nr1aWYM-QLysb94u2gfMNW_mcAs_xDTPqJT_Y3papnpLSYuM3UQtwVy4t5j8R5J8NQpTvNQzWXetANQ_OOCg9p2J8tAi8lP3b6BRn7oXhiLLlCVCE0YuaoLDpFecnqHYmMiuUN8aI-TuAliJZujvVtahP_wnnk0RcFy4FXtCaGQwI-rHVUVwdiyQ42r059IRcPoCW8cDTaNIXgNrRHzv46mEx5W4E_WaUlLrfpfHhypbWG4ItTpJTknnYM_J45N8O5SRvj4A1esXIoDh9ZMvqtZweJI3IuC65jHhVPT14VH9TJVjzawuKrdesQKjOUegjEwIEuD5q_6tpAXakCWM1nAXuVijX94Lpa5l2l58FV_oDJ-tZtMruEI0DpKLkHi05TCMqmqpAYmcRCWV-xlXUnZSqPhumI5SUpSYEdfTEHwMG32xtkbOhLI0w9ycSkWqzpx4_V0GFmWkaSu4XcbQOpAYY_1sgqJKVX0j7X_cmX1hx0rBAkC___kzK-edisNvOvTYWz-pgLhTTKeZFqI9TOtMFWCGt8srbg_p9l5pWXZysMV3wFX94qWMxHLpjw8UjAZH7MOh-UNZKxOzCn9V-7XQrOc7-s2T7TnaxNi8-fuh8SWkJUivjpc2qqZ1xPhlxwnjtHBZ-kJrZI-R5TKrbDLkURtmEpqiYJhPY9ed0cuEDZ99L0XE5k9gdZWYwQSFOtySp5-JaHLitQ2ysYQmIfRLxvvoVq5rXKgWHKp6TnK1HZTOD_I98OczhN6IS_7_biEpi6OBMWEBc3ej-tha0S8ppOawg-pTq6Ob-Cb-YnJyZLn-GrwQX-gySPfFoWqegWIcLUh8dHVIXAQS107kHKM7VUDk2BHD4YB5f3sY4FdCSQ_zfRJ-__uJGJ_avM24kQteaI1t603YyEo1LJLdonQ029bmF6xO4ATUsEwixfGLuK7M6dnzZ7hVsfxDNCmKMZgLGLe61Fz38gtpS1J3Ac2EC0PXnLMJ04Wyg7l79Xef3Bj9A4tWqjX0L9QcbTrcgT2JMDQs16D4LgK6405kgIbpHkO1pWWvbkU6pFfpobAkpevd_vIFKb4rrzx-NXlp0ersAfF7fXOofT2tIOEWZRErhi-KIW9GF98bnDbsa2M9rX0mFU0AS9zQ6g4Ieljf1V_-loPAVVnp6Fi7oWtAohyQ2SJhBaywxGWyLCOfs9PIS1kx0R5FNRDJxxAk8kC-Wa8Jr_YKcw_GNsrqHqw2ay7LZOeXvQt7U1NJfx73PIgUV4I9SRJSbKhorbpNaKmkqjtmjnERqNOtbWizVG5nDIGU5wQrkjuyUbMFQ_goQcyVWgBPJkpVND3TzMaCaq3HgbhRZpd7_BaYcCa5cvW00bGSbbt1pzFS2jhH1pX70SyK-NVKfgU44kIpPjbbLjVJgRg-o0PSN-AJbMdbw5Z3rYekFq1qPNhKY_9DR2byEF77A7PwUzvYns-ZDkDyZbZ6J9_1bfki5C6eHoD_s0h6Z5HgdwEkei_zw82Kv64v8JGy_8qgBFSj5EiXGDtPxBVae88EAgZlFRZwjWybgshbMy-K-8DN-xeyxYoROgAp3WJFLrv1zz0nmgcW47haWBZ6yr6H0chjMXVDyoU4hPRM=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_04b17a0d3e3fe56f016ae369995e1887d0b50741b52f2acd04",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793288600,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 347,
+      "prompt_tokens": 2760,
+      "total_tokens": 3107,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 124,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2757,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0103685,
+        "upstream_inference_prompt_cost": 0.0068985,
+        "upstream_inference_completions_cost": 0.00347
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "34a6ec173dff47759e4a5e67bf8ad2d8645839ef46818781eb7b7c46460fdd00",
+  "elapsed_ms": 8817
+}

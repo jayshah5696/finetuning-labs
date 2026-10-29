@@ -23,30 +23,18 @@ def cell(kind, identity, source, *, hidden=False):
     return value
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset-revision", required=True)
-    args = parser.parse_args()
-    receipt = json.loads((ROOT / "data/rewriter/releases/public-parquet.json").read_text())
-    published = next(
-        r
-        for r in receipt["repositories"]
-        if r["repo_id"] == "jayshah5696/finetuning-labs-rewriter-training"
-    )
-    if published["revision"] != args.dataset_revision:
-        raise ValueError("Build the notebook from the current published dataset receipt")
+def configuration_source(dataset_revision, counts, model_size="350m"):
+    options = json.loads((ROOT / "configs/training-models.json").read_text())
+    if model_size not in options:
+        raise ValueError("Choose 230m or 350m")
     config = {
-        "model_id": "LiquidAI/LFM2.5-230M",
-        "model_revision": "40cb2ad3b3044d5a41eee083a6103c8b523afa45",
         "dataset_id": "jayshah5696/finetuning-labs-rewriter-training",
-        "dataset_revision": args.dataset_revision,
+        "dataset_revision": dataset_revision,
         "dataset_config": "sft",
-        "expected_split_counts": published["splits"],
-        "hub_model_id": "jayshah5696/lfm2.5-230m-rewriter-lora",
+        "expected_split_counts": counts,
+        "language": "en",
         "hub_private": False,
         "wandb_project": "finetuning-labs",
-        "run_name": "lfm2.5-230m-rewriter-lora",
-        "output_dir": "/content/rewriter-lora",
         "epochs": 3,
         "learning_rate": 0.0002,
         "batch_size": 1,
@@ -57,10 +45,34 @@ def main():
         "max_length": 4096,
         "seed": 42,
     }
-    config_source = (
-        "# Change model, LoRA and upload settings here.\nCONFIG = {\n"
+    source = (
+        "# Choose 350m for the larger trial, or 230m for the data-only comparison.\n"
+        + f"MODEL_SIZE = {model_size!r}\nMODEL_OPTIONS = {options!r}\n"
+        + "CONFIG = {\n    **MODEL_OPTIONS[MODEL_SIZE],\n"
         + "".join(f"    {key!r}: {value!r},\n" for key, value in config.items())
+        + "    'run_name': f'lfm2.5-{MODEL_SIZE}-rewriter-english',\n"
+        + "    'output_dir': f'/content/rewriter-lora-{MODEL_SIZE}',\n"
         + "}\n"
+    )
+    ast.parse(source)
+    return source
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--dataset-revision", required=True)
+    parser.add_argument("--model-size", choices=["230m", "350m"], default="350m")
+    args = parser.parse_args()
+    receipt = json.loads((ROOT / "data/rewriter/releases/public-parquet.json").read_text())
+    published = next(
+        r
+        for r in receipt["repositories"]
+        if r["repo_id"] == "jayshah5696/finetuning-labs-rewriter-training"
+    )
+    if published["revision"] != args.dataset_revision:
+        raise ValueError("Build the notebook from the current published dataset receipt")
+    config_source = configuration_source(
+        args.dataset_revision, published["splits"], args.model_size
     )
     ast.parse(config_source)
     cells = [
@@ -80,6 +92,8 @@ Choose an L4 GPU in Colab. Add these two Colab Secrets and enable notebook acces
 Run the cells in order. This notebook downloads the public train/dev/validation data, trains a
 LoRA adapter on the configured model, logs loss to W&B and uploads the final adapter to the Hub.
 Change `hub_model_id` if you use a different Hugging Face account. Code stays in Git.
+The active data is English-only. Set `MODEL_SIZE` to `350m` or `230m` in the config cell;
+the base revision and adapter destination change together. Both choices use this same notebook.
 """,
         ),
         cell(
@@ -136,6 +150,7 @@ raw = load_dataset(CONFIG["dataset_id"], CONFIG["dataset_config"],
                    revision=CONFIG["dataset_revision"], token=False)
 print({split: len(rows) for split, rows in raw.items()})
 assert {split: len(rows) for split, rows in raw.items()} == CONFIG["expected_split_counts"]
+assert all(row["user"].splitlines()[1] == "LANGUAGE: en" for rows in raw.values() for row in rows), "Expected the English-only export"
 tokenizer = AutoTokenizer.from_pretrained(CONFIG["model_id"], revision=CONFIG["model_revision"],
                                          token=False)
 if tokenizer.pad_token_id is None:
@@ -181,6 +196,7 @@ model.save_pretrained(final_dir, safe_serialization=True, save_embedding_layers=
 tokenizer.save_pretrained(final_dir)
 card = f'''---
 library_name: peft
+language: en
 base_model: {CONFIG["model_id"]}
 datasets:
 - {CONFIG["dataset_id"]}
@@ -191,6 +207,7 @@ pipeline_tag: text-generation
 
 LoRA adapter for `{CONFIG["model_id"]}` at revision `{CONFIG["model_revision"]}`.
 Training data: `{CONFIG["dataset_id"]}` / `sft` at `{CONFIG["dataset_revision"]}`.
+Language: English only.
 Train rows: {len(encoded["train"])}. Dev rows: {len(encoded["dev"])}.
 Rank: {CONFIG["lora_r"]}. Alpha: {CONFIG["lora_alpha"]}.
 The checkpoint was selected by dev loss. Final validation loss: {metrics["validation_loss"]:.6f}.

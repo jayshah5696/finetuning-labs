@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-1-prompt-long-0007\", \"row_sha256\": \"4541f3d580d9d4948daf115b23c66dc671e7a4f6511153f5e93fb1fb7ab66b45\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\n i'm a beginner trying to understand a tiny python function, and i want a prompt for an explanation of this code, not an explanation written now. i can read basic function syntax but get mixed up when sorting uses a function inside the key argument. please keep the question focused on this exact snippet and explain it at a beginner level. i don't have other files or surrounding application details to share, so the request should not depend on anything outside the code below. use the complete snippet once in a fenced python block:\\n```python\\ndef sort_stock(rows):\\n    return sorted(rows, key=lambda row: row.get('stock', 64), reverse=True)\\n```\\n\\nThe main thing i want to ask is what order `sort_stock` gives the rows, and what happens for a row without a `'stock'` entry. i want the prompt to ask specifically how the key expression and `reverse=True` work together to determine that order. please make clear that the question is about the behavior visible in the snippet, not a guess about what the utility might do in some larger program. i find it easier when someone separates the pieces before describing the overall result, but please don't turn the request into a line-by-line lecture about unrelated python syntax.\\n\\none person described this to me as, “reverse means it just flips the input around,” and i'm not sure that fits here. i would like the explanation prompt to ask for a clarification of what reverse does in this call, in relation to the sort keys, rather than taking that quote as the answer. i don't need an argument about the person or their wording. i also don't want the prompt to assume that `rows` is a particular real-world inventory, or that the code is connected to a store, database, file, or user interface. the function name is there, but the prompt should stay with what the expression actually specifies.\\n\\nthere are a few separate bits i hope the eventual explanation covers. first, what `sorted(rows, ...)` is doing with the iterable it receives, in a broad beginner-friendly way. second, what the lambda is used for here: each row supplies a value for comparison through `.get('stock', 64)`. third, what the `64` means in that call when the requested key is absent. finally, how `reverse=True` affects the result after those values are used for sorting. i'd like these explained in that order if it reads naturally, and then brought together to answer the central ordering question. please don't claim a missing stock value is zero, or that the function inserts a `'stock'` field; those aren't what i am asking.\\n\\n1. The request should ask for an explanation, not a rewritten implementation or a code review that ranges beyond this one function. It may ask the explainer to say what the return expression returns, but only insofar as that helps answer how this function behaves. Keep the wording direct enough that someone new to Python knows precisely what to explain. If a detail depends on assumptions about the objects in `rows`, identify that limitation rather than inventing the shape or contents of the input. The prompt should not ask for sample output based on made-up rows, because I have not supplied any rows to run.\\n\\nI would appreciate a distinction between a value used temporarily to order items and a value being changed on an item. I am unsure whether the default in `.get` edits the row or just supplies something for the comparison. Have the eventual explanation address that uncertainty, but do not ask it to demonstrate a mutation or make a claim beyond this snippet. Similarly, I am curious whether the function is sorting the original collection in place or returning something from `sorted`; the prompt can ask for that point briefly as part of explaining the return expression. There is no need to discuss performance, alternative sorting techniques, or what values the function ought to use instead.\\n\\nFor the response to the prompt, a short, connected explanation would suit me better than a long tutorial. It can define terms like “key” in everyday language, but it should still name the relevant Python pieces so I can match the explanation to the code. I want the missing-key case compared with rows that do have a stock value, and I want the direction of the ordering stated plainly. If the explanation needs to qualify what can be said because the snippet gives no actual `rows`, that's useful; it shouldn't manufacture a particular output list. Keep the answer about this function rather than giving general advice about writing inventory software.\\n\\nPlease make the final prompt readable and self-contained, with the code included exactly as shown and no altered version. No imports, wrapper, tests, second implementation, extra code, or answer to the question are needed. It should retain my beginner background and the specific question about ordering and a missing `'stock'` entry, while keeping the scope on the snippet. End the prompt by asking for the concise explanation rather than adding a conclusion about what the function is good for.\", \"output\": \"I’m a beginner with basic Python function syntax, but I get mixed up when sorting uses a function inside the `key` argument. Please explain what this exact snippet does, focusing only on behavior visible in the code; don’t assume there is a larger program or any particular application around it.\\n\\n```python\\ndef sort_stock(rows):\\n    return sorted(rows, key=lambda row: row.get('stock', 64), reverse=True)\\n```\\n\\nMy main question is: **What order does `sort_stock` give the rows, and what happens when a row has no `'stock'` entry?** Please explain how the key expression and `reverse=True` work together to determine that order. Someone told me, “reverse means it just flips the input around,” and I’m unsure whether that describes this call. Clarify what `reverse` does in relation to the sort keys rather than treating that quote as the answer.\\n\\nPlease explain the parts in this order, if it reads naturally, and then connect them to the main question:\\n\\n1. What `sorted(rows, ...)` does with the iterable it receives.\\n2. How the lambda uses `row.get('stock', 64)` to provide a value for comparison.\\n3. What `64` does when the requested key is absent.\\n4. How `reverse=True` affects the ordering based on those values.\\n\\nI’m also unsure whether the default in `.get` edits a row or only supplies a value for comparison. Briefly address that distinction without claiming that the function inserts a `'stock'` field. Explain what the return expression returns, including whether this call sorts the original collection in place or returns something from `sorted`, insofar as that helps describe the function.\\n\\nKeep the explanation short and connected rather than turning it into a long tutorial or an unrelated line-by-line account of Python syntax. Define terms such as “key” in everyday language while naming the Python features shown in the code. Compare the missing-key case with rows that do have a stock value, and state the direction of the ordering plainly. Do not say that a missing stock value is zero. If a detail depends on the objects in `rows`, note that limitation rather than inventing their shape or contents.\\n\\nDo not assume that `rows` represents a real-world inventory or comes from a store, database, file, or user interface. No actual rows were supplied, so do not make up sample input or output. Stay with this function; there is no need to discuss performance, alternative sorting methods, or different values the code might use. Please provide the concise explanation requested above.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-1-prompt-long-0007"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "4541f3d580d9d4948daf115b23c66dc671e7a4f6511153f5e93fb1fb7ab66b45"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "cb1b306fa7df445adaa6ee721b9551d5e64c172a1abef892f066839eb6e48e7b",
+  "started_at": "2026-10-29T15:52:38.851021+00:00",
+  "result": {
+    "id": "gen-1793289158-c76GNekqKreeUyZnrfhK",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-1-prompt-long-0007\",\"row_sha256\":\"4541f3d580d9d4948daf115b23c66dc671e7a4f6511153f5e93fb1fb7ab66b45\",\"critique\":\"The input is a coherent, self-contained request, and the output is a readable prompt that preserves the exact snippet, beginner background, ordering question, missing-key uncertainty, and requested explanation sequence without answering the question. However, it drops explicit constraints against a rewritten implementation or code review and against imports, wrappers, tests, a second implementation, or extra code. Asking for a short explanation focused on this function does not fully preserve those prohibitions. This is a material constraint omission under /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42vO7V-BBj8kvTvZ7IE9zonhugNqeyJ6mWf6m-CEp8yrZGmuMhC-LdI3fC1IXPCcfMppmYu8RtotmcjnE0YZL1SE6IP2-B0JU8tKbLdrHiSXqhLcxpj06fWoPZuHzgopMgM-eEH2Jo4kWBU6cnF5emDXYn-xo9JRYS8nzvBkl5jSxrTJmD-5tjSwxGBFQWBelFIXWGfkWTKniGcEw-PxXlWgY2rJxzCGHqx39wtg-UfoCm-uwIGZfSlGGXsO9RrsVopsN_aKGnzmWxguHXzZZdJSlW3O1K4YkiAISgDUfwzCVJN9KQogiFtHRwNVbtcGu9Mbklzo4SwUpNRrgKeqUdmeCZSDAj08WAu6eFTNlXn7NKTB2Mf1GQ9Co-3tjXYKJSP9oOj6hs13-5LKlOQ-xwvYQ2LOhnNb7rNJWHbKbu_-zXCByhRMmixO-kRF0yB7J5ZUv4g_Ik8R70g-MpjdnEhf9yzzr2FfUjIb_n3N5m2kbnq1bmixCoMbatr5BSitc4ke1bLq-P017-Uymj9Y5QLYJlsM5Fnz5QTyJYb-ttXKORb91Bpgjhufn44aleWE69GteECf4BPnUGRkG-Kpk4xa7Uxbnmy1HngJlx5EBqsczxFyyJHjmA7WB-n62eJxGf3usmr85Pps9vugm3rUXtD0FUgW4BchLt9lUReEY26xh6t-wx4Iu0liWL2u14-jZkHyiwACuYvKhU-d8UH1R9-DQM45FkcjbYg6pz-HTvfpVQXdRRW-vqhsr2eMMv6Dud05AFeOszOjcOOQEdbK16vhg8upezyWqZ3byp2vVVsehyanfdcSZ4ByW4CqD9wCDN-147IZrepom7dR9e5IwME2SKT49WSsBY9FfdFodvKFpuoLmY0TfGkB2KfPCvAoa3CTyJrqnPSbNvQYO6-CTza0fijRI4wuHZXf6xxEcDFBsW45qqBYCjcvoXiNP0mgSdUDyGqNwEZDwKhJ3eIymY-yr7nt6szELgBQyN1kEIsidXBQjS7zwtaMeGqOjUBFkPzfw9-XkCL_JDSNrsdlr9OjYFZCxcYIk1fq9ECOkuBEzQ_uUqWuiEvGptpWC5rCg0bBNtBF8j3MhKACLmv7WOcbPlwGWkJB8VBvOQXf8Lzwt5olPGP35NQ3KHTMfyQIswu43LbZXSaLkqR44-41gEBfvjxh4fAN__ULI5yN7MBht0yUuLWseOeyyG2_ppLiFeRYAnW5mLeC7OU4c6OBtoBYxqduRcFc54s3CKWGaOpfoQZnKjEazHO85gwb3ry-m8ocL9pRh2g1AJqrwueTNL-HsymvHxwAh3N0Nh_DbrSsT_oBWIy0eqO6QVk4fsii45pE_XmIZu-gA0mfpExK2VdWXkICnEgbVuW632YszCGm0DG-2267J353XbNyhTql5rxAR9KXg0cLr56R5vabcYchamISSznkE4Vl-1KrMNB5HcT3vRQZ-BLlxKAXbrRlzONMC7b4IEyaNm1MY1jmaPVu4o_cPmLMDw_UMD9Ay4y6OekDCUdtpZl2U2H3euW4993KccscWiZjX16RDbG2RLgeWDUM1qB2Ky4mcOgc_5l149cdSNj8eGFpKQeAPwwS2MYKZNujf3eDANxjonr-idRYw2owYQJ3pQ03jO2YPFBbFmooB_esby6_KTy6onNb5NMpzf-1ZPLjL7EgYpOTL8rUuW6_qFQ2Yx5S_o_qeWPCTC76SF5mbTROdaTF2BlE6eXXm76ReSN6dSXoi6FYOfNPa9qKJE4I_WGF2Aoq9QggUYhJPbk0G5yIH-YxcJ7BjppOoJ7wI9vtWHgPMPo9V4ChBlqPnN0bvsSGwrYedreu3MRJUISCXU5Bb7J-Zo7thk9mWZ-MLeWbwKqrT036lkFAq3fllEIN9gTDT48x_tnlgpBHMQ8cABn97rAYXjlLwHEqh8LGxLLPVHJV25cdW7bbnxKUcWSi_5ISIzVPTG__k-zZ9ht52FSz2lXAxubysq8FqQtzvKM35nnyBVb7IUZ19BfDBl35v5A9ev7CIKXYmj7JoQWnjemTtqDvahnMs14RM1lpQBc6VeZgMvVdQQVTwpZDeoX7vjSD50NwzkQjNFant5fbr4xm0rY7BfDwMAHjgJCIjqelgz5hZAVsE5gciRUcLp41hUeY8Zw8idfA7QjElDo2rK1_kiwvzmt8rYf2i_ABFjRcAnFQ84_DBfAeHhE9JjNc9lgwq326_AreIMnUV-q2N1veq3ntqKqnQZE9MqlLvrZb8nf1AxBarz2OsG7saOVoEr4R_IkSSBqwkbPZcVnzHwCkyiM8IrQaSeo0BWo_06h5GQixTqiWL-HrBPAW7w7n9ztIqTydTfsbECn8fTSRGtkDVzi24bz1bYvbpfP_fteQ-byG6M5sU1fon0YEDSM3L6SRcnbfbXOszJ42VgtJ9MS_UujXznrqurb7TVFfCZpMhTeaAUprVZT-A6XXIzzqGwdwgNGp8JV_SwKZdpWrET18ZY1DqXoKcX8Y3kCnUvPOrRKsIELGfovdzAkKVWn70DAzZOWBIbHIPdkLBSApAL9v6H_pj6pDCwDMUr2qrw50C-Iu6ml-3hdcZEzOQ5ffDqQD4BvoKufQJIHUOy5U8Vnv5wpHX3ymP-A3h1ef2L3mCyvHG1PiD4_-TLrYuol9CSqxPTHXBUBqjSkfuvYhd8v4NccO_nqNcrQvfffvse31P3-oH-i2QYuZAzneXg8XlBFvTsrcKDVpui84kVL19PGAFHWssWimCxk_ElxR-yBHMKCbnexiM3DJpv_ZiHXr5NzVPSQkLU6HdcAyn9vEXPdLodFNeF5ClryTPm4mj-JWJtBx4rjfdxd4JDD6DegUOhahPmtlxR95uDXAa_e1dyUMYR0b_AEx3gk0gSLWcNK38F1yDb9zwYyAmmiFNDUxv0OtXBO_D8DimIEPec5BxRfrpylBt-Z3JlNX-iTTcQzuGTGOyJksGVKdyVN1407kxgtYXtiiwkY-HEfEaHg2VQKtznmz0CapCl1CeRxmO317WYteCCCrN7JhN9puDvFa_z_tDbKaYUrzVxoheva1Jv-XbnhpqV00fCiC79lXQuST_2M-cs2FRTNQcP1fX0hQXg6iA61L2fqe7VcjWqZTHFsIOVAT6ynUkbvwSLuaW6Aep1Xyp5ov-PDsbSPaiFa_i0SWeHU_TJ5WwPtgcza8pQ7rnZuC7YbB16ff17XO0TD-ssrIVCUZXdWwIAvFfOCpOYALlT_SAxYZsKGprctLjX49wB_fP2Z1TmNXLm0422O1vbRFcVnOhn7ndQA95noay1p7WSg99YmtETbTCMhWQ6E0QG-LKO86US0WBNNYxp-CY43y-1rOsAbMz1dfqOXI7hXGctnOfRwLs3sGkmrHcx6k9TGWLIyRO02uXjgGFYyZ-jNLJ0KBRjNEDizYj-A0zQ-lejKk6ntyOkagAW4YRq2nHjct4i6vw-7YbjbeYMNtUJXSkS0Oc0BsLCB_WqTlaqOCWpQhdEauC1ZGz6CYQSDi5MOL7nhp4Uo4tOFX5ghaC6jFGoEZck0tu2_1wa8e4QSyGhDWMkW8njEtkd_CepkM1p9u2zQLuf_O0Tfl4XN2XBzpFnmj8f1GKOKpdN1S7q3WJ8ancRd_h5fi5SGtIOvqkznIkZ6KS_O8UYZJaKOU5R7ZZ4_-XlcUriSX3YET5GnJdLlEU0jx_0RBjx03IRD5sjhiVXGxJcyvcsLWpuJfBCLJzfwt6-8quvYFLxLAaBRga0d6VNM-uPJQAXV970j1Lf8kdocupJtl-IRhL6FWzJyNk_5l6mIHBAGoVReFOWI3d50LFMHfjBzWztZjvM8MVW4_C9PbvK3512gDcqa1Nyq6QDMurYsIf3_Fj1YDFJBEv2hi2Rog9eJ6yqmihFzKFA-k6PS6qRf182CZkSs8uoGeDUMoorhOIGSBQ2eN6G1upjgXbqRHLKp5x-iK-twzKPTJBo17lWs03BdsE9WwRkULD3zF2EL77X1J3ptovM3xyGfXSUePtUKQd0I-y90mlY_lZ38M-CxSVHx4RBtx2TYuaWTB_ZGi9WMX5BTYNcjCevQqeZRvPArN4LrXsVR81xrbAMaps_zjdKXpHV2yGsMDNRWnHov6-NvIfW4vT_-nprcolOtvr1ol5SrlYV7LPOUc7U6Zf6JQ_RbIsQbNfaTxmkHXThsEoQ==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_03436b1c867a8430016ae36bc8510887d0b01c7d357f28cd20",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793289158,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 371,
+      "prompt_tokens": 2172,
+      "total_tokens": 2543,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 173,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2169,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0091385,
+        "upstream_inference_prompt_cost": 0.0054285,
+        "upstream_inference_completions_cost": 0.00371
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "c6173d9e1f236301f4b2ca76a90311d0344064fb13f5d96e60d1d3099432c81a",
+  "elapsed_ms": 9632
+}

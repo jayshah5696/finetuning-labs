@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-prompt-medium-0011\", \"row_sha256\": \"4c57025887498260d444958d2f94676cdc4bb5fbd589f6290545e897f9e3d203\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"can you turn the notes from the ventilation check in the fabrication workshop into a short handover note for the next shift? keep it to what was checked and what the notes actually say, so the person taking over can see the status without us filling in gaps. the extraction hood at the soldering bench was running, and the handheld reading at its grille was 0.42 m/s. the west wall fan was on and its indicator showed green, but nobody took an airflow reading there, so don't imply that one was measured. the side door was closed during the hood reading. i don't know whether that is the usual test setup, so include it as a detail rather than calling it pass or fail. please put the hood and fan information in separate bullets, and mention the door position with the hood reading. do not modify records; the existing maintenance log can be checked for the date, but no change to it is requested. you may list the readings in the handover note. if the date isn't stated in the notes, leave it out instead of guessing. keep the result as a short handover note, not a new inspection procedure.\", \"output\": \"Draft a short handover note for the next shift using the ventilation-check notes below. Include only what was checked and what the notes state; do not fill in gaps.\\n\\n- Extraction hood at the soldering bench: running, with a handheld reading of 0.42 m/s at the grille. The side door was closed during this reading.\\n- West wall fan: on, with its indicator showing green. No airflow reading was taken, so do not imply that one was measured.\\n\\nMention the door position as a detail, not as a pass/fail result; it is not known whether this is the usual test setup. You may list the readings in the handover note. The existing maintenance log can be checked for the date, but do not modify records. If the date is not stated in the notes, leave it out rather than guessing. Keep the result as a short handover note, not a new inspection procedure.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-prompt-medium-0011"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "4c57025887498260d444958d2f94676cdc4bb5fbd589f6290545e897f9e3d203"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "ab30e954403ec26f83bab41e228c061086a0fc3df056d0e4ccfda60e300c1a90",
+  "started_at": "2026-10-29T15:13:19.684256+00:00",
+  "result": {
+    "id": "gen-1793286799-mKV4HVKRyoYpRciKhLon",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-prompt-medium-0011\",\"row_sha256\":\"4c57025887498260d444958d2f94676cdc4bb5fbd589f6290545e897f9e3d203\",\"critique\":\"The input is a natural, self-contained request, and the output is a clear prompt rather than an answer. It preserves the equipment details, reading, uncertainty about the test setup, and date and record-handling constraints. However, it drops the explicit requirement that the resulting handover note put the hood and fan information in separate bullets. Presenting the source notes as bullets does not instruct the eventual writer to use separate bullets in the handover note.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing formatting requirements**\n\nI need to reassess whether I followed the explicit instruction regarding separate bullets. The output utilized notes with bullet points but didn’t clarify the final use of separate bullets. There seems to be a loss of material constraints. While I could infer the intention given the structure, it wasn't clear in the prompt that I needed to preserve bullet points. I’m confident this oversight led to missing that explicit formatting requirement. Everything else seems okay though.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing formatting requirements**\n\nI need to reassess whether I followed the explicit instruction regarding separate bullets. The output utilized notes with bullet points but didn’t clarify the final use of separate bullets. There seems to be a loss of material constraints. While I could infer the intention given the structure, it wasn't clear in the prompt that I needed to preserve bullet points. I’m confident this oversight led to missing that explicit formatting requirement. Everything else seems okay though.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42KVNBIYctuEf8jpJAHna3aDleiJiix6aYzyLwsz8Q-40UXFrHEk7GpmMx6aoPXbYLMUMiWHdqg6H0NrEa8ppUZ3E5_8NmC3MnkUrrl_zTr1Yj4I-MZoVuMuOHcP2FVgp1jh6ahvzjPYaXhcAyYVvygicyJSZ2OyljTzlY07F1T4uTUl-R9LnE2IlMntReViKW1WQCOVGv2ojzkXZGpjI8dwASW6D6IvYDVEJ-BH9IFiniMO9rbJrX6vG29is8_w7Uxw6LEnC4TC2MnM0UfMpMLXyyMiAcn7p59N0UyCuYwPMmvKT_cmGvcbEM1zgV1PtQ3ak_4ouBc_B6eZeRZ4RICq_2zXnGkLNUS2Ze7TYRPplXwpV40iVFZJdjBU2ULAlz6qAqa5uA1U9iJe7qtOQNUIfU9XYxtjyYsKtCSdKAU2aNHzjw7yz2bpY7jB-OANAdmWj5fmjxsQF0mBJNk9b_JI5QIwAjrvaqNKE_ckbgOTNN1FYQR2Kz4Q3HRJUYi2XxvaIWkksOwx1cMWikInTCX5sKF0MXsHK-Ccu2nxUW1FLQFXBcUD2am2dJsgbNcezfpjZrjb0KNO0xENzTuejSNZzRr3JVWWlJPN74h1vCkuA2mwBlpTuMkNJ50hKQrDDLFdd6FU0B69IMoRCrEloHIFQ7wBf7qStT1KLa2haHDAVLxelbu9W9LXfN-LjAqda6EB1nzUG9jKb3Y2DeKfzLlto4S9ltYQJRUG-d3XfGYJWfO12SYe9PQON-Y7M3UZYGdDWQ1lIP8z2qzAGFhDOb-9381Dt7AtKrVIw-6jKQnlxUbOqN2VgggI6jZfH-EkAp1_x4hW7XHg8srOp8pezLrtL9JKX8QrEUvTe0uJvz0ffJKy4qU5ZHaJ-xMIzfD6WKmree1E2cvH-xJoA8pgcfd1A5sLsqXDPVUcalAK37OS5mypsZrwDKJUXb2oVRAxhQIq2lg7yfgTZI4hExudVQfor_yY_63FA-OUEcVmzAnqM3u4DCSaNmfzHoc6YMJKvxqQozz83Cd7jWk7eqbOe6an0NIBiriWaQOs49I8xksFZsOjrIbtEFcDsanrFtG7EACo4wrnmW8mVEQF6p-XDkk4lWKdXwv1VovzlkPisYBSlaZi5e4GW1e8lD_WibuBWbiRpZ0_ms51B69CJAof7PuiN1omLyZ8JdnyYoFd98U10Fc8-qq4F9UtU2dPi0QPRpfjcLbNp2xHfiO57wzVzCor9c21TUY5Pp1RYRTTm17OVB6mnXj0V7jMhCFDWvFRrAoGnJ5DOBjlnTLXMFValdQtznBwzLc4sSm4AJNUjjhwOJWapWHqeH_lGAliGHf8DfuzY7KbCgSBlpR0RBWMwLqAFkrbQZK-0_anU-f32nTPOijdxcFwOWFOZU_7rI7eVXU3ACOtJZgRXCZEkkTM2-1fcWsmRU6_TfYUnLvDqmL-YrxQ_1Y5HDmKYO4KcTvbGQGZ2c8kNIGoQi0r0AWGujzhI1Jyol2boQGq-tJcQwaQSO8LHiLDrHyqFMPTq-nyXlD9ZbUSzh2qf0AnnAPrt-M1hvAdXb3yshIgrNmnQOnl1X42SraUjRivgOe5p6fPsjrjZ3EIs5hqhQZoCn31EjIMJ3lT4u1swCIyShUu-T7DLVC_0U4V6_EDR59daMnzXik4Brf8jkC3Mh1XebewKfV44kGLHzR67KfBtFX3KJkiYi4d6s8GFpNOXgCb-fkKxdGJ_O18xZ6xadcJxHTcZcpvIaYxuXNofMXTS3OeC8Q7ZWBmNE56Qnnhnp-98YXVug33nsWuJvziSm2sa1VQEHBwSBGOM3zh9B4kTfUIh1fb1e2U5ONmZuRoBnJFiBgqooGTxUC-diNbfrL1XRiJsjVKupiheRwMgYox5WK7dlnvbLlthP6zO20paYJ1Tf7Ru6DOFbilpADweaJpwJjcBjS_n0Nw1-tsa9uaHPdkjNv7HN2Ct9sbl8NsyBNJdI4tlgts3VQ0lzCE16fe0xiduPg03pZ-UlIqTGtbPRSgVnVJPCKgg1Zr5AAHaFkoZAHqxhxZoce4Ipf5rhS72mj29_dtrZntfug0TdtoNz0XfToCEKY8uNrwKoChex_jhvdzQMKW1g8c2Twmdi-eCMBS0UJw--8psh0QUqUpk0bwjG03_qkP8JWPEJDOIdhgsHcZV2df9ocw7hdOR6zZmZCXAR3BhrZME-5DyY81qrPyARsUc3iMEbOfCW1qwfd4YQx6IeKY6m8mAsXVZDmp7NzPDj_bNRc3daPqACrb0QNY7CBwL5eAdSj0sSZZJ6hCpLbvkS8Fj1wQybN-loDEwc1BmGsmaq3wKtdUQnOyDsHL6ZuzRayWWCB14afQ7g1Vvpa5XDQBtRLr3dswaqzSzZj3qwwKj9-GYZ-coguUK90HFau3XnDixp6-9nNkWJJoq9pPbMo5IQam2M_248IZD6ppJ_dh5HbuD2YKocPhjvb1hpXlvtEx-LT2kPy-DYebLCs9SLtN0f03iXH0dqdiTCIclodWlfVTJtJ-fK3FAaCm8MMtYDNSJSDw29hU7tK4IuKQCsswmo8nWARamShxyGjTGADxZFY5Ikuj2hdMmgqeHZgIKBDyWsYWqUjrsWSsi6-YuFywgmpRRt1oeTIdwd2BzGhq2Oqeoj9HhNXCffdModkz9gsocCXFatBfcr2oUU7_AWuMuIIxrRGQupEyr8LOazOpVA2a84AmQATcBzTDu--4DOnKd0ce9zQIaK4l_CVJlb0OoUeCeNRvIj7zD73qL4PewzMbePryYP-9z443KN0_5kV4bHIwrP_D3sa6Z1P-uR4GIKSWEUxx0BAo2_HfofSKLPkTgE0tDdj_o68jZFOGK98UNkFThTD1af4UsULPTfeDFV0YnGMmmyqsP1GJm86MsI9v2uCOOV9kNoksYNUWdjGhkW8-6ptp1EQ_yurnW7LfSC8k_zQVVMO8uBMlIgnpV85UpOal8yQ_wMXdgF3AWrPvP2307DDSS-rzg2oXKidi.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_03c450c503a4822b016ae36290e3ac87d09f1c9f7bf54e9c6f",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793286799,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 280,
+      "prompt_tokens": 1024,
+      "total_tokens": 1304,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 95,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004848,
+        "upstream_inference_prompt_cost": 0.002048,
+        "upstream_inference_completions_cost": 0.0028
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "aebb44326f88bbeb0f4fe8e2d191bcd4f44908152700b8939473ee39ab36685a",
+  "elapsed_ms": 6443
+}

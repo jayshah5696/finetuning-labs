@@ -1,6 +1,7 @@
 # Finetuning Labs
 
-Fine-tune a small rewriter with a LoRA adapter. The default model is LiquidAI/LFM2.5-230M.
+Fine-tune an English rewriter with a LoRA adapter. The same notebook supports LiquidAI/LFM2.5-230M
+and LiquidAI/LFM2.5-350M. The larger trial defaults to 350M.
 Code and notebooks stay in Git. Hugging Face hosts the public data and trained adapters.
 
 ## Latest trained adapter
@@ -16,20 +17,29 @@ one truncation. It is not ready for acceptance under the current targets.
 Both arms ran on the same A10 with the unchanged Sol rubric. Exact judgments are reused only
 for unchanged packets. These are development-validation model judgments, not human gold labels.
 
+The English subset is the comparison for the next run. The current adapter passes 51/81,
+compared with 46/81 for the previous adapter. Seventeen of 80 complete English outputs have
+judge-flagged critical errors; one more output truncated. Errors include reversed recipients,
+amounts and prohibitions, lost correction context, invented code and missing long sections.
+[Read the English cases](data/rewriter/evals/lora-1500-validation-20261029-a10g/ENGLISH.md).
+
 ## Data
 
 [Browse the training dataset](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter-training/viewer/default/train).
 
 | Split | Rows | Use |
 | --- | ---: | --- |
-| train | 1,500 | Fit the LoRA adapter |
-| dev | 100 | Select the checkpoint |
-| validation | 84 | Evaluate after training |
+| train | 1,864 | Fit the LoRA adapter |
+| dev | 89 | Select the checkpoint |
+| validation | 81 | Evaluate after training |
 
-Training has 300 Slack, 450 transcription, 400 prompt and 350 polish pairs. Each mode still has
-25 dev pairs. The original 1,000 training rows remain unchanged. The 500 Arka additions target
-action preservation, spoken corrections, conditions, supplied code and quotes, and long-document
-completeness. Dev and validation bytes are unchanged. The same public dataset is updated in place.
+The active public export is English only. It selects 1,364 earlier English training pairs and
+adds 500 new Arka episodes targeting the remaining critical errors. The additions include
+100 long examples and 125 unchanged-input examples. Recipient and numeric corrections use
+both directions so the correct answer cannot be guessed from a fixed ordering.
+The full 2,000-row source training pool and the original 100/84 source holdouts remain in Git.
+Earlier training rows are unchanged. The English dev and validation texts and order are frozen.
+The same public dataset is updated in place.
 The original [68-case calibration benchmark](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter/viewer/default/validation)
 is also public and remains separate.
 
@@ -55,10 +65,13 @@ Add two Colab Secrets and enable access:
 - `HF_TOKEN`, with write access to the destination model repository.
 - `WANDB_API_KEY`, for Weights & Biases logging.
 
-Edit CONFIG if you want a different model, adapter repository or training settings. Then run
+Set `MODEL_SIZE` to `350m` or `230m` in CONFIG. The preset selects the base revision and its
+matching adapter repository. Then run
 the notebook cells in order. It downloads the data, trains LoRA, logs loss to W&B, saves the
 selected adapter and uploads it to a Hugging Face model repository. The default destination is
-`jayshah5696/lfm2.5-230m-rewriter-lora`. Change the owner if you use another account.
+`jayshah5696/lfm2.5-350m-rewriter-lora` for 350M and
+`jayshah5696/lfm2.5-230m-rewriter-lora` for 230M. Change the owner if you use another account.
+You run training in Colab; this data update does not train or upload a new adapter.
 
 The final folder contains adapter weights, adapter config, tokenizer files and a model card.
 It does not merge or upload the base model. No notebook or source code goes to the Hub.

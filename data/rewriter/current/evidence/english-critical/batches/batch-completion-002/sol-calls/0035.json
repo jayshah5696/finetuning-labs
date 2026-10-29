@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-3-prompt-long-0007\", \"row_sha256\": \"d8696d1985cadc982cac6d8f70424d534a6180d8b417234186927a302340a988\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"so i’m getting back into python after a long break, and i’m trying to understand a small function in a practice file. it’s not part of a larger application that i can describe, and i don’t have a sample input or output from the person who wrote it. i only have the snippet below. please help me turn that into a clear beginner-level explanation request, not an answer to the request. the question i want answered is what this function does with a collection of rows and how it groups them. i want to understand the actual steps in this snippet, rather than have someone guess what the rows mean in a particular business or scientific setting.\\n\\n```python\\ndef group_distance(rows):\\n    groups = {}\\n    for row in rows:\\n        groups.setdefault(row['distance'], []).append(row)\\n    return groups\\n```\\n\\nMy first uncertainty is about the shape of the result. I can see that the function starts with an empty dictionary and later returns a variable called groups, but I am not yet comfortable tracing how a loop changes a dictionary. Please ask for an explanation of what the keys and values in the returned dictionary represent, based only on the code. I think distance is the field used to sort the rows into groups, but I am not asking for a claim about miles, kilometers, or any other interpretation of that name. There is no description of what a row represents, and I would rather the explanation say what is visible than attach a story to it.\\n\\nI have been told that each row is a dictionary with a distance entry, but that is all the input information I have. I would like the explanation to make clear what assumptions the code makes when it evaluates row['distance'], without pretending that a missing entry is handled somehow. I’m still learning the difference between looking up a key and supplying a fallback value. The line with setdefault is the part I keep rereading, so please ask for a plain account of what that call does here, including what it contributes when the same distance has already been seen and what happens the first time that distance appears.\\n\\nThe instructor in my study group said, “read the loop from the outside in,” and I think that is useful advice for this example. Please include a walkthrough of the initialization, the repeated work for each row, and the final return. In particular, I want the explanation to connect the empty dictionary to the list that gets created for each key, then to how the current row is appended. I do not need a general lesson on every dictionary method in Python. I need enough about setdefault and append to follow these lines in this order, because those two calls look like one operation to me even though they affect different objects.\\n\\nIt may help to be explicit about what the code keeps in a list. The expression passed to append is row itself, not a newly constructed dictionary in the visible snippet. Please have the explanation address that distinction without turning it into a broad discussion of copying or object identity. When more than one row has the same value under the distance key, the code adds each of those rows to the list under that key. When a value has only been encountered once, there is still a list for it. I would like the explanation to be clear about those cases, but not make up sample rows or sample distances that are not supplied here.\\n\\nI also want to know what can be concluded about the returned object and what cannot. The function returns groups after the loop, rather than printing it, and I want that stated plainly. It looks as though the dictionary associates each distance value with a list of rows that had that value. Please ask for an explanation of that overall shape in beginner language, and of how the contents are accumulated as the loop proceeds. I do not need a discussion of how a caller might display or save the result, since there is no caller in the material I have.\\n\\nThere are a couple of boundaries that matter to me because I have seen explanations drift away from short code. Please keep the request focused on this exact snippet, and have the eventual explanation distinguish a fact directly visible here from an assumption about the input. For instance, the code indexes every row using the literal key 'distance'; it does not show validation or an alternate field name. If a row lacks that key, I want the explanation to say what follows from the lookup, rather than quietly assuming a default. I am not asking for an exhaustive list of possible Python errors or a review of a whole project.\\n\\nFor the explanation itself, I would find a compact numbered walkthrough easy to follow, perhaps one point for setting up groups, one for handling each row, and one for returning the accumulated dictionary. Then a short paragraph could bring those steps together as the answer to the central question. The numbering is only an organization preference for the explanation; it is not a request to change or annotate the function. Please don't supply an alternative implementation, imports, tests, or a code sample beyond the snippet I have provided. I am trying to learn how to read this existing function, not ask for it to be edited or expanded.\\n\\nI can follow basic terms such as function, dictionary, key, value, loop, and list, but I benefit from a quick explanation when one of those terms is important to the behavior in a particular line. Avoid assuming I know why setdefault is used in this pattern. At the same time, please keep the language direct rather than explaining every Python concept from the beginning. I want a careful explanation of this specific function at a level suitable for someone who has written a few short scripts, stopped practicing for a while, and is now trying to rebuild confidence by tracing a small example one line at a time.\\n\\nPlease frame the final request so it asks for an explanation of what group_distance does, how the returned groups dictionary is built, and what its lists contain. It should leave unknown details unknown, use only the snippet as the basis for claims, and keep my beginner perspective in view. There is no need to propose a use for this function, evaluate whether it is a good design, or infer what kind of distances the input represents. I want a focused reading of the code and a clear account of the relationship between each row and the dictionary entry where it ends up.\", \"output\": \"I’m getting back into Python after a long break and am trying to understand a small function in a practice file. I don’t have a sample input or output, or any wider application context; I only have the snippet below. Please explain what the function does with a collection of rows and how it groups them. Keep the explanation beginner-friendly and base it only on the code, without guessing what the rows represent in a particular setting.\\n\\n```python\\ndef group_distance(rows):\\n    groups = {}\\n    for row in rows:\\n        groups.setdefault(row['distance'], []).append(row)\\n    return groups\\n```\\n\\nI understand basic terms such as function, dictionary, key, value, loop, and list, but I’m still learning to trace how a loop changes a dictionary. Please explain the shape of the returned value: what its keys and values represent, and how its contents accumulate as the loop proceeds. The name `distance` is the field used for grouping, but the snippet does not say whether it refers to miles, kilometers, or anything else. Please do not attach a specific meaning to it.\\n\\nThe information I have is that each row is a dictionary with a `distance` entry. Explain what the code assumes when it evaluates `row['distance']`; it does not show validation or an alternate field name. If a row lacks that key, explain what follows from the lookup rather than assuming a fallback. I’m especially unsure about `setdefault`, so describe what it does here: what happens the first time a distance value appears, and what happens when that value has already been seen. Then explain how `append` adds the current row to the list. I keep reading those calls as one operation, so make clear how they work together and what each contributes.\\n\\nThe instructor in my study group said, “read the loop from the outside in.” Please use that approach for a compact, numbered walkthrough:\\n\\n1. Explain the initial empty dictionary.\\n2. Trace what happens for each row, including how the key and list are selected and how the row is added.\\n3. Explain what the function returns after the loop.\\n\\nThe expression passed to `append` is `row` itself; the visible code does not construct a new dictionary. Please address that distinction without expanding into a general discussion of copying or object identity. Explain that rows with the same value under the `distance` key are added to the list for that key, while a value encountered only once still has a list. Do not invent sample rows or distances.\\n\\nPlease state plainly that the function returns `groups` rather than printing it. In beginner language, bring the steps together to explain how the dictionary associates each distance value with a list of rows that had that value. Keep the explanation focused on this snippet. Do not discuss a caller, displaying or saving the result, or possible meanings of the distances, since those details were not provided.\\n\\nI have written a few short scripts but stopped practicing for a while, so a careful, direct explanation of these particular lines would help me rebuild confidence. Briefly clarify a term if it is important to understanding a line, especially `setdefault` and `append`, but do not turn this into a general Python lesson or an exhaustive list of possible errors. Please explain the existing function; do not evaluate its design or suggest a use for it. Do not provide an alternative implementation, imports, tests, or another code sample. Conclude by making clear how each row relates to the dictionary entry where it ends up.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-3-prompt-long-0007"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "d8696d1985cadc982cac6d8f70424d534a6180d8b417234186927a302340a988"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e0e4f017d9972522ba8907b243c90f6337c6f6303c5d1b09e3d4a146c5b3900b",
+  "started_at": "2026-10-29T16:14:39.553559+00:00",
+  "result": {
+    "id": "gen-1793290479-eYcACJdoVjgbIRdbl1qT",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-3-prompt-long-0007\",\"row_sha256\":\"d8696d1985cadc982cac6d8f70424d534a6180d8b417234186927a302340a988\",\"critique\":\"The input is a coherent, detailed request with recoverable intent and no material contradictions or artificial noise. The output reorganizes it into a natural, self-contained explanation prompt without answering the underlying programming question. It preserves the exact snippet, beginner context, instructor quotation, lookup and missing-key concerns, first-versus-repeated setdefault behavior, append distinction, singleton lists, return-versus-print distinction, and restrictions against invented examples, application context, alternative implementations, and broader lessons. The numbered walkthrough and concluding synthesis preserve the requested organization. No material defect found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating output clarity**\n\nI see that I need to evaluate the omissions in my output for clarity. The input asks for a short paragraph at the end of a numbered walkthrough but doesn’t explicitly state it. The guidance I provided may change the optional structure into required steps. I also need to ensure I clearly distinguish between facts and assumptions. It’s crucial to explain how the different calls work together without assuming implicit understanding. I don’t want to nitpick too much, but I want to cover everything effectively.**Reviewing input clarity**\n\nI need to ensure the input is clear and natural without any fake padding or leaked instructions. My output should perform the prompt accurately while retaining the facts provided. When the input says, \"I think,\" I need to consider that when asserting similar facts. The user likely expects that hedges, like “I think,” are maintained for authenticity. If I remove a request for a \"short paragraph,\" that could be seen as a failure under strict guidelines. Overall, I feel good about how I preserved the important details.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating output clarity**\n\nI see that I need to evaluate the omissions in my output for clarity. The input asks for a short paragraph at the end of a numbered walkthrough but doesn’t explicitly state it. The guidance I provided may change the optional structure into required steps. I also need to ensure I clearly distinguish between facts and assumptions. It’s crucial to explain how the different calls work together without assuming implicit understanding. I don’t want to nitpick too much, but I want to cover everything effectively.**Reviewing input clarity**\n\nI need to ensure the input is clear and natural without any fake padding or leaked instructions. My output should perform the prompt accurately while retaining the facts provided. When the input says, \"I think,\" I need to consider that when asserting similar facts. The user likely expects that hedges, like “I think,” are maintained for authenticity. If I remove a request for a \"short paragraph,\" that could be seen as a failure under strict guidelines. Overall, I feel good about how I preserved the important details.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq43D8Ntli3KRrGGDNjibLGFPnBJiRST1hfyJYZZe7IxwC4ZlpjHLP5ezVx7tR0sP1V8oFmzbjwD6KPrgG4HrxETUcM76aun5ymp3NmtuCcDgxxUSQL1zCSEoMrZL-U0ZhpPKQctfPn8pB58otvD3Vjs1YULpiWq6yg1c3cJdqlzyag592UKRUJN2n0OoC0RZs4tRDKiD4KWnZj0KcAuH_BjzZJ__O7pivDEqz98bzSoP9MK0wJzomT2Zq3FDht_QL0VCnM6a7S4b2hQko3bX-FgysdKXlh8ub4M47E5Nw6v1lJzo6yWoWpX8HZeqGdPJCEcNMgrZ72d0Pa9iMtL4G4AKo8mqW6-X2ea3fVV6JiWm4f2b8FcGsksrHQjR_I4hkuMFdwX_qe8g8Rg1zsLut27qpI8bcDAtAt-4CkJrYsTXokRdCFbAsbfDESoBINKnwI4WOvvGrO-T6Q9gKYbjz8ByQ-R7ia8lvIuFTvfoolGLFR0tz4whUm1VvVKO8o7cpeLX6NhhYZ1d7A9aVq7_YntZ6VMacn-ViW-bjtWJyft99VRzvkQpnlOUBcOUgscX3V-9JWcCowhQXF6whWpcVgibyKRFSZFV1gXBmQjHHPwzfHrIlZVmvnzhNrGl0nwLoSbvNthuyKhS-K1_FQPaxe83J_kVplNTkfG-NANn2ryLs1yFEXHTN33o5SNdi_QI8tCUAns0X3g_JueXIlCuJcFShHJPrzwzQhtjtZDq4Kb-BCoWAhQo1umdhBgXZde4quKrZXcpBQlhPgv1OblpNzBiWFV2ue44fenjyH05Yk7s-sGpF7eixFtmEMjBucB8eSBjDhqnRWJh6P94ABJg3NOLT3wsWg87McjUVJ_Rib-HcfO7T4UD7yLN2hZf1L7siPg8phIbQtDwp2DEriiH_sn33Bnj7QcD-jyidCApmELBvxum0-Te6jpbE4J4i6cUwc1Mqnyuw90zbNUAzHaS7h8Fm-Dkt3QmF79-mxfl6oBJVnmAE27kPICEYZysq3AHIcdHqKhegphNal7etj8u7abFr8-OMs8I7R4ZQGI82CPRJtd-F_DFzpgBI-dRLldaX1N1zeR3k2lSKuTFQvviR7TvDOYv8nAoqQ5KWigt1xO7vEn7ix0h1YxhndYNWiS471qv_gPg-9BCZ9EWNwRRJJNKyJpzAFrIaDX2030b54Sjo8OqZXKpN_Y1JLwkfRe0uVQX0llxASGQrnJ42kmO-jSGVE70s7kMBznyNIjTW-DchO90uniW6XGp2gi-pbhWBRsF7VqfJaxTTnr9f9gNFCAmFFGP-o6mhyuG3AbouoHS8l01pDxg99XbyIT60vSU3ssNIM9Lhy6NiIsJ1wSBgpz6eaHvDU399dKZBBTLSRqQy-hYWXWJrorc4wNylksJsIAnluyfFUNv6-iEQhHfsLnn3rd31FPiHALGiV8AfU1PWPBU_4iRe_EQJZj2bMNQfm740jXjxhmz-VAXlBC_QBIwCZ3fEXbj56EyHOBMRECAlP-gVLTjVFCAJua0e71LpqyMDwRf8PNS1A6O6QzM7EqQcgoipfnIhJYrTzyMMPv_BH7XnTtdMMFL5582mcKVRtOPqUjGk1JDapeexn0MS_4L3jOFCnnBZPNiSvWTpGWN-XnnULibCqw91KmN_MeDRlwC0454z0SuQiVjbtDrUtbynVATxgo3JpKdVxdL3-BEUNhLh6W3CWrvNDlm5kPLuJMsirRweFY4Bk4iWFXT9lMCznF0rrz8S-mrGaeyjLeMfGKQWZPY0iCViqJQWipnI-35QwlflXkbHSdyS298c1khjY7J2RU-A-V4f8KBEFNONplDfvHCGy_jtIwVMzDUKAWeZu-QuWOqxN1Z-esDCd5C5x2owhwcykdjI56EjTVJc5cjMquCJHdz6fjsnjERzRIw9_49aarfMmwLIz5rV-UPYiBMyI99Q5OrzVRKPeuJQTpLjaWerfDgtunpJsAVtwCk5B2xzcXHngMdY3bKS2u0Rie_TJ3DzGFe5SAuGmHcDncYuWg7zr8kpxwOCXK7XWiTgN_9dustpIMXojqiP5DtnmCmaVi7CVWC8Iasw7PdKuq3LdX9C1_5riOJmv-Ps0mCDCEEOU67y33ABuHDqOXJnxPNT6U4gXzLiKGaHmoBkdi4AZskNkcv-2Elj8yRHAoORIdiITD8LQl8KG5PM886-RYwZNzG0DKuyTJtEkIQbx5GSUj8fV5JZn5CGiGOojpQOZ5tnllRU2Gppa7gUOPvPqzyhQJNquD3s31dPdNV_Gj4JYojQDWjO0Wz7_LEIBJ-hY-mXebiNy6Gl1aTaghJ6HwOOTBfdDfMtcP5FUcgV-9pREGlMl8Mvfzyei3S709KlHwiGEQP-lzdZiESwBshhe6-LVHWk44UNfxA42Ky66R7tfu2tgHbo6CHS_R5u9WuoqwS7P5neVZQoU-jX05ejCo0rLjbtewoA4CERE7sfjKBvxUlS3di4dkoZkjByvqmsEwqIM0QIzxIf1DahyJDTgFipcMeC6gWSmFFWHmwwu6w62tmeJcjpZTR1VFDk7VlGvouj4i6f13WhPbvtg8ieAsSQHmwi9wMmgI90HZfcouhdM32WfyHzrhNsAUO40p0AzB8jVDSPL9jgKwYfjAypxl-BNsgQpxapHbgGFf7bO3o0mpEAtHPJxVjGfUTmwTTdmeckzepdfzfs8qKD_Z73KD2rkb8g5yaTwaZI9wc_JnEmUniTKa9CjwDxJewkVH7Hzl7XyZLJprAqFnn24jWxd9HIVDbUzZqxVut2nxDBfd7PAD5GXzF3JECG3_J6L63XilmYy52_bDAYQxgtAtzX6hugpWxuacxn9c5VKT3vUkRSKiHh-X6STckMSk5AXpL9lnyMBmmB3Efi_7AbOR9PZiFcfMPMYZPaUPsPLG5L1yz4WdXrL-o8XaTPCfEpGle1j_RRp8l1QLTQwPcgtqHmI7xlA4AuViT1os0E_Bkxi3H4SwgSbEO8pMDXeIGStrc8ojHCE0fRP2BVoAhBjAHd-GK1sJFU5BZNvQ_7vXbWeche2xcDwfe8hCN6_GbJa9cwdNIIlgld0H23e1T9AocGO3DbfU9UYL1XeK5mlKvv7v0v95k7Ydop9oQUTjbIKYmYy6ou_KOqvYhpBKT2DOPmWfV8qMK3JJGFTb1zQBgDtVh6IO4Lje-gd3ItLm4HqlcLPcAhgA5siL9BoSetpurifgM95tXmv7_E3LTPQXRkqRwX8zf5sAKeg4tp97LORAeHqtwsKRAuFK8vGMGUpGVsfpokVEPDOCEIjG4kX9LaoKPQGlD8wJinaI4BoJUAEWpApD0xWkUAW5AHJwr8WLfvKlRZXUnRw3ZbC_89c9XXk5w17QoDAykkfEgxH75Qgb5G1E4utkgDoSZWasF9It1nv9PzzbG7jMcw0EHHeWgDIJlSrZMW-2E_aPPiWF2DHTN38A5d1ejCUNjOlqBLzXWFe3ZgnjFWrF4XqeJMkESrvIOlZLDlFnnvifaeePiXVRKgdUBwtgXQvy-nmA5BcYhwHeSjaej_rEFlyJJ77CXF6_Y8UtZ_hxEvl57QVxKl3-4JN7FAV7GhlYEGyYfT-ncX-HRJvon3lfEC7Eb7vJy9G7CcngxZDnlv4flBVfztTz712_C5s_ORtkSF1icm3mAoeUm3gxuCtayPGxqKo4DUH_O9vYSaKE3A72PDx5jIaUy8Vi1cf3oON0I-rIApwxrPBEtMuOhcU1mFASk_tABrKgqXPT1sFC_KMf5mzoU6cGtqyqBvgK8RAyonGlkfBixhJNPBxzuMzWZEJ1S5u0For8pcZ9s4HrKoYaNffW1JGnmj9vOfKc-Ln2FT6WQEHaqywiseUL6cLe-tzSFdb3aoLFJu4T5Ep_T6dU4Y0-tpTGBGyvk9K1g42IN3oinT7EDN7Ees49FqhoSZmQX86JEPOibjc0oA5e6irkK15PuUjbP1clsfanenHRV2-JSY_IwWdmassx5_yjagccgsl6cRRm4W_3M0rQOTc9GH7oXGu0o7giB2lKOXgkSddJGEdEuxhX6yzHbb72GTkK2Fl1lHe_PaA2fSGg4_hUSfpZbyxiH6QBBIrF_EaPVEKRRec1FohmO9tPnlAVGdL1gWMjqSBWMlfmYVXlyKRTgV4n2Kl20xBMRpWJNQVJ07mJzqgL2sM8P-Os0G8PNoKFZEVnAz2M6EzLKUWmYPXQdMAsMwyz9Zc19ytOrRVF-iJrGfinEXT7rhhdOFdE7Qv3ONg2SJLISTcihAZH9fxU6NeM0oc9WcmVejI9XPxENp2VRCgRvQCtmyDZG76NwWhPzVtaM8kpXFUKBlU5qX3kUIL5ncXtt7Br_RY7bpqU_WD2VI7Xe6yWHmA3TD-xVkTdoVGiw3PtE7dEqJlfRaKz3-d3pOmTQce2FY5Gwh7ks6QjieZwtXBpM02_hZN1Afvu-NKdAiJJlqLQYzc2HuvLaWRT4OxbIm92HROoD056E_UfdWtODh2Lhjy_RwS6-NVpeQoteINUjMxSYuYNtnemfh4FvqKKeZcRMIx45jYd7G7DowIURdtM2HnTnMk94emk5X8pI7cExzAFFH1Zn55ZduurjfSQGYf-9vW6EcH3L44qFPzpjSAE9YDWX9WYieqUy-RCgBJAIQ2BB0PthpZQuaYVRsHEr38PvY-s6FzOq3klN7vjhAjXfCPExblF_qvSuGlH4D7chefPwi72Ym01DC0slU1IJ8iGXnciZKPeC1LUfadvtMxaPvn_lbNKJLp53DxRuCzMySRU3arTbokpH2n5c8yfaDn85fUQBvMgLYyKNenAjdwfgAHDmOgSMhM7UfmvyMa9PAxzRPgyQwlSndoUWD5VkOKZLcBo-LPz6bXhKRUUTUnXRNTb5AnypBu0Jb4nBwVKL6q0NJyWSxEtLyyPEB5jbK8ezvXEga8oCAgNx24uNIbq3vdG5dCZdmOY3SrIsxU8P4rXMyvV4mHmkZ-tG_5P3Z3-qIqVpbQjNwlFV_cviSHx0Uz108ZImWe3EqohMHCMUO_0r876-BNKakwIxj8w969puEd1pUBrNAF9lVmapW3yGFGaWcGMocODTq-1OHWed0p55jNAcWqBWOopDCCtCD952T0OaAJJPf6ey0f9YF-x5FuqfRUf0xSUWmvwhSuMi2KuVoNXnR3kvhWuQqvh0nrFLSQu4uHflsDmCvYuQkZ5RBCNPz9c85_5z3dAUf6BYM41nvcYcwgPFFBdQwlXusW5h_7vjDCv0oW01poP9qBS_1blCXISfBich4V3s24VNJXkmT5wl-jqsmlTF8VIbcxkDQsRE-mieG6h59CEte32Ln1oc9ce1wACiUpp50Or3oZtyIQd1kOp3u7xYoISBkQCBr4HWHWl_Lhwz9-r6S2v5rdpJHarfKRuHgMTbp08vP__V83ER_4lUrJ5qeDXcNOg4C7C1W6FVnU4X3xryzUUhAJq4gZ2WMfu-FyWu9ZxGuALETwA8cyf-SIfmEm-o-Qd49CUH1uq6Vo0citGxD99fM6HHgoGg8fHPybglmeknNsQPij5sy2Ru2XyaiD5MlVzVr_niezuHt5QfrkKnnkDV1K9kEbY_cvFgNAL-vVBtmZcMmMtliTIdcJcNUEherBsKKyD031gtb2B1trw5JoL3FQ73ijpHZcFYqjhleDhfcikpc34Tj8AGAGdJjriiBta1-CwBKHxc-V9TLEyOwGs73mdXjnQsJ86CFgsHwRwvbkr9RPbrHiOaBsQctSSBoofbaoAjt3uRnpTZisO8SkUcoA5WC7UNB8aNd_VsGqLBvkxwUcAGQZ43TKTm2tibWXZ5Wm79XmQ9Gn5wTBPYuGAdrGiMw64x1hwCN1UaaSHUQg_8uvh75hD-FOzs9SwZ4VoKcIGnupMjcT_l2SL9STkJqh6SsT8bHXoWgF1GxC6YZuvmqFCUzLis37Q9abXc4scJ64ey_H_Lq5PAwO012KB76Hg98QMH-qEVkm4Zyr90TAC7VqmxsXhCPv3T8mIDmo4xqMa3_pPRmaTm4U-cP25YOV1CbL1nvjpFpqWX9Dmp26ecmVfoymUoOZb8EXyL3fheqY3kUeUDcFbypgne95zDjJ01d55EdRmRBD0S1C_igrwQETbw6mYboxIr7Coe4_25NSGq0-1WO3_ieQZtU7uvTjcunG02qgT8xqeHz9IgW1fD7LMrZOKnmtZbeh9Buy94Gqyn7389rGYJofN5waaWLfURwLXHsTSrjk5NkaLydYIDIABghBgXSaU_Mhw457EE-HTMmL6zDtGjThW87LtYmxQqXzAxDgfcnT5NxVy6GiYSIXkKnIeMGVbMQ9u3L6MvD7_Xb1_WkWrgAsJlPjw==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0310185589db9e2e016ae370f1034c87d0be4033bc86b0955d",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793290479,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 540,
+      "prompt_tokens": 2612,
+      "total_tokens": 3152,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 335,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2609,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0119285,
+        "upstream_inference_prompt_cost": 0.0065285,
+        "upstream_inference_completions_cost": 0.0054
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "54d2926c0d7b1778142f38d21a0b76b1a9fb9b111d53dc21186c07a73ae1c1cb",
+  "elapsed_ms": 15766
+}

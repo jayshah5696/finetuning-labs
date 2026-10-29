@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-prompt-medium-0017\", \"row_sha256\": \"684e3b94af1b1a75db3daecd2c195b88f44a0751b92058e40cae2b3ead9d0fd5\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\nI’m new to Python and trying to understand a small utility from an example. I know a record can hold values under named keys, but I’m still getting used to `.get`, checking for `None`, and converting a value with `int(...)`. Could you explain what this function does in plain language, following its control flow?\\n\\n```python\\ndef read_capacity(record):\\n    value = record.get('capacity')\\n    if value is None:\\n        return 63\\n    return int(value)\\n```\\n\\nI’m particularly unsure whether the `63` is returned only when the key is absent, or also when the key is present with a value of `None`. And if the stored value is a string such as `'24'`, what does the function do with it? Please stick to what can be understood from this snippet; I’d also like to know whether the code tells us why `63` was chosen, rather than guess at a reason. I can follow basic function calls, but a short walkthrough would help me see how these cases differ.\", \"output\": \"Explain the following Python function in plain language, tracing its control flow. I’m new to Python and understand basic function calls, but I’m still learning how `.get`, checking for `None`, and `int(...)` work.\\n\\n```python\\ndef read_capacity(record):\\n    value = record.get('capacity')\\n    if value is None:\\n        return 63\\n    return int(value)\\n```\\n\\nPlease explain whether the function returns `63` when the `capacity` key is absent and when it is present with a value of `None`. Also explain what happens if the stored value is a string such as `'24'`. Stick to what can be understood from this snippet, and say whether it tells us why `63` was chosen without guessing at a reason.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-prompt-medium-0017"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "684e3b94af1b1a75db3daecd2c195b88f44a0751b92058e40cae2b3ead9d0fd5"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "7c603a17ace1161c366c5c18133d2632578ded4d5d736bca91c328141d1d21c1",
+  "started_at": "2026-10-29T15:32:44.529283+00:00",
+  "result": {
+    "id": "gen-1793287964-K0ilqnNNnbvZ9lhJ6CWd",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-prompt-medium-0017\",\"row_sha256\":\"684e3b94af1b1a75db3daecd2c195b88f44a0751b92058e40cae2b3ead9d0fd5\",\"critique\":\"The input is a coherent, natural request, and the output is a clear, appropriate prompt that preserves the code and the specific questions without answering them. However, it drops the request for a “short walkthrough”; tracing the control flow preserves the walkthrough aspect but not the brevity constraint. It also omits the supplied background that the user already understands records as values under named keys. These omissions violate /prompt’s preservation requirement.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42clSwSMXpC_-D9uWXWd3QuhKEwO2gU6amOmRu0F2Aq_t0MThOHqXDT-S9bNvvL9eD_k5WCgYZxinoK23A7swmgO3F_EfCnfrGPXg9VIWwpnEpm8fLKg3Rs8FcABVRnfAZVSYIez6RfcaHbDLLwixg3L0wcAci_-YNzci-y3GET31ng3DdbRr3GTH5f3Ht5E0mIBn5fQL9NjXXD1pvA3oIZxkBHtXJD9Q6rGnCNk5imBAeciBr3l4VMNbBP7N-GROz5vbMk3GOU0Pf0sbu3zyRI4GeDbN9lSBXCrpIjMAEjlrq_EtT09pUlsrkjf_LGOqFmEC6Byxu0h6jXc4hJ1t8JpqX4lzikK5FFyM2_c0B4QPJeWqIzTjhraS4a7suoBgqAoTSktAhzmYi5PwCfmvKXUifGk0Hmv0RrRoiKTpVUgD9w0zTBxs2X1BBeYTyvop2RK2HMVVQ2N5ogG4_AGEm-gdZIKWhCngesC_FJMmUxa92KgHWR2EIbBLGVJdk7Qf6Ke3N_awFllFzCGYxXpXlaG8FYaRjPfE_R5jhc10ZeX3ajPvJSJkSbR8lb3ERIhPHopx_uSIwaIUPvoETooKbGSzUVaImFhk4jWQ2sH--7y_jCbaMP9xK7eyPqijtT8k7subPdmHBVkZY7v6Ipaq4L1UMSh0bwjWGlVb0VClFnlkC3EgON7KuYZTtGEPKGhH-bTVV2hnrYSxCP-X9cq5vDgZewCxHJpwgdzJQHK0EBNDxwaLzmr_1kekHNalkXeVO5HyTBioOc65bFHOsIF79wiY4uL8bovhaqMHAEt31vwsgprtgCj6wOxty33hzZOUMll27oMFP0hB98vHrX7yxmETq448Gvq4LWmVMh2HDxqMiYSXXKFMcSAcVMbQrE_DOao0Ar9LWJ-IPa9grxHGjIP5f-oOu1CAm009Yvg4ufwYsgvUhbd385JbciBuafh0A7BHuYWvn02k0rIJ3dWS8Fr_mO-BOhHyiGpWbxU4LRh5jedSM8iGv9sHqw0IM1VTqik7nioe233m2nj3A8e9pvsl8iQaLa4-9W5ZKfCOUCpdQfDcTOsm2vgTAOPBCXNS3JvohtyeOScyKiWBl8Bk0H9bNnufdUXkNeiG3kSqfFdcIinBxsJz5Z3AW5T8joCvaUeRL7DNVgFnL6K3GJ-L3zPjvOZ3KO_2uu4o2yWKJ6i1vvdLebMNdoBLy1fALDm70pKa3690tMj9wh5Fz8-9kLZ9wiKP8IJhiN_XyRLOVfeLWrewKPBJPo3smeW6nnK1lacoeFVLiODAIuErcr_mJcpKz_2QWxgaw_pVjFmMlV4bLnVGciTlrM5AC-5D2ziVJJcrDxQNxgtFZ5Gvprjk4lJU8WR4BaumYhyGu75gB6tZSQcpu_v1tc06J3LitqjhpHrU_W048C1cv2QcZg18I_EXDt_aVqlQajK4BvwrM1-GgmxyeJoBF2PJbhJ6MrEo8s1VBLgf8pg6PAx6wWxQ9EP61OmccAEYgzJgat_9bvoyjbwsNXLY90ue_StBk-HcSS-iY5wIlpXGwbBBPOV6Le3pxcT6SfDaXkgKi_2b1acKJrwQdhV-oqnQqfzOnMkDH-dXvLo399te2neNylymRRVE5q3cRngFmumhqE1lcE5EBwJD9wnIk-RXRjgAmkaYEEEX5no7UatZfXQ3-j4u69gPTl7LI5vPpJc9cYZV1lEcPzjIjrZ_kAMVt3rQFr4ieVux703-A7GFGtMd5UK5ESFAKLaVdw1L_CHxV13hUYqdk2HvT2hwSu4Aejmj1a8Q1T0RS7qzhv-6SmVgp8-xmYqVqVhSpT3jeHC6AmB6pwGbTW7AtBU1Nz4LsQat5YBgvx6qtnESdjPbKflR_ASww6H8j8QXkIjwiIJToNHLy8hDIChSpAJ4dGZFousilGdhK-0vrDbjnZpNct00_HgepbUWVTcI2P7UVzkP_d3P8X8hoiDoGicWRJ4nxYpefE1RblgrdA0OtA3H8ZY6ZDuz5Gty7nA7ot5rScy5EOp7kRAbk0DcBrt0_nyLZ64vWhBGKvxKRM8T5w-NPfp8V7cc18rkhrOC8Xsignkk51PaSX_7S6dqWJjrlBRpN4Xk2JxvwWQAhkOCBzjyJ3ehJBrWUvTLhYKf0dokvhnE21ALb0OTZL-JzjvKFYgfzLnYtqqSkJggeX-d7L1C2aNbXRB7Vc-1JZv_QJcrBK3R6ytLpTkQs5mvbi8m-kGzl8ZYXaUkGdzA-rTyeqp2MKDfjDNUFrDA7xvwUrfxRCV5tf-75V2x8_BI32iCdFb6sTTqwwDfWG4ziQbdd-X6VtLVxbIk3EdecESiw0Gg8g1utcQchnR3b02CIWk6q7OzfkCp0CXzpZoT71yM4LOhgWZjtvjEJqM4z4H70VmH6o5KdN3dcYyvI6xVvS6VB9MVnpQQsFlGLm2Di_yCz-4412HqHE-jDTNSWX3A_AFoZwJngbxaYiiO4rk1nIixq-L8ReqUe68CmMW2K5d_-YK0DVnVHsINQQz0804mNhpmOI01Ph3mh_OQ4G_6enASuNtoOdgp9qkxqFMwfAwgI44kBB0N3_zYyVGuO41BVdBcDnbjfmE5CYTdl1AIJQUuPwgUzb5GL_IPlwvInf9iUNs9hIRbU7QP1528Wl_dy8IxoNGdy8guofurw2nfXYsLGTDo09dyZrJ7dnLmzp_lO5Ez6dRnmcSUszw0lyv3ImuXyaA3CoPO7bUorVugEuI9zuko14uZqBWqC34J2avXGIt3Aa9Npykm2H4JcIrq7OxlVCtidqwWysgkA8MOsFN2-qZDdIsEtMM2aJoKhB5ToZSgfwE8Lzfg2xyKdg8j5LjTF0pjDAiIaFvJxzOlF-LR1cGwHghcuCP6Mv2GqdHnecOxKf2m7xS_If6FgHHHasLvYwbrhKO-H-88NzNe-CtQiuaWsYm0BMBtuTL_eWKKA-oJae2YLwemu0XxbXgMwRXag0m9VmbclNhkY7vT153Cm_UKgLOeykVhybivR_8o1t_zMT5-Uh39VZ2vvLpEEuo7bP1Z0iRzyNurXACPvfsC7xtrqvqwwL9UmEZSfYZX-AFMI15K4ZdPrYN0rIu1mah2io49xKCVxxSfCUm-qHvsI8UUWM6bY1BPoetsejQ4erLydHM7MdN1ysGcxPWSYMSMwDygFTU82OQX7SwhW9KoABD5Hey-N_cu8xxFV893YJKV5FE8fDxi0vARiAsO1ejLy49qR7dHE5gMepbfhlawTOG3WYiG7diYOXU_45OeAZc2_Z_nU3MtZzNfef1mc49S7jJ3fB-Ss764jMEI0-sZUvAA0g-nSz6_bSWgi5LsYg9VirOcN4HwbpKr5eHNIlhSGhRrOzjIgEJc7TbKCRGCz7B945TkLXfwABFoBv2_BJtbn0CoOsEnpXMKqSGIHA4jk7NkFJ7r0arUALK_J5ChPmw2jBapXdRcDrrKL_8rQqAJsFD_5Hq7_nOnCjaANMW_ChKb3iaYkFCX8i5Vi4hOUmBsFt3AWDuPnNi6ynhU4ZCymJcwDyKZXI5gQFGKHvuLAFW68sloV-wD8zi-aAOAuDuiNML1-EkJLMwDlvDKe-PfdYgNI1rOyHXhMwtRVLr45x79zeh6Ul11Vz1u-sKfxMZFDKYT9Msmq3ffQrbWDiGAz0s95G-2zkDkuE5rpVgDZ5kGfNzeO0ZOrHED0REk1F9rcJB3P2lxBshwhBKc0Mx6uy31sB7R4rcb_aWk2C6LFQyrf4k0iFpzquuGSkcz56xYfiYzst-zmnHxq2zr-qfUzhAAU2Nt67t4WoHBvKzRvtA89iVSZIuCOf5eDg0w4WLh4fV-HuQX4dWXb0NKFHJ9YzVJm4vNVWidHSq_xHSA-PFEAJtSopf7h7ocTotTMClySsddZSF8Bf-6DXKSTLb52uJqeOnS7GC42I_Tkr74BAfOkRVxkd2JwDI0r6b7UuFdZkKKi-xDVy6iiBMDRI1mWGKSf24ZOrTFQzvh6fY2yaoWmAhZBgAVOY1kfCoKPyLe844WKP45UFmSFbFMNEXBNZ15IzldKuPy8b5YgVFX9z0TBR-kLttagc=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_093fabb4baf664d9016ae3672074dc87d09b22817e540331c1",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793287964,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 353,
+      "prompt_tokens": 1004,
+      "total_tokens": 1357,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 166,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.005538,
+        "upstream_inference_prompt_cost": 0.002008,
+        "upstream_inference_completions_cost": 0.00353
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "3d8b305253afa811813ea18daf6947d4b4ef60b9ba6ee24099d20931c833a483",
+  "elapsed_ms": 11006
+}

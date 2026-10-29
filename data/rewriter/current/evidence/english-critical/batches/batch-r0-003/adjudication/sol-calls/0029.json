@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-english-main-0-slack-long-0022\", \"row_sha256\": \"c7806857673e22ae141ac7e43d6dffc9979e03cfd870bc798d8f7cefc5a8a590\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {}, \"identity\": true, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"Maya: I’m testing the new Linux desktop shortcut for opening the project’s local notes. It’s Super+N on my Fedora laptop, and it opens the right folder without bringing up a terminal.\\n\\nJonah: Nice. On my Ubuntu machine, Super+N is already assigned to the notifications panel, so I haven’t changed anything yet. I’ll check whether the desktop lets me reassign it cleanly.\\n\\nMaya: That makes sense. I set mine through Settings > Keyboard > View and Customize Shortcuts, under Custom Shortcuts. The entry is called “Open project notes,” and it runs `xdg-open /home/maya/work/notes`.\\n\\nRavi: Quick question: is that path supposed to be the shared project folder, or just your personal copy? I don’t want to point the team’s shortcut at a directory that only exists on your laptop.\\n\\nMaya: Good catch. That’s my local path, not the shared one. For the team setup, use the synced folder under `~/Projects/Orchard/notes`; I’ll update the setup note so nobody copies my home-directory path by mistake.\\n\\nElena: I tried the synced path on KDE Plasma. The shortcut launches Dolphin, which is fine, but my first attempt didn’t work because I pasted quotation marks around the whole command. Removing those fixed it.\\n\\nJonah: I’m on GNOME 46, and the shortcut editor accepts the command without quotes too. One thing I noticed: Super+N still opens notifications until I log out and back in, so don’t assume a settings change takes effect immediately.\\n\\nMaya: Right, mine took effect after I closed Settings and started a new session. I’m not sure whether that’s required on every desktop, though. If the old binding stays active, try signing out before changing more settings.\\n\\nRavi: I’ve added a short test section to the team page. 1. Confirm the notes folder is synced. 2. Run the command once from a terminal. 3. Assign the key in desktop settings and test it after a fresh login.\\n\\nElena: The terminal test opened the folder for me, so the path is valid. I didn’t run it with `sudo`; there’s no reason for this shortcut to need elevated permissions, and we shouldn’t normalize that for a file browser.\\n\\nJonah: Agreed. I also checked the command field for trailing spaces. There weren’t any, but the editor silently trimmed one when I pasted the line. The key binding itself is saved separately from the command.\\n\\nMaya: Thanks. I’m adding a note that the shortcut doesn’t create the folder. If someone hasn’t synced the project yet, the command may open a parent directory or show an error, depending on the desktop.\\n\\nRavi: On my machine, `xdg-open` showed a message saying the location couldn’t be found. After I synced the project, it opened normally. So the error wasn’t a permissions problem or a broken key binding.\\n\\nElena: Could we mention that people can use a different key if Super+N is taken? I don’t want the setup guide to imply everyone should override a system shortcut, especially on machines managed by IT.\\n\\nMaya: Yep. I’ll say to choose an unused combination and leave existing desktop bindings alone unless you know what they do. The exact key isn’t important; the command and notes location are.\\n\\nJonah: I tested Ctrl+Alt+O as an alternative, and it worked on my laptop. That doesn’t mean it’s free everywhere, though, so people should check the shortcut list rather than copying it automatically.\\n\\nRavi: I’ll add that to the guide. I also tested after restarting the laptop, not just after logging out. The binding persisted, and the folder opened in the default file manager without any extra prompt.\\n\\nElena: Mine persisted too, but Plasma showed a confirmation the first time I used the custom shortcut. I accepted it, and it hasn’t asked again. GNOME didn’t show that prompt on my test account.\\n\\nMaya: That’s useful. Let’s describe the prompt as desktop-dependent instead of promising it will appear. We shouldn’t tell people to approve anything unexpected; they can check that the command points to the notes folder first.\\n\\nJonah: I noticed the guide calls the folder “shared,” but the sync client keeps a local copy. Maybe “synced project notes folder” is clearer, since opening it doesn’t require a network connection once the files are on disk.\\n\\nRavi: Agreed. I changed that wording and added that offline edits won’t appear for everyone until syncing resumes. The shortcut just opens the folder; it doesn’t start the sync client or force an upload.\\n\\nElena: I checked with the sync client paused. The folder still opened, which matches what Jonah said. New files stayed local until I resumed syncing, so the key itself isn’t a way around the normal sync process.\\n\\nMaya: Great. Please don’t add a command that starts the sync client automatically. Some people use another client, and the shortcut should only open the location they’ve configured.\\n\\nJonah: The guide now has separate notes for GNOME and Plasma screenshots. The menu labels aren’t identical, but both let you add a custom command and assign a key. I left out screenshots for other desktops because we haven’t checked them.\\n\\nRavi: I can test Cinnamon later this week, but I haven’t confirmed its menu or whether it uses the same key editor. For now, the text says the steps may differ, which seems fair.\\n\\nElena: I also checked what happens if the key combination is already in use. Plasma warns about the conflict; GNOME displayed the existing binding in the list. Neither one automatically moved the old action for me.\\n\\nMaya: Let’s keep that detail. If the desktop reports a conflict, people should pick another combination instead of assuming the original action will remain available somewhere else.\\n\\nJonah: One small correction to my earlier post: I tested Ctrl+Alt+O with the work profile, not my personal profile. The command is still the same, but those profiles have different synced folder locations.\\n\\nRavi: I updated the example to use `~/Projects/Orchard/notes`, and I added a reminder to replace it with the actual local path. That tilde works in the command field on our tested desktops; it isn’t a literal folder name.\\n\\nElena: I tried the example from a second user account, where that folder doesn’t exist. It failed as expected, and nothing was created. The guide now says to confirm the account’s sync location before assigning the shortcut.\\n\\nMaya: Thanks, everyone. I’ll leave the team page open for comments today, but I’m not changing the shared shortcut remotely. Each person needs to add it locally, and the final key choice can stay different across machines.\\n\\nJonah: I’ll send the link to the support channel after I finish checking the wording. The instructions cover the tested GNOME and Plasma setups, explain the sync limitation, and don’t claim that other desktop environments behave the same way.\", \"output\": \"Maya: I’m testing the new Linux desktop shortcut for opening the project’s local notes. It’s Super+N on my Fedora laptop, and it opens the right folder without bringing up a terminal.\\n\\nJonah: Nice. On my Ubuntu machine, Super+N is already assigned to the notifications panel, so I haven’t changed anything yet. I’ll check whether the desktop lets me reassign it cleanly.\\n\\nMaya: That makes sense. I set mine through Settings > Keyboard > View and Customize Shortcuts, under Custom Shortcuts. The entry is called “Open project notes,” and it runs `xdg-open /home/maya/work/notes`.\\n\\nRavi: Quick question: is that path supposed to be the shared project folder, or just your personal copy? I don’t want to point the team’s shortcut at a directory that only exists on your laptop.\\n\\nMaya: Good catch. That’s my local path, not the shared one. For the team setup, use the synced folder under `~/Projects/Orchard/notes`; I’ll update the setup note so nobody copies my home-directory path by mistake.\\n\\nElena: I tried the synced path on KDE Plasma. The shortcut launches Dolphin, which is fine, but my first attempt didn’t work because I pasted quotation marks around the whole command. Removing those fixed it.\\n\\nJonah: I’m on GNOME 46, and the shortcut editor accepts the command without quotes too. One thing I noticed: Super+N still opens notifications until I log out and back in, so don’t assume a settings change takes effect immediately.\\n\\nMaya: Right, mine took effect after I closed Settings and started a new session. I’m not sure whether that’s required on every desktop, though. If the old binding stays active, try signing out before changing more settings.\\n\\nRavi: I’ve added a short test section to the team page. 1. Confirm the notes folder is synced. 2. Run the command once from a terminal. 3. Assign the key in desktop settings and test it after a fresh login.\\n\\nElena: The terminal test opened the folder for me, so the path is valid. I didn’t run it with `sudo`; there’s no reason for this shortcut to need elevated permissions, and we shouldn’t normalize that for a file browser.\\n\\nJonah: Agreed. I also checked the command field for trailing spaces. There weren’t any, but the editor silently trimmed one when I pasted the line. The key binding itself is saved separately from the command.\\n\\nMaya: Thanks. I’m adding a note that the shortcut doesn’t create the folder. If someone hasn’t synced the project yet, the command may open a parent directory or show an error, depending on the desktop.\\n\\nRavi: On my machine, `xdg-open` showed a message saying the location couldn’t be found. After I synced the project, it opened normally. So the error wasn’t a permissions problem or a broken key binding.\\n\\nElena: Could we mention that people can use a different key if Super+N is taken? I don’t want the setup guide to imply everyone should override a system shortcut, especially on machines managed by IT.\\n\\nMaya: Yep. I’ll say to choose an unused combination and leave existing desktop bindings alone unless you know what they do. The exact key isn’t important; the command and notes location are.\\n\\nJonah: I tested Ctrl+Alt+O as an alternative, and it worked on my laptop. That doesn’t mean it’s free everywhere, though, so people should check the shortcut list rather than copying it automatically.\\n\\nRavi: I’ll add that to the guide. I also tested after restarting the laptop, not just after logging out. The binding persisted, and the folder opened in the default file manager without any extra prompt.\\n\\nElena: Mine persisted too, but Plasma showed a confirmation the first time I used the custom shortcut. I accepted it, and it hasn’t asked again. GNOME didn’t show that prompt on my test account.\\n\\nMaya: That’s useful. Let’s describe the prompt as desktop-dependent instead of promising it will appear. We shouldn’t tell people to approve anything unexpected; they can check that the command points to the notes folder first.\\n\\nJonah: I noticed the guide calls the folder “shared,” but the sync client keeps a local copy. Maybe “synced project notes folder” is clearer, since opening it doesn’t require a network connection once the files are on disk.\\n\\nRavi: Agreed. I changed that wording and added that offline edits won’t appear for everyone until syncing resumes. The shortcut just opens the folder; it doesn’t start the sync client or force an upload.\\n\\nElena: I checked with the sync client paused. The folder still opened, which matches what Jonah said. New files stayed local until I resumed syncing, so the key itself isn’t a way around the normal sync process.\\n\\nMaya: Great. Please don’t add a command that starts the sync client automatically. Some people use another client, and the shortcut should only open the location they’ve configured.\\n\\nJonah: The guide now has separate notes for GNOME and Plasma screenshots. The menu labels aren’t identical, but both let you add a custom command and assign a key. I left out screenshots for other desktops because we haven’t checked them.\\n\\nRavi: I can test Cinnamon later this week, but I haven’t confirmed its menu or whether it uses the same key editor. For now, the text says the steps may differ, which seems fair.\\n\\nElena: I also checked what happens if the key combination is already in use. Plasma warns about the conflict; GNOME displayed the existing binding in the list. Neither one automatically moved the old action for me.\\n\\nMaya: Let’s keep that detail. If the desktop reports a conflict, people should pick another combination instead of assuming the original action will remain available somewhere else.\\n\\nJonah: One small correction to my earlier post: I tested Ctrl+Alt+O with the work profile, not my personal profile. The command is still the same, but those profiles have different synced folder locations.\\n\\nRavi: I updated the example to use `~/Projects/Orchard/notes`, and I added a reminder to replace it with the actual local path. That tilde works in the command field on our tested desktops; it isn’t a literal folder name.\\n\\nElena: I tried the example from a second user account, where that folder doesn’t exist. It failed as expected, and nothing was created. The guide now says to confirm the account’s sync location before assigning the shortcut.\\n\\nMaya: Thanks, everyone. I’ll leave the team page open for comments today, but I’m not changing the shared shortcut remotely. Each person needs to add it locally, and the final key choice can stay different across machines.\\n\\nJonah: I’ll send the link to the support channel after I finish checking the wording. The instructions cover the tested GNOME and Plasma setups, explain the sync limitation, and don’t claim that other desktop environments behave the same way.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-english-main-0-slack-long-0022"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "c7806857673e22ae141ac7e43d6dffc9979e03cfd870bc798d8f7cefc5a8a590"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e46a19aae9f2823f424c0a8012dd5d8e49e14b8621f6d637081997e01b052dae",
+  "started_at": "2026-10-29T15:14:15.385293+00:00",
+  "result": {
+    "id": "gen-1793286855-ZEV2rx6A5a1u64vM8y2C",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-english-main-0-slack-long-0022\",\"row_sha256\":\"c7806857673e22ae141ac7e43d6dffc9979e03cfd870bc798d8f7cefc5a8a590\",\"critique\":\"The input is a coherent pasted Slack thread with recoverable intent, natural casual language, and no leaked authoring instructions or material contradictions. The output is byte-identical to the input, as required by the identity flag. All paragraphs, speaker names, command literals, paths, shortcut combinations, desktop-specific caveats, sync limitations, and the work-profile correction are preserved. The unchanged formatting and tone are appropriate for /slack.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating contradictions**\n\nI need to assess the contradiction in the statement \"There weren’t any, but the editor trimmed one when pasted.\" The idea of it being recoverable after trimming suggests that the absence of a defect isn't exactly the case. It seems plausible, even if it's seemingly manufactured, not failing without concrete evidence. I see that visually, they are indeed identical. I just need to ensure all specifics are preserved when citing them.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating contradictions**\n\nI need to assess the contradiction in the statement \"There weren’t any, but the editor trimmed one when pasted.\" The idea of it being recoverable after trimming suggests that the absence of a defect isn't exactly the case. It seems plausible, even if it's seemingly manufactured, not failing without concrete evidence. I see that visually, they are indeed identical. I just need to ensure all specifics are preserved when citing them.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq42LNUvQAcV8-kgQTUvut3nwBbZxRElALEVQW4gCH4UfbK96VqXrFmbtG0yMu_4suyS6owx6FDZCShtVzQbem9lsjw34fsMRSbesRlhKKX0I_9fWeb9pfqiiCxwrbo-Em4hfhBIoxPgV5lnbgqKzwauKRB164vhLUy60uFQPOxktUbtdai_aq_VkZLphKOsmN14rqgTa8nKG_c_-H_2rtuVo2UwctmyJKp4oHYrePBaQTvdZxp1oVCj8cIBHdtys5c12lEe_ZuO-CC3YpYFRq6pjvcfkWY0rtWs8RMX8j_387cY9TDymnBxahLlChpg0Ga_sHIyGn_QigxF1Az8GdImW24NeJ9TIV9YKoHCteIKikKzJr3FACqPeqAPy7m4XgVX3LaDv9su2P7H-NdoXm3NzYBNbhrAgIatI4VplHlZe2UTzwGRHU5LbjkveCWbxXv_bhZ0jekb7Yn_O4cNR6pZzPhFvevoxfcgs9oMDTTPV2j6apAIfFGGu9eh8K3IHxu14desSxaziKefXOmeTHA2SdXAPnRX1IMOAscJwO2ykH1HcBqd1v5HlwDlpf2tCLMSbF7mhSflltzu3bqkVkw631Qkhuur9bwtEtxdYwMWnCL7ZfGLHVrq90AzRpDMzSxZ0x94u-hAagNrZc767zoFBWm2vHkrVCnYebeDcdCiXMSOGKA8FlGpeTHnxrRUmGejaE4oGI9VLmxuawrzeuX2OHGtgy_uQzIEK8oqt7M_7U4y2GG0rL0jTmopJb9gCBhS9vLconspdlp0GQvfUvuPPjd2djRlvl4iw3UejZ9cdvzrv6pKkn8tHY6OppBWzL5UpfIHxHVopJIjJrjQoH46TSF0_AqbHk1YCs_u97wepN50ceSD7kaIkGFZ3w-PHRjFF0KFhrxlpOX9XcBE2QAjo24_rsbHZvSk0arFwxW1FX5nOiU3W1rwhZ9VY23tn1JPjwoObBsty3zoUL82pgZOrJV4B0gUOOLy1X3bES6sgB3LIvk9Cf15LBWZcaqWb9zVUR_jFN2pNlAuU2wEZMzyvO18hdOW4_leTZ0LgBRxXHs0ADK3ET-QENn1No0Y0Ctc7cV0K3-SgYzFUopWAyhnkK4D4RwQLd6YIPvDH-1UxSgrof24bH98NPJqUoZpYtiv8HbC1vHT9A7m_k5_i_IeigXCZsV5UHa2Q_2p64wt2WKxRtBUjr_xI2c2Y6KFigt2k9ujdJvPSYwmUklT-cwA6DnCAh_t3SItZDPho8-0sQ91qEJSZmidDoEFefF7rZO-PFcIGVGYJjKs0PePO7FU3gAjkBR4HaB8kVP19r_a1S-iR2iV128tpZM9CTRCa3XBbX8N7gd-M6C3ahxhVWx9FlB3GSiLNQ_QKcCK2dYfLbpMRXHkwZSYDs5o4Wt52JeJ8zNmowa5-7k6NGVipsVYtMgkXhE84Xh6JQO_gpBRhUAlBNOM6ko_1wRh-DdCh9nvc2y5-58RawZ5u2CE9tBKuIeTwSrBFipIQrOVdvn7u36Ia8tcgMR35b8J5EbNcuQAxKO0ZZkkOgQJB73UOMDk8dO4_8btZO7--D6o6vTmlxLJElG9EFc-ZQgbixWWHiK9M3QmZ5MN7f0Gc-8xO40rmz81aOS7zNvor78EBQx1wvuFB_dzLOHFshXCP5DwOAAhXVB_jepSGwIxVRzOUY5I6B8mhiXGxTBH1EY3ZHLsfhj33ezUpGEb0Sm_TRwiZaTsqRbWrewz86o55IMu1VTogAnREjYwgUx8-K4hGrukYc6DshTUdJhIJczasaWmrjl_TRsA6VagX6nxKw1cCl1lEgIPs9sOMTyF5iEf54iN3BbGYfUA5ODNG5YSB-eUNzUMdrqenlWCZ-Ll2kRVeHNFiyYgL9I06A0N9jO6nTdPfhSpMkcCr3nQiWe1SHWPQW6e-vEf9oycHSd5SG-bvzFbziKDKJm88p60YR_Suy0_8xXXMnc5hGMP7Xq0RKmPEfjKfebb-rPNdO7jw3Xoot5-pexHkqHdLTNkTVlFR6tvpLmnnlkPgH5Pguqhc0QfRbpoQiyz7tW9qeYeJoJwRhzCkjNABA-gaT8_UbiE95oArSw0LburIymgFIQnACSU-0ej0y_Tlw2JusSOTjYwzhtAS_Ov6Xzqm8JXamqubZKJZsgafURS4zXhbmoVY7Mo_36QwrbU3FR3d60ih-HWFmqlIb97qdva9uuUVX9sG9A27IozgLSIiqZEZlU6ihch5nJei4ruqXUi-U4UnIQzpLnWgzRV6Fs1-Ok9yE8Zx5LPs0ZN7kftV8y2Xyz0lcTUqmLEYV7XqZRqrCZ-lGS4ysQxxqrg==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0d69ae8bfae84fe4016ae362c9b2c087d09c929f5c7d3cd1d1",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793286855,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 236,
+      "prompt_tokens": 3636,
+      "total_tokens": 3872,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 52,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 3633,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0027293,
+        "upstream_inference_prompt_cost": 0.0003693,
+        "upstream_inference_completions_cost": 0.00236
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "85637b3676047aacad37b83c7eabc703117a164e007e935db9249dd431d86ba4",
+  "elapsed_ms": 6944
+}

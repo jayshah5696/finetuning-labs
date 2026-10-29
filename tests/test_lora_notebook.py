@@ -1,6 +1,7 @@
 """Specify assistant loss and adapter-only upload before writing the LoRA helpers."""
 
 import json
+import runpy
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -10,7 +11,7 @@ import pytest
 from finetuning_labs.rewriter.lora_training import adapter_files, encode_sft, push_adapter
 
 
-@pytest.mark.parametrize("train_count", [1000, 1500])
+@pytest.mark.parametrize("train_count", [1000, 1500, 1864])
 def test_public_data_cell_runs_without_auth_environment(monkeypatch, train_count):
     notebook = json.loads(
         (Path(__file__).parents[1] / "notebooks/rewriter_train_l4.ipynb").read_text()
@@ -27,7 +28,16 @@ def test_public_data_cell_runs_without_auth_environment(monkeypatch, train_count
 
     raw = Dataset(
         {
-            s: Rows([None] * n)
+            s: Rows(
+                [
+                    {
+                        "system": "Rewrite.",
+                        "user": "MODE: /transcribe\nLANGUAGE: en\nINPUT:\nhello",
+                        "assistant": "Hello.",
+                    }
+                ]
+                * n
+            )
             for s, n in {"train": train_count, "dev": 100, "validation": 84}.items()
         }
     )
@@ -61,6 +71,19 @@ def test_public_data_cell_runs_without_auth_environment(monkeypatch, train_count
     exec(compile(source, "notebook:data", "exec"), scope)  # noqa: S102 -- exercise trusted notebook cell without secrets
     assert calls == [("public/data", "sft")]
     assert scope["encoded"] is raw
+
+
+@pytest.mark.parametrize("size", ["230m", "350m"])
+def test_model_choice_switches_base_revision_and_destination_together(size):
+    builder = runpy.run_path(str(Path(__file__).parents[1] / "scripts/build_lora_notebook.py"))
+    counts = {"train": 1864, "dev": 89, "validation": 81}
+    scope = {}
+    exec(builder["configuration_source"]("b" * 40, counts, size), scope)  # noqa: S102 -- execute the trusted config cell
+    cfg = scope["CONFIG"]
+    assert cfg["model_id"] == f"LiquidAI/LFM2.5-{size.upper()}"
+    assert cfg["hub_model_id"] == f"jayshah5696/lfm2.5-{size}-rewriter-lora"
+    assert len(cfg["model_revision"]) == 40 and cfg["expected_split_counts"] == counts
+    assert cfg["language"] == "en"
 
 
 class Tokenizer:
