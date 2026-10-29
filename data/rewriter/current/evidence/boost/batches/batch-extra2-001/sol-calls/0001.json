@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-extra2-prompt-long-0148\", \"row_sha256\": \"df913886fd4d98ceed61ff8af217da070c0fff04a6da57b0b312ffa93a4962ad\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": true, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"Please prepare a self-contained explainer for new volunteers at the fictional Harborlight Cooperative Shop about how the weekly price tally is assembled. Use the reference notes below as the source. Explain the shop’s process and the role of the supplied Python function, and make the explanation understandable to someone who has not seen the shop’s records. Keep the people, dates, amounts, and events consistent with the notes. Include the function exactly as supplied, including its line breaks. Do not treat estimates or questions in the notes as confirmed facts.\\n\\nREFERENCE NOTES\\n\\nHarborlight Cooperative Shop occupies the ground floor of a converted sailmaker’s warehouse on Juniper Quay. It is owned by 46 household members, though only about a dozen work regular shifts. The shop sells pantry goods, cleaning supplies, locally made preserves, and a small selection of bakery items. Its price tally is prepared each Thursday evening so the treasurer can compare recorded sales with the cash drawer and card-terminal report before the Friday delivery arrives. The tally is an internal working figure, not a public price list or a statement of the shop’s financial position.\\n\\nMara Venn has kept the Thursday records since the shop opened three years ago. She writes down each item’s price in dollars as it appears on the shelf card, then enters the list into a small Python utility maintained on the shop’s shared laptop. The list may include repeated prices when several separate items have the same price. Mara says, “I want the number to match the way the shelf cards are written before we compare it with the till.” The cards show dollars and cents, such as $2.49 or $6.00; the weekly record stores the resulting tally as an integer number of cents.\\n\\nOn the Thursday described in the notes, Mara and shift lead Theo Bell counted 38 shelf-card entries. The entries covered tins of chickpeas, jars of pear jam, soap bars, paper bags, and bread delivered by a nearby bakery. The notes do not give the individual price list, so the total for those 38 entries cannot be reconstructed from the count alone. Three cards had been replaced during the afternoon after a supplier’s price change. Theo initialed the new cards, and Mara entered the prices displayed at closing rather than the earlier prices. No one recorded the old prices in the Thursday tally sheet.\\n\\nThe shop keeps prices as dollar amounts when staff enter them, while the comparison sheet uses cents. The utility converts each price separately, rounds the product of that price and 100 to the nearest integer using Python’s built-in round function, and adds those rounded values. It then adds a further 31 cents to the sum. The supplied function is the complete code excerpt used in the weekly tally. The notes do not explain the reason for the additional 31 cents, and the explainer should identify that fact without guessing what the amount represents.\\n\\nMara tested the utility with the small list [1.25, 2.50] before entering Thursday’s prices. Theo watched her do it and wrote in the margin, “That gives us the cents from the two test prices, plus the fixed thirty-one.” Their note records that test, not the missing list of 38 shelf-card entries. It also does not say that the test was a complete validation of every possible price. On this occasion, Mara saved the weekly tally file under the date 18 April and printed one copy for the binder beside the till.\\n\\nThe binder has a separate page for cash and card comparisons. On Friday morning, the treasurer, Inez Cole, is expected to enter the cash-drawer count and the terminal’s reported card total on that page. The Thursday price tally is one reference figure for that comparison, but it is not itself a count of transactions. The notes do not report Friday’s cash count, the card total, or whether the figures matched. Inez wrote, “I’ll complete the comparison after the delivery is checked,” because the bread delivery sometimes arrives before she can reach the binder.\\n\\n1. Thursday’s recorded sequence\\n\\nAt 5:40 p.m., Theo checked the five shelves nearest the front counter and found that two replacement cards had curled at the corners. He pressed them flat and confirmed that both showed the revised supplier prices. Mara checked the remaining three replacement cards against Theo’s initials. They did not change any other card while they were making the list. At 6:05 p.m., after the last customer had left, Mara entered the 38 prices into the utility. The notes say that she saved the file and printed the tally, but they do not record the value displayed on the screen or printed on the page.\\n\\nA volunteer named Niko Ames asked whether a price written as $3.10 should be entered as 3.10 or 310. Mara answered, “Enter the dollar amount, just as it’s printed; the utility does the conversion.” Niko did not enter or edit any prices that evening. The question and answer are included because volunteers sometimes see the integer-cent comparison sheet and assume that the input list uses the same units. In this shop’s recorded workflow, the input prices are dollar amounts and the utility’s returned value is in cents.\\n\\n2. Records and limits\\n\\nThe printed sheet went into the blue binder, while the saved file remained on the shared laptop. Mara usually keeps the previous three Thursday files in the same folder so that she can check whether a shelf card has changed. The notes do not say whether she compared this week’s file with the earlier ones. They also do not identify the Python version, the laptop’s operating system, or any other software used by the shop. A volunteer may explain the documented steps, but should not fill those gaps with assumptions.\\n\\nThere was a brief discussion about the extra 31 cents when Theo saw the function on the screen. He asked whether it was a bag charge. Mara replied, “I don’t know; it was already in the shared function when I started keeping the tally.” Neither person looked up the amount in another record that evening. The notes establish that the function adds 31 after summing the rounded price conversions, and that the staff did not establish its origin during this event. They do not establish that the amount is a fee, tax, correction, or charge of any kind.\\n\\nThe supplied code is:\\n\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 31\\n\\nOn Friday, Inez is to compare the available records after checking the delivery. If the cash and card figures do not agree with the comparison she prepares, she plans to ask Mara to review the Thursday entries before changing any shelf cards. That condition was written in Inez’s planning note; the notes do not say that a mismatch occurred or that any change was made. The delivery check matters to the order of her work, and the comparison is still pending in this account.\\n\\nAt the next volunteer orientation, Harborlight wants new helpers to understand the difference between a shelf-card price, the dollar amount entered in the utility, and the integer-cent figure returned by the function. The Thursday incident also gives them a concrete example of what the records do and do not establish: there were 38 entries and a saved tally, but the individual prices and resulting total are not present in these notes. Mara asked that the explainer tell volunteers to ask her or Inez when a record is unclear, rather than supply a reason for the unexplained 31-cent addition. The binder and laptop remain the shop’s reference records for this episode.\", \"output\": \"Please prepare a self-contained explainer for new volunteers at the fictional Harborlight Cooperative Shop about how the weekly price tally is assembled. Use the reference notes below as the source. Explain the shop’s process and the role of the supplied Python function, and make the explanation understandable to someone who has not seen the shop’s records. Keep the people, dates, amounts, and events consistent with the notes. Include the function exactly as supplied, including its line breaks. Do not treat estimates or questions in the notes as confirmed facts.\\n\\nREFERENCE NOTES\\n\\nHarborlight Cooperative Shop occupies the ground floor of a converted sailmaker’s warehouse on Juniper Quay. It is owned by 46 household members, though only about a dozen work regular shifts. The shop sells pantry goods, cleaning supplies, locally made preserves, and a small selection of bakery items. Its price tally is prepared each Thursday evening so the treasurer can compare recorded sales with the cash drawer and card-terminal report before the Friday delivery arrives. The tally is an internal working figure, not a public price list or a statement of the shop’s financial position.\\n\\nMara Venn has kept the Thursday records since the shop opened three years ago. She writes down each item’s price in dollars as it appears on the shelf card, then enters the list into a small Python utility maintained on the shop’s shared laptop. The list may include repeated prices when several separate items have the same price. Mara says, “I want the number to match the way the shelf cards are written before we compare it with the till.” The cards show dollars and cents, such as $2.49 or $6.00; the weekly record stores the resulting tally as an integer number of cents.\\n\\nOn the Thursday described in the notes, Mara and shift lead Theo Bell counted 38 shelf-card entries. The entries covered tins of chickpeas, jars of pear jam, soap bars, paper bags, and bread delivered by a nearby bakery. The notes do not give the individual price list, so the total for those 38 entries cannot be reconstructed from the count alone. Three cards had been replaced during the afternoon after a supplier’s price change. Theo initialed the new cards, and Mara entered the prices displayed at closing rather than the earlier prices. No one recorded the old prices in the Thursday tally sheet.\\n\\nThe shop keeps prices as dollar amounts when staff enter them, while the comparison sheet uses cents. The utility converts each price separately, rounds the product of that price and 100 to the nearest integer using Python’s built-in round function, and adds those rounded values. It then adds a further 31 cents to the sum. The supplied function is the complete code excerpt used in the weekly tally. The notes do not explain the reason for the additional 31 cents, and the explainer should identify that fact without guessing what the amount represents.\\n\\nMara tested the utility with the small list [1.25, 2.50] before entering Thursday’s prices. Theo watched her do it and wrote in the margin, “That gives us the cents from the two test prices, plus the fixed thirty-one.” Their note records that test, not the missing list of 38 shelf-card entries. It also does not say that the test was a complete validation of every possible price. On this occasion, Mara saved the weekly tally file under the date 18 April and printed one copy for the binder beside the till.\\n\\nThe binder has a separate page for cash and card comparisons. On Friday morning, the treasurer, Inez Cole, is expected to enter the cash-drawer count and the terminal’s reported card total on that page. The Thursday price tally is one reference figure for that comparison, but it is not itself a count of transactions. The notes do not report Friday’s cash count, the card total, or whether the figures matched. Inez wrote, “I’ll complete the comparison after the delivery is checked,” because the bread delivery sometimes arrives before she can reach the binder.\\n\\n1. Thursday’s recorded sequence\\n\\nAt 5:40 p.m., Theo checked the five shelves nearest the front counter and found that two replacement cards had curled at the corners. He pressed them flat and confirmed that both showed the revised supplier prices. Mara checked the remaining three replacement cards against Theo’s initials. They did not change any other card while they were making the list. At 6:05 p.m., after the last customer had left, Mara entered the 38 prices into the utility. The notes say that she saved the file and printed the tally, but they do not record the value displayed on the screen or printed on the page.\\n\\nA volunteer named Niko Ames asked whether a price written as $3.10 should be entered as 3.10 or 310. Mara answered, “Enter the dollar amount, just as it’s printed; the utility does the conversion.” Niko did not enter or edit any prices that evening. The question and answer are included because volunteers sometimes see the integer-cent comparison sheet and assume that the input list uses the same units. In this shop’s recorded workflow, the input prices are dollar amounts and the utility’s returned value is in cents.\\n\\n2. Records and limits\\n\\nThe printed sheet went into the blue binder, while the saved file remained on the shared laptop. Mara usually keeps the previous three Thursday files in the same folder so that she can check whether a shelf card has changed. The notes do not say whether she compared this week’s file with the earlier ones. They also do not identify the Python version, the laptop’s operating system, or any other software used by the shop. A volunteer may explain the documented steps, but should not fill those gaps with assumptions.\\n\\nThere was a brief discussion about the extra 31 cents when Theo saw the function on the screen. He asked whether it was a bag charge. Mara replied, “I don’t know; it was already in the shared function when I started keeping the tally.” Neither person looked up the amount in another record that evening. The notes establish that the function adds 31 after summing the rounded price conversions, and that the staff did not establish its origin during this event. They do not establish that the amount is a fee, tax, correction, or charge of any kind.\\n\\nThe supplied code is:\\n\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 31\\n\\nOn Friday, Inez is to compare the available records after checking the delivery. If the cash and card figures do not agree with the comparison she prepares, she plans to ask Mara to review the Thursday entries before changing any shelf cards. That condition was written in Inez’s planning note; the notes do not say that a mismatch occurred or that any change was made. The delivery check matters to the order of her work, and the comparison is still pending in this account.\\n\\nAt the next volunteer orientation, Harborlight wants new helpers to understand the difference between a shelf-card price, the dollar amount entered in the utility, and the integer-cent figure returned by the function. The Thursday incident also gives them a concrete example of what the records do and do not establish: there were 38 entries and a saved tally, but the individual prices and resulting total are not present in these notes. Mara asked that the explainer tell volunteers to ask her or Inez when a record is unclear, rather than supply a reason for the unexplained 31-cent addition. The binder and laptop remain the shop’s reference records for this episode.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-extra2-prompt-long-0148"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "df913886fd4d98ceed61ff8af217da070c0fff04a6da57b0b312ffa93a4962ad"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "196b1229055b7a4e40061da9bc5865a3fe7d3c7dbfd3c7081173d5d006224445",
+  "started_at": "2026-10-29T03:35:52.829050+00:00",
+  "result": {
+    "id": "gen-1793244952-NF3RCAoAxiEnVUh4d62R",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-extra2-prompt-long-0148\",\"row_sha256\":\"df913886fd4d98ceed61ff8af217da070c0fff04a6da57b0b312ffa93a4962ad\",\"critique\":\"The input contains a concrete numerical contradiction: it says three shelf cards were replaced, but later describes Theo checking two replacement cards and Mara checking the “remaining three replacement cards,” implying five. The output is naturally formatted and byte-identical to the input, as required by the identity flag; it preserves the full request, reference material, code, and uncertainties without performing the task. The input contradiction nevertheless makes the overall verdict fail.\",\"input_verdict\":\"fail\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Identifying input issues**\n\nI need to address a contradiction between having three replaced versus two plus the remaining three, which totals five. It seems like the output is natural, but it still presents the same contradiction. The output should pass formatting per scope and match identity. I need to critique the concrete inconsistency found in the input since it didn’t change. Also, before delivery, it’s worth comparing the input and output, but it looks like additional notes aren't necessary. I should avoid overly verbose comments.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Identifying input issues**\n\nI need to address a contradiction between having three replaced versus two plus the remaining three, which totals five. It seems like the output is natural, but it still presents the same contradiction. The output should pass formatting per scope and match identity. I need to critique the concrete inconsistency found in the input since it didn’t change. Also, before delivery, it’s worth comparing the input and output, but it looks like additional notes aren't necessary. I should avoid overly verbose comments.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r8dJBdxn2_YONm0UboXgBViTllghVJcRWA5TZz-yCJprP5RAQwENZIP1-A4tjhBuoNTichPNh87zcEiBAQbaK7QvQHu-UIBM5xq3omJBM2md94hUlyUluP_Mw0UfnGbCkHNzwWf2b-k_gaQall7NS7YYeFaTXj8vzyb8ZkhcMrVF62293gYiYRUp6pTAqHi3sAHKVrR1rAAkFpEg_R4LvKFRbV4RJzH7wexVGdd0nsycEVJQMwoYMdTfM9uvBrkzt1APWdaM5QyYonnTcdHHIimu8DgfkNQx6PTeBReUSwA9MZO5cFBPMIpZWnU92eFQ-IYZfQZ8Roj8vu7ZY2XHk9e_WwQ9BDpJT_tkJ2EcAsLI-MHRjtQefPk74NEHI2fuzRjugtDpQmh6h01HszIHRGGD_x0ZEFLS_SMHKCaJ_iY0DxkCd4GKILCVHRN6cCaVdAWPIlCU-QUmruoTYHHV834ZCodh-aNbp8nkgF-v29s5YVjrtDAvWzcvshIU7bJ7S7MEJjOAD4ksxdgYfaOSJuChr368l-HVh_a5vmlDqbBi-c4xDeRviiuSr8b6ua0QKPJtme55VmCcnvZ_lWRYhwv90ou9RHGmdmYj5h7m_zRrFbbkFXzROwIaZFt5JWzyCIQTdV06wjY0GF0VHjuuy0OzIf567DulEsgtXRbToUZzWz4QHRHD6kP5jNIR4tm-LS4gIA5f0zucS9Kdm7v1XaeTXHHY4JmckPeeqc-hYTvkv16A2v75NFa3VxvDEk-ju8eNZXtJw0_haHRDUkRk995boHFkySCEoTcOa3TTfzf5B7MZ3N-JT3oI9ynm69odDYpJj5Cd7f7mVHkvRkd7TqulnOlox8Si9RxI20nHBWKWvVXB5g4GAhhQwhnMXB87za--Jc64WZBK7de3qJ53t5RQu5A0xbh2yxtWBZjucF3W7OmVF_RzZ3kE0DU7FcXXmDUqUS7Q_s69usTGG8_RnGLNZFrf4WbxvSou99ZAeWdUI1sqOA1XVBXF1TLByyu5YQdydHm5o9aVqG_w2IP8qeLeEChOb50WsZZ7bl2IodQptHC2abLr2WYpaPNFnyTRObWG1nFg7HLIOBJ8nJr1Oh6vXORfu6zuBZyZsQo94RZsRUmJcVzg_kcB70BnZqKe2G88sOpk5-yL7ugux-obrn6rg5zoz-gJitIw-Gey-_v_VxK7z8lDy24J-vhthF8wtDssF4Vz6oUNNkJIwzvzPMzgRUcvjirrVlShZP9U8e3DhKssdYxZxEtxAuJMPyOFN7ZW3RWhZyGX2Kg1faYe7KbNOCQ9kIvGwsgzMGuTqmgJYl7MyoEL1xRvvEtv43QQ0ep1nTO54sNaBWcy-4ue17KSRtsy_7dCKzW_ZEmFn3rLX8e7hLf_XyHymi4szP7WJsHMAicyyH4ksdSyG6Iw8O9QeH50Mk45-8jVPlIKQrx-DH_hJ-e-tNzS3OWU4p-dcaXCKc1ip_Xopot95oR_NdMN2hRY89Re0bZLg6uv3QNGnC2vjzAAmm6z59mabF8ulRVBXYtadTUBccyf_emgITADw0TPuMneKWvXZfj3-hN1gZzCaanJ4mYIAgiVfOEDQjbY_OKcbbKp-Ipzxy3fqf7l5bvCDeLB3164gDI00AU1mKqulp1wyKUkhzgiYdvcu2zLhHEu5AhEGmPfBQ7q4cDyLRq84T32arOUrjtWK4sqThYzEEYB2vTxLh1WzWrQHYVelxLlGJ_kqSxav0fUEdSVnbCNSSIiNhzamtEYq4CQeVUjMq26wS7lKkxCfQcYFNZBBfjdo_fZopR5ADCtfturHLkOcxMAXzMFXon8rxqR9gEALHWgKtdVuai8rFt-iuf--JGaZek1lBrzBwtoWTKUclZsAr790HMN3vmUavvojszpP8pb8nvjQjs9VDetq2Ex2DvuW_3LEYvOyfa5CM6bGIEERJ1wiCjQdrQfnt64UkiLZZ-ld9hb1z1jTmELtdatqjCUnFAe4OJ9k0_IFZvAbeoh855rvu7Q4Oq8idtWr-qvrzlL9KUuc266nh6UCoBlKPfdLrlVQiEj03f_FkDEFCHTXIDpXD-BKA2kq4tzjOgioFPaRbvWdlicGyjUMOqvHgN-YWI5mHtQavUONfz9wUgGAqYXW-QChzYHCDVTUDCdF1pvSPP-5cGerDdNo7BeNrmy14Aj2-OZS1h6xjmopHUfvqkdJhz4JtOVKjwcZMDZuRPi7_DcLuTQA4Ef1MZttM9tpEh5MbowQ6Nxn5BVsB40HuV-idcMG3UnEWFRqVR21BBwfnjqvAosANlqAHhGoNTSBubbjJx-U2m5gnXcref7mpajTNuQ1DRVQP-c9fqOVfIJKlj5iJdk9d18I3-PH-pnqMut2fxAbRK-rIrLmJxJzOmQM5ljytlNMa04t-zPdUZJ52sV1lZjXWkVEZK6KHUllRcO9X8SwEhn3RXrcB96Y6pLotwa6axigNUPJjnX3p9PN7BbfGOHY0eA4vbKwp3KK6iYNIaYU3dZLqf7WeRnzDdGMAScEX59GJZajNaDLL9mkR5oHLZUpH4m80wG-51-P_ftvV0x2hfkZhigR-brGAo2gwpc1c4P_fm9b4=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_00d28ef7aa13802e016ae2bf1a310887d089c82631a2587f23",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244953,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 248,
+      "prompt_tokens": 3736,
+      "total_tokens": 3984,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 70,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3733,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0118185,
+        "upstream_inference_prompt_cost": 0.0093385,
+        "upstream_inference_completions_cost": 0.00248
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "eab0bebb50d0fd052588b26d54f7dd12cb6c855ca62866e7497688e15cf8c39a",
+  "elapsed_ms": 5644
+}

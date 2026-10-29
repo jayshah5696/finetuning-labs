@@ -2,7 +2,8 @@
 
 Use `uv` and the project Makefile. Keep this project independent of the root uv workspace.
 
-The current release is reviewed v3 with 1,000 training, 100 development and 84 validation pairs.
+The current dataset is data/rewriter/current with 1,500 training, 100 development and 84 validation pairs.
+Update the existing public dataset in place. Do not introduce a new dataset version or repository.
 The public Hub repositories now contain Parquet data, dataset cards and source-license notices
 only. Code, notebooks, configs, review reports and run logs belong in Git. Do not upload those
 artifacts to Hugging Face dataset repositories. Model repositories receive trained adapter weights,
@@ -17,7 +18,7 @@ runtime bundles are available in Git history. Data review must not depend on tho
 Keep all v2 validation rows and source families out of future training expansions. The student
 is `LiquidAI/LFM2.5-230M`. Comparisons use GPT-6 Luna as the cloud baseline and teacher,
 and GPT-6.1 Sol as the historical baseline evaluator. Replacement data uses the latest clean Arka
-pipeline with Luna Decisions, followed by Opus verification. GPU work targets Google Colab L4.
+pipeline with Luna Decisions, followed by GPT-6.1 Sol verification. GPU work targets Google Colab L4.
 
 Existing data retains its exact Opus verification. After an OpenRouter credit-limit failure,
 the user changed the remaining review and fix loop to GPT-6.1 Sol only. Use Sol for new reviews.

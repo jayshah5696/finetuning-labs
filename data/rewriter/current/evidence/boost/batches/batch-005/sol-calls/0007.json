@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0106\", \"row_sha256\": \"8be63180e64f5e5c13a7fcd100660e23bfd670f7f45b7ae14c8b7c4dc089025c\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\nlowercase request for help with a depot delivery query, for the handoff notes we are putting together for the receiving desk and the depot operations analyst. Please explain what the query does and review what can and cannot be concluded from it. If useful, suggest a few tests someone could consider, but base all of that only on the code pasted below. We are not asking for a broader report about delivery performance, and there is no sample output or extra schema information to use.\\n\\nThe immediate setting is the North Quay depot's weekly receiving check-in. The analyst wants to understand a query that is intended to summarize deliveries by depot, and the receiving desk needs a plain explanation they can follow before the check-in. There are several depots in the deliveries table, but this request does not include example rows, a database version, column definitions, or a description of how units are recorded. Please don't fill in those gaps with guesses. The audience understands basic tables and filters but may not be familiar with SQL aggregation, so it would help to explain the grouping and total in ordinary language as well as identify the relevant parts of the query.\\n\\nHere is the complete code exactly as it was sent to me; please keep the snippet intact in the prompt and focus the review on this code:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\\n\\nFor the explanation, mention the selected depot identifier and the sum of units, including the output name used for that sum. Explain that the query reads from deliveries and that its WHERE clause has two conditions joined by AND. I want the literal status value and the units comparison described accurately; in particular, don't make it sound as though the query includes every row marked received regardless of its units value. It is important to say what the comparison actually says without silently turning it into a different threshold or a different inclusion rule. The group by depot_id should be connected to why there is a summary for each depot rather than one total for the whole table.\\n\\nThe name received_units is a label in the query, not a definition of a business metric that we have supplied. At the check-in last Thursday, Mara said, “I want to know what this number counts before we put it on the board.” That is why the distinction between what the SQL specifies and what a person might assume about units matters here. We don't know whether units are cartons, individual items, or some other measure, and we do not know what other status values exist. Please explain only what the code establishes, and mark those missing details as unknown if they come up. Don't claim that the query validates deliveries, finds all received deliveries, or measures a complete week; there is no date condition in the pasted code.\\n\\nFor the review, please point out any behavior or interpretation a reader should notice just from the query. Keep observations tied to the actual selected columns, aggregation, filter and grouping. The analyst is trying to decide whether the SQL is clear enough to discuss, not asking for a redesigned query. Don't rewrite the SQL, add fields, propose a different filter, or assume rules such as units always being positive or depot IDs always being present. If you mention a possible issue or question, distinguish it from a demonstrated defect: the code alone does not tell us the table's constraints or whether the expression runs in a particular database.\\n\\nA few details from the handoff may help frame the explanation, without turning them into facts the query proves. The desk prints a small summary for each depot at the weekly check-in, and the analyst has been asked to walk through the code before anyone uses the label on a slide. The query itself contains no date range, ordering, or limit. It also does not select a delivery identifier, count rows, or show the underlying deliveries. If describing the output, avoid promising a particular order or a fixed number of rows; those details are not specified here. Nobody has provided expected results to compare against, so don't invent a result table or sample totals.\\n\\nIf you suggest tests, keep them as ideas for checking behavior based on the code, rather than reporting that any test has been run. A numbered section would be useful, with a short explanation of what each test would check. For example, it may help to consider values on either side of the units condition and rows that differ in status, but don't supply made-up outputs or state assumptions about how the database handles missing values. If you cannot describe a test without information that is absent, say what would need to be known instead of making it up. Keep the test suggestions proportionate to this small query; the handoff notes are not a complete testing plan.\\n\\nPlease make the eventual explanation readable for the desk staff while still being useful to the analyst. Keep the review separate from the explanation and from any optional test ideas, and use direct wording rather than a long SQL tutorial. The prompt should leave room to say where interpretation stops: for instance, if the meaning or unit of units cannot be established from the code, call that out rather than treating the column name as documentation. If the phrase “received units” sounds more definitive than the query warrants, explain the difference between the alias and the filter, without proposing a new metric or changing the label.\\n\\nOne condition is especially important for the check-in: if someone asks whether this query covers all received deliveries for the week, explain that the code alone cannot establish that, because no date range appears and the units condition also narrows the rows. Please keep that qualification visible rather than burying it among optional details. The team wants an accurate account of the supplied query, not a conclusion that it is approved for the board or that it matches a reporting policy. End with a substantive note about what information would be needed to settle any unanswered questions, such as definitions or expected behavior, while keeping the requested work limited to explaining and reviewing the code and suggesting tests only where the code supports them.\", \"output\": \"Please explain and review the following SQL query for the North Quay depot’s weekly receiving check-in. The receiving desk needs a plain-language explanation, and the depot operations analyst wants to know what can and cannot be concluded from the code. The audience understands basic tables and filters but may not be familiar with SQL aggregation. Use only the supplied code; there are no sample rows, output, database version, column definitions, or additional schema information. Do not produce a broader delivery-performance report.\\n\\nKeep this code unchanged and focus the explanation and review on it:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\\n\\nExplain that the query reads from `deliveries`, selects `depot_id` and the sum of `units`, labels that sum `received_units`, and groups the results by depot. Describe both conditions in the `WHERE` clause accurately: a row must have the literal status value `'received'` and satisfy `units > 42`. Explain that the `AND` requires both conditions, and that grouping produces a summary by depot rather than one overall total. Do not imply that all rows marked received are included regardless of their units value, or change the comparison or inclusion rule.\\n\\nKeep the explanation distinct from the review and any optional test suggestions. In the review, describe only behavior or interpretation evident from the selected columns, aggregation, filter, and grouping. The query has no date range, ordering, or limit; it does not select delivery identifiers, count rows, or display individual deliveries. Do not promise a particular row count or output order, invent sample results, rewrite the SQL, add fields, or propose a different filter. Do not assume rules about units or depot IDs, or that the query runs in a particular database.\\n\\nThe receiving desk prints a small summary for each depot at the weekly check-in, and the analyst has been asked to walk through the code before anyone uses its label on a slide. As Mara put it last Thursday, “I want to know what this number counts before we put it on the board.” Treat `received_units` as the query’s alias, not as a supplied definition of a business metric. The code does not establish whether units mean cartons, individual items, or something else, nor does it say what other status values exist. Do not claim that the query validates deliveries, measures a complete week, or finds all received deliveries.\\n\\nIf someone asks whether the query covers all received deliveries for the week, make clear that the code cannot establish that: there is no date range, and the units condition narrows the rows. Keep this qualification visible. Distinguish the alias from the filter if “received units” seems more definitive than the code warrants; do not propose a new metric or change the label. Do not conclude that the query is approved for the board or matches a reporting policy.\\n\\nIf useful, include a short numbered section with optional test ideas. They should be ideas for checking behavior, not claims that tests have been run, and should stay proportionate to this query rather than becoming a full testing plan. You may consider rows on either side of the units condition and rows with different status values, but do not invent outputs or assume how missing values are handled. If a test depends on information not provided, identify what would need to be known rather than guessing.\\n\\nUse direct, readable wording for the desk staff while retaining useful detail for the analyst. End by noting what information, such as definitions or expected behavior, would be needed to resolve unanswered questions. Keep the work limited to explaining and reviewing the supplied code and, where the code supports it, suggesting tests.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0106"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "8be63180e64f5e5c13a7fcd100660e23bfd670f7f45b7ae14c8b7c4dc089025c"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "144e2e2cd6d18c1bbc24fc894625ef0d6315717fd0a2f0341ac9ffd8347cba53",
+  "started_at": "2026-10-28T23:43:03.087943+00:00",
+  "result": {
+    "id": "gen-1793230983-s0LXOjbAZd8T6ffCACuH",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0106\",\"row_sha256\":\"8be63180e64f5e5c13a7fcd100660e23bfd670f7f45b7ae14c8b7c4dc089025c\",\"critique\":\"The input is a plausible, detailed drafting request, and the output is a clear, natural prompt that preserves the SQL verbatim without performing the task. However, the rewrite omits the supplied fact that the deliveries table contains several depots. It also drops the explicit requirement to distinguish a possible issue or question from a demonstrated defect. The remaining restrictions against assuming database behavior do not fully preserve that instruction about how review findings should be characterized. These are material omissions under /prompt, despite otherwise strong preservation of the scope and constraints.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oiNxiAILokK4yEj00IueD1oTj99R-ycvOU9ZIOasRbBjx5dvYTNbpyBTcE-aL7DTOfZ8vc0xXsB32iOzj_7w7x4ieqKTN51Et4JIbUeHHAyfWCuq16Ok7ibj1CaB09sdXpAk0SU2OpVp5EeIx85xHay1p5VaAyKOe5lNc_73g643ijmDUvhusqWmuaRGI6t8gqg2UeQBnAEjg3y8TUPskxp7wVvej_Zb867LQC3SbNNIV9acNEjff3cm7L6AmZy1ucVM7zpNE05c5kdzzqBGzBAEqQ3t7mpIZSWDLCLjqgupf89-Zc6acCZ1G2FAgcQRBk89JZJZtrBxQHwDgNoZv0--Y-zzucHQctOmOzQQWdQZCf0j6DrVXXEBdTsPnmBZRihVrDxxmX51kwVVJ9HMcYJQbUA2hN3voYkpCk1deV4brOmSxNDrB14bPuoq_EdTvcYYFPyXlEddFORVKLSx-x7fZjE0MhnWNYhacp0BijfIZAzwNB7vOZBbT4rx6oCpbu_tQD6m70cdmjhlgaAdliFnBfxSTMMWKUbKa9PMtxY3pQz7mBWY-XAnqRymKDjaFH36CgW1TmyW5XJ6tZg4PIR39VQjIxnSjz54LBe31YJ7GIrzHOQa1NBl2b-Xz7I30Vw3bTzjfuHjNPLavbQmWwdp1QA_V2eE-0oyNwuRFRN31wGkgERVWGDOS_I1XWSwb4jusn99SKk6RQypM8stv1ubXetpXZT9K3qb2Gm_5x7qKh1MeBm9b6WngYMiyL1xlBx2vDxTk8m3DYd52kj_HA9knacyBhGWFIAWaHK-dFSdhVswqtpWLRmvX73WYOkr0Dnv_QuOolGnSsxf37uOng69Ij8ARjC4yEPRv7vp-U0-Wm1paaw2JlIfm-xOtc5JgwFA_Thd_mCBCTFJWQw-p2kG6vZbVw-bu9SHMBk-rTfei9ASpePzFst3HY6EjnAGG8L9a8ornrkAytBqA5B2-94bLfMSt5I5AAax0e-vvGYJiSpEFqEBykCOHUB8H-NoHmdp7-qpgBjECESMUj3QuvwuSz2fauYXCwq0nTVGM_38ZauipFaTostd2dkOlC6HUzHg2_uq6e8wIpmeGVI9CIFiHU3LOITtocDozIuMeqse0LeLg3_DhDN2nYvSSMYZgiK050RiHM1KK5_7WHlEZSziGj_F3kcYLmP9j7iTQbzko54mn5wR39-yVcKAiwXK4iMmfvFL2G2i8vcj7ZQJ76aAPWFQrWXcrQ0St67MWiXz29HF93tvKCnP5rhsPVPoPoujVdxqjhjz3QB3-IMTQ4eSTbUhvaLes05Q1ORf3t4bW81I1drdtwKZqAer_4BDT3vLGg6TP8fOsoR2YBQQDobodVNszq4o0dKxB0QvB-L9M2mW_iChjPmOg4Q4ajAAlhiv0ZYEXGgKPtU5qXiW4umVJUqVxY7YLzObeWA-tDRni-Wvn-xTcLJywpFZl3FBokVnT2RXt3AMZvhcGfZ_KxUQlOOT7LCW-z5BKjgxRsJJnCHWtgtfupQY9LmedtkH8htQCYkGhHj9KH7KCzzZngaaR1gH26gk2cXWZq474sJuznhKHQOyFoEeR_x_YdX-JbiwjYza2YuxTQ6QzQeDcKP1f2MxKZ9N5fK1LQYy3gFc_49vWMW758fqSIjidYqyRFO7LulTOXcO3I58Nkrjm58GCd9FE4XVENCBPp8ZrBPqJwCH_nm-2f8Q8VxYfHD3PfOYuh5SWBNtlxcKVGOf5g0QT5kRxn2_BPj8PF9Q_XaF67x0guxo3VRqNAiJEpbG110nRmO-e_p-J2d5cwih1MObKGqJ4IrBmgTw3rdlcfFRzX6ooTJvlAWIXlO1fo7dGJfbiakxftgloQaSUpKDI96b2P_9PMTaoXu7sZwS4VZJ0TmhSWf84eAayj-VOuJy-izmF4SbbKKrTFPpnZi2FcmBIXX9ZZcLJT-uP6Ywu88wkNS6asYiqEfQDF10kK5_aJL49K140CPSvzv4gtl1YAhd4CyXKS9e9tsn2Mya70Y6UVHrPaXfeLn9she3LCJgWPaiF_E7gRELsqaIq3YD941thC9FZD7Mio2h75C3IrOckRvgYBmdg0W5d-hY5T7PhkYo4H0YolBOkHTVliMOHqDUHA0EKbmfrz_k8Gq6JM8eOQhY6WJ8ywcCzJ16jkv8dcymWTGcPORC3zQrC2jLHd9qJBZcKgacbedqGfttjgol0_5Rs0j-_Zq_TXGZFfJQeUVqAdiLwUR9lb5I7ssWJsoO87ir68hJkvWruz4mkJ-DwUmSxOpaKfN-jm6bq3GkefM8pSbNlXlnTZs4cQSBHmoxKvUqT0mHzaGiwajxIDXidr_1tcKdMaiR3CZZAEUHQXnNOuu5xa4KHJXqdQyV6g4eRPJgXS7gzraSAVv-cAon7qvS0a1tm0RBaKxlr9BgEo25XWdk53WTexpPy8Wj5SQc3marLPjzULyFZ-1lEM_rLyEhPTpSswg7n2R0tQCmnh4s-lgGJtfCCW0QUJqU_xakDAeuMh6gpfKRHmpNsztNru7fDLM2kHdE1bcRiIXL5WSKIm83mpk8Qseeuk1nxjxuB-Q8BpjI3a49wc0z6Y-dVu6lMolp8jvJ3AopTvHpzH9sn4QpQNTwRlAGX7uZhyrwkx4Y4d0Rn50VQxXahrc6LQNcVe19QSTwLFr50MxoSthT82LbtCVWKEBt0hq1yXFFOiU5Ovk9_xGrEl2Rf_V0vEPwYsllUFlhTDTuz0NudlNeUAgT8C75vhitYyi9jWwyJqoUS8X2CWanWs7ArERWjdHrNxSIsrLUGMGiV2S6PtrhnoRnZH5kWeacfExalMaWx0ZlzEaun60kmk6dVSfQAEx48Bd2W3oD_VyBGS2KDYMJnEdVL1AMIY2en74yIptxqcH9uYX2rjx715sdjEJzNKvTi9eyGDqxM2L8KtDHUoRGqtrwvafsr4M5TXY2qeknIXNnd_BcqKQyCX0r4-gcWrD4GAvg-Xvj-_8RG9rcrBxLKMAg75A6HHFJ7KWdjprCt6tfKPDIrGGPIggl3iE3qJsLKl7DMkcDYuryxws8TfOh1jAi5sQzeTu-EPjUesMmQ8u6BncO5n9DMAE6zgK6_RlZY2LRbi4IQNWKnLOPzo9GBtw_OazqDU8aJC1h4puITvMeXeKjK1rKF-LNl_MCQyEp2lLZbkxLWMQTu3Jqykx9TRT-aosG8lA0yVIYMyzDEfK6XIk3oZ2IxXc5sUeFLQhopwRtV1WCW_a8Bfm8ey3UKMMku0Uzlo42y7_9KJh6E9eA1UXOFIDtBt8AL8C4BeWwRk2Ze7KtqlMlmxm-p6DG2JeWvLw56E0mPoUTFOdPNrTAcU8d-aNTI6hMeZz-zZbJz4zwIlQ0Ea8jant2n4EgeNvuIGI6rD8YjrOluOzYUF6Z8jZDo-6K5-ESQIjJ84MF06-iOxP2b4kW8cc_dpzvuiln_64Nvj3WaYwZTlIDVxmpuphJdPd4MLaM9b6w2TczYEvT3oc9BDAJGdnfq7xR4nEzGEGqnZLOg5T-RMderumwKOSu9Gdc4CdJkzIORkTKahqb65OALznC__EMNy51ak8jI0iUBqRFVZVUPThWqlNjfM9HLjgXVvrAp_M60sZSCW5JCLhPtnG4eT7PlOsIjIEjPe-NtwK1Lh_qbIDdVhltk8FqPWDb4vjykMpCmNuJopFm9D4WJESNxcK-8I1ay2rAZpFATiY-qnHRstGtZSSrNp9_GsJmuQe_wtUMe7GubKqt2aYi1SUPSz6fGPFCsW5ePdYZ3WCsDOpqadwJVb2_00KwG1NKoRA8qLJeTqofDsP9wXJanQ1p14FnllO8yUX4v5YdZIea2Ai0YnlWPq4_DxtM1sukgG2yH9LgFzAq1Ensts8wLLZbwKJXneZrYM7BHO30bFB42wjxpRKzNrZV44pTZT3JPKnNZ8PVEWuU5lkN2okesLb4qnm5T4ft-Tq9Q9psoHBM0sG8--MwHDHLenuZWvhH13UqPY9Kd_1CjB7SMDxGnNCpiOmR14He7Se2odLrLp0i4hdrDlzxvGykVMyLDD13twn8wj_0vI=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0bd6b9f71064031d016ae28888747087d0a111d92b531b9238",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230983,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 379,
+      "prompt_tokens": 2592,
+      "total_tokens": 2971,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 176,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2589,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0102685,
+        "upstream_inference_prompt_cost": 0.0064785,
+        "upstream_inference_completions_cost": 0.00379
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "b3305593c03ca3a2fff1061d0a0022adf5eebd132f6d7554f5fb7bdecfc56c7c",
+  "elapsed_ms": 9228
+}

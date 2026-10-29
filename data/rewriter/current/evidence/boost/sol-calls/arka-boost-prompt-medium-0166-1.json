@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0166\", \"row_sha256\": \"3e8436ce2949507094f00738bfb20224b0e1e0f76de9c48e72f946dffa848494\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\ncould you help me understand and review this query for summarizing depot deliveries? i'd like a plain-language explanation of what it's intended to return, including how received_units is calculated, which deliveries are included, and how the results are grouped. after that, could you point out any possible issues or ambiguities that are apparent from the SQL itself? i only have this snippet, so please base the explanation and review on the code here and don't guess about the data, table definitions, or results that aren't shown. i'm especially trying to follow the status and units conditions and understand what the output columns refer to. keep the explanation focused on this query rather than suggesting a different query or describing a broader reporting setup. here is the complete SQL:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\", \"output\": \"Please explain and review this SQL query for summarizing depot deliveries. In plain language, describe what it is intended to return, including how `received_units` is calculated, which deliveries are included, how the results are grouped, and what the output columns refer to. Then identify any issues or ambiguities apparent from the SQL itself. Base your explanation and review only on the supplied code; do not assume details about the data, table definitions, or results that are not shown. Keep the discussion focused on this query rather than proposing a different query or describing a broader reporting setup.\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0166"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "3e8436ce2949507094f00738bfb20224b0e1e0f76de9c48e72f946dffa848494"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "c09eb937779de3c22f6d2a7092f84ae7be896ebb1adc005c3afce35778732393",
+  "started_at": "2026-10-28T23:52:30.879802+00:00",
+  "result": {
+    "id": "gen-1793231550-5bKIfn8246u42CAYtpwz",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0166\",\"row_sha256\":\"3e8436ce2949507094f00738bfb20224b0e1e0f76de9c48e72f946dffa848494\",\"critique\":\"The input is a natural, self-contained request with clear intent and no contradictory instructions or artificial padding. The output reorganizes it into a clear prompt without answering it. It preserves the SQL exactly, including status = 'received', units > 42, the received_units alias, and grouping by depot_id. It retains the requested explanation of calculation, inclusion criteria, grouping, and output columns, followed by a code-only review, as well as the restrictions against assuming unseen details or proposing a different query or broader reporting setup.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating output focus**\n\nI need to evaluate what’s missing, especially regarding the focus on status units. It seems the output should explicitly address these conditions, while the developer didn’t supply constraints. I wonder if there’s material being left out? The output has the same SQL and explains the deliveries included, and it likely passes since all requested semantics are covered, even if not verbatim. I'll make a note that the focus on inclusion requirements should be clear in the critique.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating output focus**\n\nI need to evaluate what’s missing, especially regarding the focus on status units. It seems the output should explicitly address these conditions, while the developer didn’t supply constraints. I wonder if there’s material being left out? The output has the same SQL and explains the deliveries included, and it likely passes since all requested semantics are covered, even if not verbatim. I'll make a note that the focus on inclusion requirements should be clear in the critique.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4orCTUL75ERGkGLR0acJs_3p0Gc1ZSnY88_pEgW7s46dAZG35Ahj5itvQ2lwpeJg6g5Ed1My3Zwead5fPEzvRiEKmrMuX8w0yClYy7uey9ijzSZMZiZhP4d1lExNR70pV3ij7PHmTlPLs3OK5bfsLBxIW6HSkl-S6AIh6TNXFZFNIPX3c6eZIAlE0JqFZO6ELGSScA8yUG2V5UcTXFqH9VoYhq4nQFOvlQ9cF68rshlqTMmc0JePnh5HiUCNcnDsLpVaw33a8CsQJkJjY9Y6IatH1wFcHs1gN5vKEAs0H5tvV9N6wxAlxavQekOpDTWaKakPo-6b9hht8MSYQFXYyMc68jsbtiLymWxepXn0xHTPR0Dsc_lcnNlAnNd0ABNAhjjBhmQTeI1Y_5HrD0cpGe6MwkYvX247vOxSgRdzmroYjJ2QpSncnlo7Fr18eMpxrFlc0KYWR369CzjZ43kIBDMxlr4KPH3aERR7Cc4gHPn3dg9TKupFoBGB9f-8hnm9UxyMffR56wgyebRpaVelSVJRtUoP0jd_fC0GQFB3HdhDi6HoWBw8ot7e9MsNUacn0liKfqSY_tVnPmUOmk2gnN2IywtshbyTvgPbL-Zg4UJK7EA_6r3-kWdQSftrnDAHT38kCbdz2CR6nu_RdY2zrNYw7mqvzuBX9JkTTvYDsJQP1Mb_wGMwVP0-aqWry2OCW-b96YiaXTbkOo_OlzvsEI6ilbtk070-xJ9KrL0Sf1OURDpyuDo0AYhSB8aaz-y4AJAr_WMYoGcEGsmR4UkdZE_7rhdC8fh2kugJMHqelfHD9Fx2Bdw4t3FJOhH0OxshzfSsilMAGt1eK0uZ_K3e2ICsMjNEAm0-6nXgva2o-a83GEgqo1ZgIl8qg5P1-DOFNPqmdgcLY5SW_QGRQ2nxQYyI5MWUCsYcxuQ0MOMhxbGeQOAdnxHU9hs5MAEkSjUn2FuLfLFymv4XaJprJGr503oIlIN8rf2aR0lylBQ2-CAesnUrBtv2soZSpUFXjnx042mGV8RpluiYLUoONjz2kywnT6kgWu3aUEIZ3lxUyefHj8sZ5aYHlAlBZPOZC8D17zATXqLe_zFIHU10BbOc3n3HXdFCDDCFUV8cp-O6qTHyUcAZ4YC-IN70JTrJWXn5s2OIo64S5KvOX4AxigFNmn0dc0Uwbae9su9lEwR4irjJFrQogwXW5WFb0D4ohpMMhfklmeKTyOZOI2mYK9HZoDU9__xcvRCmiKaP942S0x1BVjt2nY2UwS2U3KDAjJDia7jhnWmFTfTY3J1fI8DXPdz6DVVzMFqqJMVbgnGdaVyU_WWDGPJQKpr9s9ddP26MrjIqusxnm1UIeOoOTQB8LbwKN9tV4T8pu8q-9XieO2wAkJBXeplD1e4ETY_YnHHLhb4yoeyn6B7CalKGjh_8gpTtd_rQ9qAp-LXrSy6UgGmDeWVYTT6G2HZNr56Or8IxVANwBw9Ia4GLidGaeymoqnRp1KJsvd08Z8FSenjBtlj5lUzOq8w3eANO5_r0024Zy5VtskoHF6Gmcfy8xMYrGrNEMUwBsuB6_02svWsvuDD4IpCAoXBMPSBWnP2Z9XChmFWsFNryUHrgEwpcHLudIjZydyaZwUTjSn7Haa3gDlpm_BcxCEoLmzRh9HQiPo7PZmXibMqJjk3sHwvfRZnjSNT9VaU_l6YhjA-4a1pNl44znfmbiv8bLRJXujraxT5SO3_IaIuu72tuy2kl2Mo6FWZcWhPAGJvEzY-L0JCI8Cvkgz4cSQMA9fY7uc-IDHqDvzo5c54sz025MxwLANnrRZIFxK0Eyksmn5oOUxqGPazd1oPEypHNE0FkJzp06wuWZbXaV5eMe_2EVDkxOI2KINGfUsFq9LhixVQmugMGX7FzqF_HA9GLTfNtL0jKqz4zUzhGDEFwl6xRuURaDBCdHz7WiNu7zfEroh8wsBF3PnvjRr8shU7qfxQQCutuSh2XP8EZRX-u6LP012UTU2nhXcDor545RYLKKQTuq6Z9C7wYmEzb8Oip2kGqWS3s7QgspeIQAGdlYZzXX0DUyUgw9e8RdBB6xqv58-31KbVfruBRxmy5v-uFCmVRS7EtuuOiMIkU1MXAJegWWDyeslFZjtHW_jp8YAHoPVZfKojIxwWjn1q6xiF4o7oiddEGVbmCjNjwrpK1IxeyQcMh2zOGwFel7bUGvyRL8nMp26OydvzcHV0S3Mh5bW7TpI1WNFKXDQOKQ4Bk0JLFe1QmC0D_bNGlOxkmotA4qV8wgLt3jEkU8AQr8SF67QjHJd13xzU6WEpTLJzRnVDFhceDslIZ1slY35g0OcuPUSwGWxW0_pFeGqqjiAIr3nF8OFRjxCToJqmAxk8HtYRM9U71ntF-1BsySc9tK4DvtKUVF651yFWZCPh_xAMNpdSZKtAAOM2hwV1FFVJFc5L7qf1tBh_DSjzayf0WhJ80O9GZHRXH-xSab6Jv_pJJZorjW8_090VLFEbbqVyRyF_tbrz65hZa8Dw1MFGYFc_pjMUTES3jyusdDitEViSt55IKExBRCd2cSbQGSCpAAe5jEczK93XSkkzbFEEQntAjSh1ziwQmvSFfxDx1jD0y4g0TIdqTtYd4KwaWjUNdQr_xBOqDKv7G9ZEcK4yyiefl-AUtQ566dsLiJsgnULR9rynDXLKPXnP0IVEVZAWAJ9rkuj5RKPEjeuWXxa_ZSY9bhk1ZxsyF6JjivV9ajxvG86ZWthCdPZp4ywO4x_AYeLaaocarky1XFbx2z1AHOTL23jAo867kr_KY1EfDiiZANt441OGRLWVIwDhhC4iHAKio6nKUoJ6zmSnmN6fbGA3hktaaa8gA-0gfH_627NPOTCcAX_-Wc8Xxh55DUSmwF6UHuFinLn0teCR5Sj0Zo6EL6kh10RjJWUWyrOo_UhymtwQvmJ41Y7zCHzYL.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_093a44739cfc6b81016ae28abfc7a887d0b80e29693be24a89",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231550,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 288,
+      "prompt_tokens": 932,
+      "total_tokens": 1220,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 90,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004744,
+        "upstream_inference_prompt_cost": 0.001864,
+        "upstream_inference_completions_cost": 0.00288
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "beb701eb8c098eeddfb6ed4947f3911f9f0b672da6d2a3371e763efad3721a20",
+  "elapsed_ms": 5353
+}

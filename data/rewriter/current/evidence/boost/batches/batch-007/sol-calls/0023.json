@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-transcribe-long-0043\", \"row_sha256\": \"7cb306d1304d460ebd4f7a663749721939a81c306e6f8b6d0893e507b157b3ee\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"we have been maintaining the family photo importer that aunt lena and i use for the shared albums and i want to make a small change before the next batch comes in the importer runs on the old desktop in the hall and on my laptop when i visit there are about 18 years of folders already in the archive and the oldest ones came from scanned prints so please do not treat this as a new library the current job reads a card or a phone backup and copies the selected files into dated folders under the family archive it is important that it still behaves the same when the source is a phone backup\\n\\nlast saturday i tested the import with lena and my cousin mark using a card from the blue camera the card held 246 files and the importer found 31 duplicates which is what we expected because mark had already copied that trip the new files were 215 and the total size was 3.8 gigabytes i first wrote down 3.6 no 3.8 gigabytes because the first figure was from an earlier test please keep the newer measurement associated with that card test lena watched the progress window while i checked the folders by hand and we both saw the same count at the end\\n\\nour usual source folders are not consistent some have a folder called dcim and some have folders named by the phone backup app there are also a few old scans that sit directly in the top folder the importer currently searches inside one folder level and that works for most of the phones we use but the flat scan folders need to remain supported the new change should not move or rename anything in the source and it should continue to use the date in the image metadata when that date is available when metadata is missing it uses the file date and labels that choice in the import log\\n\\nplease leave archive.retain_originals set to true when you adjust the retention behavior the action i need is to keep the original files in the source until the copied files have passed the importer verification step we had one case last winter where an external drive disconnected halfway through a copy and a cleanup pass removed the only remaining copy of two scans since then we have made a second copy of the source drive before a large import but the importer still must not delete the originals just because a destination folder exists the setting is used by the regular import job and by the small repair job that runs after an interrupted transfer\\n\\nnumber one keep the source untouched until verification reports that the destination files can be opened and their recorded sizes match the source number two put an entry in the log for each skipped duplicate with the source filename and the destination path number three show the number of copied files and the number of skipped files separately in the end of job message and number four leave the current date folder format as year month day with hyphens we do not need the importer to create a report file for this change a readable log entry is enough the number four item should apply to both phone backups and cards\\n\\nthere is a condition we need to handle when a card is mounted read only the importer can read the files but it cannot create its usual temporary marker on the card in that case it should continue with the copy and record that the marker was unavailable it must not show a failed import only for that reason if the destination verification also fails then it should stop the job and leave the originals in place on a writable card the temporary marker can be created and removed as it is today the marker is not a replacement for checking the copied files\\n\\nfor the test set use the blue camera card again and a small phone backup from lena's tablet the card test should contain 246 files including the 31 duplicates and should result in 215 copied files if nothing changes in the source the tablet backup is a separate test with 42 images and 6 short videos and it should preserve the capture dates for the images that have metadata the videos do not all have a capture date so check that their file dates appear in the log do not combine the two test totals because they represent different sources\\n\\nmark also asked about names with accents and spaces and we saw examples like josé's picnic and lake day 2022 in the folder list the importer copied those names correctly last time so this request is only to make sure the logging addition does not turn the names into replacement characters or collapse the spaces we have an older windows machine that still opens the archive and lena checks the same folder from her tablet so keep the resulting filenames readable on both systems the importer should not add a new prefix to filenames\\n\\nin the review please check the interrupted transfer repair job as well as an ordinary import the repair job should pick up the incomplete destination and verify it before it offers to continue the copy if the source is no longer connected it should report that clearly and leave any surviving source files alone a job that completes normally should show the two separate counts from the list above and the log should include the skipped duplicate details use the same example names from the test folder so we can compare the before and after logs\\n\\nwhen the first version is ready i will run the card test at home and send lena the log for the tablet test she can confirm that the image dates look right and mark can check the old windows machine if the read only card condition cannot be tested on the blue camera card we can use the spare card that was locked in the camera settings but please keep that condition in the test notes either way after those checks we can decide whether to include the change in the next family archive maintenance window for now i only need the importer behavior and the log details described above\\n\\narchive.retain_originals\", \"output\": \"We have been maintaining the family photo importer that Aunt Lena and I use for the shared albums, and I want to make a small change before the next batch comes in. The importer runs on the old desktop in the hall and on my laptop when I visit. There are about 18 years of folders already in the archive, and the oldest ones came from scanned prints, so please do not treat this as a new library. The current job reads a card or a phone backup and copies the selected files into dated folders under the family archive. It is important that it still behaves the same when the source is a phone backup.\\n\\nLast Saturday, I tested the import with Lena and my cousin Mark using a card from the blue camera. The card held 246 files, and the importer found 31 duplicates, which is what we expected because Mark had already copied that trip. The new files were 215, and the total size was 3.8 gigabytes. I first wrote down 3.6—no, 3.8 gigabytes, because the first figure was from an earlier test. Please keep the newer measurement associated with that card test. Lena watched the progress window while I checked the folders by hand, and we both saw the same count at the end.\\n\\nOur usual source folders are not consistent. Some have a folder called DCIM, and some have folders named by the phone backup app. There are also a few old scans that sit directly in the top folder. The importer currently searches inside one folder level, and that works for most of the phones we use, but the flat scan folders need to remain supported. The new change should not move or rename anything in the source, and it should continue to use the date in the image metadata when that date is available. When metadata is missing, it uses the file date and labels that choice in the import log.\\n\\nPlease leave archive.retain_originals set to true when you adjust the retention behavior. The action I need is to keep the original files in the source until the copied files have passed the importer verification step. We had one case last winter where an external drive disconnected halfway through a copy, and a cleanup pass removed the only remaining copy of two scans. Since then, we have made a second copy of the source drive before a large import, but the importer still must not delete the originals just because a destination folder exists. The setting is used by the regular import job and by the small repair job that runs after an interrupted transfer.\\n\\n1. Keep the source untouched until verification reports that the destination files can be opened and their recorded sizes match the source.\\n2. Put an entry in the log for each skipped duplicate, with the source filename and the destination path.\\n3. Show the number of copied files and the number of skipped files separately in the end-of-job message.\\n4. Leave the current date folder format as year-month-day with hyphens.\\n\\nWe do not need the importer to create a report file for this change; a readable log entry is enough. The fourth item should apply to both phone backups and cards.\\n\\nThere is a condition we need to handle: when a card is mounted read-only, the importer can read the files, but it cannot create its usual temporary marker on the card. In that case, it should continue with the copy and record that the marker was unavailable. It must not show a failed import only for that reason. If the destination verification also fails, then it should stop the job and leave the originals in place. On a writable card, the temporary marker can be created and removed as it is today. The marker is not a replacement for checking the copied files.\\n\\nFor the test set, use the blue camera card again and a small phone backup from Lena's tablet. The card test should contain 246 files, including the 31 duplicates, and should result in 215 copied files if nothing changes in the source. The tablet backup is a separate test with 42 images and 6 short videos, and it should preserve the capture dates for the images that have metadata. The videos do not all have a capture date, so check that their file dates appear in the log. Do not combine the two test totals because they represent different sources.\\n\\nMark also asked about names with accents and spaces, and we saw examples like “josé's picnic” and “lake day 2022” in the folder list. The importer copied those names correctly last time, so this request is only to make sure the logging addition does not turn the names into replacement characters or collapse the spaces. We have an older Windows machine that still opens the archive, and Lena checks the same folder from her tablet, so keep the resulting filenames readable on both systems. The importer should not add a new prefix to filenames.\\n\\nIn the review, please check the interrupted-transfer repair job as well as an ordinary import. The repair job should pick up the incomplete destination and verify it before it offers to continue the copy. If the source is no longer connected, it should report that clearly and leave any surviving source files alone. A job that completes normally should show the two separate counts from the list above, and the log should include the skipped duplicate details. Use the same example names from the test folder so we can compare the before-and-after logs.\\n\\nWhen the first version is ready, I will run the card test at home and send Lena the log for the tablet test. She can confirm that the image dates look right, and Mark can check the old Windows machine. If the read-only card condition cannot be tested on the blue camera card, we can use the spare card that was locked in the camera settings, but please keep that condition in the test notes either way. After those checks, we can decide whether to include the change in the next family archive maintenance window. For now, I only need the importer behavior and the log details described above.\\n\\narchive.retain_originals\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-transcribe-long-0043"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "7cb306d1304d460ebd4f7a663749721939a81c306e6f8b6d0893e507b157b3ee"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e4f266634a4bdf576e259f8c2bd35e37a863e6d9da6dc8aff4a63302b051cc19",
+  "started_at": "2026-10-28T23:48:50.714829+00:00",
+  "result": {
+    "id": "gen-1793231330-kZIh8VwlSibImcE8O8Dy",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-transcribe-long-0043\",\"row_sha256\":\"7cb306d1304d460ebd4f7a663749721939a81c306e6f8b6d0893e507b157b3ee\",\"critique\":\"The input is a coherent, plausible dictation with recoverable intent, and the output is readable and appropriately formatted. However, the output retains “3.6—no, 3.8 gigabytes” rather than applying the explicit correction to the final measurement, as /transcribe requires. It also changes “the number four item” to “the fourth item,” a lexical rewrite rather than punctuation or list formatting. Otherwise, the paragraphs preserve the technical requirements, separate test totals, conditional behavior, example names, and trailing archive.retain_originals literal.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Reflecting on numbers**\n\nI’m analyzing the notation I wrote down, like 3.6 or 3.8. It seems I was correcting myself as I went along, possibly reflecting my thought process in real-time. It makes me wonder if those figures were intended to communicate something specific about a previous test. I think this approach of writing things down is fascinating, even if it feels a bit messy. I guess I just need to keep trying and take my time!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Reflecting on numbers**\n\nI’m analyzing the notation I wrote down, like 3.6 or 3.8. It seems I was correcting myself as I went along, possibly reflecting my thought process in real-time. It makes me wonder if those figures were intended to communicate something specific about a previous test. I think this approach of writing things down is fascinating, even if it feels a bit messy. I guess I just need to keep trying and take my time!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4onpW7g4iXj1iROnTNzEhrCnwQuUlA09Nssp88eRdrANmUVPT9YS6fbgkf1GxGx0ZflIWkGy7Xe67JmBcUH-l7b-PH8Wu9Ro63MF6kaesVJq5OPRrkev0S1NQpha2zQQOOoMGfWd8pIFgl2Z22mgYW0EkKHaTJa-IAwKA-n5WT2hN_2_C3905X_CqvYPempQaVpM9tOuETWo8sYYsmxQGsgq0Ipgnux2SxV_nKkqKZDWIbgOwewQySJsrK9ci4sG59U2TPDiGNolrsQYi_rPZ8nFuMRE49bMTCH_qt8HwFdNgKXCO6vWexZE4MsJYnm1GmeCLqLDhiJxCHMsgrNoAPP1kgn5k7SfkoM91P3YnRpaMxo2AXiTcjPHeXFnGnxEA5ntHJ-UGV3Vpqjv04GSCPb1k-z4Wcn9yk6miqp0Y7Uxi6f7F_d0TMBI7f1ixyymOLtsXSNcE0xV0ZBrvh96eJFEFwFwNcruqQYAmhZVRXkultYMZWhzQEfKxatK6bTx7LwTbhZ742j4EaQil2kqm4QnNOOAmMjla64j4WjG7D7a82IErHTb3ch3CeyntCyt048I1GRYciGhSbWl2VHWfBBu7gDMXdtUYzB1S8A7ThN6UoxJqpRg7ayZFCAHod9ch-xvhOb-DCxYul2z1zNgubEdNRfdaURQeEJhiDvWPwqVBtRBBxGIKpmKmpAimrLwYrAOB-eaEAF_bhvvg38irSIgApu6kCeqVFbsPNooUmi8mIa1S5f5yNri9Ekra7HVvTF_h18oUVt_lPQOQjREAFHfBPXx2mz6e8g2YIuniETydCFW0rcT_DqdB60ZXbdj3-siBaowmgSfYWwbe_zhPa5FqVwcFTFhRsPEwIJfxsSsv5corLjk81SH7Fgu0B2-ttlH1zEFkkYFn7miwbSf-zelJouMTJA6faZo--A6TAWlzS2uygbb9uZ0LnLN658nqYWM--kVcdMEjp5UMavrpv6u6I2uPi_Ygg11nUyrHR8BbcTfpoeGgqFPLDcEZ5iY25ubJjIbUOYQRxushe0cf-B_htGbS9kTbAgPwupN1onMYFH18QzVSkiCiRz7h6azXs--Alw6yZHudwHl_EDUaon4YVOx9HLV-DpkExJdKv3Lk-LPXX_0nvFQjQB1PTTl0xIpuspMLLxmH-vv44Hv7zVMB_qVmWb77EzNSbp_oe-Hr1ItFv05n426qdQge0ouBBm7VlCuYT0oJqTWk4Fk1fXrIhIh_jouPvFDylWD8Cg8i49eJrRxP-str7j1ijNPga5oAi_0FAVU7kReh8J0xeFqR1UcKa5rBf8GMjZ5eJvdO-W68LA2L-NK-TWFqtKzJeCFDTFTXFXv2jAkjnamVsILFhXVrydeQUhXMRuQlpbtOZjoK7rhV-7SyJE4K39Zch5vnVUG-D2u96DS3ggZJ9AVH6xlNXaTYL9S_fsXabuarl8Appvxv5K9PQd6x1J2gyYGQE0UyNd-_PPIrSa4KHsHlnKK8Gf2RkqbcIv4h89Lnvs0BodSkNZkpr34BbUtQcrF2dKZGSWw-Uu4DnheD7_N6lMQ3YC26zYcsKd1-SrPIQ59cvM37xDA0qmk0YpUX0NV7k3WYotfbBAcT0-v7Fl1UZaF8Qb9FdvJIvVZ4Mx4oy-QsNIpW-RLE0A7O-h8ZV2daH6ZCpFaepa8M9_7oIek-pbqahUGHkyVFwMs-I8Tnn5apFYceKyVEeBBa-jPqkLlri4mNQRs3RH7FKLCuT9vpjRu1_L9ztssp4mTqvLXg1KVy0AVPhgku5ZwecEIi6xvgvzi1rNSmDejpepQ5CcHQknznhT6qApPMsyrrL-ZAFQR7hjkeMaQlCqGYnXbepaeor0FarVjPl173uwiJgqYCe9z5IgclODElKdp7r0_Ea4om7e0j7peSNDN5-rqFB5Jk4YG-2kKWLGQfCHwRJR_ArI3CU0Eh7Mhg0W5UJfEWs1fwjpranxy3A-Fq4wDRm5bPHIndd8YApXOYvDwKGWzJWzkQpg_jiZNDzyCbxc0_1rac0KcMr-Tyx-uh29ceO3lv3zV8X0SmJ1Npikm6Nv90xrsJMNbrzqNFmB77532VxL3V8ijgSxLDQ6ehQ-uPQsrByZEEeSGxCdLQv3yoM8JyBVzFUpEfFF8l_ZuzOfhkwbK30DBDJk4vVjZvVtT5JBO27FARLqBC5KMS1HRHklOXDITEfEc-ZPPqzY2J2Not83P_HBV4ewoKKDUFQF8KC7mgTz_0p2RwwzbG-h2_9w3B2Zm6ssPlDroN1c4fiyq2dosRTV-aJzv3symVdnVpawifEjt1gCi4YrXwOCZebchoU1kzzE7hdUo0HdaGvx2c1qAOJN0yg7o54ZgZbY77IwqMtxLZKJuMXufStBYjj65cRiUNJi-Kemze05x_1K1XZ0i_aGBnSYgOETKgFpDeWXU0Pj3q8cmh_EyVGTUU95xmdsjBkQGNZsG4gEzGHai6anaX6b5Kbe7aLBijs5ey8ty3yeX0YPlZCoNWlBXv9Xy6A9E1sJcXEdnzt4a6jWmYRyKwMzU4SmKVJ3PxoC0iLSnd6gUAMu97eSDg2Ws9IsBmQQKlV6T3DT8nzU14BuQE_GGGnJGlqlDPMFemKbst3K5FnUB1G6hlpZTFbY_jp3C51KA1pS8vyGB8kGtuROPZP59f4fSi9f2rCLPxD_j7zIjZyzK_7Pe5DfQM6x3I1ejqUGF6gt2Ga2clahUudX2i3sVu5OXbD-rZrZBqrGYkqI8LrkGL06Ogqy3ZcN0NGtWBiFmasvgKw5JXE_XRWYgkf-Zzd1iTFpKvUMN2ce5rUGjTMSdhgq25QzfQopkeTVBMgxd3kB2xoWegIo-ATuCBokmnL8fjRNniznr_0v7sA5itWA4FKKGgP97BLaowdRfwosx-cSyXU3hOxUcI5K9iSfToQpm1V8KY84cr8A0ok35iQcJ0f0pmLmKW0OXBC3DN46Fbs27C93u7o1Gd0-H0G5pc-dpRIbnlLk8WgLCtcP599IF3zqDY9I_ZDfqUeLcqWahua_LEhHjjZKWjmxLg6O1IyzqRdqSyAcf3-iRjSGcoMAC9BP_nJORiny1m8shNVkPKmIagqP13wt39DQl__Cee47eae2wA5DO626bhIJfQZEb27a0dd3uG_Cccurq5fzJnBcSipOzpMZz2F2y8BE02kUTW_6KJ8QSkhV6dxIA4HNi6HsRP0m6_9g74_r_sgrMAUjxDn2IFwIvn6eLKpGTJ4bgnvuR6CopydBvcHes-sSSs3SfL4wzbpwKWyurGj787FNqKm7-w9JOzGaonXwOgkV7y0GQXnVM_eZKyfTMfCuOny-DhPy54VKcvg6Xaz1HdJcbfkV-XOuFnbm-rLZrGGN-Va3Q8axw3NEWkqiX1YbOmD5oF4adf8LoJYyi-uswpkxzz6bkm6K_PjHmgkyizf4A2sAX9ERftme_6APTFD4pxsfn4XPHRWWPCV97vHgty3vDrNlm3xmD5k67pEJnTjCGsWOzz2GyR9wmLqNJAm3jDcI5gRk2QUPI_OTGHXJCSfXPfd5MGwTWP9y-WCe8VJ4Xl9Hu_76AtZfLdik1CX_sIUnXIJ7RqE1d7gw52O3TD85myewF8cIJg98WwXaEL7z2sIJCGiLIVmn87NkLfA79wux_r7i_MsIGdzqsSh8UeybyvPIBG8szraoxeEBbdrmUBnkPkMH06vd9XeGuhW1_7R8buyvqMABPl83qUuwKnzIo84ASEEPK3YreuXPVHwIXEHp8FUP3tndq0EuyR5HXWHIIvTIZZKcwOYxTk2Q6YORw_fcuWSUBkAOnnE85FQwXlmlCzhqnZ0pnNnRyMNhhz01n4w5ZBgJ7EXN5L5aG2POTIKJg-s7Jy3xIlenkmr7fn29IrUd57g4U1mdLzIyIAlz7oWve9Iig7K_8vupmsq1-2HLeeOh-qYgvvxZh3JiUKvR0VgecH97zPLfUodLwNtcdq1AM_aEepysXlM6EfJVxxJc6c3h9bzNZ20LQGO1L_oOe6GPWZR0Mlv1KDGF6QSVCEgxoYqmlkVQmhTcUNH1zM0DIEi4hzRn8kaJZzK1ABeOZNdKwNE9xnQk_OcfC4Npuk_aaRZJDFfas1tCBOu61JZZbpPr4C6NJmE_xIqhMCk4nsoScTeNSY3EpuWp2LPek_X9IkzodzHi0z95k0TJTYgWt9BqNJR5_HPArgZNx-IgnBsiCwAxOK6JM9_gNcZLUOl3sw1JDOc4XuqiERXxAbVk4WgTOHddgCUukPDl9A6KIwApFvRdzVUwSD4Fv5mgVoB4CnC4O6hqhfgVv8vv5WpCvyLGMsCpKyZTnBRpRsOQ0WqwMq2TWU5yPYsn1WbNOwmWomtc-QTtSa0vWo3t8rrhJJcFodK7bxfE25QJE4MN8pr5oUwSR74SBaV7EQPtOs4qwcuGghEZtb_lAFD1hPohFLMSfn9MPe3-aV6GbMPJWI30shESecbiLvUdURvYkDPviG1R54xw2i1XaAaRNfebTIcPla0Impy-SHpy8BFTpw7e8OLMkYeUdcQYW_IrabP2W3vFQZ5EbypYrztJm1pkn8SZ4uset2AMDJ-V4fN0qu9ncC_RRRK1SbtDTh0cU8cNcqskfIsqlHb5dlz0GIoTjrLN8ziOhs4sniGq2MOg_y5M_zuFD-Q2eLlg9rglCj7AFSuylPNxwi71qMis93DnHmbt1lhg0pa-ecaIplTbM0v_xD8zglBA5NvuqNh04VsJVKrl0zknvNPBqaFRp1haWOt2CLJQaInIOnYaayKEZ4FNerrolrcnK6HDCxvt07Jh31r9fiF5xW8RZjSg8djYlJHbAgWRVqhU=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_07941884d577ad4e016ae289e3d88087d089d1d02222e67804",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231330,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 442,
+      "prompt_tokens": 2951,
+      "total_tokens": 3393,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 234,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2948,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.011796,
+        "upstream_inference_prompt_cost": 0.007376,
+        "upstream_inference_completions_cost": 0.00442
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "247c84c15e0bc0bfe1131241d3d39b55418ef0ce4a803f327e2033bd719e68f1",
+  "elapsed_ms": 8160
+}

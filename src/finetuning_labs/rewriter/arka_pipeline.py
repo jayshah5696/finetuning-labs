@@ -326,7 +326,14 @@ def rescore_candidates(source_root: Path, root: Path):
 
 
 def run_generation(
-    root: Path, *, limit=None, resume=False, plans_override=None, prompt_override=None, workers=4
+    root: Path,
+    *,
+    limit=None,
+    resume=False,
+    plans_override=None,
+    prompt_override=None,
+    workers=4,
+    rubric_override=None,
 ):
     import yaml
     from arka.config.loader import ConfigLoader
@@ -337,6 +344,7 @@ def run_generation(
     root = root.resolve()
     plans = plans_override if plans_override is not None else scenarios()
     prompt = prompt_override or GENERATION_PROMPT
+    quality_rubric = rubric_override or rubric()
     if limit:
         plans = [x for mode in MODES for x in [p for p in plans if p["mode"] == mode][:limit]]
     root.mkdir(parents=True, exist_ok=True)
@@ -344,7 +352,7 @@ def run_generation(
         "arka_revision": ARKA_PIN,
         "plans": plans,
         "prompt_sha256": digest(prompt),
-        "rubric_sha256": digest(rubric()),
+        "rubric_sha256": digest(quality_rubric),
     }
     if (root / "source-plan.json").exists():
         if json.loads((root / "source-plan.json").read_text()) != spec:
@@ -365,7 +373,7 @@ def run_generation(
             "".join(json.dumps(x, ensure_ascii=False) + "\n" for x in seeds)
         )
         (root / "rubric.yaml").write_text(
-            yaml.safe_dump(rubric(), sort_keys=False, allow_unicode=True)
+            yaml.safe_dump(quality_rubric, sort_keys=False, allow_unicode=True)
         )
         config = generation_config("seeds.jsonl", len(plans), workers=workers)
         next(x for x in config["pipeline"] if x["type"] == "prompt_based_generator")[
@@ -381,10 +389,14 @@ def run_generation(
     mapping = {r.id: plan for r, plan in zip(sources, plans, strict=True)}
     generated = writer.read_parquet(run_dir / "02_generate/data.parquet")
     scored = {}
+    exported = {
+        digest(json.loads(line)) for line in (root / "native-output.jsonl").read_text().splitlines()
+    }
     for name in ["data.parquet", "dropped.parquet"]:
         path = run_dir / "03_label_quality" / name
         if path.exists():
-            scored.update({r.id: r for r in writer.read_parquet(path)})
+            records = writer.read_parquet(path)
+            scored.update({r.id: r for r in records})
     tokenizer, blocked = _tokenizer(), validation_index()
     rows, metadata, rejected = [], [], []
     for record in generated:
@@ -428,6 +440,7 @@ def run_generation(
                     "record_id": record.id,
                     "mechanical_issues": issues,
                     "decisions": decisions,
+                    "native_accepted": digest(record.export_payload()) in exported,
                     "tokens": {k: v for k, v in tokens.items() if k not in {"input_ids", "labels"}},
                     "opus_review": "pending",
                 }

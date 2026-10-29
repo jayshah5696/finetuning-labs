@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0112\", \"row_sha256\": \"b6e353467f052e285858fd3fe389913c5168cb7f89cfbf4396d8b254738e2d73\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"make me a prompt for a short operational summary of deliveries for North Quay Depot 14 for May 1 through May 7, 2025. the people who will read it are depot supervisors planning the next intake week, so keep the summary useful to them but don't pretend we know more than the records say. It should cover what was scheduled, what arrived, and what still needs checking. I want the final summary in a numbered checklist, and each checklist item should put the evidence first and any recommendation second. That format is for the final summary, not the background material or this request. If the evidence doesn't support a recommendation, say that rather than making one up. Don't turn the checklist into a general essay.\\n\\nThe depot intake ledger shows 26 deliveries scheduled during the seven-day period. It records 23 as received, two as delayed, and one as canceled. Its received rows add up to 812 units. Treat those as ledger figures, not as independently verified totals. The ledger does not say that every unit was inspected or cleared for onward dispatch, so don't call all 812 units usable stock. The period is inclusive of May 1 and May 7. The records are about inbound deliveries at North Quay Depot 14 only, not outbound shipments, other depots, or depot performance in general. We need a concise account of this one week's activity, not a new inventory report.\\n\\nThe source material includes the intake ledger, the gate log, supervisor notes, and a dispatch board snapshot. The gate log matches 22 of the 23 ledger entries marked received. The other recorded receipt has a gate timestamp of 11:58 p.m. on May 7, but its ledger posting date is May 8 because the batch was posted after midnight. The supervisor notes say, “we can confirm the pallet count, but not the carrier scan time.” Keep that quote as a statement from the notes, not as a confirmed explanation of the date difference. If the summary uses gate time to decide whether that receipt falls within May 1–7, include it as a May 7 arrival and identify the posting-date mismatch. If it uses ledger posting date instead, explain that it falls outside the period on that basis and identify the conflicting gate timestamp. Don't silently pick one date or claim the records resolve the difference.\\n\\nThe two entries marked delayed were scheduled for May 6 and May 7. The dispatch board snapshot labels both “awaiting revised slot”; neither the snapshot nor the notes confirms a later arrival date. Don't describe either delivery as received in the period, and don't imply it arrived afterward. One delivery scheduled for May 5 is marked canceled in the ledger. The cancellation note says the carrier withdrew the booking before arrival, but the note does not give a reason. Report the cancellation as recorded and do not guess why it happened. The gate log has no matching arrival entry for that booking, which is consistent with the note but isn't a reason for cancellation.\\n\\nOne of the ledger entries marked received lists 42 units and has a supervisor note that its seal check was still pending at the time of the note. The record does not say whether that check was later completed. Keep the receipt status and the pending-check note distinct; don't change the ledger status to rejected or cleared. The 812-unit total is the ledger sum for the entries marked received, and it does not by itself answer the seal-check question. Avoid treating a recorded receipt as proof that every follow-up check is complete.\\n\\nThere is also a query included as a reference for how a separate received-units breakdown is defined. It groups results by depot and sums units only for rows whose status is received and whose units value is greater than 31. No query result or database extract is supplied here, so don't report a result from it or substitute it for the ledger total. Preserve the query exactly if reproducing it in the prompt or final summary:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 31\\nGROUP BY depot_id;\\n\\nThe summary should distinguish recorded facts from unresolved points and should use plain operational language. Include the period, depot name and number, the ledger counts and unit total, the gate-log match count, the two delayed bookings, the canceled booking, and the pending seal check. Make it clear that the May 7 late-night receipt has conflicting gate and posting dates, and follow the conditional treatment described above. Don't infer a trend from one week or add delivery names, carrier details, unit breakdowns, explanations, or dates that aren't in these materials. Keep the quote exactly as supplied if you use it. Do not present the query's filter as if it were a result.\\n\\n1. For the final numbered checklist, start each item with the specific evidence from these records. Put any recommendation after that evidence in the same item, and only include one when it is supported. If none is supported for a point, say no recommendation is supported by the supplied records. Keep each item focused so supervisors can distinguish the ledger count, the date conflict, and the unresolved checks rather than blending them together.\\n2. End the final checklist with a substantive item about what remains unresolved: the late receipt's period treatment depends on which date basis is used, the two delayed deliveries have no confirmed later arrival, and the 42-unit receipt's seal check has no recorded completion. Preserve those qualifications in the final section. Don't add a conclusion that claims the week was successful, that the records were reconciled, or that the depot is ready for the next intake week.\", \"output\": \"Write a concise operational summary of inbound deliveries for North Quay Depot 14 covering May 1 through May 7, 2025. The intended readers are depot supervisors planning the next intake week. Summarize this week's scheduled deliveries, arrivals, and items that still need checking. Do not broaden the scope to outbound shipments, other depots, general depot performance, or a new inventory report.\\n\\nUse only the supplied records: the intake ledger, gate log, supervisor notes, and dispatch board snapshot. Distinguish recorded facts from unresolved points, and do not infer information that the records do not establish. Present the final summary as a numbered checklist, not as a general essay. Each checklist item must give its evidence first and any supported recommendation second. If the records do not support a recommendation, say so rather than inventing one. This checklist format applies to the final summary, not to background material or this request.\\n\\nThe intake ledger records 26 deliveries scheduled during the inclusive seven-day period: 23 received, two delayed, and one canceled. The ledger entries marked received add up to 812 units. Present these as ledger figures, not independently verified totals. The ledger does not establish that every unit was inspected or cleared for onward dispatch, so do not call all 812 units usable stock.\\n\\nThe gate log matches 22 of the 23 ledger entries marked received. For the remaining receipt, the gate timestamp is 11:58 p.m. on May 7, while the ledger posting date is May 8 because the batch was posted after midnight. The supervisor notes state, “we can confirm the pallet count, but not the carrier scan time.” Treat that quotation as a statement in the notes, not as a confirmed explanation of the date difference. If using gate time to decide whether the receipt falls within May 1–7, include it as a May 7 arrival and identify the posting-date mismatch. If using ledger posting date, explain that it falls outside the period on that basis and identify the conflicting gate timestamp. Do not silently choose a date basis or suggest that the records resolve the difference.\\n\\nThe two deliveries marked delayed were scheduled for May 6 and May 7. The dispatch board snapshot labels both “awaiting revised slot,” and neither it nor the notes confirms a later arrival date. Do not describe either as received during the period or imply that it arrived afterward. The ledger marks one delivery scheduled for May 5 as canceled. Its cancellation note says the carrier withdrew the booking before arrival but gives no reason. Report the cancellation as recorded; do not guess at its cause. The gate log has no matching arrival for that booking, which is consistent with the note but does not explain the cancellation.\\n\\nOne ledger entry marked received lists 42 units. A supervisor note says its seal check was still pending at the time of the note, and the record does not say whether the check was later completed. Keep the receipt status separate from the pending-check note. Do not call the delivery rejected or cleared. The ledger's 812-unit total is for entries marked received and does not answer whether the seal check was completed. A recorded receipt is not proof that every follow-up check is complete.\\n\\nThe following query is supplied only as a reference for a separate received-units breakdown. It groups by depot and sums units for rows with status received and a units value greater than 31. No query result or database extract is supplied. Do not report a result from the query or substitute it for the ledger total. Preserve the query exactly if reproducing it:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 31\\nGROUP BY depot_id;\\n\\nUse plain operational language. Include the period, depot name and number, ledger counts and unit total, gate-log match count, delayed bookings, canceled booking, and pending seal check. Explain the conflicting gate and posting dates for the late-night May 7 receipt and apply the conditional date treatment above. Do not infer a trend from one week or add delivery names, carrier details, unit breakdowns, explanations, or dates not present in the materials. Keep the quotation exactly as supplied if using it, and do not present the query's filter as a result.\\n\\n1. In the final numbered checklist, begin each item with specific evidence from the records. Place any supported recommendation after the evidence in the same item, and include a recommendation only when the evidence supports one. If none is supported for a point, state that no recommendation is supported by the supplied records. Keep items focused so the ledger count, date conflict, and unresolved checks remain distinct.\\n2. End the checklist with a substantive item identifying what remains unresolved: the late receipt's period treatment depends on the date basis used, neither delayed delivery has a confirmed later arrival, and no completion of the 42-unit receipt's seal check is recorded. Preserve these qualifications. Do not add a conclusion claiming that the week was successful, the records were reconciled, or the depot is ready for the next intake week.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0112"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "b6e353467f052e285858fd3fe389913c5168cb7f89cfbf4396d8b254738e2d73"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "d2e9e03e9bea805518e7984515782746bba041e4ad8a469ec6bfdf2f148ae74e",
+  "started_at": "2026-10-28T23:30:22.156663+00:00",
+  "result": {
+    "id": "gen-1793230222-nGCNy9CGxiLgSzb4jXIn",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0112\",\"row_sha256\":\"b6e353467f052e285858fd3fe389913c5168cb7f89cfbf4396d8b254738e2d73\",\"critique\":\"The input is a coherent, self-contained prompt draft with recoverable intent and no material contradictions or artificial padding. The output appropriately reorganizes the request without performing the summary task. It preserves the inclusive period and depot scope; all delivery counts and unit figures; the gate-log match count and conditional treatment of the conflicting dates; the delayed and canceled bookings; and the unresolved 42-unit seal check. The supervisor quotation and SQL query are preserved exactly. The evidence-first numbered-checklist requirements, limits on recommendations, substantive unresolved-points ending, and prohibitions on unsupported conclusions remain intact. No material omission, invented requirement, or change in certainty is apparent.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oWSFl4k06IsLIfbk_A1JaJ4t8K6mqDYnE2DEYe3ms3sS79uMEN_Ppqiyq95iaajqcRf0CsvPtNjwBevsU_yA1_Mnae9AjC85hSileYWXZPen2I4slmkMViV9N_0E20DdR4I8dPi2ZQ6C1JrPo36VB5f4NXcTVS7jCqfkoqHHM1nHYFi61hSEU5hjzDPLBGYAjor9JSCGqsA9XZM8rvRJiRnjOZET70ZyifYgqj-wunfQZkrmzYnMyYjCOqhfysja_Djf9nmvHOzK4tKprXJGXfdMFa0ZNaEQ9G74KLFHyDlJjBJdcAf1zz-9wUyI_oQXiDKlgC4c2ss6L5oK-yz8C9jO5FI66x15t8ncyqXM19sNGpogm8MbtO_SIBrm2D4Q2P3-nx79tHjPvQ-mHzANeCGwnSFkefiCJUgA1t1yBp9suYaBotjDk00qZ91NY2_FZJWbGR84Q8Ani4IUAJeX_X-L9-5dNwpTzCUZNEHnrLDqJaDq1KqYx_b_eeLd3EmwIU4sjNRfOsc96azkCr98Z9LkPUSnxK06JMoNXd6sgP6bMBnBvjrZmhnVN2rmtcFitmsz4sBlFizIdKbZKoJVA4c3THAg0Wj88wDfY904UYdPzlI3DySrH7nKhbZRXbv51lEoOHJL8tYpQXLSufqqnT6FaKOZdc-tAnCZeQRdR_7qHltnzBCUf9RvE7O_jnR11n3uVN_lZP8aYRKL6W4RKWHqGyUVHDADl03vhJxHNszGXHwoIiFtkpru-f6un3-N6keFC_xiku56PRrdwKB4tjuPgofghkQA_wv94yG7E1QWqXvhNBeSJF_38Aj3afogbJ3YK-pV7mfcyYiXHz-C8DlunWRXFeBahQpRPPPl8xVrum97F3qHztXFjPxYVkFHZeWFrIMxJ0Sr-VrIKQeE-tNBF3sJ2iGr2KgKmKL1HrOHKsVKoddR2wTrSPF_XRxWYPhw_LL94b8mOyxqUdnNvdw0mCAcC7v9XjPGHngRDyYuZ8Ak8tuDDXnHh538Jey5J4vsMfIN8OlswFr51r3bvGf39sBK1AJBgKQOCfWWuIRdseBYC9_c6x_wf7WDqkXXb7ki_t5W55RbA1ZZF-dj5XBPtOnwz5j-0MfSuYS8YG1EBHVD1sixCd2CeGVLnFZHxQ4C1K-_lDyVlBLWYXgDuZRYM7X0RkQz7eydoOAtXeE8K4NjYe3Da9m5Ji-ALfhUJMC02ClUoJiBzM8-Nrcrq9D1nI197cpLHff1YCwHC0BxAFgzrw6FICAepr5vZXpsBJZCbhC40dJ2wQQyMGHF8PkqIeRDU0lkhkoqGPOA_N065lbpg_2mxPGvZ-dS5O4HV_KV6FHxLHd_Hupg9CnVDsFgpvVKmiL-JMxNnV1qxZ-BD5F_XuuH2ly_imFtvG71QpZySy7cUdY91oiix2QuaO9Q2RFIAVno1XvJwP02o4DeQjtZnuCiREY5WfVyOJkioBprzGja-kMD24maB0DwxWWChD61ML7n9N3Myb5H-UUF_ArkWCCl9ALmE3rQdldSBji5JYPVTE7t6LDPO80-d4V1hs405LeiW8raUd0eHmlAYUSECeC_yiApC40Yb9J8NxJy2ag5vtoAYhN0v--_CP9udhuC-cNRlAJASrmtDzsgF-Yr5I5pnmxjMlMlDlDXIOUv8ETnR777kg7hf7vsv85oK5V5HE3TdB5ZrRb4ULOMTx-8z7OujPmVtv9oVKkvXZHMz0ikgX1JCy54X3CyftNGwZyX2MdgFQ29BruaEoLyjp6ZtSXIEocXhZaEltxWD0Kt6lPBCzaFd9y0TnqRD6zHeSKlDxE1ky6mD1Zm66IzRamIoIHSk8rf7YB73d7FafW2AvgGbUmwarlzU3NG8wo90OdsMzP2YkhhDiTC0O3ZlAHgvjvfD2cmi0NuTw2IY9Al1RYtWpn09mL4T-x4RVmdVd9xgyRq2clxTyD5kiVwMHDoITdTGbkE0b1WgTCkvKfg3cbXDOTP9MskFOrQn9_NNgIjGmfrM4ofcN9pBpHRS8j51XPrUxhIfLJJF7kFmCEvOebHQkIM_mUVaDSHg7jftJoFYMYmgqnYm4CfMvQWOFzt55a6bfy8FFKs6dsXybMmfyMg4QMJJSywWKhW_d-OsNh-Bgp0_1w8zU3GbOzgweF4JL6ftfTBSyKQUphepMw6mfY10TxID94BGyIKwZNfA0TNkw-o418Vrjtvpn2s2AOMbRqw5m2mjoQ-zrFirFu6KBDAmNJnSayfdklOB2BIBhsNcGkQN9PcWV7zd6YFSHml1W2y4B4Pc-1hEg6ngvCuLAzTYdq7GuWk2TI30Yci_UQVVlt7DUNfNPPr7o8F5alADt9jga1y2tZIYTwuBK25OVikd6BHy4rhOHIBEkogig21-ZpdYN9lPO1YP-vyPnBXVQQAAC6c6rq0PG1S4_HEjA3L-47a0jTeOjJgH9Fm2bhtpONTp7i9dnq9BCOnKv_oyXFme2WlsPwJV3vZTKAS5j_IPe0Yaecw-RnQ7zUzgFB55uec9RHrBb9FUiwSHgzMVB_PNUnGH3vCvODwuLZKd7vSSJkVsIFpDIGbyRyJlxCpQujUwh3ZEaXOQ6bchBN7JaoJKi9X1mQ44XbNjMA8TWu5pHv0KTEQ4WgjsLY8nGtxd8UI4TogwztIDjjVtYxPNNTQInUiZdou7kr8THyncrd4gYoaPgoiv6ob5NhAJEsChNFTu0TqbFjOv3uBGdv0xswGWs0eK6fJgcR1GESfc5mTweyfI6h1vor3Xm2ha61S64LERfwe4WsaOi1mK49pUD7xJfbovgC9akW7GQBbWi0DO1xYeSOJBZWNxvrkww9t9uwUIKJi6iQPP8RVwlEPYZaPX7p7nmzH73bi8GjGOUz2DHjTEUl-9z2QyXiYJ63s2y5L17HTjNpwR0Kx5XVbS_mTobJxtg_kaxoJLcwyGx9H2ik2kKd_SW_MLdd_ZXFllNtkWqEdJnonoP2PlzDtLhB7EQqv7RK7JCM0wiZU1Ml-8qlawt90wrc9D0V1KwQqTwYeqsfZXeIGGjJi5Pgt0UKbezPTE1U4esI6Dp5fQo8fq9ndYTLNwxlyiUogaEtvKb8KDOs5MKj0u4mCsAkmd8G76MiqI73_FBpZ5sUCV1XcyTdsvcWz5kbOwrx-4pRoWaSlhzzVsQsu7hQcAk3eKqyavIHxWE4XVN7XEHXlrS8rsROs7fj2NqsWltX3lkVm3HXhkQ_N27Fc9caxa2MiHJRH7MjjRrxNjtCP69OBTDdcRl8orUJCiSAKPGuGcPvYBTfU3I5m8lQSzMor4-SpJXcuwL7bKSI1EGXfHCPg2s_iNfg4lv4MbPh5TPhO8HUqh4yvFeewdGrZNj_QABx0ii943Lol2bPNJBT2jdASVDlaeM5Q84KDbmdPMIvEZuc2pTEcKtqmhqASMpdUcgL5Aaieuausij9TS8hJpoFtO7hgHgvr3c5GLElW_0M2_IPXPLBNjCiRtxmS358P6D_g7h-pwZWoNEJRKr6rLdu.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01ee2afa43f923b6016ae2858f6f9487d085f8418767cff449",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230222,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 359,
+      "prompt_tokens": 2782,
+      "total_tokens": 3141,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 136,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2779,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0038739,
+        "upstream_inference_prompt_cost": 0.0002839,
+        "upstream_inference_completions_cost": 0.00359
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "bbd51bcef8ea32330e4e76b5a79292c5b70e7128cd5d3f208eeb57bc8d23cc32",
+  "elapsed_ms": 7238
+}

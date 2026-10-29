@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0043\", \"row_sha256\": \"97eba284b4c3c16629f96de8a1d25de2458816e0f92fe2c8ed27e62c06656000\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i need a technical proposal and a focused test plan for batching records in the photo importer used by the North Quay Archive. please organize this into a prompt that asks for a design, not a patch or a finished implementation. the importer receives rows from camera cards and from archive manifests, and the same component is used by the desktop ingest tool and an overnight command-line job. those callers already hand it records; the question is how to group them for the storage writer without changing what a record means or losing the relationship to its source.\\n\\nthere are usually between 200 and 900 records in a card session, but one manifest can describe several thousand. a record has a source_key, original_filename, captured_at value, checksum, album_id, and sometimes a sidecar_path. the importer may encounter a missing sidecar_path, but the other fields are present in the records arriving at this component. don't ask the design to invent a new schema, rename fields, or infer metadata from filenames. the storage writer accepts a list of records in one call and reports success or failure for that call; it does not accept a streaming iterator. the proposal should say where batching belongs relative to the importer and that writer, and explain the record flow at a useful level without designing the rest of the application.\\n\\nwe currently use a default width of 56 because that has worked well for the desktop tool. there is a small helper already in the code review notes, and please discuss its relevance rather than silently replacing or “improving” the supplied lines. it slices the input list into consecutive chunks, but the design still needs to explain what the width means, how a final short batch behaves, and what happens with an empty list. do not assume that every caller will always use the default. both callers need to be able to choose a width, and the design should cover how invalid widths are handled, but it should not invent an agreed error policy where none is given. the overnight job usually uses 56 too, though the request is to make the choice available, not to assert that it uses another value.\\n\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nkeep the incoming record order stable through batching. the storage writer's existing behavior is to commit or reject one whole call, not individual rows; each resulting batch therefore needs to stay identifiable to the caller if that call fails. the importer can retry a failed writer call, but this request does not settle retry counts, delays, or whether retries happen automatically, so flag those as decisions rather than deciding them. make clear that a failed batch must not be described as a successful import just because other batches succeeded. don't propose a transaction across the entire manifest: the writer has no such interface. the plan can describe what the caller would need to know to report partial progress, while distinguishing that from a claim that reporting already exists.\\n\\nthe archive staff have a few practical observations that should remain visible in the prompt. one curator said, “the card order is the story” after finding a set of scans whose sequence mattered to an exhibit. a field technician said, “don't make the field team rename files on the road” because cards are ingested with their original camera filenames. a developer summarized the boundary this way: “a batch should be a transport unit, not a new album”. Treat these as reported concerns, not as a request to group records by album or to edit their names. Album_id is data on each record; it is not permission to reorder or merge records across the input.\\n\\nthere are two source notes from the last intake that are relevant to test examples. please include them as ordinary context, not as claims that every import will look this way: “Dock 3 set: filenames are already in camera order; two sidecars arrived after the image rows.” and “Gallery manifest: one album spans 143 records, with a checksum mismatch reported on the final row.” The sidecar note is about a missing or late sidecar reference and does not change the record order. The mismatch is reported by intake staff; this request does not say whether the importer or writer validates checksums. Avoid implying a validation outcome. The design and tests should make it possible to discuss these cases without adding a checksum policy or a rule that sidecars must be present.\\n\\nplease make the eventual proposal useful to engineers reviewing a small component change. cover the batching contract, order preservation, caller-selected width, final partial batches, empty input, and the boundary between grouping and writing. Give a focused test plan that includes ordinary input, a length that divides evenly by the selected width, a remainder, empty input, and a case that demonstrates record order is unchanged. Also include tests or open questions for a writer failure affecting one batch and for the invalid-width policy, without pretending those policies have already been chosen. keep the tests at the component boundary; don't turn this into an end-to-end redesign of the desktop application or overnight job.\\n\\none condition matters for the later design discussion: if archive mode is selected, preserve source order and do not split records from the same captured burst across batches. The current records do not include a defined burst identifier in the fields listed above, so explain that this condition depends on identifying what source information is available; do not invent a burst field or claim the condition can already be enforced. For other modes, the request only states stable incoming order, and does not ask for extra grouping rules. Please make the proposal call out this gap and leave the needed source information as an open question. End with a concise list of decisions still needed, including invalid-width behavior, retry policy, and how archive-mode burst membership can be established.\", \"output\": \"Write a technical proposal and focused test plan for batching records in the North Quay Archive photo importer. Describe a design for a small component change; do not provide a patch or finished implementation, and do not redesign the desktop ingest tool or overnight command-line job.\\n\\n## Context and boundary\\n\\nThe importer receives records from camera cards and archive manifests. The same batching component is used by the desktop ingest tool and an overnight command-line job. Those callers already provide records. The component should group records for the storage writer without changing their meaning or losing their relationship to the source.\\n\\nA record contains `source_key`, `original_filename`, `captured_at`, `checksum`, `album_id`, and sometimes `sidecar_path`. The other listed fields are present when records reach this component, but `sidecar_path` may be missing. Do not propose a new schema, rename fields, or infer metadata from filenames. The storage writer accepts a list of records in each call and reports success or failure for that call; it does not accept a streaming iterator. Explain where batching belongs relative to the importer and writer, and describe the record flow without designing the rest of the application.\\n\\nCard sessions usually contain 200 to 900 records; a manifest can describe several thousand. The current default width is 56, which has worked well for the desktop tool. The overnight job usually also uses 56. Both callers need the ability to choose a width; do not claim either caller uses a different value.\\n\\n## Existing helper and batching contract\\n\\nDiscuss the relevance of this helper without silently replacing or “improving” its supplied lines:\\n\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nExplain what width means, how a final short batch behaves, and what happens with an empty list. Do not assume every caller uses the default. Cover invalid widths, but treat the error policy as undecided rather than inventing an agreed behavior.\\n\\nKeep incoming record order stable through batching. The existing writer commits or rejects one whole call, not individual rows, so each resulting batch must remain identifiable to the caller if its writer call fails. A caller can retry a failed call, but retry counts, delays, and whether retries are automatic have not been decided. Flag these as open decisions. Do not describe a failed batch as successfully imported merely because other batches succeeded. Do not propose a transaction across an entire manifest; the writer has no such interface. The proposal may explain what a caller would need to know to report partial progress, but must not claim that such reporting already exists.\\n\\n## Reported concerns and intake notes\\n\\nKeep these remarks as reported practical concerns, not as instructions to group records by album or edit filenames:\\n\\n- A curator said, “the card order is the story” after finding scans whose sequence mattered to an exhibit.\\n- A field technician said, “don't make the field team rename files on the road” because cards are ingested with original camera filenames.\\n- A developer said, “a batch should be a transport unit, not a new album”.\\n\\n`album_id` is data on each record; it does not authorize reordering records or merging them across the input.\\n\\nInclude these intake notes as ordinary context, not as claims about every import:\\n\\n- “Dock 3 set: filenames are already in camera order; two sidecars arrived after the image rows.”\\n- “Gallery manifest: one album spans 143 records, with a checksum mismatch reported on the final row.”\\n\\nThe sidecar note concerns a missing or late sidecar reference and does not change record order. Intake staff reported the checksum mismatch, but it is unspecified whether the importer or writer validates checksums. Do not imply a validation outcome, add a checksum policy, or require sidecars to be present. The design and tests should allow these examples to be discussed without adding those rules.\\n\\n## Proposal and focused test plan\\n\\nMake the proposal useful to engineers reviewing this component change. Cover the batching contract, order preservation, caller-selected width, final partial batches, empty input, and the boundary between grouping and writing. Include a focused component-boundary test plan with ordinary input, a length evenly divisible by the selected width, a remainder, empty input, and a case showing that record order is unchanged. Include tests or open questions for a writer failure affecting one batch and for invalid-width behavior, without presenting either policy as already chosen. Keep the tests at the component boundary rather than making this an end-to-end redesign.\\n\\nOne condition matters for the design discussion: if archive mode is selected, preserve source order and do not split records from the same captured burst across batches. The listed record fields do not include a defined burst identifier. Explain that this condition depends on identifying what source information is available; do not invent a burst field or claim the condition can already be enforced. In other modes, the requirement is stable incoming order only; do not add grouping rules. Call out this gap and leave the needed source information as an open question.\\n\\nEnd with a concise list of decisions still needed, including invalid-width behavior, retry policy, and how archive-mode burst membership can be established.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0043"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "97eba284b4c3c16629f96de8a1d25de2458816e0f92fe2c8ed27e62c06656000"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "dbb959a49db7832b2a2deb309ff433dfa4ee9df1781bffb13468ec96b03fad40",
+  "started_at": "2026-10-29T03:28:01.954485+00:00",
+  "result": {
+    "id": "gen-1793244482-SaUaYSeKqYwgRKswXpMJ",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0043\",\"row_sha256\":\"97eba284b4c3c16629f96de8a1d25de2458816e0f92fe2c8ed27e62c06656000\",\"critique\":\"The input is a coherent, self-contained request, and the output is a clear design prompt that preserves the helper, reported quotations, test scope, and archive-mode uncertainty. However, it changes “The importer can retry a failed writer call” to “A caller can retry a failed call.” The input distinguishes the importer from its desktop and overnight callers, so this transfers the stated retry capability to a different actor. Retry counts, delays, and automation remain correctly undecided, but the actor change is a material fidelity defect.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r1GM23pUnlSzuq9RgVDHWfLXtFc7ntOiusCSGocI_Az2_Ro5rYbkaAV9qQbugit5lYN8Vbh4GnP3WvtQclep0QxWTu88HZ5tY11JklUuOPZNbSW-pzbSnJy_-jMtEhWTckumoGSpkPjLlr43HmRoyy_zj3IM6zH5Pq3uWI4opEFafZcgBifAczjOIOKt4dpbZ-ZijI7bart1LKLG0xk1hV8klfnrbkGf8njXLtNbXUNiJXxINUb-4TOWenapEU5xKJuRLD2L-h499_FEeMiT5ZXg-G8P-khzKROrBkcO5TEnHihmJh6KY63zjZIif1n6G-Eyu_5UBO5ugt-LxSNaX-rBEAtQlFtHi8Nl6E4hbs0uik-uyiSMiC6s43xIffCcAAIcET1H4sK7xB5AY1v6dapI-C12EzFW6JCAijdUmM4qZmeXDh30K7yKNSXsvQzDAdvtWKrDKhnSI3IVQuik4uBRTcT9oGQeGrVkIyR_1WZjuk6r8EvzHPRwZfjbw4REZEcsoxUvoHMC8GuvOzR68N30Uw5D1dP8xq0xMBcg8PtqbsojX0C6BLQMsdGJUFUS6VlbgsMf99N7hGb1hfrlxz0bCfdTgrYb25CXANm4-r9rz3wFf24HRDsen08uuYa_bimx4U3TpOppkc4QiaryCvjJ-W-MGpe_DpZxhYXsw1TdPINAerI9W9ruFFDpw2Mi7vVa_YfeQQv6dN8tCnU_PofzAP0l2VIOATAdogMfpKRvQ736Yea_8rg8oi5WTbOXDPoVuDVNdDzKczwRBoqLZ_S0drlUJVYdZZuwsw0H_VgJXeVYC4vPbSvjENNWA8cXX09oWt49XNlBtK8axd3-eqJtDrCWrCEtzQ7YPjn7naO3Dr286RW4KEOsOueROBrL_c7RFOCHk2Tn7wulYD5Aocvt8g0irszngkXJkkI0cPHgl_RxuZSlQV6-TPGFTlk8FO3eytIqAizgic52rJEuZYFnQcUCZ8z4ArkEVJ_H8Yc8iRZC_YKQs8dPVLb4oKwzzKEleDctg11aTtumOjia0c9BZQtXnHFyfdlyqw2fncWriRlWeGtq0Et7V6XgbU9WFPD7g40rfLkm3SRHBa-JUJcWfpOZLmbrpKEYpye5UysBMr6ieyXbLBBokVnDY4pUlQSpCpJjzu1IuNxOWQggZqB6I2m6Rp403043Mki_KktO6hmpqJVGPfNAqrXkheMacxYGhaf1Sfqy5OX9FlKHd0wAYKtHsEkrYK5jG4gE20VexdGiVc3FSQDd9ADualjhBOMoOezizNGcqxwR-93BwKFxQO7xnVoNbNPfmQtnOlR-fMIvBCwnzwuFbtfQwjfilivPrBq7z5aOaWNd4zlVGSOzLaxKrqG8mVzoSzoeGBGHqviph1bngeRhn8HB43i1JwCHsB2sJoi8j_pJyBQXdP6RxmrJw5luJqoyFWj5XESLZTjNNyZPxWStuZ2xg7oy-T2C08iO1qgZM2umlKH_dBoxEmUrpf2NtzFSll466eNDSGmlEkFBny5jcXs4isF3fuDq-K93mJTFVm8-VNvMzNcwM9oku46CJEw0Wk78CUq10sHgRFysrPFL54-lM3K3SQPw-koREZnAf38U0a39_SYoOMKg8h1pjjqtB2IIAo6DbRmeg0chOr72ThCDrhT1uS0ZLPhW1-n2WkS-Gah-bmZtc3ABzjnDq9_8Q5kAcLSDDF9kig5R1DFKKAlbr12ShhWO0TaAI0SxYqvCEoz2j6I29lXkpCxLg9jwi6_Nssbr97xapj2Qwchr-EC_M0aZSzZaaP-eo740er79A5K0DF06SSxe5cW4e70cUrQxlm6m-OP01pWKIzdFym2100zovzOjcq5g84-0YtooZoMIruxk0MstwdaTczUPfzpLcepXrqgg7eiz3--zCURuhAEnD2lJcwhbSKhxuGrD_oIMZObgAtad3hscinuvzU63MlGtqR_UZlX5C6BTnY2Ii4lwTeDpIDoJtA9jpqADRhy1xvyjwYdn2HEcWDmgWWZtJzM0FIWv4phaaQHv2BfdROiDql0Nds6URMPjS-E8hS1BFMFYk0vb4IGynEef13qWB2gRem3VP3e7qvBlJDIsF8omna5qYPWutXyM0HzgH55dR5Og58awRzW5pSxE3rXEQh6IWsZfghGZKYJJOmdXnfefLwEbj9dF9ig0xang1HSuEOvGvbV38xAEjPn-98mKFEh6GOuqEiN2yZs_sv3wy8xRT4lUPr80aNyldGcUoP-3_GmuFlEdMEpkDYW4Ak1HkfSWKHSC3C-ce_Zp9k_jnpkyXVJg0peuuZNzzoS5t8p6qK8ZTPxwGDnn0BDIVQ2GZKXdB-eOyRsify_6hwEHKbeUFKQlrEynkGNvMq-kn8_uRy_iuJTZ2tuwoOsLxMwqTizzTtReqWt7e-l6VrBMdElSRrj4Jyu9CDhYqHwOundRUpuRKhUnro5EfvykfWEAVGxv-Nyf02y5zMl9JANxT8mY-3-4Ek0vnGDFUZ9o-EyLJLuYzc5ugwH4CJ41DDfKQt0WwFfJB-Sefa74IbjnT2jL-7GNtWycSlYXFtdnE3jIWAEbwldtrR_HqKmoCbLyKryhpOjkLP7DOTPee_0wKGYgGgAU5_bPBw8Q7FZaw6YaUXadFEKSSgIL_Eyv_Kuy8XdtAP8deNfJwDOlj7WfIetccvn2sDgpbn7mCxCj5jFCt9qHP4naaryY5a-uIJO_fz56dK0iefx6hkTgVSeD-R9eT3_TMXuOA2bZNu3FHwhAR0u5kK_CNaslGG2cgMSwWL_mSJKbgF0VNOataOkMIQrs22XNb7RIaT_nRPMMmCiGhfosPP0WCeU7di6dffAfsRO_DKmMeKsjxcq7VB4BcRuQGDUxbVqz1wesPPxH_i5cknhK_niZeqiGfn7d_062_7BoRgDcJaun0azckAbd8uWQ0qtRPseAJ7hVRlh24DKasrLfeyFGmrvQZVwdO-V9Nc55Ok0uusmAIZZHwu97gPjag3yX7ybUM4ZxRp5J1K4vP-5MxtItfZlXQ5sjEyG4tNTHd8jsTMMCcTX32rW1Xzt3L4Hk-_VcneFFFNQ-5w8eOitMg==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_013245c4024f18b3016ae2bd4331f887d0a148486b2e7efabe",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244482,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 305,
+      "prompt_tokens": 2868,
+      "total_tokens": 3173,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 105,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2865,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0102185,
+        "upstream_inference_prompt_cost": 0.0071685,
+        "upstream_inference_completions_cost": 0.00305
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "a9766cd0d407d99dc474c32d527f5777f32f013af34d852caf75405e476e4071",
+  "elapsed_ms": 6854
+}

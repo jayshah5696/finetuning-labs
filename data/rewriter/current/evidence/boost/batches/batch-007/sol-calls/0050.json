@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0040\", \"row_sha256\": \"7d6aeb24a2089a53665a94cc7dc5564a661fe5df63f6bb862271f649f67840fb\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\ncan you turn these north quay depot delivery notes into a useful summary for the operations group. cover the delivery period from jan 8 through jan 14 inclusive, and keep it to the inbound deliveries at north quay. this is a handoff brief, not a general review of depot performance. the dispatch calendar lists 14 appointments in that period. the gate log has 11 arrival scans, signed receiving sheets are on file for 10 loads, and invoice matching has been completed for 9. those are counts from three different records, so don't present them as if they were the same count or assume the gaps mean a delivery was missed. the receiving clerk says, “the paper folders are one step behind the gate log this week.” please keep that as a quote from the clerk, not as an established explanation for every missing sheet.\\n\\nthere are a few operational details that matter when reading the dates. bay C was closed for a floor repair on jan 11 and jan 12, and incoming loads were directed to bays A or B during those two days. the maintenance note says the repair crew finished at 16:30 on jan 12; it does not say that bay C reopened at that time, so don't infer an opening time from it. a dispatch note records that one Atlas Freight vehicle waited 47 minutes at bay B on jan 11. the note does not say why it waited, and it doesn't identify the load number. don't attach that wait to a particular load without a matching record. the ambient stock area logged seven pallets put away during the period, and the cold room log has two chilled pallets entered. those are handling entries, not a complete count of all units received, and some entries do not have an appointment number beside them.\\n\\nwe need a compact but informative account for the operations group, using the records and notes described here rather than filling gaps from what seems likely. keep dates, counts, and record types distinct. there is no need to estimate a total received quantity from the pallet entries, and don't claim the appointment calendar proves receipt. the quality log records a temperature sensor battery alert at 06:20 on jan 12. the same note says the cold room reading was 4.1 degrees C at 06:25 and 4.0 degrees C at 06:40. the log does not record a temperature excursion, but don't turn that into a claim that every chilled delivery was checked or cleared. Mira, the shift lead, wrote, “we used the paper slips to keep the cold-room handoff moving.” that is her description of the process, not a count of which loads were checked.\\n\\ninclude the analyst's query fragment below unchanged in the prompt as supplied reference material. don't edit its wording or line breaks, and don't treat it by itself as a complete record of all depot deliveries:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 31\\nGROUP BY depot_id;\\n\\nsome source details have different levels of certainty. the gate log records scans, the signed receiving sheets are signed paperwork, and invoice matching is marked complete for nine loads; none of those labels should be silently substituted for another. a note from accounts says two invoices are awaiting a corrected carrier reference, but it doesn't identify the invoices or say whether they are among the nine already matched. leave that relationship open. the dispatch coordinator estimates that three appointments were rescheduled, but the calendar has no reschedule field and the estimate is not confirmed. mention it only as an estimate if it is useful, and don't recast it as a verified count. there are no carrier-by-carrier totals in these notes, and we don't have a full row-level delivery export here.\\n\\nplease make the output a numbered checklist for the operations group. within each checklist item, put the evidence or source detail before any recommendation; recommendations are optional, not the main task. distinguish what the records say from what a person has said or estimated, and use a short note where a limitation affects interpretation. if invoice and signed-sheet differences have not been reconciled against the signed receiving sheets by jan 18, label the affected details unresolved rather than confirmed. that condition applies to the status of those details only; it doesn't change the dates or the record counts above. don't invent the reconciliation result or imply it has happened.\\n\\nthere is also a staffing note for the period: the roster lists two receiving clerks on the morning shift on jan 8, 9, and 10, and one on the morning shift on jan 11 through 14. the note records the roster, not actual attendance. a handwritten margin comment says, “we borrowed a pair of hands from put-away after lunch.” it has no date or name attached, so retain it as an undated comment if you use it. the depot manager asked that the brief not single out an employee or carrier for blame; the material here does not establish a cause for the unmatched paperwork or the wait at bay B. keep the summary focused on operationally useful facts and the open questions, not speculation about fault.\\n\\nfinal scope note: this brief is for the jan 8–14 inbound-delivery handoff at north quay only. do not extend it to outbound dispatches, other depots, later weeks, or a full audit of stock. the cold-room readings, bay closure, pallet entries, appointment schedule, gate scans, signed sheets, invoice status, and quoted comments should remain identifiable as the specific evidence they are. leave room in the summary for unresolved comparisons rather than smoothing them into one clean total. preserve the jan 18 condition if it is repeated, and keep the final checklist item within this same scope; the operations group has not supplied a later reconciliation or a decision about what caused the record differences.\", \"output\": \"Create a compact, informative handoff summary for the operations group about inbound deliveries at North Quay depot during Jan 8–14 inclusive. Keep the summary within this period and scope; do not extend it to outbound dispatches, other depots, later weeks, or a full stock audit. Use only the records and notes below. Do not fill gaps with assumptions, estimate a total received quantity from pallet entries, or treat the appointment calendar as proof of receipt.\\n\\nFormat the delivery summary as a numbered checklist. Within each item, present the evidence or source detail before any recommendation. Recommendations are optional. Distinguish recorded facts from comments and estimates, and briefly state limitations where they affect interpretation. Do not single out an employee or carrier for blame or speculate about the cause of discrepancies.\\n\\nThe dispatch calendar lists 14 appointments for the period. The gate log has 11 arrival scans, signed receiving sheets are on file for 10 loads, and invoice matching is marked complete for 9. These are counts from different records: do not conflate them or assume that a gap means a delivery was missed. The receiving clerk said, “the paper folders are one step behind the gate log this week.” Retain this as the clerk’s quote, not as an established explanation for every missing sheet.\\n\\nBay C was closed for floor repair on Jan 11 and Jan 12. Incoming loads were directed to bays A or B on those days. The maintenance note says the crew finished at 16:30 on Jan 12; it does not state when Bay C reopened. A dispatch note records that one Atlas Freight vehicle waited 47 minutes at bay B on Jan 11, but does not give a reason or load number. Do not associate the wait with a particular load without a matching record.\\n\\nThe ambient stock area logged seven pallets put away during the period; the cold-room log has two chilled pallets entered. These are handling entries, not a complete count of units received, and some entries lack an appointment number. The quality log records a temperature sensor battery alert at 06:20 on Jan 12. The same note records cold-room readings of 4.1 degrees C at 06:25 and 4.0 degrees C at 06:40. The log does not record a temperature excursion; do not claim that every chilled delivery was checked or cleared. Shift lead Mira wrote, “we used the paper slips to keep the cold-room handoff moving.” Treat this as her description of the process, not as a count of loads checked.\\n\\nInclude the analyst’s query fragment below unchanged, with the same wording and line breaks, as supplied reference material. It is not by itself a complete record of all depot deliveries:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 31\\nGROUP BY depot_id;\\n\\nKeep record types distinct: gate-log scans are scans, signed receiving sheets are signed paperwork, and invoice matching is marked complete for nine loads. Accounts says two invoices are awaiting a corrected carrier reference, but does not identify them or say whether they are among the nine matched; leave that relationship open. The dispatch coordinator estimates that three appointments were rescheduled, but the calendar has no reschedule field and the estimate is unconfirmed. Mention it only as an estimate if useful, not as a verified count. The notes contain no carrier-by-carrier totals and no full row-level delivery export.\\n\\nA staffing note says the roster listed two receiving clerks on the morning shift on Jan 8, 9, and 10, and one on the morning shift on Jan 11 through 14. It records the roster, not actual attendance. An undated, unattributed handwritten comment says, “we borrowed a pair of hands from put-away after lunch.” If used, identify it as an undated comment. The material does not establish a cause for the unmatched paperwork or the wait at bay B.\\n\\nIf differences between invoices and signed sheets have not been reconciled against the signed receiving sheets by Jan 18, label the affected details unresolved rather than confirmed. This condition applies only to the status of those details; it does not change the dates or record counts above. Do not invent a reconciliation result or imply that reconciliation has occurred. The operations group has not supplied a later reconciliation or a decision about what caused the record differences.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0040"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "7d6aeb24a2089a53665a94cc7dc5564a661fe5df63f6bb862271f649f67840fb"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "0ed8ed8fc02a1691feb954f9dca3bf4e20fe4a219ebc4ba4eac4709ed0810212",
+  "started_at": "2026-10-28T23:49:08.995390+00:00",
+  "result": {
+    "id": "gen-1793231349-irySVobruCy4OHzmYhY7",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0040\",\"row_sha256\":\"7d6aeb24a2089a53665a94cc7dc5564a661fe5df63f6bb862271f649f67840fb\",\"critique\":\"The input is a plausible, self-contained drafting request with recoverable intent and consistent constraints. The output reorganizes it into a clear prompt without producing the handoff summary. It preserves the Jan 8–14 inbound-only scope, distinct record counts and evidence types, operational dates and measurements, quotations, staffing caveats, uncertain invoice relationships, and optional rescheduling estimate. The SQL fragment retains its wording and line breaks. The numbered-checklist requirement, evidence-before-recommendation ordering, no-blame constraint, and conditional Jan 18 unresolved status are retained without inventing reconciliation results or causal explanations. No material defect identified.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4on5G0RZqLPmF9Tc0wAuZ1r0iC3sL32ATJvMce6E78WcvtjZMuXVunhRB7IIlFAgoezzAo_TEbGNtGywTDqeQST3xIFVqpQS_uW31dVjqG6OnO_YQAxidr2Ly7AK38oPsj_PxJxYbJJmleFfTptRiNyxTd1wQz4iDQa9hxZ794Uj00cvk4gbb-xajxFFNWo2By1LVaE0GxdCj2Q78pyAfy7YXDyYNbLfCECMVyJHbZGO9L2Jmh0VcyyHqOdl-FpGKmtLa2ZyXkQA3Xr9DzcPC2W0bRs3odi5j3Y75ZxFXD-35xvlal8vkXqkUm9PtozUH49JW-6qzZT-VxFxG9RE4uLzedn361bPD1xrvCWA3DNnpKLYbi4rNIcgD4HwUVQR54VtFWQVAUCO-aBx4KV5tHzCL_VSt5V9DTNBxckS5GxmEotcVJS4f5hFXEC0TM7n-CQj_ffgJ_ZK7mmHzJGa8TwCeG8U4snZFNIwRE_ehaDoWl0nfPJnfvBZ4-JOgbRrjQVVmwsH5pm_AVIDJHxHDPo_A0bGuZcAxVTCATBvKVxw-qxTPLDnBvjrld0h9Eqb6EVQHzK6fEvy-ElOjQjgACz94-SL2FO0aW6TRZoi54wTSWy6cMeCbTVp3rnAsoLuZRHczRn320MUf27EW-cSYyQY2hzE3Kxfg3hNiPe7Crrz4vHGbP-xx3QJCuo-Ldgc62lkHELEcbiijmnGOa0e3y5Z2QZH5pYnESVQMiA2zxiXe8Fn_614SGXLHnwujhC7d-i7CbpNDas9ZvM45B_ZtIaSbsYqtLIhAq0AD4jbiyRDMb-1mTJ6iksHqsig3lIVuVkh4cjufsG-P6qTSamKH4vG8c7VcRYjt1RI2XTGkolasME8wfOWJM8Ctes3dOUiG0GV9OLMjolEsdhI-V2U5zmJmlPlhbITRHuQb0XK38AUTJNPk24OKZ5IhsBbH6xVB2XQ4OaP7ZQMAyUYPAdQfxYJjMPJeAzD7omiJhlCAjIbGK8-1tSgOFBP-9EZ-rPzrf76cFpj8kiUYQWYwH5YxlMWXXbIBsI8RpQA1uxofrBJPuGE_2HuMigQKd96L5BsCYDA_WdIwAJqp0r-YZROZTDbIaO-bF2qvf_eXgxKVIAkdpM_DaYLiDNtksTTgRmmVcCu6NoV19oUHyNd4YFFQzqmnpCAHas9J45F3WHlqGCL_wTdOCyJPzGv0l8kqKf93LP4NQfJ-58nV_sxK2-lnpmpI71WFA44KieiwvSLBQ_c4RsGykSjyEiTKjmfmnpzaEtSgY8AUotUte5VbKOnnV2Mky2j4YpHfNz6SlC717c6iTzWaoTzI4KaloL8PYH9vXMuCSUXnyr0hJ0skwD71WQt-V2PLPSXzHEDtCthdPvnZM90hhW-r-8p62TdZWtXU7nqnObK-c-LQY0FFcrTxdnDlVfVHHwrokm1Mbfd3zOXaiCLynHBga7xutyKEPaDgBKX5VLwgDRrOGIM-itNOdMHJmMYkiOOEnOtUm8Fq3Ac2A9XVcoYSYeiYPT80ttDJE5a93khfW5xMWfbIl4Fg45ACMBGY7SZIjczd7u41xuSV_jBZ4F6NE6-76V3IMHDMrzV46otYYec0DFCzDk9rpxRyms10S8afWT87EJctc82sbLXX4OZw3RV95xdRQn4Q0OrFOOURKegd09tTm083nRyz5NVwFE_sUmGZfZPMcUOp81TqccPCYle5URrrbdBlGtoXN1wb5O_f6M9TmpAXt_xkwx0-RU3e7ZgmmevQ7h1GNoR-P71fChDCGCYlrtIzE-5BPHgzUyIY37CLjOiiyiyK98_wb9kkT2WrJwaK6Bm5B_o9pzOjTxxES9z45PkaRnughlrCNAnwMq7xYMRYPUWar8oFNsiWUPGIypI5qY7bd0j8D78K_dyCXXNgeIXBDhWhhONYNqXgIs-gjIIOsYUVBIsXoCzEDna3DwKYkxxLvGZ5Sm3oV8aBgMIi3tb-E-87vRiqS3tjc5p7fxI7hWmvRHIpWxQ68jrvbUjqRGH3WmpXF9nyMeCPRasRNpoKFPdHRQVebbaDAlYKUFm8nUKo7Uq_RN7KN3aGrqjBSZtNLyC3hyNqzX3Fp9dwJOnEgR68DATMGMHnCCw4BEGl-McTwJDLgie3hMYVn3gnaaCyKPA3g0l3PZW2ocGTTsopHrukgUzAbDDxfCczH5zyoU0rGy_TjKmHoji7aDzS9kXyo6Jn1-slrGk9EzQ2MAXXqRKRPrlq-pwid2G1EON17QLj1G-hS1VRWfTg0GoAYuwrCws4jLdVag3YFVvZZHC7IVgaHH468t5igtgHru366LlGkq-8N8lVqbw5klmOR2Xrx-gKQHbYyZzbC_zT0kPmDR80R7_RlrpoHx23ahUFQZfbd8Sz9biod6DE2V_0Cl1vziEaY7zb9Zdg2RdLaQVghsmu7JQLROhphBW0E0JFhdS9tHd_NkDxXiXn2Hpb4T_rVPv-vJePkKno52tkD2G4lVax9SYkim5TFyrSCRFSJGdFqH0aIpDsJAmdDCGDsNxQGy_fT5r4OwtPHCs78sVIDF3f-jYBTspjDtdTOSmjPnrrZlVoHWCxxRNJfWLYb7jzJNCK3C92HB7auVIQ4f7R209ORyY0sUYx9vdYBAevXQR9-7EDCJk3njG3hDHI8S7aN8-tbWXaK7hjk6__AsM5ltqL85VDtXIOX3n6-2-wxUz0iNfUmvyxMIee-dFkDzbtvz61xOMyQ7_kG_j-W54BiVQhagN5Cy_Yf7kIqI9SImqhfmHvQ35JcAXEA1zoPNj3-cc7LvRuiCD7z0hbVEFA8FpWsqbVixNle3lBJHfRkn9BlvQVC-bPqq6278JXgjVdnzleSjrlRa1qfi94h_yvmoXozoYPFAch92EPmPg-JHLQxsGl2fpo24W5b750h5l1u2_QjxUJrTIGmNye7omlEhQfhufojF153N-5hmVHh4msCAC8-ebC4PRPkZfeHOgpVWcwxGFs-TNsB2XgL3jn6VB7P1g_glQqz5GOqqcrX_-LQBiSwYA2-XERPIa2IbcdRlvhbK1lFQBS79ed9KhfowF5YY7EccDhhrR23AYeCfU7qmC8zWrN7f4ZyFBZceIaDiyowawOiT6o0u9kndXxcV88NDwqvJqojvsg3L3q7yKRNJ6Vfu6J6PkcyshRaS-v7DOU5albJXi_nAM-yjm5xXaRXPemGci9LSyheGT43UW5fH1bpHfWNFfHUR71qB-05Jmm2ug6FaOB4FfvhNF-h_Jm0drXOo1w0-bHCPKxq5NKMDipKDwMfWLj4ozlmzShkXpm6dVZxSww1nd4aAh_HZ8BuYrZGC-VxBfXMInNMt6wKbMRRaz8Ba6kBWLk7U-7TlC2MJ4XwFT1NlQ1luC_V9cbHO-cWYE7jpjzopqO1j1jT7wgdNtA2tz8YC__gPwnRy61yJEpGwL54kC4TNca0BbAfQffTYtkKuoFB9m6cCUJ4ieMxelCEzpL_CQqzrudrci_fUHEZhHtQ8RdekA0J2J.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0adccf47b7f4cc28016ae289f61f1087d08c9a85babd3279e8",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231349,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 350,
+      "prompt_tokens": 2688,
+      "total_tokens": 3038,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 131,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2685,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0102185,
+        "upstream_inference_prompt_cost": 0.0067185,
+        "upstream_inference_completions_cost": 0.0035
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "5c05db129a63c58594b8996c6cc5b21fc7b887c610ca427d8fbb54081ef82328",
+  "elapsed_ms": 7090
+}

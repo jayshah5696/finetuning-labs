@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0019\", \"row_sha256\": \"027058fefcb7f7ce4250cfef4af43e0e9785488a27b4d112f29da4472b9702a8\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i need help turning this into a clear prompt for a technical design response. it’s for LanternDesk, a small desktop photo importer used by an archive team. The importer reads rows from a CSV manifest and copies image files into either a local archive folder or a network share. This is about batching the manifest records and coordinating the copy process, not redesigning the whole importer. It should not be about batching image bytes; the files themselves are copied one at a time.\\n\\nThe manifest is kept in its original order, and that order matters when a staff member compares the import with the paper intake sheet. The normal manifest has around 6,000 to 9,000 rows, though the largest import seen so far had 42,000. Treat that as an observed example rather than a promised maximum. Each row has capture_id, filename, camera_card, captured_at, checksum, collection_code, and folder_hint. camera_card is a printed label such as CARD-07, and filenames can repeat on different cards. There is a note from the archive lead: “the card number is a label, not a database key.” Another note says, “we need the order to survive a retry, not just the happy path.” Please keep both of those remarks in the prompt as direct quotes.\\n\\nThere’s also this source note, which needs to stay word for word: “source note: filenames are not unique across camera cards.” It isn’t a proposed rule for deduplication; it’s context the designer should account for when describing the records and retry behavior. Don’t turn it into an assertion that the importer already deduplicates by capture_id, because nobody has confirmed that. The prompt should ask for a design that explains what is known and flags that as an unresolved behavior if it affects the answer.\\n\\nThe current helper is below. Keep the code exactly as written and include it in the prompt. The useful detail is that its default width is 56 and it returns slices from the ordered records list; don’t silently change either of those details while explaining how it fits into the importer.\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nPlease ask for a practical design note that describes where this helper belongs in the import sequence, what data is passed to it, and how the resulting batches are handled. It should explain that batching applies to manifest records, that the original row order remains intact within and across batches, and that the importer should not use a filename alone to identify a record. Keep the scope to the existing CSV-based flow; don’t ask for a database migration, a new manifest format, or a general rewrite of LanternDesk.\\n\\nA condition that matters in the later handling is this: if the destination is a network share, the batch manifest must be written before file transfer; for a local archive folder, it may be written after validation. Keep that condition explicit and ask the design response to show where the two paths differ. Do not flatten it into one rule that applies to both destinations. The prompt should also ask how the batch manifest relates to the source rows, including which batch is being processed, without inventing a new identifier scheme.\\n\\nFor rows with no captured_at value, the requested behavior is to keep the row in its batch and flag the missing date. It should not be deferred to another batch or dropped. Ask the designer to account for that case alongside a row whose file is missing and a row whose checksum does not match. I don’t have a settled policy for whether either of those two file problems stops only that row, stops its batch, or stops the whole import, so ask the response to lay out the decision points instead of pretending a policy has already been chosen.\\n\\nThe user interface currently shows overall rows processed and rows remaining. Please include a request to describe useful progress reporting at batch level, without replacing those existing counts. A batch can fail during transfer and staff may retry it. Ask the design note to explain the retry path, how the original order and record association are retained, and what duplicate-copy risk needs to be considered. Don’t claim retries are already safe or that any operation is transactional; those details are not established. Mention that one failed batch should be distinguishable from completed batches in the explanation.\\n\\nPlease include a numbered section asking for a small test plan, with cases around an empty manifest, one row, exactly 56 rows, 57 rows, and 112 rows. The point is to check batch boundaries and the default width, not to demand a benchmark or a particular test framework. Include coverage for repeated filenames on different camera cards, a missing capture date, and a retry after a transfer failure. If the answer suggests any behavior that depends on an unresolved choice, it should label the choice rather than report it as current product behavior.\\n\\nThe design response should be understandable to the archive lead as well as an engineer: define any technical terms that are needed, use the supplied helper rather than replacing it with unrelated code, and separate observed facts from recommendations. Keep the final response focused on the requested design note and test plan. Close by identifying any remaining decisions the team needs to make about file and checksum failures or retry safety, rather than making those decisions for them. The importer is still in use during this work, so the request is for a proposal that fits the stated flow, not a claim that changes have already been implemented.\", \"output\": \"Create a practical technical design note for batching manifest records in LanternDesk, a small desktop photo importer used by an archive team. The importer reads a CSV manifest and copies image files one at a time into either a local archive folder or a network share. Keep the scope to this existing flow: do not propose a database migration, a new manifest format, or a general rewrite of LanternDesk. Batching applies to manifest records, not image bytes.\\n\\n### Current context\\n\\nThe manifest contains `capture_id`, `filename`, `camera_card`, `captured_at`, `checksum`, `collection_code`, and `folder_hint`. Rows are kept in their original order because staff compare imports with paper intake sheets. A normal manifest has around 6,000 to 9,000 rows; the largest import seen so far had 42,000, which is an observed example, not a promised maximum.\\n\\nThe archive lead’s remarks are: “the card number is a label, not a database key.” and “we need the order to survive a retry, not just the happy path.” Keep these as direct quotes. Also retain this source note word for word: “source note: filenames are not unique across camera cards.” Treat it as context, not as a deduplication rule. It is not confirmed that the importer deduplicates by `capture_id`; flag that as unresolved if it affects the design.\\n\\nThe current helper is:\\n\\n```python\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n```\\n\\nExplain where the helper belongs in the import sequence, what data is passed to it, and how its resulting batches are handled. Preserve the original row order within and across batches. Explain why a filename alone should not be used to identify a record. Keep the helper’s default width of 56 and its behavior of returning slices from the ordered records list; do not silently change either detail.\\n\\n### Processing and failure cases\\n\\nExplain how the batch manifest relates to the source rows, including which batch is being processed, without inventing a new identifier scheme. Keep this destination condition explicit: if the destination is a network share, the batch manifest must be written before file transfer; for a local archive folder, it may be written after validation. Show where the two paths differ rather than applying one rule to both.\\n\\nA row with no `captured_at` value stays in its batch and is flagged for the missing date; it is not deferred or dropped. Also address a row whose file is missing and one whose checksum does not match. The policy for those two file problems is not settled. Lay out the decision points—whether to stop only that row, its batch, or the whole import—without presenting any option as current policy.\\n\\nThe interface already shows overall rows processed and rows remaining. Describe useful batch-level progress reporting without replacing those existing counts. A batch can fail during transfer and staff may retry it. Explain the retry path, how record association and original order are retained, the duplicate-copy risk to consider, and how a failed batch can be distinguished from completed batches. Do not claim retries are already safe or that operations are transactional; neither is established.\\n\\n### Test plan\\n\\nInclude a small numbered test plan covering:\\n1. An empty manifest.\\n2. One row.\\n3. Exactly 56 rows.\\n4. 57 rows.\\n5. 112 rows.\\n\\nUse these cases to check batch boundaries and the default width, not to prescribe a benchmark or test framework. Also cover repeated filenames on different camera cards, a missing `captured_at` value, and a retry after transfer failure. Label any behavior that depends on an unresolved choice rather than describing it as existing product behavior.\\n\\nWrite for both the archive lead and an engineer, defining any necessary technical terms. Use the supplied helper rather than replacing it with unrelated code, and distinguish observed facts from recommendations. Keep the response focused on the design note and test plan. End by identifying the remaining team decisions about file failures, checksum failures, and retry safety. Present this as a proposal for the stated flow; the importer is still in use, and no changes should be described as already implemented.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0019"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "027058fefcb7f7ce4250cfef4af43e0e9785488a27b4d112f29da4472b9702a8"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "4fae542e2a6ff8e9da90f83d5e51e946186acfec57ed726690fcdbf9a21777de",
+  "started_at": "2026-10-29T03:19:55.036635+00:00",
+  "result": {
+    "id": "gen-1793243995-3d2JYKKiTVbZbP2id5mw",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0019\",\"row_sha256\":\"027058fefcb7f7ce4250cfef4af43e0e9785488a27b4d112f29da4472b9702a8\",\"critique\":\"The input is a coherent, self-contained draft request, and the output is a natural prompt that preserves the helper verbatim, direct quotations, destination-specific conditions, and unresolved failure policies without performing the task. However, it omits the supplied detail that camera_card is a printed label such as CARD-07. It also substitutes numbered test cases under an unnumbered “Test plan” heading for the explicitly requested numbered section asking for a small test plan. These are preservation defects under /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing camera label omissions**\n\nI need to address the omissions related to the camera card printed label \"CARD-07,\" specifically concerning its explicit context. The numbered section should be clearly headed without being numbered itself, while I need to flag concrete issues regarding outputs. The label example raises questions about whether quotes preserve its printed form and implications for the database key. It's crucial to ensure that no material is dropped, which could lead to failures in the testing cases. Overall, the output should remain natural and critique balanced.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing camera label omissions**\n\nI need to address the omissions related to the camera card printed label \"CARD-07,\" specifically concerning its explicit context. The numbered section should be clearly headed without being numbered itself, while I need to flag concrete issues regarding outputs. The label example raises questions about whether quotes preserve its printed form and implications for the database key. It's crucial to ensure that no material is dropped, which could lead to failures in the testing cases. Overall, the output should remain natural and critique balanced.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rtfXyarzHyC3MovJdk3IHbQwAdU8LedIKZoBxrmD7nHMb3GYDGsXafqoWtEhXOTZEZG0T01RrCggONr6RNGPil9z06YXb92JJhHb94NCKgfNFeJRWsyg0l5ySvL49O9oMIUDBiW9SsIUsgWko9OyULkMDlkcHJCFKBD7tCb6i5qDC_OtX0HjQWQ1LhYx8876M3ONFTgakvp0Cg_O7YkLgLaovY-ODzF8bBVWi1qGNZqqdoUli0VMN9FIffzTucWEtpiO_NfE9EH9QNRNFkNtmLVOSGcKPgXn-YHtoVjTvqQgvOm2DH5nii9A6lOCxD64H7grS0-lNDj-vxS7mXCXvPlb2KJzSUjVkaLqNSYAqdpxmYGzw2XfZTkvPF6FXgqSAo7qNuU7iKqMYa36Epy6VuZ4KBax5oBM11f1i6roJQwV9p2vjhINJoMzGLKh5AMA-z6GIhW8K2mI_oWNngA9ZJgPJa7sQVLQZ31n80HAL3Td4fNs0EfjdW07RT_dP1jNflshGZmZ7_yllSagWyz_ZS2Ot5IYgn0UzJB0C_3oIj23Icx3iF1VJRh9IAwKodzW5vWluucU8rHme55WtkYNhUk0Cr5hRty3YKsbvVqnh48uXzRTMoQVc4ALovPKL8g8iiMQEYyOUtF3nnJo2tiWliauAOstIKaUce5vWanzMXO5OZYPofVQpOQtE9jz2HA4dkZtDaNSt-bf8BGpp-MfiEv_b_UKnf9rnYxBJeaVfkWzdkYDhO32Y_bi1PJF1eAG4RH1nbB4zAUjt0zJCiEJRtOr0KKYjrK6jHncxzI9e26qJ50D05tPM-_IeRORd2B0JDIPASBgL8d1DZMD7AYPmytD2Sy8moGXWdRA6FN0Ash4ZAzzKos-s9M1KQBM1OaoGhRbX9ymzdg53Mo_pBLkBSgOpiW8KoRYHX4_1JVaAABmDH1T_kM4SL5ESE1z3H7-no-MUUI1oKLTnxQKzVM8YuwhrjLYLWy7SorZ3tFotZq5MFqNoxD6oFyuMdj9BCe3A9i9G9-LXR3nMrbog3PIoFf1Cf9yJS5FA4a_Bc88TTyzfUcmrQok4bZY0i3I0M6OiDa8zisFw6OPFD31DWwIYbHG_nkfMawkh4rJk3kAUMn5y2UHzsbw42A_1WjsV9U0kz67tUKpLrz8aZjuYmpXpHndF-Uxy2CNo_SFJj7P2QjFjhn11kNz4vl5pyRsexmsXYUFSX97mXvIoChfieIAlz8RoRI-9CmlTCyMenEHS3gzMN3_ZWu3OwN0Z3HnXkDm0186GqdlYfqz74PtmLyG5BjT-wi-XKahWsNpY-6gWMQ3SPJjD-d2k_6rZExWdCZxwm9CxO0KQDOsnWy9AjN8pbgO3GKoqsOh0LJltO7DABPONtRX56pWeiGhP_QsVuu3LdJtFj8ynbyCI6GbCwTspbM7b4lPHfF0z_S215QEekyiWM8whd_Fdy5u93g1-KaZH_Px0SnwIXg5vSX3c4ZI4RIUDCA5R5jC0WRLhxAWelTSoR1sc5zs_IC7DP2QNTZJnUPXJJGgV-7WvnN9QGbupcOjlT5hkZoZILCMLivD3TC3ziUT6ydBnFOhfb4fnc467MrI9xNrhVs2TnxFNzbpN5XzJVce9LKDArBv3gQeKHDPLBADjbzmymv_WI8n3BQF5GcKZBsC4xUvngr9cE_HS8VgS91c8tyFxnV_p46-a99nQvL8YUP6AtHIpjAIOJXHDxtKhK6ZXsUjqCoFeGcndGhmmSr4fuEvEo4tOS4h9TavveuGh_-xdKmr6uWiY9S1GymhdglLkiFLtEJdnZjyib2gAVVGp0U3t0hDx8SbHzkucBrWICm-PWJwAR-aMMqzRkAkbgoWxtQshm7giT9QmCKrGuior6cguHdqYnDsv2W0EOEX5R74Xr6rrGNtlq_gr8tncRv-l1-3KM0HqPuwFm2w_rHo-fyA9QavAhgp8yocLyj7fuP81zG-7yQBI2aY3pWot4qWqa-kNlEWNKCWAvoKiAtoNzby8KKNB7QB8FoWbPVdV-60RpcPpHRswVRFtY9TZ1V2lTTf7-zDz0nrTtRCcYv2TDVk1SKTx_cC_LyXBWdfdu1h3XAx3WgnPspA9spjQ1PcFVi-akED523XPqsncDXcDOp8VYZhXxb8KhuKuQ6vY9iBqyVnbDkeJjqp1ks3xGwfyJUfbgUwe6zsv1s3-24kKU8t-eBw_ZlsvT1PWzIhZPosFQEiOd_nl7PExjuYQjZ5BTsG0rc8vRRBEJFgDhhLOyh0Enfj2G3e9GODAbzL5M2uCIbUtlXASSQ0W6rahJrhh6NuC129NmIAxsgYg7GrF0sbHQhjRd8RO8l6Of0JJ6jhrkmD38rFpZ8Z4IHiHhIBnoSk9jPGU4fmCgQh5yuKZ8RLqD10OoPE0O-myk0rwXQoJm216JN9ixIlAckanETNoJoqkzDYlvUtxutsN1-FrpsvPHTklZF6JlYCD67t3NbGvf8iUQbljFyJekt2CEQJzwNb4LD6Nfv5DU8SWHgfQGFU7cKaeD6kc3PLRGtKzQ_LUIm0H4TIv0SBUZ_qOJ_cPKrLzQASG5kht1MHPz_wGZAT2Z6Al0Lx4NuJnU_HCRB0uQqKGAYch5zmGwSNG7EpMpsHoYsbDCyWciS_0fnPfMY4Pad83gSN6Gq0xCdDS2-tGUS4n71dm4Lj7L_AdtevRm309Zu-exebQhD5e4vn8TxmR2u--CKj5yVpeyRrkE45nDUEkoYTOoZWHkXwv3NJcWXIup-EoTT3w6XLr8LMn82F7icttNwgNB8HhVZXNOgsXGTyFXK0mky9iRCZYQuF9kdPtCWQz1WeZDUVmnx-fIFj3_JeF9cno63b0wR5UbEt61CGtUHNjqYJsXpMPofMpqHNrcOMucZypM0YA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_07337a7af18c8667016ae2bb5c45f887d0b50520f5a6b082f6",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793243995,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 287,
+      "prompt_tokens": 2608,
+      "total_tokens": 2895,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 92,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2605,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0093885,
+        "upstream_inference_prompt_cost": 0.0065185,
+        "upstream_inference_completions_cost": 0.00287
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "eb0c949874c9a5c575bf58aff7dd9870320a36694684d3696d16a531a03626a2",
+  "elapsed_ms": 6050
+}

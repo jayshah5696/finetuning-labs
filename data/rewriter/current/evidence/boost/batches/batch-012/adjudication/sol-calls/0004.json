@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-transcribe-long-0083\", \"row_sha256\": \"f238ee8fe9f5ff44454ec7f31468d8f501e871e9f7f3c716448c5e34af9334a3\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {}, \"identity\": true, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"The family photo importer is a small program that copies photographs from phones, memory cards, and shared folders into a household archive. Its job is deliberately narrower than a general photo-management application: it identifies files, preserves the originals, records useful metadata, and places each accepted file in a predictable folder. It does not edit images or decide which pictures are worth keeping. That distinction makes maintenance easier, because a change to the importer should not quietly alter the family’s photographs or their history.\\n\\nThe importer runs on a desktop computer when someone connects a device or selects a folder. Before copying anything, it lists the source files and checks their extensions, sizes, and available date information. The supported formats include JPEG, PNG, HEIC, and a small set of camera RAW formats used by relatives who still bring a dedicated camera on trips. Unsupported files are reported in the review log rather than deleted or renamed. A video file may be recorded as skipped, but it is not treated as a failed photograph. The log identifies the source folder and file name so that a family member can find the item again.\\n\\nThe archive is arranged first by year and then by event or source. A folder might be named “2024-07 Lake weekend,” while an image inside keeps its original camera filename. The importer can suggest a date-based folder from metadata, but the person running it chooses or confirms the destination. This matters when a camera clock was wrong, or when a group of scanned prints has no trustworthy capture date. For scans, the family may use the year the prints were made, the year they were scanned, or a known event date; the importer stores the chosen date as archive information without pretending that it came from the camera.\\n\\n1. Review and copy sequence\\n\\nFirst, the program builds a manifest containing the source path, file size, available timestamps, detected format, and a checksum. It compares that information with the archive index and shows possible matches before copying. A matching checksum is strong evidence that two files have identical contents, but a matching name alone is not enough to call them duplicates. Relatives often have files named IMG_0001.JPG, and two unrelated cameras can produce the same name. If the checksum matches, the importer can offer to leave the existing archive copy in place while recording the new source location in the log.\\n\\nNext, the person reviews proposed folders and any warnings. A file with missing date metadata can still be imported if the destination is chosen manually. If the source becomes unavailable during copying, the importer stops that file, reports the problem, and leaves the rest of the review available. It does not mark a partial copy as complete. Once a file has been copied, the program verifies its checksum against the manifest and records the result. If verification fails, it keeps the source untouched and flags the archive copy for inspection instead of quietly replacing either version.\\n\\narchive.retain_originals\\n\\nThis setting expresses a central family preference: imported source files remain available in their original locations. The importer copies files; it does not move them, delete them, or rename them on the device. That rule applies even after a successful verification. A person can choose to remove a memory card later using the device’s normal controls, but that action is outside the importer’s copy process. The settings file is backed up with the rest of the importer configuration so that a future maintainer can see which behavior the family expects.\\n\\nThe archive index is a small database stored beside the collection’s maintenance records, not inside an individual event folder. It keeps the checksum, destination path, import date, selected event label, and original source location when available. It does not contain image contents. If the index is missing or unreadable, the program reports that condition before importing and asks the operator to select a recovery procedure; it does not create a fresh empty index over the existing file. Periodic backups include the index, configuration, and import logs, while the image archive is backed up separately according to the family’s normal storage plan.\\n\\n2. Practical maintenance notes\\n\\nA maintainer should test changes with copies of representative files rather than with the only copy of an old family image. The test set includes a phone photograph with timezone information, a scanned image with no camera metadata, two different pictures sharing a filename, a true duplicate with a matching checksum, and a damaged file that cannot be decoded. Expected results are written beside the test cases. For example, the two same-named but different images should remain distinct, while a true duplicate should be identified without discarding the new source. A damaged file should produce a useful warning and should not stop unrelated files from being reviewed.\\n\\nDate handling deserves special attention. Some devices store local time, some store a UTC timestamp, and some store both. The importer records the metadata it actually reads and documents which value it uses to suggest an event date. It does not infer a precise time zone from a family member’s current location. If the timestamp is ambiguous, the review screen marks it as uncertain. A manually selected event date remains distinguishable from a date read from the image, which helps later searches and prevents a correction from being mistaken for original camera metadata.\\n\\nThe family’s shared folder includes a short runbook with the application version, supported formats, backup locations, and steps for a test import. One relative maintains the software, but another person checks the runbook each year so the process does not depend on a single person’s memory. Changes to folder naming or metadata fields are recorded with their reason and the date they were introduced. When a new device produces an unfamiliar format, the maintainer tests a sample and documents the result before adding support. The importer should report a limitation plainly rather than silently treating unfamiliar data as an ordinary JPEG.\\n\\nThe program’s ordinary messages are written for relatives who are comfortable selecting folders but do not want to diagnose a database. A message such as “Three files need review because their dates are missing” gives a useful next step without implying that the photographs are damaged. Error details remain in the log for troubleshooting. The interface distinguishes a skipped item, a failed copy, and a verified copy, because those states call for different responses. The wording and status labels are kept consistent between the review screen and the saved log.\\n\\nThe final maintenance check is to confirm that the archive still opens, that the index points to existing files, and that a fresh test import follows the copy-and-verify sequence. If the backup drive is disconnected, the check records that the backup could not be inspected; it does not describe an unavailable backup as verified. The family can then reconnect the drive and repeat that check. This condition matters when reviewing the yearly maintenance record: a successful test import and an inspected backup are separate facts, and the record should say which checks were actually completed.\\n\\n3. Record for the next maintainer\\n\\nKeep the importer’s purpose narrow, retain source files during import, and treat uncertain dates as uncertain. Preserve the manifest and logs long enough to investigate a reported mismatch, and make a backup before changing the index format. The review screen should continue to show the proposed destination before copying begins. If a future change affects checksums, folder selection, or how dates are interpreted, test it against the representative set and update the runbook. The archive is useful because its files remain traceable to their sources and its decisions are visible; maintenance should protect both qualities.\", \"output\": \"The family photo importer is a small program that copies photographs from phones, memory cards, and shared folders into a household archive. Its job is deliberately narrower than a general photo-management application: it identifies files, preserves the originals, records useful metadata, and places each accepted file in a predictable folder. It does not edit images or decide which pictures are worth keeping. That distinction makes maintenance easier, because a change to the importer should not quietly alter the family’s photographs or their history.\\n\\nThe importer runs on a desktop computer when someone connects a device or selects a folder. Before copying anything, it lists the source files and checks their extensions, sizes, and available date information. The supported formats include JPEG, PNG, HEIC, and a small set of camera RAW formats used by relatives who still bring a dedicated camera on trips. Unsupported files are reported in the review log rather than deleted or renamed. A video file may be recorded as skipped, but it is not treated as a failed photograph. The log identifies the source folder and file name so that a family member can find the item again.\\n\\nThe archive is arranged first by year and then by event or source. A folder might be named “2024-07 Lake weekend,” while an image inside keeps its original camera filename. The importer can suggest a date-based folder from metadata, but the person running it chooses or confirms the destination. This matters when a camera clock was wrong, or when a group of scanned prints has no trustworthy capture date. For scans, the family may use the year the prints were made, the year they were scanned, or a known event date; the importer stores the chosen date as archive information without pretending that it came from the camera.\\n\\n1. Review and copy sequence\\n\\nFirst, the program builds a manifest containing the source path, file size, available timestamps, detected format, and a checksum. It compares that information with the archive index and shows possible matches before copying. A matching checksum is strong evidence that two files have identical contents, but a matching name alone is not enough to call them duplicates. Relatives often have files named IMG_0001.JPG, and two unrelated cameras can produce the same name. If the checksum matches, the importer can offer to leave the existing archive copy in place while recording the new source location in the log.\\n\\nNext, the person reviews proposed folders and any warnings. A file with missing date metadata can still be imported if the destination is chosen manually. If the source becomes unavailable during copying, the importer stops that file, reports the problem, and leaves the rest of the review available. It does not mark a partial copy as complete. Once a file has been copied, the program verifies its checksum against the manifest and records the result. If verification fails, it keeps the source untouched and flags the archive copy for inspection instead of quietly replacing either version.\\n\\narchive.retain_originals\\n\\nThis setting expresses a central family preference: imported source files remain available in their original locations. The importer copies files; it does not move them, delete them, or rename them on the device. That rule applies even after a successful verification. A person can choose to remove a memory card later using the device’s normal controls, but that action is outside the importer’s copy process. The settings file is backed up with the rest of the importer configuration so that a future maintainer can see which behavior the family expects.\\n\\nThe archive index is a small database stored beside the collection’s maintenance records, not inside an individual event folder. It keeps the checksum, destination path, import date, selected event label, and original source location when available. It does not contain image contents. If the index is missing or unreadable, the program reports that condition before importing and asks the operator to select a recovery procedure; it does not create a fresh empty index over the existing file. Periodic backups include the index, configuration, and import logs, while the image archive is backed up separately according to the family’s normal storage plan.\\n\\n2. Practical maintenance notes\\n\\nA maintainer should test changes with copies of representative files rather than with the only copy of an old family image. The test set includes a phone photograph with timezone information, a scanned image with no camera metadata, two different pictures sharing a filename, a true duplicate with a matching checksum, and a damaged file that cannot be decoded. Expected results are written beside the test cases. For example, the two same-named but different images should remain distinct, while a true duplicate should be identified without discarding the new source. A damaged file should produce a useful warning and should not stop unrelated files from being reviewed.\\n\\nDate handling deserves special attention. Some devices store local time, some store a UTC timestamp, and some store both. The importer records the metadata it actually reads and documents which value it uses to suggest an event date. It does not infer a precise time zone from a family member’s current location. If the timestamp is ambiguous, the review screen marks it as uncertain. A manually selected event date remains distinguishable from a date read from the image, which helps later searches and prevents a correction from being mistaken for original camera metadata.\\n\\nThe family’s shared folder includes a short runbook with the application version, supported formats, backup locations, and steps for a test import. One relative maintains the software, but another person checks the runbook each year so the process does not depend on a single person’s memory. Changes to folder naming or metadata fields are recorded with their reason and the date they were introduced. When a new device produces an unfamiliar format, the maintainer tests a sample and documents the result before adding support. The importer should report a limitation plainly rather than silently treating unfamiliar data as an ordinary JPEG.\\n\\nThe program’s ordinary messages are written for relatives who are comfortable selecting folders but do not want to diagnose a database. A message such as “Three files need review because their dates are missing” gives a useful next step without implying that the photographs are damaged. Error details remain in the log for troubleshooting. The interface distinguishes a skipped item, a failed copy, and a verified copy, because those states call for different responses. The wording and status labels are kept consistent between the review screen and the saved log.\\n\\nThe final maintenance check is to confirm that the archive still opens, that the index points to existing files, and that a fresh test import follows the copy-and-verify sequence. If the backup drive is disconnected, the check records that the backup could not be inspected; it does not describe an unavailable backup as verified. The family can then reconnect the drive and repeat that check. This condition matters when reviewing the yearly maintenance record: a successful test import and an inspected backup are separate facts, and the record should say which checks were actually completed.\\n\\n3. Record for the next maintainer\\n\\nKeep the importer’s purpose narrow, retain source files during import, and treat uncertain dates as uncertain. Preserve the manifest and logs long enough to investigate a reported mismatch, and make a backup before changing the index format. The review screen should continue to show the proposed destination before copying begins. If a future change affects checksums, folder selection, or how dates are interpreted, test it against the representative set and update the runbook. The archive is useful because its files remain traceable to their sources and its decisions are visible; maintenance should protect both qualities.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-transcribe-long-0083"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "f238ee8fe9f5ff44454ec7f31468d8f501e871e9f7f3c716448c5e34af9334a3"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "34573afe1f8f7a92b6dd1a7dab36cbe8c213545df8426d7928e97dca01b2dbf2",
+  "started_at": "2026-10-29T03:18:06.243687+00:00",
+  "result": {
+    "id": "gen-1793243886-yyhCnBtHlIvfG9jN0VAW",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-transcribe-long-0083\",\"row_sha256\":\"f238ee8fe9f5ff44454ec7f31468d8f501e871e9f7f3c716448c5e34af9334a3\",\"critique\":\"The input is a coherent maintenance-document draft with no apparent noise, padding, contradictions, or leaked authoring instructions. The output is natural and appropriately formatted. It preserves the input byte-for-byte as required for this identity example, including all paragraphs, headings, the archive.retain_originals literal, checksum and duplicate distinctions, uncertain-date handling, and the condition that a disconnected backup cannot be reported as verified.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rrxS7H982YP_ywyIx7KUssdgPsXtaYgXKeVZBWfGXPvEr1Q5hqCT7jxBmnVP3XRxp0FHckB7mh1MI06jQaW7B7H1yrLf2uh_JiiRvrxVXVcxrxItCv0v62C3FHvgIKY3piFHMyySjgyMqJDalNEecOoijvFRQnlo8o4xVP284flHREdQuAURkUHAAz38oyU4qibMBHCFuBzhfE9EeyFslaAO6o9m-GouX_tzc580X9oCCZdNHS3iWb_SdiEzYfk2YDunOtEnZkr0V3F3ahkNBNNjabfioT_tSg5bwn2647DArwX_s_JyX9iSdT913xCzmZer7QgsoHhSTNJsQ2Jh0CwN9KWQX61HDEx05ibc9Vvk5tqhp2mYWFwwpLXWAOVAHCSylguABlG3WpzPhE11wrfOW5Rk1I9YsrmoEgyy247dMjfSivghP1I8jvhKNE0soAJSe5ZtCqG0ijek-H6WlKT-IZgNLAziNtP4P_psfpxah3KgIGRxsFn-QCAwexOaJuwlVqzIvasw5qFWWcXuhxaDPEeRfduBl_zfVbZ5gi7JOCX_zVC2LCive0MCYKMrM7z8hob1lMqlkausybJS_o2h-y6Ni5hai6lPUn4akpLFW-N3dKUluI3ofoIVtlaczP7f9kwDxYLuA_R-Pwr54nvQwxEr5px06PUjk20_nh4aKrjxwuGFOkOLQe86RYiBv4qQ2WwcfvmvePg3NxWeq0jXaogf-R_JB-DUoluy6SpSGfZwMokQ1Y1N99FpRWhglradU9hsYJG8TQ0PEIeUi5p6F4RdQpb3mAqQcYOHzxSjkKGAZ6P9eELcftzH6F0ntz1yuCsm6ePGIrMffQFsOnOSy9J_JooUa_KHrHjxFqKtuQwTeWlIBlYCpfoZx-iTTuw323B0HALjoddBOQ4Z613rXy6pFIZ2zanKHBkHdS1y1vC8C-NMqfPyi9hBL-hZrGECMYEs-MCT6yX-9YicFdPPlS8H8WvR8LhzppxKzMbPVCxs3r1W3okLkbHLvc1nzZUSFVso_EYysX8SM6DEsHhnZIiZj_V_GBdOkWZLmqhlfG5GiORaTCgY4mN-cb-XiKWU8jjz0T-5rVEqamOEb-G98LU1ytLYx0zfo5Yd40Mpz7JRU2p3u32iDragsa5lq0Mk93tPTjP_DASO-Tl6IS48uGRoeASxh7HjjBkS-2RxIbVy4vEXejtMViGfPfjCjj9DVc3QI0LKCzs9PfaOBUL2NjopgewarN_Ir4cxeXXAgIqgRNi_WS34PoTd0DQ5LrMM1C7xHtnEjzPOcJ1A8c6LwAB9aWoOrD8o6xRmd5A2hx6hEqW4q6OfbMvoaThZftcHjnGv43MC7Z_RgKLzm6PSD3qP4Zzw5_TGcJ7nHnvLrYeJSWS6tKin0ChTkQt5oNVLEc6YA1iqswP26vWOpqB0Vt10JmpDdO_BY0TH2LtID7idfHTB6Sl72gkqmWcgYhx65uwgy6a0VUPsM9zI2K2us8FWTmi62lbhvLevESa8bWPElDAXeFrvCqbAtKizzvp5cejG5DShviwE-rehiZDeamTSlbFoPd23Nub2kgCED5uEyY79Va2H0fo3ElcY2ZHpu8RYDEg0se72ZJlrTmuOfSmI9fM7xUWBZ2tgaXl1ZiRE6sMlYUUD--paIC_xpodCe2ig9XV9fvjnLajrQCgrWQqBWLQXvAIk_ZEYgnF5kD44FwbAaEtUvZHw4RQzkf4XjGGiQHScKOBZ8v9LJZZS_tlAKNRboCH9tOITXZTWGzuJaEyRG-bWSG2dkHGYUwZHdyXi40sSiwpMVN9cSGCr9rR59vA0edVDMvnizDA65Fm-yaDi0M8T-w3yz0fZ7moTGPKm7uxUF2CeqE8-FHdoWRmBuguCzXcAamb8pU4-Djl5lfnQ81qhE2MjVEIETYlYotWtygi87jtyM4hBiyU1WXKv6xnuuc0mZmUEBSGRBXabu7CiLn6j-UuPR9L1W-wBFinGpotfyHacHqGZpmTgkS7uB-NE7oifPh_RQ4nIjBoHw8hgeDHfUpjS-uksLCA.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_097c82944e3decd5016ae2baef390887d0a31021b88835ec69",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793243886,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 210,
+      "prompt_tokens": 3634,
+      "total_tokens": 3844,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 31,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 3631,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0024691,
+        "upstream_inference_prompt_cost": 0.0003691,
+        "upstream_inference_completions_cost": 0.0021
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "d6f9f6f46f03b2677dae7e0e373b5c13fbe749748d42d70b5fae5bfb5e8ff9f8",
+  "elapsed_ms": 4957
+}

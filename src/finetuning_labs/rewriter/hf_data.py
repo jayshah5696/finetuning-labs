@@ -115,9 +115,13 @@ def _sources():
     from .benchmark import COMMON_SYSTEM, MODES, load_bundle
     from .reviewed_publication import audit_publication
 
-    release = PROJECT / "data/rewriter/reviewed-v3-1000"
+    release = PROJECT / "data/rewriter/current"
     # Audit the retained Git records, then export only the data columns.
     audit_publication(release)
+    from .boost_data import verify_holdouts
+
+    freeze = json.loads((PROJECT / "data/rewriter/holdout-freeze.json").read_text())
+    verify_holdouts({name: (release / name).read_bytes() for name in freeze}, freeze)
     rows = {
         s: [json.loads(x) for x in (release / f"data/{s}.jsonl").read_text().splitlines()]
         for s in SPLITS
@@ -126,8 +130,9 @@ def _sources():
         s: [json.loads(x) for x in (release / f"sft/{s}.jsonl").read_text().splitlines()]
         for s in SPLITS
     }
-    if {s: len(v) for s, v in rows.items()} != {"train": 1000, "dev": 100, "validation": 84}:
-        raise ValueError("Expected the frozen 1000/100/84 data")
+    counts = {s: len(v) for s, v in rows.items()}
+    if counts["train"] < 1000 or counts["dev"] != 100 or counts["validation"] != 84:
+        raise ValueError("Keep at least 1000 train rows and the frozen 100/84 holdouts")
     bundle = load_bundle()
     old_rows = [{k: getattr(case, k) for k in PAIR_COLUMNS} for case in bundle.cases]
     old_guides = [
@@ -144,8 +149,8 @@ def _sources():
                 guides,
                 "Rewriter training data",
                 (
-                    "1,000 training pairs, 100 development pairs and 84 frozen development-validation pairs. "
-                    "Each mode has 250 training and 25 dev pairs. Use dev for checkpoint selection and "
+                    f"{counts['train']:,} training pairs, 100 development pairs and 84 frozen development-validation pairs. "
+                    "Use dev for checkpoint selection and "
                     "validation for the later comparison. All selected pairs retain exact-row model reviews."
                 ),
             ),

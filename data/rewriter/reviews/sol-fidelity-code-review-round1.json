@@ -1,0 +1,68 @@
+{
+  "reviewer_model": "gpt-6.1-sol",
+  "scope": "Targeted Arka data append and public dataset/Colab consistency; review only.",
+  "verdict": "pass",
+  "findings": [
+    {
+      "severity": "medium",
+      "file": "src/finetuning_labs/rewriter/reviewed_publication.py",
+      "symbol": "audit_publication",
+      "issue": "The native_accepted flag is trusted rather than rebound to the actual final Arka export. A six-score-strong pair that was not exported can be changed to native_accepted=true to satisfy the one-review path. The actual 03_label_quality record does not prove final export membership.",
+      "fix": "Preserve per-batch native-output payload hashes; recompute membership from the exact pair and require metadata flag equality before choosing one or two Sol calls.",
+      "status": "resolved",
+      "resolution": "Apply and publication audit now recompute native final-export membership from exact native payload and saved batch export hashes. A failure test changes the export set while retaining the claimed flag."
+    },
+    {
+      "severity": "medium",
+      "file": "src/finetuning_labs/rewriter/boost_data.py",
+      "symbol": "apply_boost",
+      "issue": "copytree(staging,CURRENT,dirs_exist_ok=True) updates the live dataset file by file. An interruption can leave mixed old/new files and a base-file mismatch that prevents rerunning apply.",
+      "fix": "Use a same-filesystem staged directory replacement with a recoverable backup and restore on failure.",
+      "status": "resolved",
+      "resolution": "A fully copied sibling incoming directory is renamed into place after saving a backup. Exceptions restore the prior directory, and apply recovers killed-process backup states and recognizes a completed same-spec update."
+    },
+    {
+      "severity": "low",
+      "file": "src/finetuning_labs/rewriter/boost_data.py",
+      "symbol": "apply_boost quality update",
+      "issue": "excluded_rows and unused_passing_candidates carry forward original-release counts without identifying them as historical.",
+      "fix": "Label the inherited counts as historical and report new-run exclusion/unused counts separately, or recompute their combined definitions.",
+      "status": "nonblocking"
+    }
+  ],
+  "confirmed": [
+    "Exact input/output/identity/language/context and mode instructions are bound into saved Sol request packets; completed verdicts are not re-judged.",
+    "Raw request and result canonical hashes, returned Sol model, stop finish reason, three dimension verdicts and overall verdict are checked.",
+    "Uncertain native decisions require two exact passing Sol calls with distinct provider result IDs; confident native rejection is a veto.",
+    "Native payload and six scores are compared with actual Arka scored records.",
+    "Dev and validation JSONL/SFT bytes have a static freeze; public export runs the audit before constructing data-only Parquet payloads.",
+    "The notebook is self-contained, reads public data with token=False, and binds expected split counts to the published dataset receipt."
+  ],
+  "checks": {
+    "focused_offline_tests": "37 passed across test_boost_data, test_reviewed_publication, test_lora_notebook, test_public_parquet",
+    "new_to_new_overlap_snapshot": {
+      "rows": 187,
+      "overlaps": 0,
+      "method": "Both input/output compared against earlier pairs with the project LeakageIndex."
+    },
+    "actual_arka_payload_export": "Verified actual Arka record.model_dump(payload) and record.export_payload have the same keys and canonical digest."
+  },
+  "limitations": [
+    "No API calls, data generation, edits, training or publication performed by reviewer.",
+    "The expansion run was still active; repeat new-to-new overlap check on final500.",
+    "No GPU/Colab execution performed.",
+    "Final500 overlap checks, full data publication and rebuilt-notebook execution remain parent responsibilities; no unaddressed blocking code finding remains."
+  ],
+  "files": {
+    "src/finetuning_labs/rewriter/boost_data.py": "b5fad41d4c8294c65d6dd94c1cdbf8d69263c55080ef85e554b423417cda44c7",
+    "src/finetuning_labs/rewriter/arka_pipeline.py": "58cc481d200bdb6f517b60b791351efebb886b2453d8393e11ecd5d2846a63f3",
+    "src/finetuning_labs/rewriter/scale_data.py": "1f97145fc49d078304a471237075f8cbd659426dcab4787dff0e6f0e54b401a6",
+    "src/finetuning_labs/rewriter/reviewed_publication.py": "9ceb05c4d152eb21205eabd72bbf149363e92ae0c42d4a2b1f9cf3a898bfcc96",
+    "src/finetuning_labs/rewriter/hf_data.py": "8689b87104b7568999f43921f6024dccf777f4aad8ed6328492aa0e215cc84e9",
+    "scripts/build_lora_notebook.py": "9e7d33c502a5d51bcf0f892173ab254cdb4e9c4f90ecd45b5f2201bb8314690f",
+    "tests/test_boost_data.py": "7a9252d0cc77bb4b2ffe203c9b174d29ff38e9d04a2921bfb573371575741cb2",
+    "tests/test_reviewed_publication.py": "07ce7bc140a55cdcd3125f67648556ede3a13f9e458d675ef231de8e35cd509d",
+    "tests/test_lora_notebook.py": "8039b441f71b309ef794e4700f4e66a7eb79ba76e2847ac951f3ab54072b1985",
+    "tests/test_public_parquet.py": "cb4fe67c9c88fbb9d1dbfd011136674ff34b5be2410bc1257642bbd1e0b65b16"
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0157\", \"row_sha256\": \"a509e0888735c98605c7bcec60b3b75b9f76bb4e2f87806cbadb8bb22ef6066d\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm preparing a change for the photo importer at Northline Archive. It receives one manifest at a time from partner studios, and the manifest's records are already in the order the studio wants them handled. right now the importer sends one record per request, which is slow on larger deliveries. please write an implementation prompt for updating the importer to send records in batches, using the helper below without changing it. the caller will provide a positive integer width; if it doesn't provide one, use 7. Keep record order, don't sort or deduplicate, and don't split a record across batches. the final batch can be shorter. An empty list should produce no batches. The importer should send batches sequentially, not concurrently, so it is possible to tell which batch failed and later batches aren't sent out of order.\\n\\ndef batch_records(records, width=7):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nThe manifest is a JSON object with an `allow_partial` boolean and a `records` list. each record has `asset_id`, `source_path`, `captured_at`, `photographer`, `rights_code`, and `checksum`; `caption` may also be present and is optional. Validation should require a nonempty string for `asset_id`, `source_path`, `captured_at`, `photographer`, and `rights_code`. checksum must be exactly 64 lowercase hexadecimal characters. A caption, if present, must be a string, but an empty caption is okay. Don't add other validation rules, and don't rewrite field values while validating. Keep the original record intact if it passes.\\n\\nThere is a choice in the manifest that changes what happens when validation finds bad records. If `allow_partial` is true, exclude each invalid record from upload, put its `asset_id` and validation reason in the rejection details, and continue with the valid records in their original relative order. If `allow_partial` is false and even one record is invalid, don't upload any records from that manifest; return the validation reasons for all invalid records. When there are no invalid records, upload all the records either way, whatever the flag says. if partial mode leaves zero valid records, or the list starts empty, don't call the uploader with an empty batch. Return a summary with the total record count, accepted count, rejected count, uploaded count, and the rejection details. Accepted means passed validation; uploaded means the uploader reported success, so those counts aren't automatically the same.\\n\\nFor each batch, the existing upload client returns an HTTP status. Treat any 2xx response as success. If a batch gets HTTP 503, retry that same batch once, without changing its contents or order. don't retry any other status, and don't retry a second 503. If the retry still gets 503, or the first response has any non-2xx status other than 503, mark the run as failed and don't send later batches. Earlier successful batches remain uploaded; there is no rollback. Include the failed batch number and its status in the returned run information. Don't count a failed batch as uploaded. Please keep the rejection details for validation failures even if an upload later fails.\\n\\nThere are a few things the support team keeps asking for. The returned summary should distinguish the manifest's total rows from accepted, rejected, and successfully uploaded rows, and it should make the failed batch information clear when there is a failure. don't put `source_path`, `caption`, or credentials in logs. A rejection detail can identify the record by `asset_id` and give a brief validation reason; it does not need to copy the whole row. We need unit tests for the boundaries as well as the ordinary case: empty records, fewer records than the width, exactly one full batch, and a final short batch. Also cover a mix of valid and invalid records with both values of `allow_partial`, including the case where partial mode has nothing valid left to send.\\n\\nPlease include tests for successful sequential uploads and for the response conditions too: an initial 503 followed by success retries only once and proceeds, while a non-503 error or a second 503 stops the run before any later batch is sent. Check that successful earlier batches are counted, that later batches are not attempted after a stop, and that record ordering is unchanged. The prompt should ask for a concise explanation of how the manifest flag affects validation failures and how the retry rule affects later batches. don't ask for a database migration or changes to partner manifests; those are outside this importer update.\\n\\nFor compatibility, the importer receives `allow_partial` on every manifest, and it should not silently substitute a default if that field is missing or not a boolean; return a manifest validation error before uploading anything in that case. The summary's total count is the number of rows in `records`, including invalid rows. For an upload failure, include the status that caused the run to stop, and retain the counts from earlier successful batches. Keep validation rejection details separate from transport failures, since a valid record can fail to upload after validation. The support team has put it this way: \\\"I need to see which rows were rejected and which accepted rows actually made it up.\\\" Please keep that distinction visible in the requested behavior. End by asking for tests of the missing or wrongly typed `allow_partial` field, and specify that no uploads should occur when that manifest-level validation fails.\", \"output\": \"Update the Northline Archive photo importer to send manifest records in sequential batches. Use the supplied helper exactly as written; the caller provides a positive integer `width`, defaulting to 7. Preserve the records' original order and contents: do not sort, deduplicate, or split records across batches. The final batch may be shorter than the others, and an empty list must produce no batches. Send batches sequentially, not concurrently.\\n\\n```python\\ndef batch_records(records, width=7):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n```\\n\\nEach manifest is a JSON object with an `allow_partial` boolean and a `records` list. Each record has `asset_id`, `source_path`, `captured_at`, `photographer`, `rights_code`, and `checksum`; `caption` is optional. Validate that `asset_id`, `source_path`, `captured_at`, `photographer`, and `rights_code` are nonempty strings, and that `checksum` contains exactly 64 lowercase hexadecimal characters. If `caption` is present, it must be a string; an empty string is allowed. Apply no other validation rules and do not alter field values during validation. Keep each valid record intact.\\n\\nHandle record validation according to the manifest's `allow_partial` value:\\n\\n1. If `allow_partial` is true, exclude invalid records from upload, retain their `asset_id` and validation reason in the rejection details, and continue with valid records in their original relative order.\\n2. If `allow_partial` is false and any record is invalid, upload no records from that manifest and return validation reasons for every invalid record.\\n3. If no records are invalid, upload all records regardless of the flag.\\n\\nDo not call the uploader with an empty batch, including when the manifest starts with no records or partial processing leaves no valid records. Return a summary with total, accepted, rejected, and uploaded record counts, plus rejection details. Total means all rows in `records`, including invalid rows. Accepted means records that passed validation; uploaded means records the uploader reported as successful, so these counts may differ.\\n\\nFor each batch, treat any 2xx HTTP response as success. On HTTP 503, retry that same batch exactly once, without changing its contents or order. Do not retry other statuses or a second 503. If the retry still returns 503, or the first response is any non-2xx status other than 503, mark the run as failed and do not send later batches. Keep earlier successful uploads; do not roll them back. Do not count a failed batch as uploaded. Include the failed batch number and the status that caused the run to stop in the run information, retaining counts from earlier successful batches. Keep validation rejection details even if an upload later fails, and keep validation rejections separate from transport failures.\\n\\nDo not log `source_path`, `caption`, or credentials. Rejection details should identify a record by `asset_id` and give a brief validation reason, without copying the whole row. As support put it, “I need to see which rows were rejected and which accepted rows actually made it up.” Make that distinction clear in the returned information.\\n\\nInclude unit tests for empty records, fewer records than the width, exactly one full batch, and a final short batch. Test valid and invalid records with both values of `allow_partial`, including partial processing with no valid records to send. Also test successful sequential uploads and these response conditions: an initial 503 followed by success retries once and proceeds; a non-503 error or a second 503 stops the run before later batches are sent. Verify that earlier successful batches are counted, later batches are not attempted after a stop, and record order remains unchanged.\\n\\nThe importer receives `allow_partial` on every manifest. If the field is missing or is not a boolean, return a manifest validation error before uploading anything; do not silently substitute a default. End with tests for both a missing and wrongly typed `allow_partial` field, confirming that neither case causes uploads. Do not request a database migration or changes to partner manifests; those are outside this importer update.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0157"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "a509e0888735c98605c7bcec60b3b75b9f76bb4e2f87806cbadb8bb22ef6066d"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "c9c2e327bcb6b9bd976ca86770d970889a05e54a287a6ee001f4c277fdb70063",
+  "started_at": "2026-10-29T03:15:57.179612+00:00",
+  "result": {
+    "id": "gen-1793243757-3nFcsDjHkv0BGyDd50Tg",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0157\",\"row_sha256\":\"a509e0888735c98605c7bcec60b3b75b9f76bb4e2f87806cbadb8bb22ef6066d\",\"critique\":\"The input is a coherent, self-contained request, and the output is naturally formatted as an implementation prompt. Most technical requirements are preserved, but the output omits the explicit request for a concise explanation of how allow_partial affects validation failures and how retries affect later batches. It also does not end by asking for tests of missing or wrongly typed allow_partial, as requested; instead, it places that instruction before the final scope exclusion. These are concrete constraint-preservation defects under /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rpxtRYZ6PmkoYkg1iHf3f_uE_yX57zZ9TCVKqjy7XPS78LnShF8_2Ju6ZwbDFyhexayvuowoqoyd-XRg3DA_yFh8bzehotRYkTr__3DGxiDMvVRSt6bGyLdgXInfiW2sL7dPY8EmTdthG1MizYJaUvJARn4VmI9HNbVU7ArzL41bG5Aq_AP9dY3Byy8SiXG02-AlH9ZDmDsc2-lhI8ReIwykWUluvFlsararNAJCL9oIcBFxN8_8Rwb-aRRNsb5BBwuYLlU6xHlzgJ6sq6dBnLfvxCE7EzVty1w4GPStcLbONwam5QbzqtqZ4XeCH4A51TsM_t1RnyVMeFwl0EjY5MALCchos3LHrvaGv9jCZdW9ZgYoQ8CVy-Gzy208ZWJH780JdIugl_bHZaQ9vhR6dHEWjR8OvPDNqrQbrmYR4QDNh__DRLbkBeMgPCmqASSbyphrflf21qnGb1vmsgVbxBYBOF4qd033QnspeD77n7TRpmSXHSd6EP8S12kQccqk4iCHS8wgI_x0F5VNW7DInLelja7g9qP3kXnp6x_SiwevD38vf7r1rx8GqG9YErzurkxIJ1_oyzrmLKHOtw7fMNKGrEEnWyx_aNJJ2pauOujOpiWFMyFU6GznfFJLCr-mlpO0LJ8v25JidBZMf6_xHEaCZdtZf15xK5HqBIawxVb8yvNpmWfAfIzyPWuXw6X3zA2zs2EqeAg2KmRMbr55NG2FEM3HaLQm9HCMyHHdRYlGyfQogoE92N8i9wZNbZ0qUE2mGrhySOYrYBg_uHUEET7JnUt30z0viYin6Nq4X5ip1QF0KFlfuSnQC-u8mNaoBesyUND_B9CGarRXJr3hjgiX8mHzH5lo1Zi8NcFlEumB4uFL1K9T7Dq0SooyM7OOIIqhMuiAJVAe4NHXhsCERyYOWWPcEUhFDQuN82pLjpYQqPyXU2FNKr4xvNOLXVTG89GAhVc4a88ywxZC-puvr268T7ao5s6xAkWQ2NdXqhC4N0ylBRd0y2JgYGJ_7f_E0UtUuyEt7xzcF4PgsEHbviUc0ZSPOvXhKrsTmMen6l0jUNnmv3lOzshurM6YoUeZ0QQWvuDNlRIo2nEsfs1Arbamrwf7hHQvHizjh58p3ghvHXvufWEZ_2zgS_qeectwSqmhL-9d5dEDjcjvJgJW7QqA8TVbv8kfY9S2QW5Q0Z4ilMnHAlmdfcn3oqeReKwNQqchyeOriNNT5v-d0hKGRRpsiPfFKmIwFdHBhCdcaxPsVdZu_Su3Vyc5P-p9yJNN3-Ycxmuei-I3rnEwLQcsZV5nDajVpTJd9Q6EA_ccnx_6HMjQSfu-vHqMOasJrhW0XYwAAmBAFTpeJsGdLo4_DOfnFxzywKr2ZGrxIlDM8LJnDAggdFeQADsT93XPT16RGQjB_Ev-SVv9luxMk_pESUrjUuzK7ykRxd4fOyNxEJB4niyN3TpBwagcK01x3mfUgq-wYNe-nHPTakR80tMRCkTnad-pb9IicgOXwVAdNaIMTSmFV1rQ5zqb0F-d5OZZvFs1x4GJCsZbEK05x0u-yP-cUYrlc00QYiPnky9FTqKyBRLvoPnhkBPQqpiGLymuadI2XbfdBIWSVOa8D7Ue7Rm3AE7AhYEQ00emwA3jCZDegEIfw4BHs0ptrcE--QqHBhhwSd9PSTkAGMqx_g3XAbxyjh5QtdTxTVKxiLCMB71JebuV-m77JObgP9JHPCbss6Li_2ELYqFrX-IIUrGzv9lWJfKMKa5wcjh1iExUzirr_JY6embp7KwMrtNxhoBYrRzY9gOw7hae4dL59fQxzcvo8LteqlcrLPPy4CfnFHDVdTEIQP9fN_34im0uGK7dn-v0j67h6twHzF-a_qhi0FrTRinPcN5nJG6x2RKFcvOLPzqLXo-JFe-j1aBe3Nyy1er4Z7OD6n6I-NVvhmpG5F9tlc9CKrUYCakd9XpT5heIByvZUU5DJIm41-RuB268l5ldXRwyOazcFO5avojYc63dIo4o5dzqB9fdvlbnUo0wofIHAX7ENCCwPi1lY74JRXkUnpx8Kuf1fNCeUlQVjsYwNkGhkSurl32rMmuPgjkKDKSQ6cRIpzPksFzDpxqMJUVe_EqeEho7QpVD8YnGXiALeXanjhZYK15eSNA_nKpGtpg6C0iwksTdGlrSHn5Js_FOSBciu8mP8iiulz_V2gakfKvSPcDW7UiXJijZHOYnZawwHe71UyVK2ToDkOsdirX4Ffuit-ogvjVDln6yhsYpgn28dRHwD4QGkuohIO48nFYD8oRQB0wE0YFIpfmBQzxr_vHoxMQisrcpzxOuYuPzvBCWf3oB0czHis8QLcgXv3MmhOdyIpMzUUQWCQIJTnoxd5LrVGl2HUBj7MmqMxuFCIIkWO9sixS2oynVo6bxVfpuK7zzzj4ZPGSTLfmabQEfQ-U3xDrGv_JyZaxfOv2-p7COnNiNlSYhBaU8vhinLQNH4M_4JlTthIg4P4icHIUemDXF0WDXhryEiPwDK8poKMHgaJsXAyA2ZosqXMyVsoslektcZguJVYXXoafHlobr4b7XWRdnYgvIrODbIgPp8-_yTOo4CjX4qJ1sX6pj5nJkGRnCI5lVf_tj1mPHmBDflcNY3wbfIJBToij7etrNqMhZPozaLP6uK4y2mv5QfrlmO14tJ2H8wiys5b15h4iogMgrabh3TpcPbYtk2gmp6Vqwso5q4QsfL9u82G1KJeaJ16yamOlG8S5J0YfAeuQP1aql82L6jze-hkfFMNgmGZZChA5rC4O46Q1XyuZ-SEOvffyBEF__FYdnf07gGLdSPMnC1kl9UxVKQMcSIi9SREY8KmB9_sAh4NfehfxaGjLBXfxPKFNJyJZsw6Tx2kmYZG2zzJBd9x3rekICGOnYW56Jvd1VT-iwGye32wG1HRU0JmsLBUdVCpnVm4BQNQKQZoeGEMjSpbOQbZSi-mTyxg5NVnWBtgjSKL4-h4Ob7rbZDa6gOQaxIuFIs6EqQ9R6JlNS9KWb8sJrDro2NZVuBaTlkWbeXe4yKPlFDYrzXrSW6IzV98jLdr3TsUEsB0CG968bDG5eUqFY4lFm4EY1SwerlMGKgP55DRwB3Dh4VCVuckqVCOypVv0GnD3FKsVjQLfgEL9StupumvGhfK_Kabdl0nyCEpaAX7V3XR52c9hL7kHM60tjbFwYZa-rD09gyGUQmHcptzmnhPU1c1fHKeW9DA4d5U-J1HhgnLy5GrQtG8aQtPRpeJpRZsb_WYs0GSbNbWeovGkiX8DGVt2X0ytZhurY4u74PM5XBICSRmkXXSEA3kfSwJE6YJPW3uKGF_zOnPkLKXWoFJa2DAwZ7EahD-isp1MI_XeGnJMYAxeH0DQ80hTboVneC0J2v74RsD3vASH8OhlneEBX9_tQaH1dFKxLQXrSz2knXNzXNqNnyrdVfrNnfYZqIDkyp-XYEkqYsvUoC6NAl861P0EwRiKHBdBb4qVMc130BICXdxsP5WuXunI9LT7fkIrpnhFzHGcLuGdgD_vq03PAuaLukhggL5Rhv4LqGUkRmw4mXZ5y6zKL50r13eCJl_mWaWq.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0a9df597ddad5769016ae2ba6e24a487d0967dc47e27ec630e",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793243757,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 329,
+      "prompt_tokens": 2583,
+      "total_tokens": 2912,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 137,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2580,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.009746,
+        "upstream_inference_prompt_cost": 0.006456,
+        "upstream_inference_completions_cost": 0.00329
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "b8c53205c588c3abb6150ea1cc99e268ae7aa280af69fc2aacc7ba81a1060e7f",
+  "elapsed_ms": 6167
+}

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0076\", \"row_sha256\": \"27101c7ea711376efeb54272b20b38622bd69818c0d57f73c89ebcb06ecb772a\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"hey, can you help me put together a repair estimate for a camera? it’s a Fujifilm X-T30 II, bought in 2022. The shutter button sometimes doesn’t respond on the first press, and the rear screen has a thin crack near the lower-right corner. The camera still powers on, and I can review photos on the screen, but I haven’t tested whether the crack affects touch controls. I haven’t dropped it recently, and I don’t know what caused the screen damage.\\n\\nPlease use only those details. I’m sending this to the repair shop before deciding whether to bring it in, so don’t write as if anyone has inspected the camera or confirmed the cause. I’d like a numbered checklist, with the evidence from my description listed before any suggested repairs. Don’t make up prices or a turnaround time; if those can’t be estimated from what I’ve provided, leave them out. Keep the estimate focused on the shutter-button issue and the cracked screen. It should be clear that the touch controls haven’t been tested, not that they’re broken.\", \"output\": \"Draft a repair estimate request for a Fujifilm X-T30 II purchased in 2022. Use only the information provided below; do not imply that the camera has been inspected or that the cause of the damage is confirmed.\\n\\nPresent the estimate as a numbered checklist. List the evidence from the description before any suggested repairs. Keep the estimate focused on the shutter-button issue and the cracked screen. Do not invent prices or a turnaround time; leave them out if they cannot be estimated from the information provided.\\n\\nCamera details and reported issues:\\n- The shutter button sometimes does not respond on the first press.\\n- The rear screen has a thin crack near the lower-right corner.\\n- The camera powers on, and photos can be reviewed on the screen.\\n- Touch controls have not been tested, so do not state that they are broken.\\n- The owner has not dropped the camera recently and does not know what caused the screen damage.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0076"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "27101c7ea711376efeb54272b20b38622bd69818c0d57f73c89ebcb06ecb772a"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "703bb9470e337defe9f1e12cd6d1437ad4a9ba79cf07f3ee710fd14f210b0be3",
+  "started_at": "2026-10-28T23:29:54.972906+00:00",
+  "result": {
+    "id": "gen-1793230194-6aNnx8ZUZ43RHng3c7eD",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0076\",\"row_sha256\":\"27101c7ea711376efeb54272b20b38622bd69818c0d57f73c89ebcb06ecb772a\",\"critique\":\"The input is a natural, coherent request, and the output is clearly formatted as a prompt without performing the task. However, the rewrite changes the requested deliverable from a repair estimate to a “repair estimate request” and omits that it will be sent to the repair shop before the owner decides whether to bring the camera in. These changes lose supplied purpose and scope. The camera details, uncertainty about the damage and touch controls, checklist ordering, and pricing constraints are otherwise preserved.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oV32GM1avhGVJhGU3K24ybSpV1G6sxpI2zVYgYTmu9eIl3UZqv7tfudnJ1TdCUJwH36JuAvpduRH8zYPrPqov_6hi1xegJV8whmncHYXse1ROlG1h3mCPbEBFcqugJ-1vKGLkcha6wZ5x0SU-47PUYrz1JuvV4290ADQZdXxp8UQq5eK6h6Xox-oe8SoNTrL6bUykxiohhhCeHgKu7g3T5yt2HhUwTQgJtWk9QuJBNAyypEMKuHkNREqMYE0D2YFFd9Rcz4kKxrZqZn0ohFd8-g2jct_7DJFlpZvk9oyd9RTviwDXvmKbpzF_KKUWrkhGz-EZ1h3x9DuAYN_OGyKWND9cTgQG9_TYQNN9jnxbSNGoMeMftwMpuG5SpX7ET1WrqHG2HfUoEpoYavbbr4MNaUWLiLlVwla1POO-yDgM2OjxdUdDGTpJ1aGMRY6y3TfilOJSOE6knkaSV5hgQwmsYCkQhjD9uiv2MKSDbULaU3WkJf7ZLMdMx_fqZE2O_ZyqtpkH-axyP4EaJYY9y6QivpU-jUFuDQyYV3hnGSxAzMLKFYrcDufNPOkeWQiZxZP-Y5sBNRcDNdh6VVXqw0Di6UxuRuo03SCHfhptbcKKkCqmSUc8VUU_QX2SLr0ofh-vXdg8B_qoPum_O-9FDHHJeF_RyCEi0LhI90VXRF8bW2soXOTBA0vDuYHo0tt39fKU9-O2mQWba1Uv1ua4KsTqpRT0W8YpR7iBxOU8KTEMTyRdJIlc9Po7FKMZgZF_3-S8GyrSFETjIaF0PvwDaKezZCJQc3M7hNBv7TExHSPlilw6zmeiESyyg8_ZUp5BglAZhuFUhH3eV_K8MvAX1trz9Akul2MY5DTHISYYkL4fUpDU1gyIr69v2UyLCbpAqVTmBT9F3WjHSNtRL1Q8imFBFeZCcmSGGVb8l7jkfzGSlNT8G0YPg0xuiVOGyuV5BtW_IVZ9CLAu5DfTU56j4ez4RoMaq5yzphhPgdhmHU3gIZhHTfS38OWRaGOb7-0keOx-S-3wNjT8FA2YIHRWvTc4RYQOZyRPivmat25opE8sGysTqEKoh7pKB7O5gNOLNqegdYPX2gyqnEPqyUcEyPkeRk80cUJ3p6gHKz_dhyX4Ow1T5Flbw4FV32zLft4gFG4g2QzZHi3nJUXs3nWG8ih7euxwB1lKeMBeWxT1h1cxvKdkVnPdqMh2EH28o75WfQsMHGbtq7lFkNK5RHYgPzjOlVTto2mgj3EMLWB2VwBqxn9cbaDmNmnN7T0M5kfPAtodocWlAT-OHc8wlZ3OmrAOYiekPGps4Eww6uMJlOHrQaznR8I8lmkdQP_lN9hVEBH_lvZ_Y39a8CH4U1VQP4deVXiRKrRr0WT_zguI1NLyBhlVyRqbwYpO5zcQ8lniN_TWZIewwTpI2VEs-f1d_8HgtGy-mJBjgxagPR9Z6ZL06_kG4yb_hXUQ_utalZaAGmvbhts1RM1vgUn8XAjWVaz2gu5F7vFZ0A001MErUv0ZuCn6cUhycfkcdIxVQ0fxj9Y3_afB_G--d49IsKyrVXfmFVKI2UO_zqdcbVcpXrfnEuZPqLiZtC_9BotELhBCycuC1No4SE6lKCrKfHpT98nOX8YRx2VpUCZPZS6oaL_gu_KBawE27kJ3oc3tMiZPXx9yRe6FLyIn4AiXjBSSHDua3Llv6crR8AJVyzOKG1EzDIj-70WvT-ynmmBw2AaZfAlVkL-dkG2MaytzozyJo4O2IholeiTVbqaJNfyPJybkKz1sE-PlQPp7j3NylNmYi7KUhluU5Lokwrm-KdZK_35rv-0y4Bfo1KNwMzOXWHUY4NTTRcCwJspJf3IY9ZARYWV8WI7tBYdtRLnrvIgRvXGyws1fNy-8oYU_0E_7HJMxjtfNvVb7UvE8_6O9_bnwZRiU935aJ1uCVHepbZEMs9KukvQorcidMf4-_uTu3TNBeWOFSZRBLzP7n0rGOyyjYic7e7jinToAXlu1JMS9qI0mqO6DhaT6WPWA-1zCJdlYvutcJB2-Wjwl_d0KbD87PAcWn8GXjg7ujun5J2qaI4PTxpDF1WsDmoTxT6-VuRJ-hGfUqQWdbG-f362t7e1yTWPsnFD-I1QfzVodTTvJYJfZq0nDk8SA8yGpcO9SzJ0p21LbOW7EDLqk0fQjKejQGNYL4ISveIYr7deDbUfxE0PG-dg4UHRYknCIOpUPfBoWODjst6CuIYQ-anNh05zwob4fecALoK2etL4PDlCZXiBVRN3Amlg8AxscWL6Z2gFokMW6OlekWo2whsbMaHHPfksSTy7TWngRQRNHuRdD5RB28XPU70DYv4dqwkdTjBVEbxMCqYaQkGrZbPkFQzntnl7n2iLYfDh9VQdmWOaPWGLhEPFlsGHb4VtyGb90O637bQWuvHYrkhlzgNCMXuYxJIV2qPL-I7sJ7FcqgzEqUmI27xMQ5Z1hhLc8ADdhGYGHLzQ8Evl68CB-EL8uJNpGhcjqQ9zKBhxSP6FwastZK2WqZwmc1BBcKnfxd8N0BtGXbjvXCbdgxz0EaV9h5N3_emVoNGTbIncmYwGu-d_ynw2QU-l2bXwJGeG8hstn1cEro_2csiFlp1aB6qB3lYKKB119zsrPWZnIj7TE_BPkKeytx6_giwbztXv05qpE7NrZOLQgK1x4CRliBFGq6EXiiaMpMfFsgTymKjknvzm3p6_falS0Vley4YnznYHyZCDnXcPP5DRV67uzmE3cvF3pVLvixg.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0be515259c4e14e5016ae28574c24087d09a945da8173df663",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230194,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 271,
+      "prompt_tokens": 1013,
+      "total_tokens": 1284,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 83,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004736,
+        "upstream_inference_prompt_cost": 0.002026,
+        "upstream_inference_completions_cost": 0.00271
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "96a2a341bd2a1293af3b9086fe6c5bfdddd4aad8ab681e859eab05c2731ea146",
+  "elapsed_ms": 6118
+}

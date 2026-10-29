@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0178\", \"row_sha256\": \"31ec0745a8d4f4fb2531389377a972ad99f64d67e573fd61d327fb64ac008271\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i have this query for a depot delivery summary and want to understand it before relying on what it says. Could you explain the query in plain language, including what it selects and how its conditions and grouping shape the summary? Please also review the SQL for anything that appears unclear or potentially problematic from the snippet itself. If an assessment would depend on information that isn't included, say what can't be determined instead of filling in details. Finally, suggest a small set of tests that would check the behavior expressed by this query, again using only the supplied code as your basis. I don't need a computed result; the request is for an explanation, a code-based review, and test ideas, not assumptions about the depot's data or database. Keep the three parts focused on this exact SQL. For the explanation, please make clear how the aggregate relates to the groups and what the WHERE clause restricts. For the review and tests, stick to behavior visible from the code, and distinguish that from points requiring outside information. here's the complete query:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\", \"output\": \"Please explain this SQL query in plain language, including what it selects and how its conditions and grouping shape the summary. Make clear how the aggregate relates to the groups and what the `WHERE` clause restricts.\\n\\nThen review the query for anything unclear or potentially problematic based on the SQL shown. If an assessment depends on information not provided, say what cannot be determined rather than assuming details.\\n\\nFinally, suggest a small set of tests for the behavior expressed by the query. Base the explanation, review, and test ideas only on this code; distinguish observations visible in the snippet from points that would require outside information. Do not provide a computed result.\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0178"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "31ec0745a8d4f4fb2531389377a972ad99f64d67e573fd61d327fb64ac008271"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "1fc015a311bb0e52fa149f4dbee2b5903e431a1ed4d94cdcf46d7f80ea6819f0",
+  "started_at": "2026-10-28T23:49:33.495293+00:00",
+  "result": {
+    "id": "gen-1793231373-235LNC0O9zGrgcU3XH5w",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0178\",\"row_sha256\":\"31ec0745a8d4f4fb2531389377a972ad99f64d67e573fd61d327fb64ac008271\",\"critique\":\"The input is a natural, self-contained request with clear intent and no contradictory constraints. The output appropriately organizes it into explanation, code review, and test ideas without performing those tasks. It preserves the complete SQL unchanged, the requirement to explain aggregation and WHERE filtering, the small test-set scope, the prohibition on computed results, and the distinction between code-visible behavior and matters requiring outside information.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing output quality**\n\nI need to ensure the assessment process is natural and coherent, avoiding any artificial elements. It's essential that my output preserves all meaningful requirements while omitting unnecessary context. I'm looking to fully understand the material before relying on it, analyzing the scope involved. I think small tests could be beneficial here. It’s also important to be precise with SQL and provide concrete critiques for my passing judgment.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing output quality**\n\nI need to ensure the assessment process is natural and coherent, avoiding any artificial elements. It's essential that my output preserves all meaningful requirements while omitting unnecessary context. I'm looking to fully understand the material before relying on it, analyzing the scope involved. I think small tests could be beneficial here. It’s also important to be precise with SQL and provide concrete critiques for my passing judgment.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ooQqOvvvJlLQnLknGnqcP3dtnxqB4SKAbY-9H3-LuoZbm9Hkt6MZmTjuPfvbZreOUjSlw8XZdXbEyCpv5AQnNrXPSm-75o9uSdRPeIoxfhxPBQ0rrTVw701PnM5cO4JrUWfTghogGTWHd_QnpugcyfwWbJwGSQKgSW3vzlF7mZO_PLACdrFDvJvKE7zTnQcir85PJqEFVrpLzJ9wY-qXBp1F65JUMR0QETGXKHzAgU6AhT3o0KEL7qZOy1tNLNXOuj2nmFGhInU71ynYvqxSkZIbDXRkd1l6S8MITm_ahCbQCPfkOj08KQLShST5Ag1SVTznBEAvzaR1EM57NKQaOhB20oaMrpEFby_ef91PZYa3NN6-xPvwz9-ogRcVqOQOMujln9RSORaKwZgCJPPka9ZCIYYbS2aZHlj2tyBJpr0fSxINm4pes7shYJ4e_VkWggElX1mUosPKtPtu1ogj7_8sYK63z7BBD8RKjhPf2Mu0JtBQlk_-VrY3NdMd8r3oSUopYXEWS3yOsq71Vi3YYfNNliGdjkhwsgr1qLy6yfU4kxP7wtDWPsp1x3pwPd_hgeITMPs51yNsHczQzdFeWMeMVWs8JbS7VRUH5Yh1U862Mp5XYK1V17Q__CB7qMfrBuiP6QHLu0PeAN7ujARnHyRiJngcuw4TT26r09cZwdJ52c_vOYqpJXg-H-IXz7Vsm6TWfq-UWxaqTExBfH7RphvsmzDZKRybMIBsfiCIrqU-GYlb20n1URxNRDAy7CsoVxxNR9kwohgvZvtgQpVp0ftnH_LSDDUboEka9Nv3vF5qNxo0lK1yzhLJ2N9fJbyaTtt_Ki_wgRJzAbN5_rk6lQ4o-dwOKm99OVQGItkZ2_NhThXJ8hwOwW8KsdoMZBgxJGFiaa0qa5gdS8Ygj03tBlgTOPqF38dJgj14RDGt0g_7jeYnQyeX2Amnxc6da_UbXRw998RqTmhO4H219RdtB8uJjVuZi_Vpe12ch49NWxjEvY9RkQB1FGHxBzfXdZykWRNvuPvBLFkfaLPtIXrKUV3yJo8AeaUPD8cK_ddt_lySqa1jwgfwZy7AHQS85Kxq6glHlp8MuzTyQq4d7TlEJknwZnFNIxBa1-adkvh4GBmc4s1gkkMPcrykhkzWgdwII14ACuCArQuoEXIb1zCX-pk8Og7axBRT1oIBfoFmY0-C_crJ0gBrsobVLd70TXTrJsfBwnNWKVqpx2T7DS6ycORtE8-cxgJOiX4d4AMmRj_19X_8a9dUgkxo25lrjL6eaLDfJ-ckcY6pAHYNsSo_Ke_OCriV7yFPgLNTRxhOpm4J9kwz-gmZmhKaJoi2CFw-zPZNnItdd22mUvcfqBUX2XO9f9a2JKjkfMwLfXojVHR7R-gEhHaHhZo2iw5VJSmgno6cjJVXAllEja6rYVn1tSliIvktDOPTP4au0ZP4__c6rZ9eY7vzyJ_LgppuICRwvuXDWKl6PIGb8IrASy7bJW4IZQH64-JM_hc6ttYLjQ2F49hpWrSS5M8NZEa8dovGFVkzIA3E6PXRxqByeYwkYSPgVluUVqSQpfNpClmvSV0q1ziA7_Gw8gYnppqEpd2vpqVKeQDJGvSHXlbRexbhBP0UdK9LFfM7znVt-04PGWso2XpXi1VxeDqqIbsHOeA4He-cwH1nlA1rNQYDpy-zhi0gSugapWSghCUM2ipfoklg4fE-sRExW0EV1m4VuDMmm36FzYiMtz8nCi4T2JaZWXlDp4QkZosmdHNl-uAU_8mZGUEYIem-o6Glavunb7plghCQ7sDGLkph3LQxdamZ4lp9Kz9SU26FDO9IbALZu_GlvJpnPOAum1fazsj3N36gpnHhi0HzgZjAgy0IgkdMp4gVWlJAccz7i8WNoqWr5U0dOqThgoKJxY5kw-WM84Wt8t2Rg0MCzFlUAvqRV45dFLyu-dFvkVVrLlgyineSyaUdAJfc67VmQE2HT6xGN8zgmf1qgebVeaqCV_TmemJ1A9LQ5FajNf1dBRCwIOChCKE6GoDC3MNe_un6DbRr4XDz8EXXnnaHdhT1YVAWZkpzhMug4IvP8HNdkvUboU3gBp0gYtSOyFowq1Pm4Ton7GZAdhWl5v1Y6Zk0bfnpl0W4XlZ1uxJ9o5w_Oti2Pi2PpOIzpg=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_04e1993d20635839016ae28a0e7a1087d0a0a916a2d3550c80",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231373,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 210,
+      "prompt_tokens": 1003,
+      "total_tokens": 1213,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 41,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004106,
+        "upstream_inference_prompt_cost": 0.002006,
+        "upstream_inference_completions_cost": 0.0021
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "2568ccbb736cdddb6f9f8d6d93326f702db0f22afcdad4271d1fc2af2ec81320",
+  "elapsed_ms": 4525
+}

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0163\", \"row_sha256\": \"78bb6ecf396e1253b46cc3cef795d2d30299e0734db2effd60064f4e76d8cf73\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we need a practical engineering brief for adding record batching to the photo importer, not a rewrite of the whole import pipeline. the importer is called Lantern and it runs on a workstation. an operator chooses a folder and a CSV manifest, and the scan step creates one record for each manifest row that resolves to a photo. each record includes the source path, filename, optional capture time, camera model when present, and checksum when the scanner can calculate one. the records are currently passed to the upload client in manifest scan order. please make the request clear enough that an engineer can reason about where batching fits without assuming a different importer architecture.\\n\\nsome details are settled and should stay settled. record order follows the manifest scan; the folder names are not a sorting rule. duplicate paths that occur in distinct manifest rows stay as distinct records, since the importer has not been asked to deduplicate. some cameras have no capture time and the current record leaves that field blank. do not suggest filling in dates from file names or filesystem timestamps. the upload endpoint accepts a list of records per request and the client needs to send several lists for a larger import rather than exceed the endpoint limit. the default batch width is 56, though an operator can choose another positive width in the import settings. the request should explain the intended use of the supplied helper, not silently change its default or interface.\\n\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nwe need the engineer-facing prompt to ask for a focused integration design and not finished production code. please ask them to describe the route from scanned records through the helper and into upload calls, including how the final shorter batch is handled. say explicitly that original order and every record must be retained, and ask what the helper does with an empty list and with a single list shorter than the width. don't imply a result from running it; this is a design request. the normal import might have just a handful of photographs or several thousand, and a width change must affect chunk boundaries without changing record contents.\\n\\nwe already have a retry rule that matters to the design. if an upload batch fails because of a network timeout, Lantern retries that same batch once. operations has said, \\\"A timeout retry must reuse the same batch boundaries.\\\" don't broaden this retry behavior to other failures or add repeated retries. the engineer should explain where the existing retry rule applies in the proposed flow and what information needs to remain associated with a batch so a retry refers to the same records. the response from the endpoint can report accepted records and rejected records, and our current notes do not specify how partial acceptance should be reconciled. ask the engineer to flag that as an open question instead of choosing a policy.\\n\\n1. points that should appear in the brief: keep manifest order, do not deduplicate rows, use the configured positive width and retain 56 as the default, preserve the blank capture-time field when it is blank, and do not change record fields as part of batching. mention that the importer may have an empty scan result, but there is no product decision yet about whether that should skip upload, show a notice, or be treated some other way. ask for that behavior to be identified as an open decision; don't choose one in the prompt. explain that a zero or negative width is outside the stated settings because operators can choose a positive width only, so don't invent validation behavior for unsupported values.\\n\\nthere are a few ordinary notes from the team that need to be kept as written, since they give useful context rather than new implementation rules. Mira said, \\\"Keep the scan order; the folder names are not a sorting rule.\\\" An import support note says, \\\"Some cameras have no capture time; leave that field blank rather than infer it.\\\" A note from the desktop client says, \\\"The progress display counts photos, not requests.\\\" make sure those are included as direct quotations, not replaced with a summary. the last quote means the design should address what the progress display counts while batches are sent, but we have not said how the display is updated across retries, so identify that as something to clarify rather than inventing an update policy.\\n\\nthe importer currently shows progress in units of photos. it has no established batch-level progress screen, and the scan count can be larger than the number ultimately accepted by the endpoint. the request can ask the engineer to state which events the design needs to expose to the existing photo-count display, without deciding whether the display advances on attempted, accepted, or retried uploads. keep that distinction clear. don't turn this into a user-interface redesign or ask for new screens; we only need the integration implications for the existing progress display.\\n\\nfor testing, ask for cases that cover an empty input, fewer than 56 records, exactly 56 records, and more than 56 records, plus a width other than the default. include checks that record order and record contents stay unchanged across the resulting batches. also ask for a timeout-retry case that uses the same batch boundaries, and a partial-acceptance case that is recorded as an unresolved policy question rather than assigned expected reconciliation behavior. mention blank capture times and duplicate manifest rows in suitable test coverage. do not prescribe a particular testing framework or add measurements we have not discussed.\\n\\nplease organize the finished engineer-facing prompt with a brief goal, the known importer behavior, the supplied helper, the requested design topics, and a numbered set of test considerations. close with the open questions that need decisions: empty-scan behavior, reconciliation after partial acceptance, progress updates around attempts and retries, and any details the engineer cannot infer from this brief. keep it about the Lantern photo importer and the batching integration only. no implementation output is needed here, just a clear prompt that carries all of these facts, quotations, conditions, and unresolved points forward.\", \"output\": \"Prepare a focused engineering design for integrating record batching into Lantern, the workstation photo importer. Do not rewrite the import pipeline or provide finished production code. Describe where batching fits in the existing flow and identify details that cannot be determined from this brief as open questions rather than making assumptions.\\n\\n## Goal and known behavior\\n\\nAn operator selects a folder and a CSV manifest. The scan step creates one record for each manifest row that resolves to a photo. A record contains the source path, filename, optional capture time, camera model when present, and checksum when the scanner can calculate one. The upload client currently receives records in manifest scan order, and the endpoint accepts a list of records per request. Larger imports therefore need to be sent as multiple lists without exceeding the endpoint limit.\\n\\nPreserve the settled behavior:\\n- Keep manifest scan order; folder names are not a sorting rule.\\n- Keep distinct records for duplicate paths in separate manifest rows; do not deduplicate.\\n- Leave capture time blank when it is absent. Do not infer it from filenames or filesystem timestamps.\\n- Batching must not change record contents.\\n- The default width is 56. Operators may select another positive width in the import settings. Retain the default and the supplied helper interface; do not invent validation behavior for zero or negative widths, which are outside the stated settings.\\n\\nThe team notes are:\\n- Mira said, \\\"Keep the scan order; the folder names are not a sorting rule.\\\"\\n- An import support note says, \\\"Some cameras have no capture time; leave that field blank rather than infer it.\\\"\\n- A note from the desktop client says, \\\"The progress display counts photos, not requests.\\\"\\n\\nKeep these direct quotations in the design context. The progress display currently counts photos, not requests, and there is no established batch-level progress screen. The scan count may exceed the number ultimately accepted by the endpoint. Address the integration implications for the existing photo-count display, but do not redesign the user interface or propose new screens.\\n\\n## Supplied helper\\n\\nUse this supplied helper when describing the intended batching approach. Do not silently change its default or interface:\\n\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nExplain the route from scanned records through the helper and into upload calls. Cover how the final shorter batch is handled, what happens for an empty list, and what happens when there is a single list shorter than the width. A width change should affect chunk boundaries only; it must not alter record contents or order. Do not imply that the helper has been run or claim a result from execution.\\n\\n## Retry and progress considerations\\n\\nLantern currently retries a batch once if its upload fails because of a network timeout. It does not retry other failures, and the design must not broaden that behavior or add repeated retries. Operations has said, \\\"A timeout retry must reuse the same batch boundaries.\\\" Explain where this existing rule applies in the proposed flow and what information must remain associated with a batch so that a retry refers to the same records.\\n\\nThe progress display counts photos. State which events the design needs to expose to that existing display, but do not decide whether progress advances on attempted, accepted, or retried uploads. Updates across retries have not been specified; identify them as a point to clarify rather than inventing a policy.\\n\\n## Test considerations\\n\\nInclude cases for:\\n1. Empty input.\\n2. Fewer than 56 records, exactly 56 records, and more than 56 records.\\n3. A positive width other than the default.\\n4. Preservation of record order and contents across batches.\\n5. A timeout retry that reuses the same batch boundaries.\\n6. Blank capture times and duplicate manifest rows.\\n7. A response with partial acceptance, recorded as an unresolved policy question rather than assigned expected reconciliation behavior.\\n\\nDo not prescribe a testing framework or add measurements not specified here. The importer may produce an empty scan result, but no product decision has been made about whether to skip upload, show a notice, or handle it another way. Identify that as an open decision. Likewise, endpoint responses can report accepted and rejected records, but the current notes do not say how partial acceptance should be reconciled. Do not choose a reconciliation policy.\\n\\nClose by listing the unresolved questions: behavior for an empty scan, reconciliation after partial acceptance, progress updates around attempts and retries, and any other details that cannot be inferred from this brief. Keep the design limited to the Lantern photo importer and the batching integration.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0163"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "78bb6ecf396e1253b46cc3cef795d2d30299e0734db2effd60064f4e76d8cf73"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "5dac2dd85cca4bbc5d98d839e49a4ed46c210828241b32edf870869b0d9873e7",
+  "started_at": "2026-10-28T23:29:39.668994+00:00",
+  "result": {
+    "id": "gen-1793230179-IOEExRcHyXqxNsX1R3Mz",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0163\",\"row_sha256\":\"78bb6ecf396e1253b46cc3cef795d2d30299e0734db2effd60064f4e76d8cf73\",\"critique\":\"The input is a coherent, recoverable engineering-prompt draft, and the output is readable and appropriately remains a design request rather than performing the task. It preserves the helper, direct quotations, retry restriction, and unresolved policy questions. However, it omits the supplied operating scale—a normal import may contain a handful of photographs or several thousand—and does not explicitly require retaining every record, despite the input specifically requesting that statement. Preserving order and contents does not expressly prohibit dropping records. These omissions violate /prompt's preservation requirements.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oVokFr0sxvxdoVipPBbk9h-NARl3fMyMEOvi-T-SS_Rn4gGoAU24ig61nz7JN3iFCKlunWiY9Ff1jEcx47TtsWlbpqR6ubYsumRvZKe1usxOXa9ViBXpYK3YAcnoYWJKK7PyVmRP9XnC-HaabKXn22iz7Jdf7eEouiSV61hszZHHcfm3YH4Xy0O0MRJAcv--H1XrhFB9au7GNk8166RhYnJiTdSLlgRmtmpQlDiObK_P-qxfbMfqtr2_kuu651fK5vldEw5LDA7RxJkWHPr1zkZgajEcA5LLKDbRQ5iSf4ShMFVk2AyzWp0-AUsYn3xC51KZarCZR38d86FGs8ofatERx-qVb_IJvzSwFf2oomKJuKt7QAZkn4-xVkEKZVg8Dwude0OnKwWTkoigepXRgMCmTPUa-_SyjR9BUq9mJ55at0sc9DYabe3ED6Zde4rcVzB7oWRzpHTr5vvg9BIuN3cHAwHt9hkyqLzJDvEzseo1szuQiybsVPZFjDPHmql1pQ0m8w3Ej29Ljxb3HE0ZfXm-AmNl-juzdDu-0EBPDd2DK6XAXJvSiLcSY2m8JWfkTfXiX_vD2L8PgnzJSdVztFS35YVFuSkf4cFKWzctcxlCfFrWcB0iymGG2y_dfMpioNemZDX4GtYGTVetFI3Inzh5utCiiPpOJMclX1bsUKQ8KIhOMn7pjryMjmEtw3nFlBSH24G4A_BkCwODLgeAi4FM_My6F2JmdBc6Fh97FOTojUZhYUvjsglMinm1fKOvmsHjZ8j4oG9OB0iG1IlCSMmyi9kU3YF2rwbCBDJ0Vm4_jwYsF5QadypO8gGra0WP4ALebQFMjTRH6LAvu2NFu6DCd5ZkDJKudQaFaMuyBEHTzcod9JJgSxaPDE23cJuq8ILNEQ2T8-A4HVjl8xzvSDHbMdeao7kcR-lR9qf0prYZyYvczYai1dogHHLSA54rg8Q7POa3134UEZoeI_tt3T2ULSkXYSf8vXP2Td8IKNLiDLB0rUBbaXp4vDf1QTlRf5N-TyVHWURa7_ZMKx9kyKZYkFWARmI-m-fwPMA8-4sBi628_36JeiyYDkZqGrDztIIhNfW9EGq7rYBGrHsphQ3PHANvGVOLjG99uV_bUoBIhpmfTNOK560OxImrfI5ELJx99prz2UfWBgWVqD4QFKZ8Dy42WEW2_oYU8Wz_CdxAS2R82gKrJ2AH8ySj_MtE8mRDM0gOZWyA6LOVZ1AsoTZmBLSGRKAs0GjKvtmPGHk0g8sbldCk8qWFJC6oduNKcIbhHMU3rd8STpEtuT2PMLAQu_X5CFt9Z9cCnhLCAfMmbDRekO8th_ovOeNidXh57epbj8FBJr9Iz2Qpcbx-BtPn459t7ZBhZ9dMVa82lahelATwvMsIHMeVk45pzcPtZzpnO0ivWOCuxhoYDNRbeCY5kCvQULFQms-VFdm9dd8gg88l9ZyLF7FOBWR2TDKVJJERTyJd1U1ct3C2hlZiizb2k2_mSrQDcqgR8yzE0rYK-oQKs8oLW1NGwXaBIZKj6O1gV_XhXYcFT2zaytCCO2q4taWMTSiYo14HwszoLLGsvNt70KgYBy0zeTtIj6haZziFG3LAd_Gu6jBroJEpxVmnW2_pFSxB2OPNuSuIlazQrj78-5kXGrmao5lSoinBS8k9176aGI5W8_DE18lVQku4g3wukW8_Ms-kNzHdp9qtv5bBg-flCMGl2zg-SK46L73mcRunCmjsdILTctHs-XoVJMMxaEhqMLcKlMfMhkpX-oqiHZgvcM2EFDrfGKf9kTkwAwBGCwY56yybLwwE79vZOjfE3L0yczn6o4hMZh9OoiQ2kIEazHYNwrt3Zq01C8qHgl-6gMwpFaBRAFmsuc8AC59NOj65FRg9eClrh1QEgLSfaTkHYu2mX5EOxpyICVyN5a6bjL2V5VdAbjFBkKIxGAya8AkXMetlnTnh_vF4sFFRB09V1_P1rOx8EDipCzYSu3TRqUw4E35Rf5p1TPzRGYSRfHazLXgoYD61oRl47wmIPU70p0JmZHl1UDMIMLzdAZpw1ygVm9Di-h448NG1R3O5raNsBK7mT60dVQwgE9O7YTddp2e2RhL6zZ_To8xCd3aUUyJ2gjwDATkXQbMArZ-d4um3NMbCRZKljYekc-qUaL83bDjzVX0wKK9vI1cSbkiRVVQushiJxjkx39RhVaQC4sn3-B2UyIpjwNz87s30ImZbEyyAGFakOXS5z6BXJrrDNAsb22rCqgwHukOWHNJb5JB2EorA5k-Ycsikyhn_hY8N13MTS98W1RoXX9tul4m9qs6kcGod05rVYzazdpzjqaCnQLDxCWzcQ4EyX7RjiY39ZDKljjah63Aqk4vIDGu1rrOwgElOR6GJQNCDjJ98GMlkScFF33O30LPX1Tnj0YnipB2tuSqjhH9wOt9CBiJh-QqouNFRAkkc9QYL65G_VtYnYZ-t8ZnV5cFr2O5cgL9gIE8V-ARgOYVfEiRoFMSMCJxRxNxBJ2gUiXnujWFIr8pVj7gQK_NUGOE53socSWu3N8zzfeS3dzTKCvEo365-2lB20oMQtZRo9OOqJhVuG6YAmcSZnuFn5peGvWcUBRmqhr5OT2BBedVey6sSoa25O0e_u0mws_oE64BPQpNN5aDqRhecUZwbeIqesL-ITi3uM-v0dUvAVIKHZDAOvQ7rWHiRWJH1B2W3BIq-AwWxUHIQP1sFkgI0l2YAtNGbxZgIIFZk5dy8Wz1SsCgTg54eZzjT36Rj2G8GAqPT_9CHYl3Fl6W7FxpdSNEfYvwgg_XfgWW0L27mgQBcT602pGIKubAQMvK0damiuvc8hVLjLvtn5MuodiDfowfVgSDbnjjx2Qm2rpvBO28IVnRQcjh4TVonDwrr_VMIbTDTLgW5XpY4OJkKOCo7kmnEjJrCPTRvZMMD1cBnv7yrfJz894Os7ZkpnqofMeYuCyqsSNqKL68K912N6NqeJDc_Ywn78wtZM6mdrQucMhH9PCnxMKeMnk6-fqDlMQo0oxNEtnEAdl3o6LXwgdpRQY78VWDtyoSK7mE_ddMgdKOLB4SxLlCBMQnKEZA6TnfLLUXRbKp2Lla6oShaNa1lBLC_GlcDUUcwohecjKTG9OyG86gWjr-gzR2xuVMJNaMVUVP8RILTIF4Ge7Ib9ngNNM99qKEL5wtrV1RgVTbJNSwVZNlIm7xuLuAt1HoT_xmU-nwYdTBY3tzduuHD0iD-y7pfMjXhrLL8wywxA0b0Ykv4AxQrFcu1wdi9cqyS6K96fKfEw==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_07af8d633ccf9f9e016ae28564cee087d08141ef56bdc3574f",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230179,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 313,
+      "prompt_tokens": 2763,
+      "total_tokens": 3076,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 113,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2760,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.010036,
+        "upstream_inference_prompt_cost": 0.006906,
+        "upstream_inference_completions_cost": 0.00313
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "b151b471529cef5f554d1ea7581dbd50749e60cdfce908c9059c47d6e69b6dcd",
+  "elapsed_ms": 7637
+}

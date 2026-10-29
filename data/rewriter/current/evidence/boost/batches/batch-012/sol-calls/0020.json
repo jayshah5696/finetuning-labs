@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0151\", \"row_sha256\": \"9e61017ed67f601e63737c98ad173be0f9e9c0d1e00b628dab1811ba73dbf17f\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we need a prompt for a design note about batching records in the photo importer, not a finished importer or a patch. this is for the next planning discussion at north window archive. the import queue is made from photo metadata rows collected from several folders, and the importer sends the rows onward in groups because the downstream catalog endpoint accepts lists. people reviewing the flow need to understand what the batching step guarantees and where it fits; don't lose the small operational details while making it readable. The current helper is:\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nThe usual queue is around 1400 rows, but on a cleanup day it can reach 18,000, and a few partner folders may contribute only two or three. A batch is not a separate import job: all groups belong to one source folder run, and the run keeps its folder name and scan timestamp elsewhere. The first batch should be the first records in the input sequence, so mention that the order matters. The last group might be smaller than the rest. We haven't settled whether the importer should reject a width of zero or a negative width, and I don't want the note to pretend that has been decided. Also, the helper has a default width of 24, but someone can pass a different width; explain that distinction.\\n\\nThere are remarks from the actual review that should remain ordinary quoted remarks in the prompt. Mira wrote, “The catalog team wants the sequence left alone; they compare import logs against the folder listing.” Jules said, “A short tail batch is fine, but please don’t call it a failed batch.” Keep both exactly as quotes, since they express two separate concerns and aren't formal acceptance criteria. A note from the importer checklist says, “One folder scan produces one ordered stream of metadata rows.” Keep that wording too. The note is there because a previous draft mixed up the batch boundary with the folder boundary. Don't turn the quoted comments into a claim that the endpoint guarantees anything beyond what is stated here.\\n\\nFor the design note, describe the relationship between input sequence, batch width, and output groups at a level that a maintainer can check against the helper. Include what happens when the input has fewer records than the width, when the record count divides evenly, and when there is a remainder. Explain that batching partitions the records without changing their order, rather than sorting them or joining folders. Don't write implementation code beyond reproducing the helper below, and don't claim that any import was run or that the endpoint accepted data. The note should identify the zero-or-negative-width question as unresolved. If useful, say which decision still needs an owner, but there isn't a named owner in these notes, so don't assign one.\\n\\nWe have a few operational details that should appear in the request because they shape what the note is for. The importer reads image metadata from a folder scan, then hands the resulting rows to the batching helper before sending groups onward. Some rows include a camera model and capture time, while others have a blank camera model; batching should be described as operating on records, not as filtering or correcting metadata. A folder may contain mixed file types because the scan stage already decides which entries become metadata rows. Don't suggest that the batching step chooses file types. The downstream catalog takes lists, but no maximum list size has been documented in this request, so the common width is a configuration habit rather than a documented endpoint limit.\\n\\nThere is a review item about a late folder scan. If a folder scan finishes after another folder scan, the importer still treats each scan as its own stream; nothing here says to merge streams into one global sequence. Preserve that scope. Within one scan, sequence from the scan is meaningful, and each resulting group is sent as part of that folder's run. If the note mentions logging, it can say the folder name and scan timestamp are tracked elsewhere, but shouldn't specify a log schema or say that group numbers are currently recorded. People have asked about retries, but this request doesn't define retry behavior, so leave it out rather than designing it.\\n\\nPlease organize the requested note around these points, maybe with a small numbered section for the behavior examples:\\n1. explain the input stream and why a folder scan remains the unit of a run;\\n2. explain the default width of 24 and the option to pass another width;\\n3. describe order, full groups, a smaller remainder group, and an input shorter than the width;\\n4. flag zero and negative widths as an open question, not a settled validation rule;\\n5. distinguish batching from metadata cleanup, file selection, sorting, joining folders, endpoint limits, and retry policy.\\n\\nThe usual queue and peak-day counts are context, not target sizes or promises about performance. The two-row and three-row partner examples are useful when discussing an input shorter than the default. Don't conclude that the helper is safe for every possible input just because its current behavior is shown. The design note is meant to make the known behavior and unknown decision visible before implementation discussion, and should be understandable to someone maintaining the importer who has not sat in the review. It should preserve the comments and checklist sentence above in their exact quoted wording. End with the unresolved width question as a substantive final paragraph, and ask the writer to keep that distinction clear: the shown helper has a default, while policy for nonpositive widths has not been decided. Don't supply an answer to that policy question.\", \"output\": \"Create a design note for the North Window Archive photo importer’s batching step. The note is for the next planning discussion; do not write a finished importer or a patch. Make the behavior and its limits clear to a maintainer who did not attend the review. Preserve the quoted remarks and checklist wording below exactly.\\n\\n## Context and scope\\n\\nThe importer reads image metadata from a folder scan and passes the resulting records to a batching helper before sending groups to the downstream catalog, which accepts lists. A folder may contain mixed file types because the scan stage decides which entries become metadata records. Some records include a camera model and capture time; others have a blank camera model. Describe batching as operating on records, not as filtering or correcting metadata, and do not suggest that it chooses file types.\\n\\nEach folder scan remains its own ordered stream and the unit of a run. A late-finishing scan is not merged into a global sequence with another folder. Each group belongs to its scan’s folder run; the folder name and scan timestamp are tracked elsewhere. The usual queue contains around 1,400 rows, though a cleanup day can reach 18,000. Partner folders may contribute only two or three rows. These are context, not target sizes or performance promises.\\n\\nThe review comments are:\\n\\nMira wrote, “The catalog team wants the sequence left alone; they compare import logs against the folder listing.”\\n\\nJules said, “A short tail batch is fine, but please don’t call it a failed batch.”\\n\\nThe importer checklist says, “One folder scan produces one ordered stream of metadata rows.”\\n\\nKeep the two remarks as separate concerns, not as formal acceptance criteria. The checklist sentence helps distinguish a batch boundary from a folder boundary. Do not infer any endpoint guarantee beyond the stated fact that it accepts lists.\\n\\n## Helper and behavior\\n\\nThe current helper is:\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nExplain its behavior at a level a maintainer can check against the helper. The default width is 24, though another width can be passed. Batching partitions the input records into groups without changing their order; it does not sort records or join folders. Describe what happens when the input has fewer records than the width, when the record count divides evenly by the width, and when there is a remainder. In particular, the final group may be smaller than the others. The two- or three-record partner-folder examples can illustrate an input shorter than the default.\\n\\nUse a numbered section to make these behavior points easy to review:\\n1. Explain the input stream and why a folder scan remains the unit of a run.\\n2. Explain the default width of 24 and the option to pass another width.\\n3. Describe order, full groups, a smaller remainder group, and an input shorter than the width.\\n4. Flag zero and negative widths as an open question, not a settled validation rule.\\n5. Distinguish batching from metadata cleanup, file selection, sorting, joining folders, endpoint limits, and retry policy.\\n\\n## Boundaries and open question\\n\\nNo maximum list size has been documented for the downstream catalog. Treat the usual width as a configuration habit, not a documented endpoint limit. If logging is mentioned, state only that the folder name and scan timestamp are tracked elsewhere; do not specify a log schema or claim that group numbers are currently recorded. This request does not define retry behavior, so leave it out rather than designing it. Do not claim that an import was run, that the endpoint accepted data, or that the helper is safe for every possible input.\\n\\nEnd with a substantive paragraph making the unresolved width question clear. The helper shown has a default width of 24, and a caller can pass a different width; whether zero or a negative width should be rejected has not been decided. If noting that a decision needs an owner, do not assign one, because none is named here. Keep the distinction between current behavior and undecided policy explicit, without supplying an answer to the policy question.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0151"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "9e61017ed67f601e63737c98ad173be0f9e9c0d1e00b628dab1811ba73dbf17f"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "06e58e96c41e691fc82ffc000c6af1b56c5517cd93d78d96bb27096c68944804",
+  "started_at": "2026-10-29T03:17:58.794245+00:00",
+  "result": {
+    "id": "gen-1793243878-yVVaPn755NDpgfVuI6Ze",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0151\",\"row_sha256\":\"9e61017ed67f601e63737c98ad173be0f9e9c0d1e00b628dab1811ba73dbf17f\",\"critique\":\"The input is a coherent, recoverable planning request, and the output is a natural, well-organized prompt rather than an answer. It preserves the helper, exact quotations, operational context, and unresolved width policy. However, it omits the explicit constraint, “Don't write implementation code beyond reproducing the helper below.” Prohibiting a finished importer or patch does not prohibit additional implementation snippets in the design note. It also turns the optional suggestion of “maybe” a numbered section into the mandatory “Use a numbered section.” These changes fail /prompt’s requirement to preserve constraints without adding requirements.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating material omissions**\n\nI need to evaluate what’s missing in the output. It lacks an explicit note not to write implementation code beyond helper functions. The initial part isn’t finished, and it doesn’t exclude the code snippets as a design note. There's a concrete constraint missing too. Also, the requirement to input \"maybe numbered\" was made mandatory; that feels like a minor tweak. I want to ensure that notes versus prompts are clear in the output.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating material omissions**\n\nI need to evaluate what’s missing in the output. It lacks an explicit note not to write implementation code beyond helper functions. The initial part isn’t finished, and it doesn’t exclude the code snippets as a design note. There's a concrete constraint missing too. Also, the requirement to input \"maybe numbered\" was made mandatory; that feels like a minor tweak. I want to ensure that notes versus prompts are clear in the output.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rrrH8UX8nroQf3ms7LiNf9UfQib2YtOCDQRordlv2DnTEXS88Hlp0YBuWyATuvSU8szE-HTHUR5_P-478PKySOGTj-f03HhjwkTgzM9NE2xNTvpZRkoC0A3u5vDw8ePOohc9BPQ42ctwOuLviFfhnuTsz7TnsyJ67O5HJHRSS0WtsjGO8QqEu5KaRJzvvu5gULiFgb0ALtwxy--bRKU7TEfLtSwo-_Pd1SOJ3L-dMBFw32VHfniJ8EhgCxrOA8HcvdMpdEoNzXpTeBUUnKtHYrTh4mXEVbGXOKIQmrg7cU6-rPdfDWDEVhQOlu_ysTKIOSctsjRa8t6JW6sKBq3zie1PnprM2Pfoij_wCSrVUg5ANZ1Y5GKahaBHaBXXmRcKdkPpXHiPShHL8L6qkLauYJ3oexu6s-erZtDOsnAkwgshLeqGxd275-uQYLvgQgkHSFRcREOJ2VBvj-Crmx2WG8gq6GgKjrOAvrWREibfeQrCt4D6DGM7z-aCZcwZ0IX1SbaQdibMM5ekQGNTwkodSCqeG8p5uD7AfZxol7sQagb35XLHKCqga51Sm3oQvjLCwWz_zLKnEA2cUl1ZVk3DoPLerX7feo1aCmPeKWZHfHXuR792oAkdaYn4WiWlVqNaeRjHApdvX_YFfNWQJyWoizb1Tev80Y8dHR6wv-JIu0jdzAF2xniy-cOEi7tszmcgl14flsRc_IaKp4H8R7uEO_SJLgCpmvqDOqR3oBs_ThcqM759TOM6ceE53SGZ5aSAyUWydQLfeTs9TDbp_-QDFFnhQuIviFVJyUKemRd59pRkjCocNfqUaLCOJRhb7IOmA3CtRTp9DvTiTUoPC755F8t5tCRJ_pYQ-0q4pykhc7EOFX0qv2TqdkcZzIrP7Ttaae2kVDNvNFDvQ3nVrysFOyS9ua3LXnFX3ejdyyT4OZihFuV4tUM4L07fGSsbhKNKgsK4KZEWz9lWuvgcfWi1aMKj2lPDG5xW9hgPC0Lxphv2fiET3WXdnt72Ck3Jia6965epz0T_O6tTPJe3eZdl2rsCuQizJGPhsDqNQ8YDU_VHbL0gRLd0Ojzx937Jo2mRC3qlj6DBYc-NHA4y9Oiyz6AOKlXFamBGbXn77FcjbZOlJsdQXg7nIAyJAHCHcGxBomX5_6aXtT38OXXWQtMq6jlrbn1lSQTD-HPDJk3dinPdNoYGUDxpjMwgQuq6OQDLLJ-c8Es-qxZ7I70k2zRXRVCLNhCf8t-I3HlwguzijqohihJgxSke1qvyZ4KfpEVw7HpjJ3ckGmg2MfcAwlh6AJfVqV0BA3sKOv_TLD3AGvq8ibLVTcgdw4-ThJeL15EBnaz64BSW31X5oqVCZSoB6xR1gNCL3b7yT08RKyTStXGkDmA-qQV5q-mYK-3kuNUCAjXwGyyBJEKnUa7hmXJn8IhWRJ5OHPXbAtW0rYYZ5zJuhgLCbffqwpImNTYl-4Rq8lYJgPAIw6C0s9ONf_s4x2stM5cMnHbx4FVF13Is7lIFZCh-YZY5hF-UmduwjTmZ5cQ9Okuf-ikWBzzwUcJrgki-IoKfSQC9e8eUAMFRdgpR1Fi_TP7461RJXSpH_i0ZAaKY4MMG2lt6zMsh6RF18ISoo5_ZwsSmNKJngH-HkPB8sD-GmImhVLZ3ZzLA5k0Lv_a1KrWFDjM13K0uGIs673VNC2d6xkqk8Q7UyZzvnK4kAkS3NsCytc46ao0RotGDFMuevhHd2ImHXYBHORaDaF76VC-4jHC3Eg8kjrs2OcviZlGxOCP7FF9xcjuQ_K8RG_EFNrGuPJVmE8FVDOW5SfkPgM70-_FkV0shi2c-ZJEtWfg2K-Kl28KAiYVOP9N6URHIU1XSOK90dELG7MXiKmgL-r5981TCf4_h1zt8JCV1GdsGpGFWn0ZKumDpg7pNNWAw8Hm2muWQXHmw9I1faunq3HdE4mvkW13jyGQdVZOcrWdgUkJC0FrZJ5462Pvf9sCvBU3mhiTVmxycBe6trkaGV0tc8R8jAmEYuZM4EoQa4ZDLKqNiLOjb-hfNyikdeFbpYy6ilafIv4QS_dq7sdlUPUoLyyTFx3-KIfhEqcYjnmUC-WTnw6gG4_oIvIU68deJji6X87CbrDFwTMlT9NqQtuXI61ZXTirETFsvAeRGZGFm4d7f0gzKDKWcmkjlCDDcpywBUCEigKuQxPwwbPnDuBQMjFQczV5dLNA8-N6x5ig9Q776bC0JfWuQL8cauoH47G0QwVU63kMsFyiqebAgBS-v0CaL8BESNWt0WLA_4GsJsJ8SIJrod2C1PAmiHuGB5Uy_gy3SszodCsA2PkOGOgioufBEhpFCgWczPCgcCCP-lrqPnpvkRMrJ1SKNM3VHZpY-NxVEAKhVWjUg9wIo3syRwNtROHIWfpFKIbInWnuouglrlMfyfu4-pEEXRQy2twGWi7UV6NwbaX9dkdpAQEBLCP41azDLkRJkRFE1FJcPbCO0FxVR6Aoya3DVLcditEZO3UZ5M9lx4ugbPIV-zntTgxHTMqsnwmRDyJzbGYNjieSn1UcJLtr0Ix7pjwV-t_YGCGC17oBgpsskjJqlc1h43Ua4wOd1J97N-85Fg_SYzkvUpZg5RBfp1D2RuSY--LXN1B_kqNNwuHKYNFLoksxj584P0ROG2295JGIYLnciBP7WRX59YnQeHfB39SetcMvOBHtmrszWsyWyledFwqQ0dH6ydLyaA3Do80t9E2L6SlisEs1k-Xu9gmuGRCJ55PMXDIAsU_WglMatVr-sEF2PSwqwC_9cWiY3TGyddWFSceEBrNBRd90m_DypXpA.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01bb9ba8fc5671ed016ae2bae811d087d0afb868d9bde4512f",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793243878,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 297,
+      "prompt_tokens": 2589,
+      "total_tokens": 2886,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 82,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2586,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.009441,
+        "upstream_inference_prompt_cost": 0.006471,
+        "upstream_inference_completions_cost": 0.00297
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "b7ffcb5a8104dd93ee6e223a44c86aeb2ad3639ca77ae0d60ff199a34f942c20",
+  "elapsed_ms": 6541
+}

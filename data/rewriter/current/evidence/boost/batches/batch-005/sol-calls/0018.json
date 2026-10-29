@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0134\", \"row_sha256\": \"7f6f9722dbbaaa9b068202003e5ec92d5086a78af24ee24acd72271dda57566f\", \"mode\": \"/prompt\", \"language\": \"pt\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"preciso organizar um pedido sobre um trecho pequeno que está sendo considerado para uma loja cooperativa. a equipe está reunindo material para conversar sobre como os preços aparecem numa planilha mensal, e esse código foi enviado isoladamente, sem arquivo de entrada, documentação ou outros trechos. não quero que se presuma que a planilha já foi processada ou que algum resultado foi conferido. preciso de uma explicação do que o trecho faz, uma revisão limitada ao que dá para observar nele e sugestões de testes possíveis, sempre usando somente o código fornecido. o texto deve servir para uma conversa de trabalho, sem virar uma aula geral sobre programação ou uma proposta de mudança do sistema inteiro.\\n\\nA loja é mantida por cooperados, e o material será lido por pessoas com familiaridade desigual com código. A pessoa que coordena o caixa entende a rotina de registrar preços, mas não costuma ler funções Python; a tesoureira conhece as discussões de fechamento, mas quer distinguir o que está escrito no trecho de qualquer regra comercial que não aparece nele. Para a coordenação, explique os nomes e a sequência de operações em linguagem acessível. Para a tesoureira, destaque com clareza o limite do que se pode afirmar com apenas esse material. Uma delas disse: “não quero que a explicação transforme uma suposição sobre a loja numa regra do programa”. Considere essa preocupação ao organizar o pedido, sem atribuir falas ou opiniões adicionais a ninguém.\\n\\nO contexto de uso é apenas este: a loja está montando uma conversa interna sobre somar preços registrados para produtos, e o código chegou como um exemplo que querem compreender melhor. Não foram informados os produtos, os valores efetivamente usados, a moeda de apresentação, a política de arredondamento da cooperativa nem o formato dos dados da planilha. Não trate esses itens ausentes como se fossem fatos conhecidos. Também não diga que o trecho foi aprovado, colocado em produção, executado ou comparado com uma conta manual; não há informação de que qualquer dessas coisas tenha acontecido. Quero que a resposta explique o que se pode ler diretamente e separe isso das perguntas que continuam sem resposta.\\n\\nO material recebido, que deve permanecer inteiro no pedido, é este:\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 13\\n\\nPeça uma explicação passo a passo, sem substituir o trecho por uma descrição vaga. A explicação deve acompanhar a função desde o argumento `prices`, passando pela inicialização de `total` e pelo laço, até a expressão retornada. Esclareça o papel aparente dos nomes e das operações, mas não atribua uma intenção comercial que não esteja demonstrada pelo código. Em particular, trate com cuidado o nome `total_cents`: ele é um nome que aparece no trecho, não uma confirmação independente de como a loja registra ou apresenta valores. Não precisa reescrever a função nem propor uma versão corrigida. O foco é ajudar o grupo a discutir o material recebido, não entregar uma implementação alternativa.\\n\\nOrganize também uma revisão curta e concreta do trecho. Quero que a revisão identifique o que pode ser observado diretamente, e que não declare defeitos ou garantias sem base no material. Se houver comportamento que dependa do tipo ou do formato dos valores em `prices`, diga que essa informação não foi fornecida, em vez de escolher silenciosamente um formato. Se a expressão de arredondamento ou o valor acrescentado no retorno levantarem dúvidas para a conversa, apresente-os como pontos a verificar com a equipe, não como prova de uma política específica. Uma pessoa da tesouraria resumiu a necessidade assim: “preciso saber onde termina o código e onde começaria uma decisão nossa”. Mantenha essa distinção visível e não conclua que o acréscimo final corresponde a uma taxa, ajuste ou outra finalidade determinada.\\n\\nInclua sugestões de testes que possam ser formuladas a partir do trecho, sem afirmar que foram executados e sem inventar resultados. Para cada sugestão, explique em uma frase qual aspecto observável ela ajudaria a conferir; não é necessário fornecer saídas calculadas. Se um teste depender de uma convenção da loja, como a representação dos preços ou o tratamento esperado de valores de fronteira, deixe essa dependência explícita. Se não for possível decidir o resultado esperado com o material disponível, marque a questão como aberta em vez de completar a lacuna com uma regra presumida. Não amplie a tarefa para uma auditoria dos procedimentos da cooperativa, uma avaliação de segurança ou uma análise de arquivos que não foram enviados.\\n\\nApresente o pedido final com uma organização que ajude a equipe a usar a resposta numa conversa. Depois de um parágrafo breve de contexto, use uma seção numerada com estas partes: 1) explicação passo a passo; 2) revisão do que se pode e do que não se pode concluir; 3) sugestões de testes e dependências ainda não informadas. Preserve a distinção entre observação e hipótese em todas as partes. Use português claro, mantendo os nomes de código como aparecem, e evite uma conclusão que aprove ou rejeite a função. Se algum ponto não puder ser estabelecido apenas com o trecho, identifique-o como incerto e não o resolva por conta própria.\\n\\nNo encerramento do pedido, mantenha a finalidade prática: preparar uma conversa interna sobre o exemplo recebido, para que caixa e tesouraria consigam formular perguntas antes de relacioná-lo a uma rotina real. A explicação, a revisão e as sugestões devem permanecer limitadas ao trecho incluído acima e às informações contextuais expressamente fornecidas aqui. Não acrescente uma recomendação de adoção, um resultado de teste, uma regra de negócio ou uma resposta pronta sobre o que a cooperativa deve fazer; precisamos primeiro entender o que está efetivamente apresentado e quais pontos ainda dependem de esclarecimento.\", \"output\": \"Prepare uma resposta para uma conversa interna de uma loja cooperativa sobre um pequeno trecho de código recebido como exemplo de soma de preços. A equipe está reunindo material sobre os preços registrados numa planilha mensal. O trecho foi enviado isoladamente, sem arquivo de entrada, documentação ou outros códigos. Não há informação de que a planilha tenha sido processada ou de que algum resultado tenha sido conferido. Explique o que o trecho faz, faça uma revisão limitada ao que é possível observar e sugira testes possíveis, usando somente o código fornecido. O objetivo é apoiar uma conversa de trabalho, não apresentar uma aula geral de programação nem propor mudanças no sistema inteiro.\\n\\nO material será lido por pessoas com familiaridade desigual com código. A pessoa que coordena o caixa conhece a rotina de registrar preços, mas não costuma ler funções Python. A tesoureira conhece as discussões de fechamento e quer distinguir o que está escrito no trecho de regras comerciais que não aparecem nele. Explique os nomes e a sequência das operações em linguagem acessível e deixe claro o limite do que se pode afirmar com esse material. Tenha presente a preocupação expressa por uma delas: “não quero que a explicação transforme uma suposição sobre a loja numa regra do programa”. Não atribua falas ou opiniões adicionais a ninguém.\\n\\nO único contexto de uso informado é que a loja, mantida por cooperados, está preparando uma conversa interna sobre a soma de preços registrados para produtos, e o exemplo foi enviado para ser compreendido melhor. Não foram informados os produtos, os valores efetivamente usados, a moeda de apresentação, a política de arredondamento da cooperativa nem o formato dos dados da planilha. Não trate essas informações ausentes como fatos conhecidos. Também não afirme que o trecho foi aprovado, colocado em produção, executado ou comparado com uma conta manual: não há informação de que isso tenha ocorrido. Separe o que se pode ler diretamente das perguntas que permanecem sem resposta.\\n\\nUse integralmente o código recebido:\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 13\\n\\n1. **Explicação passo a passo.** Acompanhe a função desde o argumento `prices`, passando pela inicialização de `total` e pelo laço, até a expressão retornada. Explique o papel aparente dos nomes e das operações sem atribuir ao código uma intenção comercial que ele não demonstra. Trate com cuidado o nome `total_cents`: ele aparece no trecho, mas não confirma por si só como a loja registra ou apresenta valores. Não reescreva a função nem proponha uma versão corrigida; o foco é compreender o material recebido, não fornecer outra implementação.\\n\\n2. **Revisão do que se pode e do que não se pode concluir.** Faça uma revisão curta e concreta. Identifique o que é observável diretamente, sem declarar defeitos ou garantias que não tenham base no material. Se algum comportamento depender do tipo ou do formato dos valores em `prices`, indique que essa informação não foi fornecida, sem escolher um formato por conta própria. Se o arredondamento ou o valor acrescentado no retorno suscitar dúvidas para a conversa, apresente-os como pontos a verificar com a equipe, não como prova de uma política específica. Mantenha visível a distinção expressa pela tesouraria: “preciso saber onde termina o código e onde começaria uma decisão nossa”. Não conclua que o acréscimo final corresponde a uma taxa, um ajuste ou outra finalidade determinada.\\n\\n3. **Sugestões de testes e dependências ainda não informadas.** Sugira testes que possam ser formulados a partir do trecho, sem afirmar que foram executados e sem inventar resultados. Para cada sugestão, indique em uma frase que aspecto observável ela ajudaria a conferir; não é necessário fornecer saídas calculadas. Se um teste depender de uma convenção da loja, como a representação dos preços ou o tratamento esperado de valores de fronteira, deixe essa dependência explícita. Quando o material não permitir decidir o resultado esperado, marque a questão como aberta, em vez de preencher a lacuna com uma regra presumida. Não amplie a tarefa para uma auditoria dos procedimentos da cooperativa, uma avaliação de segurança ou a análise de arquivos que não foram enviados.\\n\\nEscreva em português claro e mantenha os nomes do código como aparecem. Preserve a distinção entre observação e hipótese em todas as partes e evite uma conclusão que aprove ou rejeite a função. Se um ponto não puder ser estabelecido apenas com o trecho, identifique-o como incerto e não o resolva por conta própria. A finalidade prática é preparar uma conversa interna sobre o exemplo recebido, para que caixa e tesouraria formulem perguntas antes de relacioná-lo a uma rotina real. Mantenha a explicação, a revisão e as sugestões limitadas ao código incluído e às informações contextuais fornecidas. Não acrescente recomendação de adoção, resultado de teste, regra de negócio ou resposta pronta sobre o que a cooperativa deve fazer: primeiro, é preciso entender o que está apresentado e quais pontos ainda dependem de esclarecimento.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0134"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "7f6f9722dbbaaa9b068202003e5ec92d5086a78af24ee24acd72271dda57566f"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "6d62c3891deb46a3a365c58d2c32f14146b33a4bb09ced17b0c1638f1e7e50cd",
+  "started_at": "2026-10-28T23:43:12.320658+00:00",
+  "result": {
+    "id": "gen-1793230992-6ecBsdeUMGecndIU2UlY",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0134\",\"row_sha256\":\"7f6f9722dbbaaa9b068202003e5ec92d5086a78af24ee24acd72271dda57566f\",\"critique\":\"O input é um pedido coerente e recuperável, e o output usa português natural, preserva integralmente o código, mantém as duas citações e não executa a tarefa solicitada. Contudo, não respeita a organização expressamente pedida: “Depois de um parágrafo breve de contexto, use uma seção numerada”. Antes da seção numerada, o output apresenta três parágrafos extensos de contextualização e um bloco separado com o código. Embora preserve amplamente o conteúdo e os limites de interpretação, essa estrutura não atende à restrição explícita de abertura breve em um único parágrafo.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oiZLrs23V_usjjGkBApJEPXgT0eCBxrhRIDsD7fbuxvuxyhOY4GmZAS4fi7-8q_ov15cVzU3q-OAVFA2FN29n2z8_zlZgjaV0VyRSOB4VM8equo11nUkt8CbZIGI10c_ZU8dqvZcrBouobW478pgp7ps4b3gjd2PLSi5-E8UnNUm89BW_CqgN-bQJkAXWFu2fxDwhvCO7GOI0Zv0CDQKO-l6D342I_WNNDmdc2GNynSsIKHYZQTLa-DOdd-o3Q7i2cwjhLhSUjTfMJadtfTqAu6uF8H4vmO-x4pELPpXY6jt6di3nm1mAcAdQSUb9OxbTg81Ll7wTZMtPYOtZgPO0lQe8Z6aRn8wdw-FLyh5_8py9tLG7jTOf7Koim8qHhHcuyLCaFEQ0vzRHIM2Ojd241w5zdcykEdkFwHFK2X4RFqhlaL-L2UxUtilMYDwKtZsijFV-N1rWzFQDR2xdkmNhV4aouFclTGPxUfaklTHqykp7YgvAv4lyroqKDY-5Ow3XR_4pkrFD3iS64b82IfbqRUhJllBbwV3HRY7RtfRZuZL9oNPzeij3NZSOQKJ41MzSUtyuG5QfgW5NFDdckTl1rbKMHTY9L6in_adUe9JwX_5YFoknSCkcgmAQ79R-siGKC61KJky5pr9u7FmjdbI--BZfmVlNxH4HdUit_yGqVZQRVOlFsxiivUD7XvOCG6nQInxGfeHBzFKGgDn5pZkPhB-0JhA5dUq4MQFh8gmPV9awU-V60Cg9PhtrjZgnFEx3YqYVmUU1A9mq2IkoKh-kdbYZdJPXonXtJqgn0PGYzGfx8ia1LV_ZTc-v_NK-03Q24C5bAnUdutGOwGeA_opQ3fdj71nadMkkUdJ0l-GP6CWEIWExobc8Bptncz9_qP_6CEk3ApLxkNrTWJXcF_ANuh1_y8_bPbgUU3iCs9eU4WqIHSbU1EZJrWtQqmDfUalUD1aHGRPMBVi3tfiSTlJU3YPP0oLcrgXWoFGebsKxGFReQUG2hAqEfuPQT_jtImSFShrGG89yKa-lqPigoVqqutOqW8KEFZgQp0Q5ZGJ01t-6tvxGOQL2EExelCdWy2kXnAgITaNyhXZkXO7RoEZbxG8YBbwb7RQYMijiCojOmGqEu4nDkUwAcScG3REtC5e400V2M8ybthZ6E1ZBQTcLfTE_yfP7tvfqXZVMeMUJUS7AXHtyIf2CUwO6dGbysnpRHK5JW-mECbI7DnwmBRG1_FUSVnfJexkxYOPr7mhIgALGH-oR-eiWrVG2hlEkkgRviTsRO3rwLkg8ZAKKEND_XInrluFtQUbUPg8LkLiGYVF_ipSRpmdTsqKwP1ceW6EUOcDMJi_HWsJ_ozrxXLQizB282Bwty2Wc6_pbfcMLwSCACDEKlLrmcm9By3ftlVMapFPFQzmRW5e88V7fdDY7AkfIGLoGvgHDIP-YPDMglLtE2JjbMDoC1kg47cURry7jpC2zNTsZkBzuqFHICv3Zwj945hMQo6dD76Ssl_-uNQoZxib4c70TCW8MgsawHjgvAvd0Z55QuEUJQK0WgPdyaeskqO94rr9IvEt3geHRePnPd80ZeeVne2FmuqEfZMQxVHjSdBlIHxyXCQLwyg9WtM9x4uC8mF4tM7cc0puPuhqvmEZTfaMrYC29MDeLo7PsZkagLAmxKv5vP0JiBNIT7yEt08nb3PA0J6p5UoU8vPPRmnUGHWpA6sVG9t3pPJzLIVhseCmrHxsjcM7zzbR2QoFmu9ItSregcY42cNbWU1V3psxKKnQFCVB48YJJijvjSx9Gqcwyaj6EdGeTlRbI2r9Gk9eF1C2K74azf0NBPlrQAG4-Ds3EKxanK4kCAJ_-_tvM0Fg7UmxJpGTM_V1m4mZn5Py-uD983U-oVsjDKtLM77cnc6POBy-qkhguXp3AFp7CYpENya35dXbEN8xY7wI46cxA4n38DBEqxo3TvYxj1A6qWlJ0_jo2c8OiS5Co6zHrVw67oV62OArQWCrPkxdcsBzyIkHQz1YnF74Np-doVnOaMf7-SBwTwnKUA1lx2rMqM2uwMOOBjEbuiAaXlq1aaTpEMM_ZV3jE_xJSJhAXHAEES_AGs8EyiFlgllHv7AccSj-u7Qb3Q7fcxIwvq44rFbI12mv_M0tqq1EecKCqjplsEbZiKvshcWnOLw9iT5signIEw7vi8ivF0Jn_HLtLhmYeYz_KAJBwNuWBwOkEGYEn2u2wqQuE49RGqdRFkZp109HftdylhRrqg43RJvUHBR6C7ajrsFMEpsaSSmvLzAxf-VmU-OQ79YdkKg91hC4HboWZOahMKTTxLip2-NxTxKUjPq1AAUp7lAvaYU4G8_gXPm5RvMREPK408bk2JlyS3d_4RvLJme7q9nJTXG2xOCqLLhg6Igwk-gqV0-6CfWyLc1twSprK1C1lz0DJbM0LRvFOFfGckLevwAyJadb0pfDmbdgk05LMJ2KNf9aWXvzv_W23GONlvCX-9ZM7uFuHT4_raRTnZumIqiKJ7J1_Q4GOygs3n4RTfJ7SqGjLaGucH0YjfcwYy-AvGLvH2IAPYPD_cJDUP99_rVDHsTKiTEGv1tFIy0gc8Xr2Di70PSfXzj3-gCNc1a4hu74nR7SdM3SC_nEWDkA-7swJVv_1WIbLmd9LlREtpcbng-HRDOgn9FMKu0IXnb_Qldj4mG7z7MxYmpKmagMtQojwF1MuowD-VJLx6RL4z-mxb2CJM1WJckH0EpbkNO8jca_KHQx3shXU8MKibVYUgsYgzBVzmDeMrJ4AP6WkYqlxG9WPRYGraFwvAFzFUWhpg6ItjaZ5xbKHALi9CMPKATOhW56ABqJwrj7q5F80EzeOBUDy7uEHB3_vW3b4qSCvMGiNyto9wXYyMRthoU0QohbQxXlgNuY6t9-kFP5_nnrivYF_CHBFxghpaKdNbu1KmGXDGuXvX_WQr7XlI8lCa3cMdRrAruCTl1EoGuv4ssOw7JaH3LLAXfyxvmipGHbGLDmXq6spayRJMORWH-pEoOpKG5MsACFITwvBY3v_VEY-_ORZW_f-1Xj45ZcBx_EA4v37DkooghmJw8sRhOs-eLHk3SPRSiBDOLsrSQtNlUlGCaO3YKy0ixSBdrX3r-yoa2FTupq3LQ24eDdlsa2lNztTWQJ5oYLLtsv4nbqfPdgxupBMIk_-5m-_H4NxHOlzw2qKpayWUC17kakqLPC9vpw74Gnek9lqieUuL5w_OaB_OuYTyqtur38kw8HfzUSiJS_Icbz24HF6BACcmCIIc7FFStr51xo9CIKnLAKZAi4fAQW1IJEqs4S52ccYgXWUAFv4W7xkPmBaflm67n4kN40n7RWan2Vqc0B6q56QN_7uLZ_Mu58ssIt6MwDruEIS9lP2vV8uXmme-3J5Q6OlIG6ftEF1ZJHvjt0bl-hj4RSCphxDyD2Pu8dWRiEPuUvQQJLvsQyy28seSe53JhqQulLhA1-AV3u5Th1usParz7pNpvhAFVbNrhZRJvP2syPLI8K8TFuE5yZH-N_OgFRMKKoSlUAH9h412vIjZOPy06MsRN2f82gtKO7OZ9nywdrJHakLsGDYh1u0vii2g9RPQvBYNqu9aUXSFr4zKXCUnyc4ww0kNh53rnEE20kZz8o4SO7DcVCNlc7pnNQczbDxhJPCU6FuOpZ5LyhC6eOVCmGUCFS5iAGBPdeUVLKPQ8VxZHcIXS585h8-879-6Gh2KZ8L6lu0QYdCyZWhecHkDyxcP6y5RJXSEUMT1pk3SAeP_OR_FFTb0bbFUPwIzpX6FyT0_lNYEndzbjl7R8xzxmiQgBFE_RS4XfKeunUOWsLiQgQIsNYOSXm0hraRRUltT83EWNTAMV7iTDDUpdlM1mhH8ciIYdpMC68aIv3K5OIP6ZX4HM8wX4lT-k5pXgCj2CM7AzVGSGiiemT4DUJ7dj_i60HSeyhu0H6he8AAsCouP5udmmNPfkhuiPklz8xyt68BqrruWQO-pDTkF2KzEeKTIhA433W6mDBPIFDLIbjs-8ieGTjfGX7xCUjNt02_X9lEk4Sg_DTNKQ9Vx8kxcFpcQJ7xfwspYn9fMp1AUbJuQWLurbT2Hq_UHmSZ0iYZgJFl6Xjb1t0VBSKdiogCnTlTO1NsEQ50mUuGBNvXUdEo2pLXIIuO2-h5XHb0G4j6AmozHyhaLLOAowdnSDKFboBka5j5nPzGlKuNLiDwTfu-IDw4ScVp-q7VJOQcVpz_5L60lrPtuxNRaYXyTmv7EdjQgPeip_664FZE-8PrNXDyuifV1eLU20osgHNKzWL86jBZFzv42GJOQnsVJNJcbxJBE9etP2PsQroXxY_yVc4R6y7tvtgGcu8CAO2npXbRsulU_DGSYfs2mlr-LehCDe7DB3NOv3ll8hxO0XlAayX5VayND4-wI8nNl4fpjEsJTCOpmtE8GZHP4fMj_LUV64YN9Fcvpy3vLmyN1uGf1fMVqS6wKufq70XNZaK4aTzPW_bCHd7K9lsvp2-CwQpnZcHu_etpT3qh3-rbGS7WvadvPZ2Ao1RVqCRiEVNBzRrvUghKZ50FcBeGMbU84AWPrfJTL634dV0pJX71eJW32QGSaFBLqItBmnbCL_X9UU8rzItAuqseKeHOzdvoCaODiWivenkn-qmImw6PUsm9V4IIodAGYdUs9EhlF3EP1zWwvSGf2lW5KCno4XHwNBbIM7qr7W8EPO322NCSnzVjPc-NWH12axI2F9sU5s2WhFz_nu5Ew-3u0IbJtNNHPXLruoMprawe-tegNS01133EA-Lf6HaGz5aK8D-Wgd2weUV4YVCFSH1a6_Dyw9KdOHtQztnsShCbHsww5ukdL1bmOdVzgYUaCZ8buuSbI89HVsTU50VUpk69G98MqbJPUQaxwvmKIHlJveXX1Q6NCjR96cpgIVXTk6_xjnvEGFm3SlziZUASGui1-pqRklHexqV_Yh40gKUsyB5unYQ_yn9HM42NyQzG7A10go1xGcLBfh250oU8ji4p9YWdBBngS8kAOSkzHwWG5XsJzw4_Nabig63v9zpCZ3kha_5GoscfON1sRcP_jQczVJYsYqMeKxswZZ5Igus3orI_37f4KMBv1wwGy5UA3yUP2rIHChkNb4R2KEDfRd0Dl04Lb3ggkxMYrQS0GJIQ6zolmh0YlPT65DPZUe20cymsji9-w8w6x2hiSTFpHvCZLZ2UwWw8D5itXY2F_zO3sqk3_visLfQSQJzsqBAwPPAlB1DpZ4BV8PYq0DLwJOBk7qgWwGrcS3wLKCFv3ANStXIlDqa7XpNkqI4iKgabQQA8I-Yq3HhMMy92whKHsBv9caL1FaqEymE9gDeekWZM6XhCdUx9LazEA-IQSl5oMAb2hUrIHCQomQDoLpZOJUGBIb4H57nlOAkD4dqEj7dSVY9SanK1kNAitywxIe75KPhz00P2aYao3W9GkvQDrY0A==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0ccb0e93c76216e3016ae28891ec7487d08063f80453c4c34b",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230992,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 478,
+      "prompt_tokens": 2923,
+      "total_tokens": 3401,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 263,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2920,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.012086,
+        "upstream_inference_prompt_cost": 0.007306,
+        "upstream_inference_completions_cost": 0.00478
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "bf63783f798373208b4939abb7d5a32a7e911c4cd0c45e71d02a90a1ce09df11",
+  "elapsed_ms": 12188
+}

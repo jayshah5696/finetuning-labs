@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0175\", \"row_sha256\": \"e1634397d3e1d31b654f428bd976889060848d6d35f95e6467709a18024fd171\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we need a clear build brief for the batching part of a photo importer, not a redesign of the importer as a whole. ask an engineer to add a small batching layer that takes the record list from the existing scanner and prepares ordered groups for the upload workers. the archive team is moving its Harborlight collection into the service, and the first full run is expected to contain about 18,000 photo records. right now a test run is closer to 600, but the same behavior should work for both without anyone hand-splitting folders.\\n\\nthe scanner has already read each folder and made records; the batcher should not discover files, edit image bytes, write captions, or choose rights status. a record can contain an image key, album id, original filename, capture time, byte size, checksum, caption, and rights status. some records also have a sidecar-row reference, and that row has to travel with its image record. the upload workers receive records, not the original folder tree, so preserve the order that the scanner gave us. don't sort alphabetically or by date just to make a batch look tidy.\\n\\nthere is a helper the team has been using in a notebook, include it exactly in the brief as the starting point, but ask the engineer to review how it should be used in the importer rather than assuming it solves every case:\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nwidth 24 is the current default and should remain the default unless the importer configuration supplies another positive width. this isn't a request to pick a new default or to tune it from benchmark results. for this move, ops expects no more than six upload workers active at once, and a batch is handed to one worker as a unit. the batcher doesn't need to schedule workers or decide how many run. it should give back groups that the existing worker pool can consume. there are no promised limits here for the largest allowed width, so don't put a made-up ceiling in the brief.\\n\\nsome practical details from the staging run: album ids recur in different parts of the scanner output, and records for one album are not guaranteed to be adjacent. one album can have 430 images while another has only 3. filenames may repeat between albums, but the image key is unique within this import. a record with a sidecar reference must not be detached from that reference when it is grouped. do not regroup by album, combine records based on matching captions, or silently discard records that have an empty caption. the importer passes a list already, though an empty list can happen when a folder scan finds no supported images.\\n\\nplease make the eventual brief ask for clear handling of ordinary boundaries: a list shorter than the width, a list exactly the width, a list one record over the width, and a list whose length is not evenly divisible by the width. also ask what the caller should receive for an empty list. describe these as cases to specify or cover, not as results that have already been observed. if another width is configured, the same grouping behavior should apply and scanner order should still be intact. the current helper uses list slices; the engineer may explain whether it fits the importer, but the request isn't to replace it with a streaming reader or a new queue.\\n\\nthere are a couple of operational details that got mixed into the notes. Upload retries happen at the worker level, and the worker retries its whole assigned batch if an upload fails. The batching change should not introduce a separate retry system, split a batch after failure, or claim that it can make a remote upload atomic. the media bytes remain in the existing object store path; this work only arranges references already attached to records. logging and metrics are owned by another ticket, so don't quietly turn this into a logging project. ask for a short explanation of any assumptions the engineer needs to make about the caller and the configured width.\\n\\n1. ask for the implementation in the existing importer path, using the scanner's record list and returning groups for the existing worker pool. keep the change scoped to batching and don't ask for a replacement importer, a new database schema, or a change to the worker count. no user interface is involved. the archive staff will continue to start the import from the same screen.\\n2. ask for focused tests that show order is preserved, every input record appears once, sidecar references stay attached, and the boundary cases above are handled. include coverage for a configured width as well as the default. don't prescribe a test framework; the codebase already has one. ask the engineer to state what should happen if configuration supplies zero or a negative width, since the current note only says another configured width must be positive, and no behavior for invalid configuration has been agreed.\\n\\nfor timestamp handling, don't let the batching request accidentally turn into a metadata cleanup request. the scanner keeps the original capture-time value on the record. if a timezone is present, the importer may use its existing comparison rules, but the batcher should not rewrite the timestamp. if the timezone field is blank, preserve the value as received and flag the ambiguity for the caller rather than guessing a timezone. this matters later because archive staff may compare the import report with the scanner's original list; do not claim that a blank-zone time has been converted or corrected.\\n\\nkeep these notes in the finished brief because they explain decisions that otherwise look arbitrary. the migration lead said, “A batch is a transport unit, not a new album.” the scanner maintainer wrote, “The old scanner emits dates in local time when the timezone field is blank.” and the upload operator added, “If one image fails, I need to know which assigned group the worker retried.” those are reported remarks, not new features by themselves. don't convert the last remark into a request for a retry dashboard; the retry mechanism is outside this change.\\n\\nask for a concise description of the chosen batching behavior, any necessary validation for width, and tests in the existing project. an engineer should be able to tell from the brief what is in scope, what must remain untouched, and which points still need an explicit decision, especially invalid width and empty input. don't ask them to report benchmark gains, estimate migration completion, or certify the whole importer. the collection's first run is planned for the next archive window, but no calendar date or deployment approval has been set. finish the brief by keeping that planning fact visible without turning it into a deadline or an assertion that the migration is ready.\", \"output\": \"## Build request: batch photo-import records\\n\\nAdd a small batching layer to the existing photo importer. It should take the ordered record list produced by the scanner and return groups that the existing upload worker pool can consume. Keep the change limited to batching; do not redesign or replace the importer.\\n\\nThe Harborlight collection is moving into the service. Its first full run is expected to contain about 18,000 photo records; the current test run is closer to 600. The same behavior should work for both, without staff having to split folders by hand. The archive team will continue to start the import from the same screen; no user-interface work is involved.\\n\\n### Input records and ordering\\n\\nThe scanner has already found the files and created the records. A record can contain an image key, album id, original filename, capture time, byte size, checksum, caption, and rights status. Some records also have a sidecar-row reference, which must stay with its image record. The upload workers receive records rather than the original folder tree.\\n\\nPreserve the scanner’s input order. Do not sort by filename or date, regroup by album, match records by caption, or silently discard a record with an empty caption. Album ids may recur in different parts of the scanner output, and records for one album are not necessarily adjacent. Albums can contain very different numbers of images: one may have 430, another only 3. Filenames may repeat between albums, but image keys are unique within this import. The scanner passes a list; it can be empty if a folder has no supported images.\\n\\n### Width and batching behavior\\n\\nUse width 24 as the current default. A configured width may replace the default if it is positive; do not choose a new default or tune the width from benchmark results. Apply the same grouping behavior with a configured width while preserving scanner order. No maximum width has been specified, so do not introduce a made-up upper limit.\\n\\nThe team’s notebook helper is the starting point. Review how it should be used in the importer rather than assuming it covers every case:\\n\\n```python\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n```\\n\\nSpecify or test lists shorter than the width, exactly the width, one record over the width, and lengths that are not evenly divisible by it. Also specify what the caller should receive for an empty list. State what should happen if configuration supplies zero or a negative width: another configured width must be positive, but behavior for invalid configuration has not been agreed. The codebase already has a test framework; do not prescribe one.\\n\\n### Worker and operational boundaries\\n\\nOps expects no more than six upload workers active at once. Each batch is handed to one worker as a unit. The batching layer should return groups for the existing pool; it does not schedule workers or decide how many run.\\n\\nRetries happen at worker level: if an upload fails, the worker retries its whole assigned batch. Do not add a separate retry system, split a batch after failure, or claim a remote upload can be made atomic. Media bytes remain at the existing object-store path; this work only arranges references already attached to records. Logging and metrics belong to another ticket and are out of scope.\\n\\nFor timestamps, keep this request separate from metadata cleanup. The scanner keeps the original capture-time value on the record, and the batcher must not rewrite it. If a timezone is present, the importer may use its existing comparison rules. If the timezone field is blank, preserve the value as received and flag the ambiguity for the caller rather than guessing a timezone. Archive staff may later compare the import report with the scanner’s original list; do not claim that a blank-zone time was converted or corrected.\\n\\nKeep these reported remarks in view when explaining the decisions:\\n\\n- The migration lead said, “A batch is a transport unit, not a new album.”\\n- The scanner maintainer wrote, “The old scanner emits dates in local time when the timezone field is blank.”\\n- The upload operator added, “If one image fails, I need to know which assigned group the worker retried.”\\n\\nThese remarks are context, not features by themselves. In particular, do not turn the upload operator’s remark into a request for a retry dashboard; retries remain outside this change.\\n\\n### Requested implementation and tests\\n\\n1. Implement batching in the existing importer path, using the scanner’s record list and returning groups for the existing worker pool. Keep the work scoped to batching. Do not request a replacement importer, a new database schema, or a change to the worker count.\\n2. Add focused tests showing that input order is preserved, every input record appears once, sidecar references stay attached, and the boundary cases above are handled. Cover both the default width and a configured width.\\n3. Provide a concise description of the chosen batching behavior and any necessary width validation. Explain assumptions about the caller and configured width, and identify points that still need an explicit decision, particularly empty input and invalid width.\\n\\nDo not ask for benchmark gains, a migration-completion estimate, or certification of the whole importer. The first Harborlight run is planned for the next archive window, but no calendar date or deployment approval has been set.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0175"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "e1634397d3e1d31b654f428bd976889060848d6d35f95e6467709a18024fd171"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "732f3ea1a0cccf872cfaf2aacac970722d3fce128abfb7ce4d1e441067d03cf9",
+  "started_at": "2026-10-28T23:55:43.299509+00:00",
+  "result": {
+    "id": "gen-1793231743-nlIkjv0YwjfmRdnQAFsS",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0175\",\"row_sha256\":\"e1634397d3e1d31b654f428bd976889060848d6d35f95e6467709a18024fd171\",\"critique\":\"The input is a coherent, recoverable drafting request, and the output is a clear, naturally formatted prompt that does not perform the engineering task. It preserves the helper exactly, quantities, reported quotations, ordering requirements, and unresolved width/empty-input decisions. However, it omits explicit constraints that the batcher must not discover files, edit image bytes, write captions, or choose rights status. General batching-only language does not fully preserve those specific prohibitions. It also drops the instruction not to replace the slice-based helper with a streaming reader or a new queue. These omissions violate /prompt’s requirement to retain supplied constraints.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ouFMytOjIQ4MaO9VDJeCvJEZiyomR9-JBUuTKFPZo1PNjgfbsmeWeVjdaWJ4_hhQ4_f4IWjMMvJDzkMo-aW0PYdm7jYmGBcVXF5EbA5qSuqJ3QJq5jgI_pSuRV58lQiUbAgd2Imw_6dHKgIqsef7H9DuskkeXvfQuWvI74LHjaij3v9-kbZC87dsaQ6R6rssDRitT7yxVt3oBWsNS86V_dKdN_JPQCh8E1CEcMB6lv9hufbjJRhGoyRw5jt3tybV7R8dldv71V663cCVcheDkfBJ9IRtb3NkzPDnPocydNzeEup-Q2RHrS4UhsKIcTt4qj81rZgqOcxZfpslFGqb3WIebYjdr3krpWiVOxxQ8bo19WFBEl21cN-4bQfZJBMLg0OwslldulYdk1j11iwnV35Fe03hWpcw-nLTiO2BPOHbcZnJUPN47UxHSZyaskg6oScZ23WGhbZdmq1pk6p0fQivixQoFJxNCBRXbXSXxzn8SUrvF7k8-gGf6MI6YOmBhHGpnLwnn5H6MJksNw9RbJp55etf8Qxf1qX3CwpkPuucakEP38AXkqbIZ4wMVoIL_INv1sLRVovOAggNxFg2nXTm_kzn1UPrxf8DZqIoRYfvdhCeR1ygbtiPCbYVKBOeeERGVDQs_x72M7FGbXWsHPt2Kpva4wSM9LYYaEV70ot2P_KYDWtZE5H02lgf6vSCOkCypf-gpsKbmtzBHJ57N_760rP-7AlbdcVSajPTaWQGNs4q8DSH0Lqpi3ZTTHr4kElWVssfbROd0yAyQjxbY82tURy9pzVF6RkLq6CLkEHajGw_wk1JPXguzT0qD29wRHP2FUBYNja_38KL2fvorQas1IaIRu7X8OZum7UXQusrXIvwqMW37fTBANazMy3nY-1UDv721C9Zm3KyPBQj4Yn89MJ_5HDQ1wRuZGePYTvDXPVcVjbOVAPo8hzr3jWcyCLY4jUWs5JQkREXqY3ycXki6W7ovvclPu7NUFOTWhTOrBXbytEO9VgowH0erfXloe6W4zRL74PV_fR4vtqGUdxK-Kudz20a_aN0xjaCDPz99vwpEYDo_SxD7gOJaXKcDe4oU4IrHbYyByCf1PWkmvrs6bL9fHehBqCPltwb5mHSce15xUYTbNB71ovie7qO65rLYdvblGBB8h2z12XzSLcYLfCE75lMLF7ytFDrxw5Zhgo54IVu3bZcrPmYRUaZUnL12rvOO5uBxonp1ilZUoWptOUxh_-_SGpcVwBKz-MwhqpXi9ILtA_8Ke8dvPC2uXNji5AsJipAuPCttDq8m2dk1P7moxQgS3elU5ExFkLKLblCnNSLZeIiVgxx3S-Ckjbrpe2kEOhjvNUJ2mXAUNuu1vdipFbPO-9hKN2JIAR9KkBJc4-TL6_c1sIUrjCXk5gaVb9YM5sbwmjwFGj8yK0PNraPawnhzma5I3Jasyf4KIJ6691H8R-Cv_QKsyw8J58HrUAHBRHNXGgJuyeJfB5avGA5PzRDJuIgaLSzX0PrIvYruBSRqh9kskTwmtGAK5M5WK1hbypTlMtEh3gJzbU2Z_bjR9U6FacvOkQj4vG2zmTqMrwzdPG_1zp9m6OyFTWvFRg9aglQRpHZdKzZXfgiq3q3gF2vU9YzNGW2sn6KNQq38qYAKOPPq0_mlVSxskHAFTL59Sz-CyyemBq-k1JH7hQdxYVU1NM7Rj2Wt-RQUhEM1IFPcEUJ8PoPjgCRi1ks32GMFNlvKRRL8gypqpNouTs3Gcu54_14Cdlb85LZf3HNEcNk0Fv_anLkKuI-eSZjMhRsslVg5dIWHR_-YsLP6s_hwEwYTFfxhMjNSX8v7I1Yj8aRoQWkqXzSzypdrE5WiO-Db6v59oGw_gRX3zn3Q4mGKgpEvvRk0kpxBhlDRezdf7XUGZOW0VuBtocRhD3dmJ2YtTrtJT_XfWeW70WK0xCxiNhxV7buGY1aFJQ0uLz-fDCa31KG_k3ARsk_YZeXCXOswvTsCILOc7c5ceDHSGGwrZPZaraC3AXtpFwBotZ_oXwsnhJGqTSBQDk_qCwpgQdkvqY8JtY2CT7ScrjdyLEzVqcviSHepxSd1OxRx5QYLqtSf2xVaB7-zu8pBFXaZXYs3cQavp_ZXx6_CeuRXMspyzQtv-y3ggYnym-_T_m93Ty74y1hG73CUsf9MU5FauDA1MGvRZxXaK1ADFLfac-NFbFLb6dXL3de-oMX_QjO3YTXpF_34h29NQolMcdY8i5JdbvxbqCoa7BQU0EAC8YIZ8iTh3MCHNl8Zuf1T00E8DWPc-26v36KC-wCavClceB5jQDr3nnjfVaUxNC2QgAT8X9tf1UXWbpYL5fu2EtJMmI4AAzo2JK5qB2hbqS2z5rkAVDbQvBk5ieaNzd-O-lEuH0phTA5civZE8Blqd01tGHdj7z6xfYE_TITrZeplCFs59pTtVdRA6ExW9ifVjuJ6zxfDN4ccOymWsqEKKUiIgupBY5cFNiDa3-z4AXFITlP84pjDlLArDIpb3fcWRapoxFuEaGvRCESvdZx7WBIDMUCmiFvo8_5FWhpuJsmbRhLA7NEcCR7xjc9fPjVbb9ehvU3gPiqKYQFnB2p8jWmI4P_ULiAORMStI3CDe4Ews2JRfjfKNzZqDkPHsqOuQNT-MLOQ7kCBHRh-jQUpGUXJAbaMGQBiSIudu382V0bOZrOS4ifnyYgmW6jgQY6y8kNOT21TBUypFM53Bkh4y9PaYgdxr1ODw-MNx7qsip4o2BFt7WgAf12wSgB20bwCPUjzSWjGRymMeIq2u0pCNlPeTs4VtvZ9OfrM0BpueJvEtR3x8jLW0nL7l35aZisqNFfUAaZUFgRyAAwuXVj5xM-nKLkV-XcCMtiRvG2Q1JG0yhI__QDcrmluPhyytwQNBLc9qbaclpa7Ot1uz7EOxWgg_yF_pkGU9kOagkw0Sz33jfeG5xjiU3CWOpPEzkVBEngRMT18ooe1BTlrwZUjiKYkE_TnZe5n8f3R2_a30DlvyoIKAGLKtMeQupuHRAzvUbj7-TKlDmLbBhqiYg8Eki92EZeuQlA4wKljvu6nY_OQ3DfRKh8fGirvk3Iy_M8elHVwQImE3HlwuG_orVO1X2eUso5z0OPcQrz8gNVLhMREFbcpseTor9SkZsWSODLZlC-KJ3YBFwwh0aPng7lEFfV5xk-K3W8K1Ey2-7rs3qq1V3dLcmeYseCZex8jv7CtK4pZseZ6gGQykyi97Ng4C3HT83KCRE03VKR4vOWlZRjUUsf6ky3BLhckRvsgl6OSHP2s9UPc2mT-LIerXP6J7hbvUSrk0y8iOBRNKFg583Qun1yt2JaLY-IfmSL7-hweplKGT0Sv-gkOv0-3_gDhgBFxBamOYAmFAZ0vzwfyz6VY0K0siUI_ZvlVwfkeRMUctwRPoZmSCU8_niaXufQc5Alio8RvOGIvm_UxFZFVi-voGwZ5_CMFMyqGBFy-UAGdB5963ZM24qB2k_y9s3fR-sj7SMDVARwG-GmeaKyz7h09WBTeYLjPtg1jzvUgNjNVpY09WbkQz8WIn2Iytxop1QtLAImMbPY2UBMY4k4dUG6731RYFfNVBcWsAggD3lZyVhp42rYPuNvmyx2fNBeOo-vc4AjhKDOAd3L3xk-szGarfoquQcbHc3qoDpQSVF5j3PaUOyQeIFZots_6bAPQSUBCv3KLczhll5Tl8ui3iOxa5MPl5Fwm1KBEc4cjBHhvfr0Lky49JrQbE9L72-qdUIBn9KJEPKO34vwXJAfBMDCrJP0bLrT7bhKJpqrqNfo6qg-MjwCJWZzHGd_lb22Ee33gHjONs-T1iUYAZt8b9nr0ixEfdotu0cwyYXfCQOQlqIF35S2_8XVtFX2ugaeKe4a99Z2Wy5SiPFqs-TfBKc.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0dbfd6fc6686f6fb016ae28b80e80c87d0ac57f98fa73e83d7",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231743,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 374,
+      "prompt_tokens": 3052,
+      "total_tokens": 3426,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 157,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3049,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0113685,
+        "upstream_inference_prompt_cost": 0.0076285,
+        "upstream_inference_completions_cost": 0.00374
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "18189db7a0b29f22968bdc14e3657d9764b20ae933bca62682a286b20df62331",
+  "elapsed_ms": 8549
+}

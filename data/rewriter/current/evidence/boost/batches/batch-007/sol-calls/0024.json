@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0110\", \"row_sha256\": \"9a8a022e1a798db6fce2b2ed1b2d4fc442fa0d19b988fe160ca00d16f2ed19bc\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"hey, could you take a look at this function for the cooperative shop? i need a plain explanation of what it does, and a review of the logic based only on the code here. In particular, tell me how it adds up the prices and what value it returns. Please keep the explanation focused on this snippet; I haven't included any other shop rules or code, so don't assume details beyond what's shown. Here's the complete function:\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 42\\n\\nCould you also mention any behavior or detail in the function that seems worth noting as part of the review? I’m looking for an explanation and review of this code, not a replacement implementation.\", \"output\": \"Please explain what this function does and review its logic, using only the code below. Describe how it adds up the prices, what value it returns, and any behavior or detail in the function worth noting. Keep the explanation focused on the snippet; no other shop rules or code have been provided.\\n\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 42\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0110"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "9a8a022e1a798db6fce2b2ed1b2d4fc442fa0d19b988fe160ca00d16f2ed19bc"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "ab606f0b59241649732c01efda192fdb3e7cb3e7de6f7187fe5258ca9fceef02",
+  "started_at": "2026-10-28T23:48:50.782833+00:00",
+  "result": {
+    "id": "gen-1793231330-t9QORuLpWWLRP5a2C2P1",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0110\",\"row_sha256\":\"9a8a022e1a798db6fce2b2ed1b2d4fc442fa0d19b988fe160ca00d16f2ed19bc\",\"critique\":\"The input is a natural, self-contained request, and the output is a clear prompt that preserves the code verbatim and the code-only review scope. However, it drops the explicit constraint that the user wants an explanation and review, “not a replacement implementation,” and omits the request for a plain explanation. These are supplied constraints that /prompt should retain.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing omissions and constraints**\n\nI need to assess any omissions while avoiding replacements in a straightforward explanation for a cooperative shop context. My output shouldn’t imply a replacement implementation constraint, but must still drop certain points. It’s important to preserve the original context and not make any assumptions. I might have to include brief mentions of exclusions, but my focus will stay on the main points that were lost. I’ll keep it concise.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing omissions and constraints**\n\nI need to assess any omissions while avoiding replacements in a straightforward explanation for a cooperative shop context. My output shouldn’t imply a replacement implementation constraint, but must still drop certain points. It’s important to preserve the original context and not make any assumptions. I might have to include brief mentions of exclusions, but my focus will stay on the main points that were lost. I’ll keep it concise.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4onmxV1eh7gV_B399cJmeeRmVaBv4k6XzZMcS1qh_qd5_epVCGNUpckchRcPkK_PHPQCgUIx8TcQGSZTnJVP3B-I6-BywzpMpJzQphGQTmwI5gF1RRt6LrVOc5j_Tgj77_BthDlq03Z9x55LOyYF3_VO5SG4SCDu2UOiVmwTXG0a5sAH1-w_lz9WtHlJRWHOtCcN1KrjXEYpwCDC6oRNhR2AV6Cy8e6J2-PFTUfNpAq1pT1K5gTWR6jvxevRh1x0vrwFq1UC34Yv1vBsDJnycoaNXYtItYXENb-OKagLzHRsfYWREZ9_GcrRkWvjm63JNdO6Jfusjn48JEQ1AI2TQwdRwMhm_Y3g0ELvwn_T9PsGzGIAoCG9IRdI5Ay-SGn7N0sR6olRgj6CaTETlyYdiDIO5mJJwujgTGrjjrg6kNzHAlxive4puIkJF99LlP2605JkWVmc8owLTYd338Oj5eG-eXyPkxE6nn6v5HKbY46Ovuhu9Q4niFLwV5ET6_483AT7LyXwbh6lyJA5Jxn--u0LJRXtSiXqALGOLGh9ybVW7sJHPJGcm8Nngh4ZiF4sD06_OOGOsV09dtVlfCEMQj0ArCYIjsCyvCHmDRiH4VOiGTD8RR8hrlDlLWMOrR4BFFAsHw0gjYrlyn9cH3Tr2Y4zLP56iZcK86C_yyPejN32uwQWgFioWHOx8xuh7csvO-yQ8GaWwH8Z8VzwzYXqltHNKq_e5q8owCmmxvv9HBail3v9AIp-TdBoJ7BUliNQNvSaoIJULMZfLQOO10esJh5k4UFoj6RofxYYgVV7vo_44iNPAGiUPxtZevw3aso9xF_a_wq1-A9WwdbmGrX0d9SuHfUVBeUxp9gxVcaoe2vbod_yD450AEAETbMaMqq5MK3JgWZq9qE0ePXbPzAftoIJKuxkWSBOUiiPVa0m4pQz8LZ3HSqKqpZ-e1T2r19zbS8cb-gilgU5SuSp544hgFqYYh5JFfwdTJ-aS6hbgum3DTEymjt162fFovQuXpdMwGIiM7SC_WkZ7BthZoeSm39zgZ1cElHCU5ICAe7HJKzrnHJtHY9-9N_TuMPe4eOlrF9AyaaKF-Wr7MLKsCAx7on_48uMchsFH_LrGwSVdnmYQhpnPkZexEXojssuW-QKue16EuKiVqjVf9HCyiKQS17bNKb6-YqWSYs5-Ky0wnvakWyKktwQVHL7o8kgSoCwzxGHU09TPISI-hDKI9a_FN5QT2SHubJUbisohGFPJZ7T2Axil_d_tXqdIFFZOyFuHOGwxaUhWUf1S14_FYE__zQpzfBexry9_ErqRJUidFnyvpQWfu8AyIWC00ercBaYQa6ymXBerVVWsyFB3ot2nJDSW_WtnztdEvdTJo9THk-gKUM2ORgBjUuuD9lMZE_U2kFH5V14wYnOLkzDgnJEvxHvICKCAbS6B-oCb18f56Kk5aSdqD6ZVFaYg-63T3r5MWeP2I7BNQHr7KcHV0eWIg2Ff_FeW07f-_2xyCNZHlr34pWqWRYlP-PtCPoM3Z--FFrCrj2syJapUUjq3orQTEYBSKVgw5Rf_wI4QYrvsQf7dLEu7QvGmkn5DO_zN55CTYcs7HKk4beh4IqxS9Kfy0aIzYc70Ft_V_KL6r0zWjn5BtAojI79Ds76iRz4IfKM2E9mC0eQnnqC_zHuvpTz9ip0HlcmD7FSGDxROChTTrjta1X6Retsvf0WMO0jlXHWbJLXVGPTZpiqWl-hRaTsAxP_J3-IY0LZU8L3ubOz3o80BUKhft96p8yKjHgVWG_jsKlGtjjE2wPPLtjqASwwM3Xwyry58RsIm9KEYJ1898x_P7f_-kgDXkPsERfeE4ddeEYUZOZVcx-Mdz06-79S5M4XYHY_utzZ7p5GAxy8upmY39XclRJv4Pdhmw6bugWafmFhOia4Qz7seLMPuaMnDrEGuRnAFTfc7SPwJUNRQ9s3yMIC6gVIhWANuLN0setGEiJIsAGltV3mHrj7GYbhbmjAL3CZQ1LOx_qcGhkWpy44lw8T1tmq-GIYebd25M40cI_jMkxCcExo8pLAIF0XCqijYBUcoZ4FDJ_yAykaLVhLaoTOx4qogC3TS075h4mWwqA1ePvMCNzuTMkVTZ4QSHeNuvLw3gvS3cR9keFU3tgm0jDJhGQeSLkTcxQLSuyMjOaF_RhXSuepD5UaQg-VecjNeXBlwMn8wxCjNfyawEXWXUvZybNkRlJEAcOsWqnPjxGMqRCB_jS8ZtKzlgG9jZ_iTJD6YV_EgN5vreVMipdJq9eC5CNNNyhXH5iTZu_L_8Pdn0N_IVbLVsSVeATJYWyY2Q4pL52c-JThhUqwGBUbKcSrXxVyk5qg3lZSNcPpF1p783y0ep8BLab3q_fEUvFeVICrf-yd3gt6HMwG43llWJ8doO9PX0204x4qQ3lO69LCUdmccsl3pydJ2FwJRHTiNkv771GRWVuc7raMPJDRlpdYUIJxZNxOO0uAmqrU8YOsiRFe7lKyEBN5fm60gXgOc0wYN3mIxpB5CB-zvglgV1E=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_02b4bf0aab072f33016ae289e3c4d487d0a19a675ba6b269e2",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231330,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 234,
+      "prompt_tokens": 877,
+      "total_tokens": 1111,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 63,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004094,
+        "upstream_inference_prompt_cost": 0.001754,
+        "upstream_inference_completions_cost": 0.00234
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "c3f3450e721839b5b0b20e0276931589cf36eb6a9f64598f8b4000ea8e70ff4a",
+  "elapsed_ms": 4639
+}

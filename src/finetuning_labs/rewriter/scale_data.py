@@ -234,8 +234,18 @@ for EVERY pair, citing the changed detail for defects. These are model judgments
 """
 
 
-def review_candidates(root: Path, workers=8, *, retry_failed=False):
-    from openai import OpenAI
+def review_candidates(
+    root: Path,
+    workers=8,
+    *,
+    retry_failed=False,
+    model=VERIFIER,
+    prefix="opus",
+    batch_size=8,
+    max_tokens=6000,
+):
+    from arka.config.models import LLMConfig
+    from arka.llm.openai_client import build_openai_client
 
     source = root / "generation"
     rows = [json.loads(x) for x in (source / "candidates.jsonl").read_text().splitlines()]
@@ -295,13 +305,19 @@ def review_candidates(root: Path, workers=8, *, retry_failed=False):
         "required": ["reviews"],
         "additionalProperties": False,
     }
-    client = OpenAI(
-        api_key=os.environ["OPENROUTER_API_KEY"],
-        base_url="https://openrouter.ai/api/v1",
-        timeout=240,
-        max_retries=1,
+    if prefix not in {"opus", "sol"} or batch_size < 1:
+        raise ValueError("Invalid verifier prefix or batch size")
+    client = build_openai_client(
+        LLMConfig(
+            provider="openai",
+            model=model,
+            api_key=os.environ["OPENROUTER_API_KEY"],
+            base_url="https://openrouter.ai/api/v1",
+            timeout_seconds=240,
+            max_retries=1,
+        )
     )
-    batches = [packet[i : i + 8] for i in range(0, len(packet), 8)]
+    batches = [packet[i : i + batch_size] for i in range(0, len(packet), batch_size)]
 
     def read_call(path, request, batch):
         result = saved_call(
@@ -311,6 +327,9 @@ def review_candidates(root: Path, workers=8, *, retry_failed=False):
         )
         try:
             if result["status"] != "completed":
+                return []
+            returned = result["result"].get("model", "")
+            if returned != model and not returned.startswith(model + "-"):
                 return []
             choice = result["result"]["choices"][0]
             if choice["finish_reason"] != "stop":
@@ -322,8 +341,8 @@ def review_candidates(root: Path, workers=8, *, retry_failed=False):
     def one(item):
         index, batch = item
         request = {
-            "model": VERIFIER,
-            "max_tokens": 6000,
+            "model": model,
+            "max_tokens": max_tokens,
             "messages": [
                 {"role": "system", "content": VERIFY_SYSTEM},
                 {"role": "user", "content": json.dumps(batch, ensure_ascii=False)},
@@ -333,8 +352,14 @@ def review_candidates(root: Path, workers=8, *, retry_failed=False):
                 "json_schema": {"name": "rewrite_reviews", "strict": True, "schema": schema},
             },
         }
-        paths = [root / f"opus-calls/{index:04}.json"]
-        paths += sorted((root / "opus-calls").glob(f"{index:04}-retry-*.json"))
+        if len(batch) == 1:
+            request = copy.deepcopy(request)
+            array = request["response_format"]["json_schema"]["schema"]["properties"]["reviews"]
+            array["minItems"] = array["maxItems"] = 1
+            for key in ["id", "row_sha256"]:
+                array["items"]["properties"][key]["enum"] = [batch[0][key]]
+        paths = [root / f"{prefix}-calls/{index:04}.json"]
+        paths += sorted((root / f"{prefix}-calls").glob(f"{index:04}-retry-*.json"))
         reviews = []
         for path in paths:
             reviews = read_call(path, request, batch)
@@ -354,7 +379,7 @@ def review_candidates(root: Path, workers=8, *, retry_failed=False):
                 for key in ["id", "row_sha256"]:
                     array["items"]["properties"][key]["enum"] = [entry[key]]
                 base = f"{index:04}-single-{position:02}"
-                saved = sorted((root / "opus-calls").glob(base + "-*.json"))
+                saved = sorted((root / f"{prefix}-calls").glob(base + "-*.json"))
                 single = []
                 for path in saved:
                     single = read_call(path, single_request, [entry])
@@ -362,16 +387,18 @@ def review_candidates(root: Path, workers=8, *, retry_failed=False):
                         break
                 if not single:
                     single = read_call(
-                        root / f"opus-calls/{base}-{len(saved):04}.json", single_request, [entry]
+                        root / f"{prefix}-calls/{base}-{len(saved):04}.json",
+                        single_request,
+                        [entry],
                     )
                 singles.extend(single)
             if len(singles) == len(batch):
                 reviews = singles
         if not reviews:
-            print(f"Opus batch {index}: incomplete; explicit retry required", flush=True)
+            print(f"{prefix} batch {index}: incomplete; explicit retry required", flush=True)
             return [], index
         print(
-            f"Opus batch {index + 1}/{len(batches)}: {dict(Counter(r['verdict'] for r in reviews))}",
+            f"{prefix} batch {index + 1}/{len(batches)}: {dict(Counter(r['verdict'] for r in reviews))}",
             flush=True,
         )
         return reviews, None
@@ -381,14 +408,14 @@ def review_candidates(root: Path, workers=8, *, retry_failed=False):
     reviews = [r for batch, _ in results for r in batch]
     failed = [index for _, index in results if index is not None]
     report = {
-        "reviewer_model": VERIFIER,
+        "reviewer_model": model,
         "scope": "blind exact-row input, output and pair verification",
         "coverage_count": len(reviews),
         "reviews": reviews,
         "human_reviewed": False,
         "incomplete_batch_indices": failed,
     }
-    write_json(root / "opus-reviews.json", report)
+    write_json(root / f"{prefix}-reviews.json", report)
     return {
         "candidates": len(rows),
         "mechanically_clean": len(clean),

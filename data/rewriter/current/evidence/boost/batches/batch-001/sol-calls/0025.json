@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0034\", \"row_sha256\": \"a45d58779778f96964aa6c827f481a8c86cec80247a85046befbee28dac0cd1e\", \"mode\": \"/prompt\", \"language\": \"pt\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"preciso montar um pedido claro para alguém explicar e revisar uma consulta que usamos na conversa sobre o resumo de entregas do depósito, e também sugerir testes conceituais para ela, mas a análise tem de usar só o trecho abaixo. não tenho aqui uma planilha, resultado de execução nem definição completa do sistema, então não quero que a pessoa complete essas lacunas por conta própria. o ponto agora é entender o que a consulta expressa e que perguntas uma revisão cuidadosa levantaria, não produzir um relatório de recebimentos nem afirmar números.\\n\\nO assunto é o acompanhamento de entregas recebidas por depósito. Na reunião, a equipe estava comparando como um resumo por depósito poderia ajudar a organizar uma conversa sobre os volumes que chegaram. A consulta agrupa os registros por `depot_id` e apresenta uma soma de unidades com o nome `received_units`; esses nomes aparecem no próprio código e devem ser tratados como nomes do código, não como uma descrição confirmada de todas as regras operacionais. Não temos uma amostra de linhas, o esquema inteiro das tabelas, o significado documentado de cada estado nem a lista de depósitos. Por isso, quero uma explicação cuidadosa do que se pode ler diretamente e do que continuaria em aberto.\\n\\nO trecho é este, exatamente como foi fornecido, e precisa ficar completo no pedido:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\\n\\nA dúvida surgiu quando a coordenadora de turno disse: “um total por depósito talvez ajude a gente a conferir os recebimentos, mas quero entender primeiro quais linhas entram nessa conta”. Não transforme essa fala em prova de que o resumo já foi usado, validado ou aprovado. Ela explica por que estamos pedindo a revisão, não fornece resultados. Outro colega perguntou se o filtro considera toda entrega marcada como recebida ou só uma parte; a condição sobre `units` parece importante nessa conversa, mas precisamos que a análise descreva o que o código seleciona sem adivinhar por que esse limite foi escolhido.\\n\\nGostaria que a explicação acompanhasse o fluxo da consulta, em linguagem acessível para uma equipe que entende o processo de recebimento mas não lê SQL todos os dias. Pode explicar a seleção das colunas e da soma, a tabela indicada, as duas condições de `WHERE` e o agrupamento, relacionando cada parte ao resumo pretendido. Ao falar de `SUM(units)`, não presuma regras para valores nulos, tipos de dados ou unidades de medida que não estejam mostradas. Também não deduza que cada linha representa uma entrega completa, que `depot_id` sempre está preenchido, ou que o nome `received_units` confirma uma definição empresarial específica. Se algum ponto depender de informações ausentes, identifique-o como algo que o código sozinho não permite concluir.\\n\\nPara orientar a revisão, organize o pedido em torno destes pontos, sem responder às perguntas como se já tivéssemos inspecionado a base:\\n1. Descreva quais registros satisfazem as condições visíveis e quais valores são somados para cada grupo. Diga com clareza que o filtro exige simultaneamente `status = 'received'` e `units > 42`; não trate uma condição como alternativa à outra, nem arredonde ou transforme o limite.\\n2. Revise se o agrupamento e a coluna agregada correspondem à intenção declarada de obter um resumo por `depot_id`. Aponte questões que mereceriam confirmação, mas diferencie uma possibilidade de um defeito comprovado. Por exemplo, não declare que a consulta está errada só porque não vemos outras colunas ou tabelas.\\n3. Sugira casos de teste conceituais que poderiam ser preparados para verificar a leitura da consulta, usando apenas as condições e operações que aparecem no trecho. Inclua casos que ajudem a distinguir o limite estrito `> 42` de um valor igual a 42, valores acima do limite e registros com outro estado. Não invente uma saída executada nem diga quais depósitos apareceriam em dados reais.\\n4. Separe explicações sustentadas pelo texto SQL de questões que exigiriam esquema, regras do sistema ou dados de exemplo. Se não der para decidir algo apenas pelo trecho, diga isso em vez de escolher uma interpretação.\\n\\nA revisão deve permanecer proporcional ao pedido. Não precisamos de uma consulta reescrita, de otimização especulativa, de uma migração, de uma recomendação operacional ou de uma conclusão sobre o desempenho; queremos entender e avaliar este código tal como está. A pergunta sobre desempenho pode surgir mais tarde, mas só se torna relevante se alguém trouxer informações sobre volume de dados ou ambiente, que não estão disponíveis nesta conversa. Portanto, não a trate como uma exigência atual nem suponha que exista um problema. A resposta pedida é uma explicação, uma revisão do que se pode avaliar e sugestões de testes conceituais, sempre limitadas ao código fornecido.\\n\\nPor fim, preserve o foco na conversa do depósito: a equipe quer saber o que esse resumo incluiria antes de discutir se ele serve para acompanhamento. Mantenha a fala da coordenadora como contexto relatado, não como endosso, e não acrescente totais, nomes de depósitos, decisões da equipe ou resultados. Caso a análise encontre uma questão que só possa ser resolvida com documentação ou dados, deixe explícito qual tipo de informação falta, sem preencher a lacuna. O código acima é o material completo disponível para este pedido, inclusive a linha final do agrupamento; use-o integralmente ao explicar, revisar e propor os casos conceituais.\", \"output\": \"Prepare uma explicação e uma revisão da consulta abaixo, além de sugestões de testes conceituais. Baseie toda a análise exclusivamente no código fornecido. Não produza um relatório de recebimentos nem afirme números: não há planilha, resultado de execução, esquema completo do sistema ou definição documentada das regras disponíveis.\\n\\n**Contexto**\\n\\nO tema é o acompanhamento de entregas recebidas por depósito. Em uma reunião, a equipe conversou sobre como um resumo por depósito poderia ajudar a organizar a análise dos volumes que chegaram. A consulta agrupa registros por `depot_id` e apresenta uma soma de unidades chamada `received_units`. Esses identificadores aparecem no código, mas não confirmam, por si só, todas as regras operacionais. Não temos uma amostra de linhas, a definição completa das tabelas, o significado documentado de cada estado ou a lista de depósitos. Explique o que é possível ler diretamente no SQL e o que permanece em aberto.\\n\\nA coordenadora de turno disse: “um total por depósito talvez ajude a gente a conferir os recebimentos, mas quero entender primeiro quais linhas entram nessa conta”. Trate essa fala apenas como contexto para o pedido: ela não demonstra que o resumo foi usado, validado ou aprovado. Outro colega perguntou se o filtro considera toda entrega marcada como recebida ou apenas uma parte. A condição sobre `units` é importante para essa dúvida, mas não adivinhe por que o limite foi escolhido.\\n\\n**Consulta fornecida**\\n\\nMantenha o trecho completo e exatamente como está:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\\n\\n**O que a análise deve abordar**\\n\\n1. **Explicação do fluxo:** descreva, em linguagem acessível a uma equipe que conhece o recebimento, mas não lê SQL diariamente, a seleção das colunas e da soma, a tabela indicada, as duas condições de `WHERE` e o agrupamento. Relacione cada parte ao objetivo declarado de produzir um resumo. Ao explicar `SUM(units)`, não presuma regras sobre valores nulos, tipos de dados ou unidades de medida que não estejam no trecho. Também não deduza que cada linha representa uma entrega completa, que `depot_id` está sempre preenchido ou que o nome `received_units` confirma uma definição empresarial específica. Identifique como desconhecido tudo que o código sozinho não permite concluir.\\n\\n2. **Filtro e agrupamento:** descreva quais registros satisfazem as condições visíveis e quais valores são somados em cada grupo. Especifique que o filtro exige simultaneamente `status = 'received'` e `units > 42`: não trate as condições como alternativas e não arredonde nem altere o limite. Revise se o agrupamento e a coluna agregada correspondem à intenção declarada de resumir por `depot_id`. Diferencie questões que merecem confirmação de defeitos comprovados; por exemplo, a ausência de outras colunas ou tabelas no trecho não basta para declarar a consulta errada.\\n\\n3. **Testes conceituais:** sugira casos que ajudem a conferir a leitura do código, usando apenas as condições e operações visíveis. Inclua valores que distingam o limite estrito `> 42` de um valor igual a 42, valores acima do limite e registros com outro estado. Não invente resultados de execução nem afirme quais depósitos apareceriam com dados reais.\\n\\n4. **Limites da análise:** separe o que é sustentado pelo SQL das perguntas que exigiriam esquema, regras do sistema ou dados de exemplo. Quando não for possível decidir algo com o trecho disponível, diga isso em vez de escolher uma interpretação.\\n\\n**Escopo**\\n\\nMantenha a revisão proporcional ao pedido. Não reescreva a consulta nem acrescente otimização especulativa, migração, recomendação operacional ou conclusão sobre desempenho. Queremos entender e avaliar este código como está. Uma discussão de desempenho só será relevante se forem fornecidas informações sobre volume de dados ou ambiente, inexistentes aqui; não a apresente como exigência atual nem suponha um problema. O resultado solicitado é uma explicação, uma revisão do que pode ser avaliado e sugestões de testes conceituais, sempre limitadas ao código fornecido.\\n\\nMantenha o foco na conversa do depósito: antes de discutir se o resumo é útil para acompanhamento, a equipe quer saber o que ele incluiria. Preserve a fala da coordenadora como contexto relatado, não como endosso. Não acrescente totais, nomes de depósitos, decisões da equipe ou resultados. Se alguma questão depender de documentação ou dados, indique que tipo de informação está faltando sem preencher a lacuna. O código acima é todo o material disponível para este pedido; use-o integralmente ao explicar, revisar e sugerir casos conceituais.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0034"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "a45d58779778f96964aa6c827f481a8c86cec80247a85046befbee28dac0cd1e"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "db2cd4f64e2134a5efb0561913daf3db3c3ad786da2bae5c35ae8b711fe09a19",
+  "started_at": "2026-10-28T23:29:53.391855+00:00",
+  "result": {
+    "id": "gen-1793230193-Jxa8F2RHDXt3TCvMZETh",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0034\",\"row_sha256\":\"a45d58779778f96964aa6c827f481a8c86cec80247a85046befbee28dac0cd1e\",\"critique\":\"O input é um pedido coerente e recuperável, sem ruído artificial ou contradições. O output está em português natural, organiza o pedido sem executar a análise e preserva integralmente o SQL, a citação e as principais restrições. Contudo, altera uma ressalva: “a condição sobre `units` parece importante nessa conversa” torna-se “A condição sobre `units` é importante para essa dúvida”. Isso transforma uma avaliação cautelosa em afirmação categórica, contrariando a exigência de preservar os graus de certeza no modo /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oV32f86vIuNKodWtbqD771HZx7F6eLIRk4NnKUh4JoSmICVri5xowMRoIyzQJUiL9pvDe33h-vVLCz2h2WqLeBTeRkFX7syjMzvd8d10H7iHwZs2uJvVThstvkFMT0sSNyfNOfTxILrH4OQO08QHfadtvfNirB2Fy1NDRWRKwHyRe4bD4I2gwMRDtN2GcOcdZBm4nd_CjHAnBaQ0ofowKAooPIbix6noGDUdxxhDmX4Rl1EZAGodbbi4KO9ibxlJWkf62zOi77sVKia1C9a42z9Z9ILVpekXRtbf-v_vy8v8WGFOT0tuxhKJS6xWbhEUIw51JlpZFuPun3vjbq4leoA5DuD--AxieJS95fmemuC_aYD7BMLWbZKunWPwMRY18JHHLPtl7rsfqmaAPLY-xXdwnN610JDr9MumBgy54n553d7jrMX8jnSajH8zOzMwLXBDr345BKp3_a4RULqN36jIqp30-zdRoy0zsxl2lybdjxDCmVhKjdy17C3ULhewKfIriB0WNA1mMtMO6Te11mdkA1SrJJmh87JXhfAn9YnPhmYc-pkwLPrfZqIkVT16B3VjVPA-x_T19PE-rnHElr-_uNBAEMVur0A4Lj1V41Nl2c9dNoEBdclMDKVCmOUhhIVjTlazEdmpnxYuFNnnvKFMU46ZGmERSXbNnGkH-vMwoWTSGGTdcJYsKYfFCfUOi-0ZCfLeCeRSJAlVPjDQkNKaOQzjYZQCDz7KJAXohzAySrNDCDYAEZwpgFskWjckV6al2M_j1w-LjrjZ5YApvuv-CXU-wNCS_CyM0eiBmr-dTQ96mt8Y8Q-nqa92ptOMfr3rr2e0uCkcY4DGRXXj6swpr-gJ8zMbR_OQpBQVAv640zlwhaNYe4jstvhmJAWU1TVeF5LlqSzJdLm9AtuYNIpzy2eqfepDU0Www1eEWCQBX1RbxYaua76F6kcwWcIuuO8qKekv7_c47GgXlLkkPKsjFLtIHVpbvsR9L6TYSIGO1MIzOIkNmL36nQ7SnxE6Aqws902i0vaj0m01ub_ohOhsilEdNAJ2zVlffO3QpCZ8timibWxz0HH1wkfjjxrGN7DiZ0vzsPo9FIAyau3IMkFiqNHdpsnNiQimRLN_sd9K_L-SKWTybXB-Jw_ZBgodCnzO2Uf-oOXQNXVTCjyDHFfEXji82ivvH0iaUjageaeh5lp1i7NhJbL4JOdACJGq9txZ0hbmFuNOQkMCdJTH-8aRd4cS-p1j_QrtMH7Dx7bGAHDE4VcnB6KciAExO8-IZl9TMtdmPawlnaw44GJQF4RnsspTFhffrQKtiQKXaUyquDN09_bBGfiWB-WJ9Id0nNnOy8vHUcPI0UjR5Qb6jsax7HFehO1twys0PPUVV63h98UpSkMt9qSvQ0iBaxCCYV7SpW6Kqxv3BN36x1u2bn_qrdwGGRWO43W74GJs7YtF80UZZ1crtbgEJDurqXXOIsGquNuycl0bhQRLAXmp9yilhzqLQD3Taf6kXgS3i-UH_t8GNfpcxvFpCQtQLebFVljIrEKn55G4b_6AIA2-ikc8Z_QcIStDzCM8lP09zvEuD-v2e8Z5KN1ZXYW_lnRKGTWdXNFtDqyLEUCkRC-JcLt01peyx-KJOoPgeaWjZVWMZ8CC99gFl8BtFXoDUeUa7x04Cd5PWD2wWUmC-aZAWMStUJM-NmE8DaZ4A7bpoYt5V3tWkEM65zrIF67rRMrOhhIDkjzxE0ZollzgBu638PbtKKNg8t0XXSDIBROZCg6FN1XjERYfKJORmWrzKY3JM4mbdygMXW7iqEXsT4KkJjQu7DMbQuANk4nxxVMZBztm0yAip-ydCziYvDSmBee35D-_-YMvIh_2KUjObKKUkDlTkTROrfGfFdphG-bFxlZM1Xtkv2SrsXJWQwQ8OocYsZe3zHQYIhM9lETQX3pSqitPUO0jrF5Xs_qg2xurh7tp9loaYQC2G3A6L8ElWWFqP_KPLEiqOASeeuxGafvRwxx3Qf-hrwPcJmKn4sFwaz1AwTE7jtwA2DqtM6TCGF24DKF8gNBR7eNfN6L1eCow-hEsgLjxz_w2FxhV-qgfjMoALj-IDYC3rjHtBycGvA7AGAAJHu-89fH3KimSvp845JdFexbP8Yd6VE0VcL8_y3JeUEWu9wrb-Gs9_2l2RcSaK4m1oQz4-aqCpzs-pTDpvaCtcFYxBLcHxujwKc4LBpBtPS71NwKpyGaAxVpJncA7Rokkc3olckfHggC2EWUFhPk8KAcJQ20Gu0_OKlUDZfwdoAT9JT8st_O_oBebmLhGy3EOWP9ZAjrnhH75QV5i5gcn8sM-1cZa33cck5jwMrBmw32Q0Yk65aaREBdLmFGOAKh52QxPR65hwA0fcCwCr_fzD-F021L7yyTGbysrZMpfDHyRtxJ_5rC2u6ds8ozDtH8YiPKXORBeA2PpQJR3C5q-vEa9v2FSKITJJrGY6Zmg1Q_rOz76F1ToZsoeCyXzU1skVHjmHW8mwfxBiGrhcUTFaUh5dod3mtROr2yqEhS0HdNuyM3nRis2DMysV8bWZH3-tm0BFqMUeWHSHYEr68qJ9_UDBD96fdW2pdZzxU7K0sYrvatKn2K8I17MsYE3-aIW4F4FtAw2IqnC3qJ0euf8AJZq466kXcsiOcseUa2sUP5XQxIvr34IUYM-UL9gmY_1vzAHZ7WeeP7R5A6lKKs5uz1KEJYwXqaZfSPTZvVFaNtEkRw13V6-uAqQHOFo9kjYW4xSWvpA4KOgv30rXuDNAlQhl7SOWY8mVAf-yjeoJnKwr2PgbD_OESGkPEWdFmVK_hC6qwZUdJfglAb0h7KLsJ_fdy8rMxG04t97dvEHh4bzOSzB9qVa3XMaGJHvYiKtjqWv5_Q2uk97svtMxR_qSTzKfl-u3BPzki1OFleLvjcEDDqEuvCS_xn3tHLnDcI2n71P_eyizOZ3tZ6avOGU6e71SHPHh1YP986WF7ZALR1ZYmQ1ukT53uSJgOM1lJVhGsH_Zf7j0VmE0x5I5U-gyWaDhRUVwgGHIsPURNcN32_UCSR3jCY7ayv0dnfeA-M1BoiIiCrLzyg6N2rY2QvmQ-Q2PSkYDbo30HdMzufI20FQ736UQatE8GAS7IDSi79Zx-yksbQ6YT-a4lJV5vrljNCnfthYnZdKeA7St8vXq2k0YE93mwjI4rSJedzNTC3-0nnzgYZ70AispM-zC13FhvLaIYpENReI-XQIaq-zinMr8m_X_BGK3tXY2UhHIQddZzF4uXB_vTrCQecxtQ7Y0mQ0-9lLkPVgwIDoFqsQG19be--L412QAazjs_pt6fRaI-zeylAX7apC4zpFsOpjG1oaUNNLsD6IczktN-HNbcutDXJ3hgeXzLKBkkmUN2pzNZAZ7suJsyvoxMfD4ie0UwNYtvLneIL31lTD3dXM5ouBfwp86puRqqsNnA7e6UfKhdukbsOJF5g47SeSVjuhhDWvw9uTnlefP3A6RPuKDcQPH6AEqNdMjfgGmY84WzEkbsZF2XLd-jJd0fBYNTj7j28YatU2uGWday7mG6maR2Jb5Z2DkZhx8tgMTnGLtPj.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0498b882440616d7016ae285724ae887d0b489b5ad3a19b71d",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230193,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 348,
+      "prompt_tokens": 2798,
+      "total_tokens": 3146,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 143,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2795,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0104735,
+        "upstream_inference_prompt_cost": 0.0069935,
+        "upstream_inference_completions_cost": 0.00348
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "cd388d07bf0560aad99fc60a27572ea0030144aab67f1357d591145e44afa6c0",
+  "elapsed_ms": 8204
+}

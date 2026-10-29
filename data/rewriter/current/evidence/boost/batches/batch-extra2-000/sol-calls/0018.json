@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-extra2-prompt-long-0090\", \"row_sha256\": \"a4b0ca26b2bd4db357fa5308fc8da0839524d3dee7bfbb2893aa5acc8dea4bf9\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"can you explain this query, review it, or suggest tests for it? please use only the query below for that work. i put the depot background in notes so the situation is clear, but don't treat it as extra evidence about what the query does.\\n\\nreference notes:\\nMara Venn coordinates inbound deliveries at Northbank Depot, a fictional regional warehouse beside the old canal. The depot receives packaged hardware, safety supplies, and maintenance parts for five neighborhood service yards. Mara started keeping a paper arrival ledger after a rainstorm damaged the office router in March. The ledger records a truck's arrival time, the receiving bay, the carrier's paperwork, and whether the load was accepted, held, or turned away. A separate internal system stores delivery records. The paper ledger and that system are not always updated at the same time, so staff avoid treating either one as a minute-by-minute account of the other.\\n\\nOn a Tuesday in late April, the morning shift met at the dispatch board before the first vans left for the service yards. The posted schedule listed seven expected inbound vehicles, though two carriers had warned the previous evening that their arrival windows might move. Mara said, “The board is a plan, not a promise.” She asked the receiving crew to leave the east aisle clear until the pallet count for the electrical order was checked. That instruction applied to the physical aisle; it did not change how a delivery record was entered in the system. By lunch, one carrier had called to say that a missing lift-gate had delayed its truck, and the estimated arrival time was still uncertain.\\n\\nThe receiving bays are numbered one through six, with bay four closest to the covered staging area. Each bay has a clipboard for handwritten notes, but the clipboards are used differently by different shift leads. Luis Ortega, who was covering the west side that week, wrote the carrier name before counting cartons. Priya Sen, assigned to the east side, counted first and asked the driver to confirm the paperwork afterward. Neither method changes the depot's published receiving policy. When a load is incomplete, the crew can note the short count and send the paperwork to Mara for follow-up; the warehouse team does not infer that missing cartons arrived just because a manifest lists them.\\n\\nA delivery record in the internal system may describe a full trailer, a partial shipment, or a small parcel run. Units are recorded as whole numbers in the system, but an older paper form has a box for “approx. units,” which sometimes contains a handwritten estimate. The staff do not copy that estimate into a record unless the receiving count is confirmed. A replacement shipment can arrive under a new delivery record even when it relates to an earlier order. Mara has noticed that the word “received” is used consistently on the afternoon export, but she has not checked whether every shift updates the status at the same time. She has not said that all records in any status are complete or accurate.\\n\\nThe depot recently moved its weekly review from Friday afternoon to Thursday morning because the service yards submit their replenishment requests earlier. Mara wants the review to help her see the broad shape of inbound activity, not to reconcile individual invoices or identify a particular driver. The review is usually shared with the yard coordinators, who care about whether stock is arriving in useful quantities. One coordinator, Ellis Park, said, “A clean total helps me plan a run, but I still need the receiving slip before I promise a specific item.” The team has not agreed that a single summary can replace the slip or the carrier paperwork.\\n\\nThere was a practical reason for mentioning a threshold in the query review. A few very small parcel records appear in the system alongside pallet deliveries, and Mara wondered whether a filtered total might be easier to discuss at the weekly meeting. She has not specified why the value thirteen was chosen, whether the cutoff should include a record at exactly that value, or whether a different cutoff would be more useful. Do not infer her reason from the surrounding depot story. If the question later turns to records at the boundary, ask for clarification rather than deciding what she meant. Her actual request here is limited to an explanation, review, or tests based on the supplied query.\\n\\n1. On the afternoon shift, a carrier delivered cartons of replacement water-pump fittings to bay two. The driver handed Luis a manifest listing thirty units, while the crew counted twenty-eight in the sealed cartons. Luis recorded the count on the receiving slip and left the discrepancy for Mara to follow up with the carrier. At 3:40 p.m., Mara wrote “check the short count tomorrow” on the dispatch board. That note records a follow-up task; it does not establish what happened the next day. No one changed the paper count to match the manifest during that shift.\\n\\nOn the same afternoon, Priya received a mixed pallet of gloves and cable ties at bay five. She separated the cartons by service yard, then checked the carrier's documents against the labels before the pallet moved to staging. A yard coordinator called while she was working and asked whether the gloves could be loaded for the North Quay route. Priya answered, “I can confirm the cartons after the count; I can't reserve them from the paperwork alone.” The call ended before the count was complete. The records available in these notes do not say whether the cartons were later reserved, dispatched, or entered under a particular status.\\n\\nMara's draft for the Thursday meeting has a small space for a depot-level delivery summary and a separate page for unresolved discrepancies. She expects the summary to be concise enough to read alongside the route plan, but she has not prescribed a particular chart, wording, or interpretation. The team may discuss whether a query is useful before deciding whether to include its output in that draft. If the explanation or review depends on facts that the supplied code does not establish, the question should stay open rather than being settled from the anecdotes above. The query supplied for that limited review is:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\\n\\nAt the end of the shift, Mara placed the paper ledger in the locked cabinet beside the dispatch office and left the Thursday meeting folder on her desk. She said, “We can look at the summary and decide what question it helps us answer.” The meeting had not yet taken place, and the notes contain no decision about whether the query will be used, changed, or replaced. The carriers' estimates, handwritten counts, and follow-up notes describe this fictional episode, but the requested work is to be grounded only in the query above.\", \"output\": \"Prepare a clear response to the request below. Choose one of the requested forms of help: explain the query, review it, or suggest tests for it. Use only the supplied query as the basis for your response; do not treat the depot background as evidence about what the query does. Keep any uncertainty or unresolved point open rather than deciding it from the background.\\n\\nReference notes:\\nMara Venn coordinates inbound deliveries at Northbank Depot, a fictional regional warehouse beside the old canal. The depot receives packaged hardware, safety supplies, and maintenance parts for five neighborhood service yards. Mara started keeping a paper arrival ledger after a rainstorm damaged the office router in March. The ledger records a truck's arrival time, the receiving bay, the carrier's paperwork, and whether the load was accepted, held, or turned away. A separate internal system stores delivery records. The paper ledger and that system are not always updated at the same time, so staff avoid treating either one as a minute-by-minute account of the other.\\n\\nOn a Tuesday in late April, the morning shift met at the dispatch board before the first vans left for the service yards. The posted schedule listed seven expected inbound vehicles, though two carriers had warned the previous evening that their arrival windows might move. Mara said, “The board is a plan, not a promise.” She asked the receiving crew to leave the east aisle clear until the pallet count for the electrical order was checked. That instruction applied to the physical aisle; it did not change how a delivery record was entered in the system. By lunch, one carrier had called to say that a missing lift-gate had delayed its truck, and the estimated arrival time was still uncertain.\\n\\nThe receiving bays are numbered one through six, with bay four closest to the covered staging area. Each bay has a clipboard for handwritten notes, but the clipboards are used differently by different shift leads. Luis Ortega, who was covering the west side that week, wrote the carrier name before counting cartons. Priya Sen, assigned to the east side, counted first and asked the driver to confirm the paperwork afterward. Neither method changes the depot's published receiving policy. When a load is incomplete, the crew can note the short count and send the paperwork to Mara for follow-up; the warehouse team does not infer that missing cartons arrived just because a manifest lists them.\\n\\nA delivery record in the internal system may describe a full trailer, a partial shipment, or a small parcel run. Units are recorded as whole numbers in the system, but an older paper form has a box for “approx. units,” which sometimes contains a handwritten estimate. The staff do not copy that estimate into a record unless the receiving count is confirmed. A replacement shipment can arrive under a new delivery record even when it relates to an earlier order. Mara has noticed that the word “received” is used consistently on the afternoon export, but she has not checked whether every shift updates the status at the same time. She has not said that all records in any status are complete or accurate.\\n\\nThe depot recently moved its weekly review from Friday afternoon to Thursday morning because the service yards submit their replenishment requests earlier. Mara wants the review to help her see the broad shape of inbound activity, not to reconcile individual invoices or identify a particular driver. The review is usually shared with the yard coordinators, who care about whether stock is arriving in useful quantities. One coordinator, Ellis Park, said, “A clean total helps me plan a run, but I still need the receiving slip before I promise a specific item.” The team has not agreed that a single summary can replace the slip or the carrier paperwork.\\n\\nThere was a practical reason for mentioning a threshold in the query review. A few very small parcel records appear in the system alongside pallet deliveries, and Mara wondered whether a filtered total might be easier to discuss at the weekly meeting. She has not specified why the value thirteen was chosen, whether the cutoff should include a record at exactly that value, or whether a different cutoff would be more useful. Do not infer her reason from the surrounding depot story. If the question later turns to records at the boundary, ask for clarification rather than deciding what she meant. Her actual request here is limited to an explanation, review, or tests based on the supplied query.\\n\\n1. On the afternoon shift, a carrier delivered cartons of replacement water-pump fittings to bay two. The driver handed Luis a manifest listing thirty units, while the crew counted twenty-eight in the sealed cartons. Luis recorded the count on the receiving slip and left the discrepancy for Mara to follow up with the carrier. At 3:40 p.m., Mara wrote “check the short count tomorrow” on the dispatch board. That note records a follow-up task; it does not establish what happened the next day. No one changed the paper count to match the manifest during that shift.\\n\\nOn the same afternoon, Priya received a mixed pallet of gloves and cable ties at bay five. She separated the cartons by service yard, then checked the carrier's documents against the labels before the pallet moved to staging. A yard coordinator called while she was working and asked whether the gloves could be loaded for the North Quay route. Priya answered, “I can confirm the cartons after the count; I can't reserve them from the paperwork alone.” The call ended before the count was complete. The records available in these notes do not say whether the cartons were later reserved, dispatched, or entered under a particular status.\\n\\nMara's draft for the Thursday meeting has a small space for a depot-level delivery summary and a separate page for unresolved discrepancies. She expects the summary to be concise enough to read alongside the route plan, but she has not prescribed a particular chart, wording, or interpretation. The team may discuss whether a query is useful before deciding whether to include its output in that draft. If the explanation or review depends on facts that the supplied code does not establish, the question should stay open rather than being settled from the anecdotes above. The query supplied for that limited review is:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\\n\\nAt the end of the shift, Mara placed the paper ledger in the locked cabinet beside the dispatch office and left the Thursday meeting folder on her desk. She said, “We can look at the summary and decide what question it helps us answer.” The meeting had not yet taken place, and the notes contain no decision about whether the query will be used, changed, or replaced. The carriers' estimates, handwritten counts, and follow-up notes describe this fictional episode, but the requested work is to be grounded only in the query above.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-extra2-prompt-long-0090"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "a4b0ca26b2bd4db357fa5308fc8da0839524d3dee7bfbb2893aa5acc8dea4bf9"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e4c2ea970199e2b6829665cc79b5ebed542b849cd8e3003fbf5351fe81a56a28",
+  "started_at": "2026-10-29T03:27:57.335895+00:00",
+  "result": {
+    "id": "gen-1793244477-jAIFYCVzbOiGD9HKPd1G",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-extra2-prompt-long-0090\",\"row_sha256\":\"a4b0ca26b2bd4db357fa5308fc8da0839524d3dee7bfbb2893aa5acc8dea4bf9\",\"critique\":\"The input has recoverable intent but contains substantial artificial narrative padding: the router-damaging rainstorm, detailed receiving anecdotes, and closing account of locking away the ledger do not support the query-only task. Repeated reminders not to infer facts from those anecdotes further inflate the request. The output itself is readable and appropriately remains a prompt rather than answering the SQL question. It preserves the reference paragraphs, quotations, quantities, uncertainty, boundary-clarification condition, and SQL literally; its opening accurately organizes the requested alternatives and query-only constraint.\",\"input_verdict\":\"fail\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r1DPfuT-5QiRN-AhblfUW7BITqr7nG8eNdo6mKZWvUD_Iw7XcwX02gZd0p9cqMujxX5ZEbFRCukg1WUZFhjShrzc6Nd-1Oe-DvXdrcwRVQCxLlF4fxcX4LJYu4vIhXcFtM2y3EQfc5wEOWbuMfcjBhH-Wa-S1pd0zCFxpB0nKf67gkf3KH92ZDx0ICUQT-AVlVQegju9qkSIhT0v7uCPyRHW3zMJ6J4feQtzFRME3_6w0s--VHQteaAKK_uENDlKFL0ljPbBRWPvj1LGolQd5oArQEgQNzS-LIrkVf7Yq00pp8vCB4hPx5ABCy6t_4CYgSdqg7-BJlIijdtvujYEYdhG22T-LcJeJapZ-2Bq08NcV_AD06qV92jRV79UJ_PzNfYHoo2icu0hsKhTW3K26jUeeGp2fSq9jTywyaUlg7NX3Nkb_hVBiklBZL66hSGW2-eKqJhdpcQeT53_A32bqw1_N9B7cYXO3Q2DtDzz0KF4JNi3_CEq5qRr41VvRvD6n3qEb5VM2sSv9Xk2jNRupw3oKBis5yxVHJKeoxSE2LjN1Ue6VooP8iz_4P53eNY4aRgH8F_y13OVqDl6wxfKwWzSUe8kHMLRcPhjnraOY0rN_968Mrh8D0qbYgO8lmwFZLxRjIG9yMWjMV-0PKh4tqVmiBKuc29XpFvJdwEXhBwaIUJ9OdSpPUYSunMiyHQ98_r4MNFQ0vfs0FhzuZvSJljxiepVFjW1dWo7mZP_Z45E17J28f7Dn8ceBiPXW6H5WZ88Yc8cdY7arnCFBYgjwMRKhSEhrD52__Z_gyjjTcTTEIHCzIIQcxy345DGFeAFvTmzf0f2OnxYVlVeIeMntAPU5fFm2xBLB5K6l-sQFRe407vW_VxM786jDtcLNc9kxZ85AouvSi1yfNd3h_9PQ7lXHLSafpb2fLEC1Evnm78tdhERb65HZ94SCoFGshWIaLbcQbhKJ6D4PR6ZUMMbw5gawtetti4fBtBtq9MVwVya4a0djZLnT-N-5BTLHhX5_TkDaDpMiTrDmvSs-zsAlaAO9VIVT7WIaa6MloWRVH72NdS2j-6T0P_LbcnDaImVh3HWWMy6a4vwjncJ5LjUayU_8tYmHCri8C8mbDzrmwryt8IHqmNR86oV6NRVu2KrFChTFlcmyIv-Gep1JbdqG3GuEtvuyKNJTRtNClQb3cdeLfqdkiTmFFp6zomKMuc7Rr-_fGEHGAx7bjGQqjYIPn3JrVSCYcQWd2Q-vUnyDOk-dE61NfMHZDfieQ8DKr3QoGRJI3JxkQiNqdPHhTW3oSAjgSa6WcYOiVJbc0P_mpG2dv1pXXxhuQ75omFO103W4sN0CrSE2aEZ11dBom6c6o-m_U9baBBCFPPyqxQknl91mDCaITBh8w4k-SFli6Yg91dBBT2S_N8YDhxQcyIJe3wKdFUXvPodytYZXitc_jyi4bM_SFH5TinQx8amI5vEQOZDcsp2iDcWXmUye7WaHzbMF1JOzSd-mxIZS2EHJz_fVmGPbBHrrhPg8Z-XTTcjfOP9owLSg4XKA26Xirdj_FgjIUNsSZG29CzEuqyVL6-jqaLw3P9UUvtBsbBJv3nk6DPcOZwA5UWpdRzcTXj5lXJSsxNIeKpELkx3oEBU_Kg50iQIcFLepN6zqTd_30ioSCPSmTdRTlrplkbCFJzRyW6SITegoybosNtMp4NDxFaVTFHyfG4ROX_prSFvTPY58s_GoYX7M_jkECpk4ZqcD4mVjHsRY43GtrD4tmd4oEfq2rcqurtQ94kzMsoKOF4RQ0NNWO5vbXAX5GxSNgHd4855AP14ikIYObVdm9Qq_OBKLfkHawiHPxO6jPT7-BvdKQjJe6fsr4YsiB-XmdJMV2aYC1VdGDCejId7gHoFw2ydUx-gFcPSGN2nSzN9b_BnUrqUZenViJqPsthpLaovc64h4kyRaO0rpFGacBfb2OpuoLGvT6cplGRtcivVRPXmRI5Hq866Uxqg2xHqaQQFKifldMxhJrtupf_kcfGLVFwXH-50LQ3-0fmrd-VReBcvR-LaQJ4JSbyhc9sTn7GJu2p-lrun3XCzcGWtVZBhHka6xn9EZY2ogx8CRfedVwm8TiavGSNk-cqIZe1VUVKSqzOOAbm9ZVLAuDCZLKBmJRvIaWM_Yxa1r-a5jzNwUlk_OtL6S2lRnJUZiT3CXuAO1AgV0x2k1QtRegTCNrlyBwzRjKttjv0CfSaKS-nBVFmi1fYGygCN4y0llOyKc5R0wZsOfI_vOUhSNyyeafgaa9NLIbspelu8vNFduxJBO4XWv09c5XFXnotrPavhsi1E_1_BRQVh3UydckStcFmv6B01oqwCEM2ICV9w8PxJ3ZUO-mOyQQetcNG7RzXyREVJ3TzooGQJ8WmNfREY_Jfwn3il-Vf3ROCVeysnQr78sofwG_auiJ3cngkoS_qIKVSbgQAhu8fDT5NvDV_hV1DH_gykcPsHCH4TzVFuzW_Yekh1EMvr2kWMZnjdoKAqJgZMS0Dm487QmnXLvLT53YcEXOaQN_1SN-ICWR77WlHURTlPhX9-6BOmtkQz3nv2UISADVewyqQc1mSwEeZvsQwKjLLts7tDl2lcuO_q8Ep_APS9tg3P-tHINBgpAAQo5akgd2voA8Qst2RVttKCq9vYlq3rHvdt5eCwyYxb-kQKZPcyg9N0V_sfRXT9lFoCY4BJNDeT8xhiOAeqFM2lH3FJZsKQ9aoraove3SYI3ffkt1UCbyF7G1m4faJmDnJSAQHJ48UFkG3CZE3sHO4ICbMCA6F6azrZmPLTpbVjZSn9ClQ3U50SPkWFkpWdHGmqRkHSVO7QdQ3roFPi2_mGOfCnKqXDiby5Q2ZyE7o4xcNiSrmC49rI9zYIkgmvX1kOtdCvIXBJ8Ik2ZNl1sO7Gf4N2sZiVKczBAtGRtvQrqN4Aea_Rtb7HBnSBuWbNSPa54G6osB_yFvcCBl1I_R5KU7XEmsFFjTfOcpKegupW-RqqbgANAAQb7y3JToIzzNlbpKxZNUP3trNIM-VimEfye1Yh1yW8xDk-ZliDWuFXWgrcX1Lp6UXg2f5hTBjxkYVcjd2lI_5TYdds1o-4aE3rj8T5hpuXMt7Gm89v0JkyPkIShwGM9rpVkeF_EWRr_N-pqqlpMljiP6XojxGMCPjxp8B90K1FOxBFKTly6RwS9GGI9BAGe7GdX-tZq9LB2gMRA05UIs8bNlcCP5aZW1eFZPd1CcUUI2pj-AItNRxkeYK8CDB9d1e1zSVDBKokcxwVGGgSW_GLCXqeQERqXNRtPp7gCp1LXgOi9hDTIQYoRDYElKRaoSpbU28Wos0nelEGGWVkYkQG3P49u6fxLGdhiFVk2G6kLU_NtHyKOsHukOSzfnHM_zhfdwlvehGVrFJPqzOoMeeGotcvTK4f2Yyo-dINZBhnhNqklnyGVcamCWzW7kgbJ3KIZf-1b6j59kJ931f1QyXiRYWjRC0yLism0mKwO1a-zZgKtUqJ6R_I373rVaB9so4RgB9CO3AMnIbzYqwcb3n37QZ9ypwnl0baxJn4QBJLQ-nvN1nWoZf_tU8qm4Y-sboyNeanJ2f5AdpSHRnXMwn2CeH-Q8Y430aSDBz7WdFzZaPdjj1n3HLqJ-kdqcAOE90UgNErhsMIqD6eoWEENtd8Jim17h93c3sAh53sYDUBO_2j1A9ogGjh8_YOVZa6cIgebrIAQUgwHsu8-w5788rOVDy3VV4v4LdgGZWV8VRDTi3lktuMztt3YPdoZd7kSIZ3sPnRHGCjOVLFxGZl-9Kb-ROXV5LBOgbJNPAYvEcmamHVF8MrUfeYktwb_ynQZOrrT6G0du1Iw9tgtP55dW4XNdoYMlUpEnki4B42OxESObYjMWdpIZYr2Lx6q0owNhN3CPZCY-asm0HIZwQs0zuMnBKygOHISZBolXM5Rt7cEyaUMxISIq-YwrLnbX7GdgHK8U2oLBvuvq2KjvbM11vtK-8_5FcDlcTs8e3V__Su1iQSbGUskmWQqV4hs3etIY9F4AHxP7AixZc1qtkvC6VkEvuIPyIe3wSB2z8q05q_PnljLLV2Wjyf2Bg13_En6nZyu2vK2uI0QH7w-N17t6hKnKPV-3yNE1x-Q_em7rtTy1fvIUjnEz5Kf-DT-d2Jsjbf3jEPYR57wfcfbdSBqVMkEDcmiYgP7Ny78n4qLbJkCjW6993cEkSuNBSXm_zHPjR.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_03160ac25420f629016ae2bd3e599c87d0b751c8a793d75740",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244477,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 381,
+      "prompt_tokens": 3339,
+      "total_tokens": 3720,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 177,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3336,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.012156,
+        "upstream_inference_prompt_cost": 0.008346,
+        "upstream_inference_completions_cost": 0.00381
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "049c991a7440771bd05440cede8986bdf77f1231663cdb707a07fa77648772a4",
+  "elapsed_ms": 9216
+}

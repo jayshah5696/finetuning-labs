@@ -1,0 +1,82 @@
+version: fidelity-targeted
+description: Input, output and pair quality for a text formatter
+dimensions:
+- name: candidate_input
+  description: The MODE/LANGUAGE/PROFILE/DICTIONARY header is context, not raw prose.
+    Imperfect spoken wording and dictated corrections are valid. A factual update
+    need not contain a request. Judge naturalness in its stated genre, not whether
+    it is already polished. Assess only the text after INPUT in instruction. Is it
+    a realistic recoverable user draft, dictation, or pasted thread? Imperfect punctuation
+    and grammar are intentional. Reject fake word deletion, padding, meta authoring
+    rules or ambiguity with no recoverable final intent.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: output_quality
+  description: An unchanged clean input is valid. Do not demand a new fact, an answer
+    to a prompt, or expanded prose. A deliberate unfinished thought may remain unfinished.
+    Assess only response as a rewritten text in the supplied MODE. Is it readable
+    and natural for that mode? Preserve intentional unfinished thoughts. Slack stays
+    casual; long slack may be a thread, never force a formal essay. Do not evaluate
+    whether it fulfills an underlying prompt.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: pair_facts
+  description: 'Does the response preserve all final intended facts, sections, conditions,
+    negation and certainty from the text after INPUT, with no invented facts or missing
+    sections? Apply explicit corrections: a superseded detail must be removed, not
+    preserved. Identical input/response preserves meaning.'
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: pair_intent
+  description: 'Does the response preserve the speech act actually present in the
+    INPUT: statement, question, request, opinion or proposal? Do not require a question
+    or proposal where none exists. Apply final intended corrections. A /prompt rewrite
+    is a request, never its answer. Identical text satisfies this dimension.'
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: pair_literals
+  description: Compare the exact quoted text, supplied code and final intended names/numbers.
+    Remove explicitly superseded corrected details. Do not require a cancelled number
+    to survive. Identical text satisfies preservation. Are names, quoted wording,
+    quantities with their roles, URLs, code and filenames preserved, allowing explicitly
+    supplied dictionary normalization and explicit spoken corrections? Obsolete corrected
+    details should not be forced into the target.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: pair_mode
+  description: Use the explicit MODE only. A clean identity input may remain exactly
+    unchanged. Minimal punctuation/capitalization repairs are useful, not failures.
+    Prompt outputs are requests and must retain their supplied material; they must
+    not fulfill the underlying task. Follow the mode in instruction. /slack minimal
+    casual cleanup. /transcribe clean actual disfluencies and punctuation without
+    lexical paraphrasing. /prompt organize request only. /polish improve awkward prose
+    without changing scope or certainty. No added wrapper or formatter commentary.
+    Already correct text may remain unchanged.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+overall_weights:
+  candidate_input: 0.16666666666666666
+  output_quality: 0.16666666666666666
+  pair_facts: 0.16666666666666666
+  pair_intent: 0.16666666666666666
+  pair_literals: 0.16666666666666666
+  pair_mode: 0.16666666666666666
+few_shot: []

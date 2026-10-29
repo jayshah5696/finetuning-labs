@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0085\", \"row_sha256\": \"92cc0f7cd66a104428b96ed988391ed71d379b075c7e068a14dd1be95ecc3a58\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"can you turn this into a clear prompt for a small piece of work on batching records in the fictional Fieldnote photo importer. i need help with the flow around an existing helper, not a new importer or a rewrite of the file-reading system. The importer receives a manifest, one row per image. Each row has a source_id, file_path, capture_time, camera_id, album_id, and checksum. The rows have already been normalized before this part runs, so this request is only about checking those values and deciding what happens to the records. don't ask it to open images or inspect the filesystem.\\n\\nThe main reason for the work is that a manifest can contain a lot of image rows and the later upload step expects manageable groups. The preferred batch width is seven, and a final batch with fewer than seven rows is fine. The current helper is available here; please include it exactly as shown in the prompt and use it as the existing starting point rather than silently changing its behavior:\\ndef batch_records(records, width=7):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nWhat i need is a clear caller-side flow for validating the manifest and deciding whether to make batches. For validation, a row passes only when source_id, file_path, camera_id, album_id, and checksum are present and nonempty, and capture_time can be parsed as a timestamp. Don't add a requirement that a path exists on disk; checking that is outside this work. If every row passes those checks, call the helper with width 7 and keep the original manifest order. If one or more rows fail, do not make or send any batches from that manifest. Instead, return a validation report with the manifest row number, source_id where available, and the field or fields that failed. Those are alternative branches, not steps to perform together. A report for a bad manifest should not include batches made from its otherwise valid rows.\\n\\nPlease keep the condition easy to see, since the whole point is to avoid starting an upload from a partly invalid manifest. The upload itself is not part of this request, and the flow should stop at returning either batches or the report. There is no need to decide how a network error works, retry an upload, or choose a storage format. I don't want a fallback that quietly skips bad rows and batches the rest. Also, don't reorder records to group them by camera or album; people expect the manifest's order to be retained when it is valid.\\n\\n1. The first useful result is a caller-side example or small function that makes the all-valid branch and the invalid-row branch readable. Show how the existing helper is called in the valid case and how the report is formed in the other case. Include the field names used above so someone can connect the checks to the manifest columns. Keep the code close to the described flow; this isn't a request for a package layout, command-line interface, or a broad importer architecture.\\n2. After that, briefly explain the decision and give a few focused examples or tests: a valid manifest of eight rows should yield batches of seven and one while preserving order; a valid manifest shorter than seven should still yield one smaller batch; and a manifest with a bad checksum in one row should yield a report and no batches at all. In the report example, make clear that the row number identifies the manifest row, not the position in a batch. Don't claim an example has been run or that an implementation already exists.\\n\\nThere is a later retry detail that matters to this same flow. A corrected manifest may be submitted again with the same import_id after an earlier validation report. Treat that corrected submission as a new attempt: validate all its rows again, and only create batches if every row now passes. Keep the earlier report in the import history; don't erase or replace it just because a later attempt is valid. The source_id values and row order in a corrected submission should be handled as they arrive, without trying to merge them with the earlier failed submission. If a corrected submission still has an invalid row, the invalid-manifest branch still applies and there are no batches for that attempt.\\n\\nFor the ordinary explanation, please preserve the difference between an invalid manifest and a valid one with a short last batch. A smaller final group is expected, not a validation failure. Someone on the team described the intended behavior as, “keep the photographer's row order, and don't let one broken sidecar hold up the diagnosis.” Here, by sidecar they mean the row's metadata in the manifest; they are asking for a useful report, not permission to skip that row and continue batching. Keep that distinction when you explain the report branch. The request is for a practical, readable answer, not a general essay about batching strategies, and the final paragraph should mention how a later corrected submission relates to the earlier report without suggesting the earlier report disappears.\", \"output\": \"## Prompt: Caller-side batching flow for the Fieldnote photo importer\\n\\nPlease provide a practical, readable example for the validation and batching flow around the existing helper below. This is a small piece of caller-side work, not a new importer or a rewrite of file reading. The manifest has one row per image, with these fields: `source_id`, `file_path`, `capture_time`, `camera_id`, `album_id`, and `checksum`. The rows have already been normalized. Do not open images or inspect the filesystem.\\n\\nThe later upload step expects manageable groups. Use a preferred batch width of seven; a final batch with fewer than seven rows is valid. Include this helper exactly as shown and treat it as the existing starting point without changing its behavior:\\n\\ndef batch_records(records, width=7):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\n### Validation and branching\\n\\nA row passes validation only if `source_id`, `file_path`, `camera_id`, `album_id`, and `checksum` are present and nonempty, and `capture_time` can be parsed as a timestamp. Do not require that `file_path` exists on disk; filesystem checks are outside the scope of this work.\\n\\nMake the two alternative branches explicit:\\n\\n- If every row in the manifest passes, call `batch_records` with `width=7` and preserve the manifest's original row order.\\n- If one or more rows fail, do not create or send any batches from that manifest, including batches of its otherwise valid rows. Return a validation report containing the manifest row number, `source_id` when available, and the field or fields that failed.\\n\\nThe report branch must not quietly skip invalid rows and batch the remainder. Do not reorder valid records by camera or album. The purpose of the condition is to prevent an upload from starting with a partly invalid manifest. Stop at returning either batches or a report; uploading, network errors, retries for uploads, and storage format are outside the request.\\n\\n### Requested example and checks\\n\\nProvide a caller-side example or small function that clearly shows both branches, including the field names above. Show how the existing helper is called in the valid case and how the report is formed in the invalid case. Keep the code focused on this flow; do not provide a package layout, command-line interface, or broad importer architecture.\\n\\nThen briefly explain the decision and give focused examples or tests for:\\n\\n1. A valid manifest of eight rows, which yields batches of seven and one in the original order.\\n2. A valid manifest shorter than seven rows, which still yields one smaller batch.\\n3. A manifest with a bad checksum in one row, which yields a report and no batches. Clarify that the report's row number refers to the manifest row, not a batch position.\\n\\nDo not claim that an example was run or that an implementation already exists. Distinguish a valid short final batch from an invalid manifest: the smaller final group is expected, not a validation failure.\\n\\n### Later corrected submissions and explanation\\n\\nA corrected manifest may be submitted again with the same `import_id` after an earlier validation report. Treat it as a new attempt: validate every row again, and create batches only if every row passes. Keep the earlier report in the import history; a later valid attempt must not erase or replace it. Handle the corrected submission's `source_id` values and row order as they arrive, without merging them with the earlier failed submission. If any row in the corrected submission is still invalid, use the invalid-manifest branch and return no batches for that attempt.\\n\\nPreserve the meaning of the team's description: “keep the photographer's row order, and don't let one broken sidecar hold up the diagnosis.” Here, “sidecar” means the row's metadata in the manifest. The request is for a useful report, not permission to skip a bad row and continue batching. In the final paragraph, explain how a later corrected submission relates to the earlier report without implying that the report disappears.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0085"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "92cc0f7cd66a104428b96ed988391ed71d379b075c7e068a14dd1be95ecc3a58"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "52dbbd45dc75862ed158a6649999abcb96b8686358d7466a8dc58b3412766099",
+  "started_at": "2026-10-29T03:31:48.455659+00:00",
+  "result": {
+    "id": "gen-1793244708-IZgkcXPYna0h8iabjIyX",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0085\",\"row_sha256\":\"92cc0f7cd66a104428b96ed988391ed71d379b075c7e068a14dd1be95ecc3a58\",\"critique\":\"The input is a coherent, self-contained drafting request with recoverable intent and no material contradictions or artificial padding. The output organizes it into a clear prompt without performing the requested implementation. It preserves the helper exactly, the field-level validation criteria, mutually exclusive report/batching branches, width seven and original order, scope exclusions, requested tests, and the team's quotation and its intended meaning. It also retains the corrected-submission rules, including revalidation, no merging with prior rows, and preservation of the earlier report. Language and formatting are appropriate; no material defect is evident.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r4oM4xH-owZylVsum7XAG8OrltnI2iW-T8PUIFuEFUN_wlwmxO3r8zhrwvavONWycnl2oMT-d2S_GpoYRN_fl5pmZNNmJwIsj8UAiPvmKYL8EgHGLIuPFi5wXlUwywqiadoZFkjwW9yo7Bd6B6cHZ3aEdjCth7o2lgRZqEbqh8EiJ8mwEreJPQUn7DsBLiuHOdAYxwQ_Xv-dCfIfiXPt1m5SUiMypi_fZqYhyra18mnNCiiQ9Gf0SWjOaTP4D5yWiSt1REafTjWCkmIq18TbOttK2g-YoK5RbM_QjrGwJhVaZr4dKogGKFgdCqrOx9a51Gf5CY1_zSW0QOZzxBD308QaInAowou6lOZtnNGDwPcz2FoeqneaxLalfgrSLdgIkxpOYnOPF_Cfb5aYwWUhc83kJ_UYB-N8ih1czUSEc4HaTHALvkwLv5sfej__aYjXb_gRdV5L8YadSbDK7tSuBw2JwjE6_9lsZhTuHqHCubkzKt9Ha7D7Q2va7n8Jag9ltFCXUZgLruQF92mNiWr4MQo0i2sCtqPs_1Y95jDch2X_QSZ-PCZpPfzgUf9hnixQ7r_Ny8MJMTnxdH6Hnx2fP2TRiTgHPVHpCsWYuxanvLnkIQ1qvz-2mnmmydvIsESn-BGRIZk1VV8Gf6cCJGixOzhtHFf8Y2qIY-0KkqdPPmb2X5ElsCH4kXOT1CI4WSAU6gs35OLIgHLCoicHIxtU-bBpv-x6kUQXZ0-8q1T07i4bqtmkn9cCBbXskngmPaqm5DKhWzdgNDO56OFFTWBwHdpvspESJiPRW9ZMLWL14-BLM8BHAWGszORIkObrR9kDVm7A0LTwPnEOxKyXeeuWRmarY5Or0jjR6MFZYekm_KlAjjl1Pb07P0ANpetPPuILRBFvJe1FGNavhgzvKyg2ogLsf5kTCmImBl7VKtZGMXxmHJiMBQbrvaM0an8XjEK5AYu29KTXQSnMkzELXJzjtaHWimgnuumAQIyFABBWzni0B5EnrbXZtsGILhmz0iWJDutGLNP8qF6ccUKSSKZOcACPZT-gFA69FPtA4b3V0767V_F0ovU4OK5G2CvH6vu9jOb1_FMWE7wVO22dsK4IbvKfRWxjt59rpCCehzkS4XIKHPHlHEFI0-S6q_SPPtY607amTUrjkU-JL2PtwUnofiWHvgAM1yjS8wzyZEi0NBvLq19hjWKIgv5cLldhiAmyt_VFMtWv2lrXbun88qCPt5hrC9d-I-apfziyQxc9oPA5jThb3M7q-u1Rxkr-2tTl-S9mSGcPCB1ftzWZ-IrMogz_23IhEbA1dtriw8ujSJqBKzbCVt9GgBE1oLUuQkV0tNEQEnwAb3LaZwHGM1hJ5Y8mzZBZbGLny6kcEFgtsPqyDqH6GNt7RISm-U70LqpQVnzuUwfb_gYwELoCk0SaHmLj8wtwdKXK4aDknCSqufQEE443UK3WygfVMJPd4ZwXpxMLMdveJaDKkl-Qk0STxcmDwoKXmgBcaE3cxA4DirAzP_jTZ72SO3Pyf2l6gdeZdVMdczZhDfOpZYIfiR5aTD8cZOgtRstmMWMXo9xD-67P24sNcLa3kJvKJyIvXehsFpS5TguWKhVgD_txjr1MaV5mEtn82Bla9XiXnyukab69PkyVloItE5qXlvj5ZmsCl2wIIBZuSpXLNCqGKQcNxHQ6d0JSYYjaKjoDmyYenuH63OQHOFzOVyqMVX8i48CfyzHVxwi9Sm4AI9t5hBDX1O3QfhNTOyDfYDqjEy8LSNZctd_mhpEFazo1_ZiES48vqQ5wjFRQoeoRIQuJ8iajIY8Ekd3pJMBlB9qR_Y_udRJZ3SjLUX8iGy3E4qh8YwNrHB76VxMAFx3CKY1esT6kHJCCDc8ZKJNKvJeLy5XA1TW3tOxK763gfeDrAINNTykvfTZVKo5yJ2v7XfaaF3Vrwdsvm-fj0PC-OBSHOz-uq3Jj-LeNVdBUJDJecmuJD8FTsXnoWMil6N7UO8ywZtjh554pID_Mh0TKAnyxBBogJQ67Y-yG5uiYRy0IyZGS7y8yTOdR5zKf1G3LcKhb1qM_3kJFsHWdrvICOS9YsdINjjRM3VQADGSZXTeIF5qEoe1XvrGauaa2bwlSP86KCYIFDmFrXdWehgzn1BQkiITiFo47jfr73kkDlTIfSMB3ytZcwZjZoBwaLRu4sKxpprQOWnmM73PqCZ1kzUc_KQid3mNV3DoirbS5pAlxQo-xzRSITnhlOTS9elrBzJ_4--f0yvYoDbW30GShj_j6ENWL_N8S99QNgaJ_GmFg-Pee698A4GwfpElRuycCTD8AZGdPNTV9qJROQw9R8bbnN_9Aohf2zEsmkWjHSUYHaAjdXemwqb_ed0MEuUQPILJmeulIMRz-nZfEo9cE6br0jT6jSYTjHIxbXnM9EOsw_4_hWY--ZYOF5kTsGKcg6hgv2mSstb97N6Xxi8wEigIGImVD9MWV-R0_1J9qXa4P90DbGCelQI59QYztbB1IGc_e9ppL14ugW5k8Qyl2fcQ3khTa8n7cKh6Pg3ze8E-bHRp9s9DNo-7Dw68fwAfqw84cEDTO2Bc1bSjYnRbJocNXDwKWfimJ67BoWk_dITYSzUKMt4qSwBmTtJembB8rDH4FFEzNdzPHeOeIDfm0sVQYi-PlZA2MFwV9VCJX15lFbzTgiB65hDzepNxqYt-_EzKQWCqoR1yU8nwpA0vH95soF0h5WQrfqxihSLuyn9MWvXJy7NqEYoQI7g3vHmn2yyMi10xuX3wftAmhXF0HtSOorgJiB2zMNIaiN2tqlBdlE9_Xq5TGl6Pkyxtq92taHGqRPup4_lsshiSfjVOe8HC0qLl7KSoE5OZk2Js7l09UrH_m4Se0JTmgtt4wNeO-50MnCOmsfredZr4TLOHhpARQQUD_z10AJarMQWPA_SlNtzLKPYskLEnumPkQKFiEp2i7MW0KzlawoLjRZIU03ygRWrQaSAOVw36rRHyTf-NZocSrRbT9ZXTk4Wo6hsuR9l1go4-mPr1vw==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_09c5df30ccd4584e016ae2be25814487d0a4a27fe97e71fae5",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244708,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 307,
+      "prompt_tokens": 2453,
+      "total_tokens": 2760,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 100,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2450,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003321,
+        "upstream_inference_prompt_cost": 0.000251,
+        "upstream_inference_completions_cost": 0.00307
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "d61fbcf4fd25630c7e8b4685dbe3d9cc727692278e971daf0344c695b67cefa0",
+  "elapsed_ms": 7487
+}

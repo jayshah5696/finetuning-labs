@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0025\", \"row_sha256\": \"a47e11142e2c11c536aecae0377c9963e33d4b45dd5fcae629c46b52d41238f5\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"hey, can you turn this into a proper coding request for the photo importer? our studio tool is called North Window, and the archive team using it is Juniper Archive. we're trying to make large imports less awkward, but this is only about how the records are grouped and handed to the existing import flow, not about changing how photos are read or edited. the importer already receives an ordered list of records from a manifest. one record represents one photo and its attached metadata, not just a path string.\\n\\nwe usually import an album from a folder and there might be a few hundred records or several thousand. for one current test fixture there are 47 records, with the last partial group being useful to inspect. the list arrives in the sequence selected by the manifest builder; for equal capture times, its existing tie order is meaningful too. please don't sort by filename, timestamp, album, or photographer when making groups. each record has an image path, capture time, album code, checksum, photographer tag, and sometimes a caption. a sidecar file can also be attached. keep the record intact when batching, including its optional caption and any attached sidecar; don't make a separate batch of sidecars or turn one photo record into several records.\\n\\nthere is already a small helper, and it is the starting point, not a request to replace the importer with a new system. the default width we use is 18. if nobody supplies a width, use that default. if a width is explicitly supplied and is a positive whole number, use that value instead. if the supplied width is zero, negative, fractional, or not a number, report a configuration error and make no batches; don't quietly fall back to 18 in that case. mention what happens with an empty records list too: it should produce an empty batch list. don't treat an empty list as an invalid width or as a request to make an empty batch.\\n\\nhere is the helper the request needs to work from, please keep it in the prompt exactly as written:\\ndef batch_records(records, width=18):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nwhat i'm after is bounded groups that preserve the incoming order. each group can contain at most the selected width, and the last one can be smaller if the record count doesn't divide evenly. don't drop records, duplicate them, or change their contents. also don't force a new group just because the album code changes; one batch may include records from more than one album, and the album code stays attached to each record so the later importer can tell them apart. a batch should be a list of the original record objects, not a flattened list of paths.\\n\\nthen the groups go to the existing import flow. there's a dry-run option in that flow: if dry_run is true, prepare and show the batches for inspection but don't enqueue any import jobs or write import results. if dry_run is false, send the batches to the existing queue in order. invalid width takes precedence here, so in either dry-run state an invalid width means report the configuration error and do not show or enqueue batches. don't change the meaning of dry_run or add another mode. for an empty list, show an empty preview in dry-run and enqueue no jobs otherwise.\\n\\nplease make the request clear about what counts as a batch and where batching stops. the batching step shouldn't open image files, calculate checksums, read sidecars, rewrite captions, or decide whether a photo is acceptable. those things belong to existing parts of North Window. the helper just groups already prepared records, and the import flow continues to own preview or queue behavior. the prompt should not turn the test fixture count of 47 into a required limit or hard-code any album names or photographer values from the archive.\\n\\nsome notes from the team, in their own words: \\\"I need to compare the preview with the manifest order, not a new sort.\\\" another person said, \\\"A sidecar travels with its photo record; it isn't another photo.\\\" The archive has albums that share a folder, and photographers sometimes use the same caption on several images, so neither caption text nor folder name should be treated as a unique record key. those details matter because the batching code should not merge records based on matching metadata. retain every distinct input entry, even if two entries look alike.\\n\\nfor the test part of the coding request, ask for coverage of the default width, a valid custom width, an uneven final group, and the empty-list case. include the 47-record fixture as an example for checking that the final group is smaller when the chosen width doesn't divide 47 evenly, but don't dictate a particular test framework. ask for checks that flattened batches reproduce the input sequence exactly and that batch contents remain the original record objects. cover zero, a negative value, a fractional value, and a nonnumeric supplied width as errors with no fallback. also check both dry-run branches: preview without queueing when true, queue in order when false, and no queue activity when width is invalid.\\n\\nkeep the output useful to an engineer who will implement this within the existing importer. it should distinguish the helper's grouping responsibility from the import flow's responsibility, state the conditions and alternative actions plainly, and include the supplied helper without edits. don't make assumptions about UI layout, storage format, retry behavior, or a new result schema; none of those are part of this request. end with the test expectations and the dry-run/queue distinction so the implementation can be reviewed against the actual workflow.\", \"output\": \"Write an implementation request for adding bounded record batching to North Window, the existing photo-import tool used by the Juniper Archive team. Limit the work to grouping prepared records and handing those groups to the existing import flow. Do not replace the importer or change how it reads or edits photos.\\n\\n### Context and record handling\\n\\nThe importer receives an ordered list of records from a manifest. A record represents one photo together with its metadata; it may include an image path, capture time, album code, checksum, photographer tag, optional caption, and attached sidecar. Preserve each record intact, including its caption and sidecar. Batches must contain the original record objects, not flattened paths. Do not split sidecars into separate entries, merge records with matching metadata, or drop or duplicate distinct entries.\\n\\nPreserve the manifest's incoming order, including its existing tie order for equal capture times. Do not sort by filename, timestamp, album, or photographer. Album-code changes do not require a new batch: a batch may contain records from multiple albums, with each album code remaining attached to its record. Caption text and folder names are not unique record keys.\\n\\n### Grouping behavior\\n\\nUse a default width of 18 when no width is supplied. When an explicitly supplied width is a positive whole number, use that width instead. If the supplied width is zero, negative, fractional, or nonnumeric, report a configuration error and make no batches; do not fall back to 18. An empty records list produces an empty batch list, not an invalid-width error or an empty batch.\\n\\nEach batch may contain no more than the selected width. Preserve the incoming sequence across all batches; the final batch may be smaller when the record count does not divide evenly. For example, the existing fixture contains 47 records, which can be used to inspect a smaller final group when the chosen width does not divide 47 evenly. The fixture count is an example, not a limit.\\n\\nUse this existing helper as the starting point, retaining it exactly in the request:\\n\\n```python\\ndef batch_records(records, width=18):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n```\\n\\n### Boundaries and import-flow conditions\\n\\nThe batching step groups already prepared records only. It must not open image files, calculate checksums, read sidecars, rewrite captions, or decide whether a photo is acceptable; those responsibilities remain with existing parts of North Window. The existing import flow owns preview and queue behavior. Do not assume a new UI layout, storage format, retry behavior, or result schema.\\n\\nState the dry-run behavior explicitly: if `dry_run` is true, prepare and show the batches for inspection, but do not enqueue import jobs or write import results. If `dry_run` is false, send the batches to the existing queue in order. Invalid width takes precedence in either branch: report the configuration error and do not show or enqueue batches. For an empty list, show an empty preview in dry-run mode and enqueue no jobs otherwise. Do not change the meaning of `dry_run` or add another mode.\\n\\n### Test expectations\\n\\nRequest coverage for the default width, a valid custom width, an uneven final group, and an empty list. Use the 47-record fixture as an example, without requiring a particular test framework. Check that flattening the batches reproduces the input sequence exactly and that batch contents are the original record objects. Verify that zero, negative, fractional, and nonnumeric supplied widths produce errors without falling back to the default. Cover both dry-run branches: preview without queueing when true, queue in order when false, and no queue activity when the width is invalid.\\n\\nThe request should help an engineer implement batching within the existing importer, distinguish grouping from import-flow responsibilities, and state conditions and alternative actions plainly. Preserve the supplied helper exactly. Finish with the test expectations and the dry-run/queue distinction so the implementation can be reviewed against the existing workflow.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0025"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "a47e11142e2c11c536aecae0377c9963e33d4b45dd5fcae629c46b52d41238f5"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "51c170e3310b29381fd8cc06c8e61dd3c62d3ff6ba5dd81e21245a3c5f2cb595",
+  "started_at": "2026-10-29T03:23:12.146315+00:00",
+  "result": {
+    "id": "gen-1793244192-tvuFkrJr4fHPZ2OKqMev",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0025\",\"row_sha256\":\"a47e11142e2c11c536aecae0377c9963e33d4b45dd5fcae629c46b52d41238f5\",\"critique\":\"The input is a coherent, recoverable coding-request draft, and the output is readable and appropriately structured without implementing the task. However, the rewrite changes required record fields into optional ones: the input says each record has an image path, capture time, album code, checksum, and photographer tag, while the output says a record “may include” those fields. It also omits the explicit prohibition on hard-coding album names or photographer values and removes both supplied verbatim team quotations. These are preservation defects under /prompt, despite otherwise retaining the helper exactly and covering the main batching, validation, and dry-run conditions.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating implementation details**\n\nI need to assess omissions in the material and the meta prompt. It looks like I should start by addressing a coding request that needs organization into a clearer format. I see major omissions around mandatory fields, like excluding explicit album photographers and preserving quotes. I should also focus on significant defects instead of superficial ones. Lastly, there are issues with optional paths being treated as mandatory, which is a clear failure according to the specifications.**Assessing output integrity**\n\nIt looks like the output doesn’t change any contents, which is good because everything is preserved intact. I want to ensure there's no hardcoding since that could cause issues with validity. Overall, the input seems fine, and what I have as a final JSON looks solid. It’s crucial to maintain accuracy to avoid any potential issues in the future, and I feel like I’m on the right track here!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating implementation details**\n\nI need to assess omissions in the material and the meta prompt. It looks like I should start by addressing a coding request that needs organization into a clearer format. I see major omissions around mandatory fields, like excluding explicit album photographers and preserving quotes. I should also focus on significant defects instead of superficial ones. Lastly, there are issues with optional paths being treated as mandatory, which is a clear failure according to the specifications.**Assessing output integrity**\n\nIt looks like the output doesn’t change any contents, which is good because everything is preserved intact. I want to ensure there's no hardcoding since that could cause issues with validity. Overall, the input seems fine, and what I have as a final JSON looks solid. It’s crucial to maintain accuracy to avoid any potential issues in the future, and I feel like I’m on the right track here!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rwoRxtJH2osYnyMaYlxU1vTk5DJngOH3oeOnfcqu5Ga4xBDQB21dSE1WNsVhyEXW13GQ71m6NVhAUR79H6V1BfStLbl1KSVrg5LnyAq0VrZ-AIMUZtrsxw9XBl1EzNyK-qqJkCdKjBpxWMJDvzCfGNQR46sO6lKJcli7qq101ePXmNtBc2rvvTr5S30xfjxX0aqkyFeWSgXT7kPX9ByWEHAmyEMGtl8WJKW_nkvZ2MzuSgCHGE73vXCxlHurBbeR27w4djwhlOtTzFVytcebKP9RIvNzOp7JlFclL9vyZbSw72_C0AsNeoJway2hhdQHqLbeAlMNNIe2A__4GnJa54MiIddG7jXoVjPnVs7Dfx1SPbVegdUo77zYdA5Zy9sIglVmcoPlycHCss0t3DI_6RBaQCFKGZDzUSUvflFpHwTIXT0_0t2XrZNjGXp_3KWq4MK2lkQZaX6vGR8upi3Ne8MpuSxj7lXGjy_jcWI-wYgOh-ZEPIyWcJOCyYNvQewhaX0DCXQFHfw_wB-D79WtWgQUH_FOW1TXlhxTOzUT_TVnzdkfwc-jVA-sLftu6r42KfkpSaV5T0GaSWT6GqMn3O54BrjSFcOy0a-t9UYxTiJFIk4RPIRhe3d8rxsYwcN6h21uwnENXRsmlaDEuQW-W9M9DjyqdXu0HNEt7T7xV5NIJGibgCpgTye9fEX2-ubK140cQD1ljGEyckyUUvWkBqPk56FC42rP9ZQUg2YLJlm7emO3sHv43HqJpfFITHM9QfASj9jt9NOi_iW-GB2DSc43tL6yNciDqPZML-YkFpXh51gncIlq5hL1hiZh1DrIkisZJ5zV--9kZJwpFbtRMgSZmltsQcwBQKfJzQDkpyJsahqzHm_rvKmMsqt01uupHkn0hrPC9YH58Kv_3Ntw1fBOGVHxSeaLglXYX2KLr2dYBqZ4bqNS26xh1PG1Xe3nLUSKVcc-iQpNK9uqT-slKhuVEkjPsbhqXEn1_8S6zH8sZvSVrqtpmGi75-aAHj4y8vYaI-QkpUhuqROM6M4T6znbuKoNEnttqUNSkmXG0yRWHcfsmeT25RtQ7XONQUnKGh1MQxM_jYG2b9Fqp7dbWrGyIX5s-AJ0ZDpNmjwPsgjtWPtRq40eg9iCXfTTyT0ZCAtytROqc2js7QYM2J3pwvRSILP4iD06AHqKdzctMOLrBynxFI1EsPil59Lge7tFjAc3A9SxK4emsRs4Ec6gsdMX_vCuSulD4JDwcrTIVso4Xg88WaGRZMcw0quTTXlbPtjPzGVCSsSGihhHkP-kq0SFu5wX9gAk2RgHxl4Rjf_NbfC13AG5cFMyOYqyfaEIKSNw5qYfUsP_7P59Fn04Tr3OEA-s5HTFZ7yvPGGPsn5DGSkfOZ4bJAN4xYgfGin-_tzPtcPLZZpcllupqucsYxeD8YK_T2lChXaGtbUfDGLZIIkbVfam7S_pRv1dmbGar2_5R-WBsbAzEKehtUnWtb9BdjSDyViqTgyPZuQN7_116uG113vZBRFrwyZycpKI3_FD_yvxxTc-3xKABjUvFZTObAnVDT78ZnOOU4KOY4lut3KdbPXnlQ4DwjRQTalDwsSS457XsBPY0571vnZ47gf8Yhark_5n4Dvy7hpPSh-53Kfm7B7RjdwvDp2_JKk3XoUeV0PpKovrRO_qG6Tkmi0p9qc-DTtKjWDoFFFr8JBmkDho05SHOwD4NPtXhqNYPiiYk1cGavABpVxfNP6lOHnroemFOkBC5Z1TQkIWDLOG8sS2CBE1M4knnKBkqONw--kz1W2ozeK1T3yzG8HPBkOHn1KigsMXamHIAbfLQ4ubAZVpb88qYDjO2uX3ohML4f_I_y-ulBK_UG93gV6lluxqaj_w1lnGF-oOwnpMgy8s_LUZ8W4GfGAYiV3w-zRCeIz1dvfrwAsd0XBtZQTaTuXW6DdD7tWddZw9tleRUNz2z0E0frmC_IYJ7Wr9tdqz_PVuCp8nw9FLOS95LdS104s8UjyRibLFss7685MuTSE6zZ2AAYTPQLM9hoLzmm--4tFkSWKVWI3sRC9ZIJfYf6j4WyfbD-rLo45jkUS9dK-88ki-CQF7YIS7sAwlmfqTmHOJ6MIrytUSQ0cZgxXbb_Lv43us1ISZLf1hJZg0YV45kxjn_PZCxO8fT_FNBkDWHcy392IPnf2KD9rxUuBwIIERnAXj7BWsDvRpGxyipsnw4cbO94oIQuu5zAcIkHpyhnhxgpdL9HNxHMLFSSfGryJQIughEJ8DEwzB6NoYRJU-Lkgd3Mr9lxY5qs32RwcNzpuyezQwpbNlkSTwUpsigaC2CFXWMMGH1ZBsC8FhEhmaUaPL0SUWZZxhj4f4QBuDCJykytV3SRQNJg3DkSzdwsehrnL2kZP7fXBb7PQ4elK2QujpOYr6HTlKs6SBzIc_QTnIHAinP74PVOoK0Nvx5mLq1sxuealDuRrvK0F3VJSWosyfevqBKFRvVmfnSDJs_C6IdaSznYTbr-4JAv0CQbC8COHIInDAbNUI-PPqpKovPzWVvI5Na-eKkUHCF1acL6u-z3l37vmKcB8uVJG9Mcy1pehdsaD7Uu_adtDsLPeY2RBV8co-Dq3rhodacnFVFLKiUEaNnvIDSlvtItLBVn9c1c6oN6fuz0IDb-KlmQaoMdMDyHMBBGI9ULfHmKwlUuPIn4OF8JbCZZzUeCO4IF4c_xTcL_35VROZNvg0iMclh7VpKJZ7NRee8lh_4euGa0bj3K534qZw_ohakfqosSSpiYlcvSdNJjxDQfSxe0Jwewsu_Me076x_-Th_p_pvSqJLu0RlwCk3efX9XiI6NZBDMECJjMXbv9m2F3NwdiuenYGTbd1faN20AVV-Yupv_Ka0yD82OLTspBbxGIiJEV4ghTQ6Y2bNg68XCrTcJexL322f6kifgUYoSW1IRQopL_0tKm8iFzcy9xRgN_BnymTAn-Fmtz83vawZpFTj9p7XPZKtfJo7Fj799fAycLG7Y74yTprSNxNwdVM7AA7FYNURjSdm2xbdkZVixyCvAfWWMamJSBRZp80E83a0CM87PvabrxJTA__73pn3HBHcRpdNRg14leVP06unHuID-ffnXdrOlBuYQcvKpPLMtK4fPZdv2gK-Y5RjbB42fFVGUhu6HTP14VzjiGvZBMQK97v8fen9ekDr7X6l7Gwhqpf9qG4muuo85GupLCiJQ1g5EUxfqijT2MF1sJ003p_cYnpu_B9zd0HEkietSuazzC-ZVfPqBNyxa0B59yyAQB_MUMfQHTe4o2ZQKgZHCjEreo3ur_3U3JvcHzki5F6itd2BUOnszRMws6pjsgiYT0d405QpbEoBgtydlYJn3BkLWT1Hw4TRT86fwHtuevt7jVDbFhPMXL1cDriGcYKsfGwfRT3BQH0g-H7l2uy_vjPeMRIJdpuqDpgXfwj3M1aYwA4DMRI3QeWgu3hzMkiPakAZ77rBX7eMn9LfFxJijajPVmXNVvxwQo-AQUs6Io4rzfy0FJH3nouf-myUGkeJ_f5l5CFC47uznjqp3fwXiRoi0V_EkbNQ7PAqv6tc_kQVmo52vujjmuEntF9Ds5UkfO1xY_AL68eur_XOmlyIs00lxOhF7gPd6W2T0SOLy9_7xk3QsDk8kWgsJ6HbSp8p0orvf0OCbmwqOO58Vkefpk-rRWy7FzzscYjZ6f_C9tMeSPTeP3SxbB-gCIMRB2-34wQ1lDTSbL6_hFZI45_HlpGcHfQyr1-5z5zcPZs-AEMSPn7K6vXwPeFbK2bvG_6DVkhLAvg4hYG4gImskTsU2cVLjQ7vHkdZb0HLjbOYvV8G-mygQyCcCLOYfeiHX5ZPhv7_AVlWO3RlImd8PfD78lAXbO_w0VDykOKq6TB6kNWpMvArPrF_8iUiU9hVFCONz8AYPJNoAUqKy34OeMQuDVRQWrRW0HiJs38DEIAy4XZRnoOhblN2aqDzmuiCTQdBYXXF4keRuXy9If5Vq3jdipJBTf5EnrvFI9Tepzyewu67Er7tDJO7l4MuH-Bn2-yi5cm0gg2qb8JYkcMn1ie_kAQ4Tavsq73ZhkXWlLVanfQatKpCeJmEd9vxDDBuWHABqab24Ji-LF4Hw6TNIhC3Wp65Bne_-X-EiaIf-gZRzecHxgjbsWf5cJaCocbfmZEQeMcHY9wJvZ78PUxLmWvJ701gVQNpiiVlmNVpxURT2THzvwhmG5ZCUj_vSLRSvEGHGQ3uMN4qgUMfQs4cepHhx3hWqkXDx77yKCCE-rfsmEDQf078Ta7_NtC187U6Ay71nUZajQL6siXp6L8pmf_c_tgc8Q2YsVd2lHgGjGU7ocsamvWyOscOmxW_dvYuG4nMXxRmuX0QdTSGPUa0tgdTcktbfI7EcvCN8AF3DsP46C7QNijdMIWNCIT8NTmkeaobx_6Og7p0eYMWJfCUK1M3UPh7dqXWQk=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0694519861dfff64016ae2bc2139a087d0977bf75a6d857b50",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244192,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 415,
+      "prompt_tokens": 2576,
+      "total_tokens": 2991,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 194,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2573,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0105885,
+        "upstream_inference_prompt_cost": 0.0064385,
+        "upstream_inference_completions_cost": 0.00415
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "d91685be662ffd1a36a1875a0cf51c1f465e9e4162cdf7ca3ea20ffd469c1134",
+  "elapsed_ms": 9594
+}

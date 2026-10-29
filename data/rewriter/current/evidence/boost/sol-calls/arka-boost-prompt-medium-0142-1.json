@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0142\", \"row_sha256\": \"5400e37da017138690532d14b16f127c8a9c2e75d017855f51ebdf36dfadb66a\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm looking at this query for summarizing deliveries by depot, and i'd like a bit of help understanding it. could you explain what the query does, review it, or suggest tests for it? i'm not sure which of those would be most useful, so you can take whichever of those approaches fits the query. i keep coming back to the same question because i can't tell from a glance whether an explanation, a review, or tests would help me more. please use only the SQL included here as the basis for your explanation, review, or test suggestions. the query is the full material i have for this question; i'm not providing separate notes about the tables, the data, or how the depot uses it. i'm mainly trying to get a clear read on this one piece of SQL rather than ask about delivery operations generally. if you choose to cover more than one of the options, keep each part tied to what can be seen in the query. here it is:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\", \"output\": \"Please use only the SQL below to help me with this query for summarizing deliveries by depot. You can explain what it does, review it, or suggest tests for it; I’m not sure which would be most useful, so choose whichever of those approaches fits the query. If you cover more than one, keep each part tied to what is shown in the SQL. I’m looking for a clear read on this piece of SQL, not a discussion of delivery operations generally.\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0142"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "5400e37da017138690532d14b16f127c8a9c2e75d017855f51ebdf36dfadb66a"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "6e55dc6d2951bf7a8077f2eb74716528b0ac8b866e0d3c3a986dd169b2e30b50",
+  "started_at": "2026-10-28T23:43:26.774229+00:00",
+  "result": {
+    "id": "gen-1793231006-eal359HwUhqcdi5PPkmd",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0142\",\"row_sha256\":\"5400e37da017138690532d14b16f127c8a9c2e75d017855f51ebdf36dfadb66a\",\"critique\":\"The input is a plausible, self-contained request despite some repetition. The output appropriately organizes it as a prompt without performing the SQL analysis. It preserves the uncertainty about which approach is useful, the choice among explanation, review, and test suggestions, the SQL-only constraint, and the exclusion of general delivery-operations discussion. The SQL is unchanged, including the 'received' filter, units > 42, aggregation alias, and grouping. The absence of separate table or operational notes is adequately conveyed by the SQL-only framing.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing input repetition**\n\nI need to evaluate whether the input's repetitiveness feels natural. The input seems to repeat the question somewhat, which could come off as verbose but still plausible. I want to ensure I don't omit any essential material. Only SQL constraints are captured, and I must keep everything provided about the SQL intact. I’m thinking that if there’s any optional critique to include, I should mention it. The input might feel like artificial padding, but I can't confidently make that claim. Overall, the output seems to flow naturally without needing code fences.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing input repetition**\n\nI need to evaluate whether the input's repetitiveness feels natural. The input seems to repeat the question somewhat, which could come off as verbose but still plausible. I want to ensure I don't omit any essential material. Only SQL constraints are captured, and I must keep everything provided about the SQL intact. I’m thinking that if there’s any optional critique to include, I should mention it. The input might feel like artificial padding, but I can't confidently make that claim. Overall, the output seems to flow naturally without needing code fences.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oijQvTlq0yOjLi2uMa6a3VX7lpvAnbw9K1dHVwLRuGB4ur2x5z1i-p-zRSSb0e-X1U1Y8lkprDRooOW1PPwu61_p7HdECqPfMW14qIUdSDaa0SnOeRB9KV1StZGEqm7ueww4PGhSFIfL8yn5D4ogvHi71zhUzA1TbhRy7hCrhcymHrU3PO4oZMoi_XcvAsQiR2pmaCaO3w05n-pYYUgeiFy2c-_XCrQa2GtAVv-0904WGa_EZfpoNZUHzSxc6hNqK20R3e6HKugXR1I-F79BV0ipTBTcN6k-dWBPm3bmsrI2dsHN9tI9G-n5mEnr3jBYp7qY_X0iD65uc9Wa8jYP_6eSMkRBvPc1K-slyQWFa9lczPb41vduOkbImzTzVgfMtl0ag045XmmyYIJJk2L6Id-jMvYG4mtreT3uZXjE89J8QmHdWKJ1gnM4vCpGCa-VDeSDA91Wtsp_u2PyOtH607_YaNskRxy2cYy4DulMT83cHXAFReKsbVjYt8O_Jw_gmXcM3pTrEcekXnBdzazUdpba8L60nXutwRWQY4asBq_-4qa9760cJdFdjsn3R7ZsNLM2TZvPOdbTTz9HTm-w__rMueI8sodWQ4j6wHAoqjVu7qhEO09ZxG7bki71EpaOjYTZHgRGOI40diXWlwlADdwQ6UfQMWr30ZvpxYH-PRo8ZOSS7Pdp1PY2nWPczEO0bXcLgmN6LlCsemuP8rViUsw7RFMlS-42CTgfpTiIAAuqTb656sBKqS1om6flohhJUMxjeDJ7vJuPsPpt8UB5mm-eTJ8iKjqO5zkbU4uol60h1pM3GF9bt7mSR192lKHZW6VdIeHXXKhDfKZdpBraynymySDT4fDliLpGuW6cYzamZRMxK-PwCP1pv6mtXm2jlvCT5DH3_WW6xgePws0NTfdYv27BKTZT0PvoY68eKuNPz9uUqu177tld_h3qTDVZRTXASZzNmXW9aJ7QfuOhxgv6rnuxHQAe6LeJkihXO4FayjaoGXyV7YaNFWHVZkr_0muxb2Ms9k9_sGsFNYX3_-aC8G8Qal9K69wWEwcAcwjnC0q8xC-FlljiSpxAixrIF-PzmA0nlirz-Byy-YH66IDnwfiUuQDtgzqurztpms68HcV5EsvYmPdNlxDdTXLOqDxewy3h1ZKEzAwV1g165zgAcwd-XDr3SSbZGsmUG_krJ7q3uzzTJ8Y7dyIe_q0AmN8pWZ5W1ffCOYsCGhQvLBcmNGvwAzxKaQjqBGfzpUXH9XqAaiRKXUhMWUWEDblh3ifETl2i74ZqWHwOMLvzvD8DErVa1AnSJRm2LsImCBpAh31sklra4oRuoTtVZ5-CP1mZutd5364ih4vzmFqH6v4eYw17tsHfDgKSdWbqj5Rf-xFld2NfVUzB8AhFrc-yGGx63wszPN-PCmGJwQAYHhfrff4QOuJMD55QGtGmepURMkHwCSkLCDkmVbywJR2sO-ujWfyepQQKUF8sPR-q518mH19cbP-pLGvev_yfhQr0gbI6yrUFMfSGn6uk1tmUPK1oUAv9gFzCh79AYozrp3jVIas_4FshJmh7H5w_vcfBBC4I9khXhR2eBhytGaQUUAp6_pUCwU77woT6xKpZFKa7mcePhFeALmr-tEdGXQC-yNaeGBHtQ7HfzAjQx_v3uznPBWCvVWqhD0xiaFB7hvnIBgbIr_PCm-8QV2KcZH0uMFi-Yr-qQQ1yZCBNWwQuDmjS2rYlpGG5W2C1XAReEp8cZwXwwj_TDG1s4LN6bp9BcQxI5vMjJk_k9jJYiAYsgBpeSKs_w3ilQJsVaQBFnG8ybv-wQJ88aaIM_thcwXRT9dWlEERv0kICJHn_0jTKQP9fYGp_BMqwimQazrxtVBhBXLWpwf2eypNqR0iU6Eotg2lBSkw15h5OtG56219oxeQ50qtjHa8l5ov9pvdjuhd2j7L7Tn3sYAEwj9VnSx5-cCm68GCAGg2P2eBlgQi7nWOkwlJoAXm8YH1vC0UsHP_iWpf3RDOuTLVaO-he7ZUg-3xjLstNMjJPApi3JF8JznBbpt2clhaNWrxq_RuYogioPOv9i9st0cOrPuDqM2Nl2KkM4dxZgZFYuBRXYnotEWqH7luFkF7G0trJzuShn7Uz51d6-Zloaz2kx_FRpgx_kOqZNUdBT3zwH3gkJZ1cz07SwtmaiFbNTfZxlu94fIQkM78i-esPHtSy3Q9jVn6Bzxwohv6KFNv5LLNRU1Ukg7YvI_2IpM7jolixn18d7C3l9Lbxh4xjBNbO5kcyNbG_HzHKqAlo7FobxzzYd2K4XEg0GH-suHW9i-Ur-N2g-Qae0RurSlED1dLFlB47FXylwxiGECQNPTiDHepreT5jQT3D2hcQ_AAWAigwIiraTmi_2EuHiMqXuWDxLQP3NIRAVxntmRx42m-u4OJTfUDOgefCLLmYeRHmBdYZPAzfM8OhPT5Q7wBJDsgDUdZdJVQJdD5euXiggB5yAqOZHJCYzFIFuDaP1srvvkEjBHnyx1TEHNPcnLQm6omHevGzHLymIWB1eH-_SgiSWFkBCH11JJSyg_20M8HVS8L55tY4_Y_AS4Zkm5ESqi63hkUDBS5Yw6wbEH3ohlvrE22xaPxLJMQ5L6AcbveReP_6fM8ADa4MZJS1uztOGtSHAe28J80UDKhFLMJMi03MrnOeZt78L4yCO_h6xh4wYA514sBZe1mSRz-TUD6zZUfBqLBhChR117bPMvTfOAc6HrUaMALV0g0_sPvJeRF1UtxXcZVkAw75Otq0yELdCKx09mZ2ICB1P8l9XbpOC3F-5bwZ_0PYpJK.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_04d396beee0b6a57016ae288a0742087d08888a29f6d89d6d3",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231006,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 281,
+      "prompt_tokens": 957,
+      "total_tokens": 1238,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 85,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004724,
+        "upstream_inference_prompt_cost": 0.001914,
+        "upstream_inference_completions_cost": 0.00281
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "ab01379a12e291527758ad652663c1924e65b6d59b8e5bc81060a946b8689be0",
+  "elapsed_ms": 6340
+}

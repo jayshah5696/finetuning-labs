@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0033\", \"row_sha256\": \"39618d08a324249826e1b0f0adb9b0cdb19dac5854945b350bc1e7dcfa56813b\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i need a payroll csv export request cleaned up for our monthly run. it should cover one pay period selected by the person running it, and the columns should be employee ID, employee name, department, gross pay, deductions, net pay, and pay date. keep the rows in employee ID order, and use a comma-separated file with one header row. if the selected pay period is still open, make a preview export and put “draft” in the filename; if the period is closed, make the final export and use payroll_YYYY-MM-DD.csv, with the date being the period end date. don't use the final filename for an open period. include a short note in the request that the export should use the payroll system's stored amounts and shouldn't calculate or change pay values. i only need the request organized so someone can implement it, not code or an actual file. please make the open-versus-closed choice clear, since the two outputs aren't interchangeable, and keep the fields and filename rules together so they are easy to check.\", \"output\": \"Write an implementation request for a monthly payroll CSV export with these requirements:\\n\\n- Let the person running the export select one pay period.\\n- Include these columns: employee ID, employee name, department, gross pay, deductions, net pay, and pay date. Sort rows by employee ID and include one header row.\\n- Use the amounts stored in the payroll system; do not calculate or change pay values.\\n- Choose the output based on the selected period’s status:\\n  - If the period is still open, create a preview export and include “draft” in the filename. Do not use the final filename for an open period.\\n  - If the period is closed, create the final export using the filename `payroll_YYYY-MM-DD.csv`, where the date is the period end date.\\n\\nKeep the open-period and closed-period outputs distinct. Provide an implementation request only, not code or an actual file.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0033"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "39618d08a324249826e1b0f0adb9b0cdb19dac5854945b350bc1e7dcfa56813b"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "b5380f75db00245529b9c875ddba7c0f33fc82e34f23cc406667830499e5c01b",
+  "started_at": "2026-10-28T23:56:01.703220+00:00",
+  "result": {
+    "id": "gen-1793231761-7KG1HDd52IIaeoto0BwC",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0033\",\"row_sha256\":\"39618d08a324249826e1b0f0adb9b0cdb19dac5854945b350bc1e7dcfa56813b\",\"critique\":\"The input is a plausible, self-contained draft with consistent requirements. The output appropriately organizes it as a prompt without performing the task. It preserves the monthly scope, runner-selected pay period, all seven columns, employee-ID ordering, single header row, CSV format, stored-amounts-only restriction, and distinct open/closed behavior. Both the “draft” filename requirement and the exact final filename pattern with the period-end date are retained, as is the prohibition on code or an actual file. The fields and filename rules remain grouped in one requirements list.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating output specifications**\n\nI need to assess if the output concerning the comma-separated omitted elements adheres to CSV standards. It seems that the fields in the filename are complete, so they should meet the requirements. I also want to ensure that the natural input passes and that there are no defects in the output. Noticing that while there’s no explicit mention of “comma-separated,” the CSV format suggests it inherently. The output prompt seems acceptable as it stands!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating output specifications**\n\nI need to assess if the output concerning the comma-separated omitted elements adheres to CSV standards. It seems that the fields in the filename are complete, so they should meet the requirements. I also want to ensure that the natural input passes and that there are no defects in the output. Noticing that while there’s no explicit mention of “comma-separated,” the CSV format suggests it inherently. The output prompt seems acceptable as it stands!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ouVkwG8xC7NZP8812w3EBVuyrKuhiLxSoBkBEsOB2qH9igw18YgDDz5GDoklUzT366QQVI54Iry-Oemzc2mfU8FcyHKE7tYOe7S1vV8KGTf8Qj_MKOxwAD9SSxXpCNj-7vV4U_nI-3sQ682RBK83zv8G6-Akq2YUtTT0jR-FvOEuU0TCOZKOOnfAYd5_GP-TMNpdOPEhKyHs-4ecQFTJ90h1LNvB1SD0hzNPB16fWt23xpxJ1q59YiRFInJKvv9H543T0mEYVj3NRHQBF9t05OXnpxKAnnj7E3fwQa7U_ppReHOsfTeo8HJAxL8Q4S0CcAOwCHWX6nUckcoD3pIFpw5VmEeJnXZlsHoZXTOreMjxZOY6-6P9S26RWQSBfGK2vxSy8NJfHv3jChEIlo7OY4TVXgT8sYOL37tY6EgChIxacG0z4ouVKedEVf11LTTgtFC9rsmykkKRrpNntW7DSEZNchP_vKdPo97MjfgSQnfr3a9oR4L0UXoDQdPIfJZGExvEyjYITE3ilNcevvp9OUtmuoTBe2cCzGjWzjGpjKC3996DtUzvCrS3Ec0RSaubnCPx10bb6959WLMB6KBfsUiqksVdNSFEfDhO728cXRn9kJaW_diTX6xK7K073RyR_2taxOYuESu_wztuwOgoCiTS2Ndnl6Uo5mW2ov65J5o2r4AohJXQ-bBV5gXCVmuXU-PGzG2EYP0AoVNkLkllUbfloG9ZJyTHsbrV2JLBIKASnN8F3xtv2Ud3qm58c6GgZsulBtLAXXCXplbYlya7676SBEaBzL5YGT42Wpa4WSbut9wU2H1dYPVDdyMEUFCiuJM13aCvrZm4kIY1kVCXH9MNIob0uAVyRx8kWNrY0MUIocCmSqto1owaOZ-rN9xzoytox4qkRcFdtNc7xsSl1r67L63BQcTmgK-6DerC0zxGxqCNOsgiFKDsq_UiQMAYtEmx2IBVz9tDEIwckxUEtCcFJY4vP-3ElzKKIx9nIHJT4cw5EDu8GNRndLeKvHQm6IWYeYk0tGoMDHZDSc5xk6XYpFsPeii6AGcoRr7QOrV5zvWpk0PHfY_dm5kp3M4coZRqJOL1rAx__sMMETFOMGP-w6Hz6sGPcgF_sddQtQeCcMfeQQABgeiGUZCRRvCmau6MNwVREVrVsvnRgHbn6Wp2hLMdLCl467bqbRfzURwOyI_TheLeJZjcF-a5YbMmVFxM3r78KHjooBqJe7PIJDULgROVQxrxyzKs-JwdL16MNpqZl0K8AdpUlJ2aD7mHZ2ms1Doi-R6RK8CRfrL9xKrpN-5pJc4g6kLVy6RTZCU7Q2ApGwHR4DA4Puhd99oWHYQy7n6A6as8LSflnw3ijctTioJflClf_aCh0lrtb9U4TyIClihWmyr_cV11f65tii5SvMmXRgofGBhRrRQCOH7rEyof0dBf3-7fbfyLkXw_ODpk5mfXj_ivNWHH-XBwl2pPsh4TDhdnlectP5aMOv5hegrCB0Kyrdd-E2ErNpNX-_P1ulYI6C1ESSNxX0XASJf-cblavykJUCYW0iRxAOWibzzQRZWmvTh58JosvKdNSHbv-YS__tTExI_JIrPKAUzsLjo0YvlZJZW8kBgSyNWUAgJLWBx0f8iL7SrKt0ODh_KEvnUFptjMqBaC9hqHK9geeGewE7AYXo6sygmgDfLpmlQLWbFPS7gVYmCWS4n8o6iZqutuTkYQsRiBDOxzxv5ks0UwDYQlojBMn2kU18lYVJw4PCroQ3v_86L5xwJSKNuJgpoQA5-Xn0VMe-6331xXiPzjCXAvIF6CGjF5ISlQMQsQfvBzXcvq9vmUzQX5YCo4HM-4KummYD25KhTWRnHJtqj2fWWZ93BgqRHhnznlIfDcILSYBoUM0Q4pBSwolOGmjrfi8066-vVuMCMSJBOc5hTb5tKZBiZ52DHLW_ZsGiZ1EjECMcRdpl-9tzUIpkBY8_4Z7h2qbC0OtF5Al5erwZAAUQh7hG02kpxEu3NtKIeHZLKruZ3MwtzUyxstlrWUlq7ZaibuF2IZPr5j5SknLXOgblCDOJUQrJI75HkTiLLV1-CyQFnc0WLUTAd_QY4eJECY15vSTekNoNw8Ud5ho28TOrIeasH1lPV_eptvJTgVnQmw7IedwaqHDXK9ugwumfpAE0wtqvMn7SytHTz2nKgkmGk1plGq7BP4GvcBFlDyBDOvQVBoNgIC_YlMtmsScwLl40YnNDNA8VIAk6gWeYb8m6gEHl7OEk7U9vFoweYzxcSmTiJiY09v6ZcL440QtEQ0iHvAY3uGM5xyxFiHfIQLQ4MCqq41sShgVK4TlGKrCYVyxQT2LpN5hqS-8S2OeIDYmOE7sQI1yWCTgrnj_UPMtofDVvzqTW89X3dewwtgC-6Hws14WmOhWACLDELseRWnJ_PiIsHtE4_k91Ed2hHO2Y9SJPJI4NkINGW2JvCMeproPl-CvbcAjq2Aiaei819bTO0lbLBye5LgHxeRtOwuQoVqRt2RQ-z4zmIgd53JSreturGgm_owli5QZ7-_5SpyzsJaXvdyHYHt5B7Im28BsBzW785ltiKOJsvtN3Wc8_C2n5rZYCCK_MRz0WeMPg2st9GyPnGPi2CaU58kPE1vNFOQAoDAvO9IyuNgzOAxUCq-jZw75MwsCIIS3E=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0c91875f50f7c477016ae28b9317a487d09adec28eb22a6b33",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231761,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 279,
+      "prompt_tokens": 1001,
+      "total_tokens": 1280,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 75,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004792,
+        "upstream_inference_prompt_cost": 0.002002,
+        "upstream_inference_completions_cost": 0.00279
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "bd643981820b327efadd911b60c9dc7bc83db8ae77898796d37a3aee0f143083",
+  "elapsed_ms": 5699
+}

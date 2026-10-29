@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0074\", \"row_sha256\": \"69b40e39a6fb65610a66abdf18fab11e9e155a3a86041f57ba3ed2fd907639fb\", \"mode\": \"/prompt\", \"language\": \"pt\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"preciso de um prompt bem arrumado para pedir uma explicação, uma revisão e alguns testes de um pedacinho de código que usamos como exemplo na loja cooperativa Ponto do Bairro. é uma loja pequena, administrada pelos associados, e os preços aparecem em reais no sistema de vendas; estamos tentando entender uma função curta que soma valores de uma lista. o trecho que quero discutir está mais abaixo e tem de ficar inteiro no pedido, sem mudar nenhuma linha. não quero que você faça a análise agora, só organize o que estou tentando pedir para outra pessoa.\\n\\nA dúvida surgiu depois de uma conversa na reunião de terça, quando a tesoureira mostrou um caderno com exemplos de preços de produtos vendidos a granel e disse: “quero saber o que este cálculo realmente faz antes de usar os exemplos na nossa documentação”. Não estamos trazendo aqui o sistema completo nem uma planilha da loja. A função é o único código que deve servir de base para a resposta; não há informação sobre a origem dos preços, a versão do Python ou as regras de arredondamento adotadas em outras partes do sistema. Então queria uma explicação cuidadosa do que se pode concluir olhando só para este trecho e uma indicação clara quando algo não puder ser determinado a partir dele.\\n\\nO nome total_cents chamou a atenção de duas pessoas porque sugere um total em centavos, mas também há um número fixo no retorno. Não sei por que esse valor aparece; pode haver algum motivo no exemplo original, ou pode ser apenas uma escolha feita para o exercício. Não quero que o prompt trate isso como erro confirmado, nem que invente uma justificativa. Peça que a análise explique o efeito observável dessa parte e formule a dúvida de maneira neutra. Uma associada comentou: “se a gente não sabe de onde veio o 42, não dá para afirmar que foi colocado por engano”. Essa observação precisa continuar refletida no pedido.\\n\\nNa conversa, também se mencionaram preços como 1,25, 3,40 e 0,99, mas não foi dito se esses valores seriam recebidos como números decimais, se a lista poderia estar vazia, se haveria preços negativos ou qual seria o tamanho habitual da lista. Não acrescente pressupostos sobre esses pontos. Se forem úteis para explicar ou propor testes, peça que sejam apresentados como casos ilustrativos e que se diga o que se está assumindo em cada caso. Ainda assim, a resposta deve se limitar ao código abaixo: não usar documentação externa, não imaginar funções chamadas por ele e não concluir como o restante do sistema se comporta.\\n\\nQueria que o prompt também peça uma revisão simples da lógica, sem transformar isso numa reescrita do programa. Que a pessoa descreva a ordem das operações, o papel do acumulador e o que acontece em cada passagem pelo laço, em linguagem acessível para associados que conhecem o trabalho da loja mas não necessariamente programação. Se houver alguma questão ou possível risco visível no trecho, que seja apontado com cuidado, separando observação direta de hipótese. Não pedir correção nem uma versão alternativa do código, porque por enquanto queremos compreender o exemplo existente e conversar sobre ele.\\n\\nPara os testes, pode pedir uma pequena lista de casos de entrada e do que seria importante observar, sem executar nada. Inclua pelo menos um caso com mais de um preço e um caso com lista vazia; se a pessoa mencionar outras situações, que explique por que são relevantes e quais pressupostos está usando. A condição importante é: se um caso depender de uma regra de negócio que não aparece no trecho, a resposta deve indicar essa dependência em vez de declarar qual seria o resultado correto para a loja. Os testes servem para entender o comportamento do código tal como está, não para confirmar uma política contábil que não foi fornecida.\\n\\nOrganize a resposta que vamos solicitar mais ou menos nesta ordem:\\n1. explicar, em palavras simples, o que a função recebe e devolve, e percorrer o cálculo na ordem em que está escrito;\\n2. comentar o nome da função, a conversão multiplicando por 100, o uso de round e o valor acrescentado no retorno, sem presumir a intenção de quem escreveu;\\n3. apontar o que o trecho permite afirmar e o que permanece desconhecido sem mais contexto;\\n4. sugerir casos de teste ilustrativos, incluindo os dois casos já mencionados, e dizer o que cada um ajudaria a observar.\\n\\nNão precisa exigir uma tabela extensa nem uma resposta acadêmica. O público é o grupo de associados que participou da conversa, e uma explicação direta, com exemplos curtos se forem úteis, deve bastar. Se a pessoa não puder determinar algo só a partir do trecho, queremos que diga isso com clareza, em vez de preencher lacunas. Também não precisa apresentar resultados de testes como se tivessem sido executados: queremos sugestões de entradas e uma descrição do que observar, usando apenas o código fornecido.\\n\\nAqui está o trecho integral para incluir no prompt, exatamente como está, inclusive a última linha:\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 42\\n\\nNo final, o pedido deve deixar claro que a análise é desse fragmento isolado e que não deve propor mudanças no código. Queremos levar uma pergunta bem delimitada para a próxima reunião da cooperativa, não receber uma decisão sobre preços ou sobre a contabilidade da loja. Preserve a dúvida em torno do 42 como dúvida, não como acusação nem como explicação, e mantenha no prompt a condição de distinguir uma regra de negócio desconhecida do comportamento que se pode observar diretamente no trecho.\", \"output\": \"## Prompt\\n\\nAnalise o fragmento de código abaixo, usado como exemplo na loja cooperativa Ponto do Bairro, e explique o que ele faz. A loja é pequena e administrada pelos associados; no sistema de vendas, os preços aparecem em reais. Queremos compreender a função antes de usar exemplos na documentação. Baseie sua resposta exclusivamente no código fornecido: não use documentação externa, não suponha a existência de outras funções nem conclua como o restante do sistema se comporta. Se algo não puder ser determinado a partir do fragmento, indique isso com clareza.\\n\\nNa reunião de terça, a tesoureira mostrou um caderno com exemplos de preços de produtos vendidos a granel e disse: “quero saber o que este cálculo realmente faz antes de usar os exemplos na nossa documentação”. A função é o único código disponível para análise. Não temos informações sobre a origem dos preços, a versão do Python ou as regras de arredondamento usadas em outras partes do sistema.\\n\\nO nome `total_cents` sugere um total em centavos, mas o retorno também acrescenta um número fixo. Não sabemos por que esse valor aparece: pode haver um motivo no exemplo original ou pode ser apenas uma escolha do exercício. Explique o efeito observável dessa parte sem tratá-la como erro confirmado nem inventar uma justificativa. Como observou uma associada: “se a gente não sabe de onde veio o 42, não dá para afirmar que foi colocado por engano”. Mantenha essa dúvida em termos neutros.\\n\\nForam mencionados preços como 1,25, 3,40 e 0,99, mas não sabemos se seriam recebidos como números decimais, se a lista poderia estar vazia, se poderia conter preços negativos ou qual seria seu tamanho habitual. Não acrescente pressupostos sobre esses pontos. Se forem úteis em exemplos ou testes, apresente-os como casos ilustrativos e informe as suposições adotadas.\\n\\nFaça uma revisão simples da lógica, sem reescrever o programa. Descreva a ordem das operações, o papel do acumulador e o que acontece em cada passagem pelo laço. Use linguagem acessível para associados que conhecem o trabalho da loja, mas talvez não programação. Se identificar uma questão ou um possível risco no fragmento, aponte-o com cuidado e diferencie observação direta de hipótese. Não proponha uma correção nem uma versão alternativa do código: por enquanto, queremos entender o exemplo existente.\\n\\nSugira alguns casos de teste, sem executar nada. Inclua pelo menos um caso com mais de um preço e outro com uma lista vazia. Se mencionar outras situações, explique por que são relevantes e quais suposições envolvem. Quando um caso depender de uma regra de negócio que não aparece no código, indique essa dependência em vez de declarar qual seria o resultado correto para a loja. Os testes devem ajudar a entender o comportamento do fragmento tal como está, não confirmar uma política contábil que não foi fornecida. Não apresente resultados como se os testes tivessem sido executados; sugira entradas e diga o que observar.\\n\\nOrganize a resposta nesta ordem:\\n1. Explique em palavras simples o que a função recebe e devolve e percorra o cálculo na ordem em que está escrito.\\n2. Comente o nome da função, a multiplicação por 100, o uso de `round` e o valor acrescentado no retorno, sem presumir a intenção de quem escreveu o código.\\n3. Separe o que o fragmento permite afirmar do que permanece desconhecido sem contexto adicional.\\n4. Sugira casos de teste ilustrativos, incluindo os dois casos solicitados, e diga o que cada um ajudaria a observar.\\n\\nNão é necessário incluir uma tabela extensa nem escrever uma resposta acadêmica. O público é o grupo de associados que participou da conversa; uma explicação direta, com exemplos curtos se forem úteis, deve bastar. Se algo não puder ser determinado apenas pelo código, diga isso em vez de preencher as lacunas. Não proponha mudanças no código.\\n\\nInclua integralmente o fragmento abaixo, sem alterar nenhuma linha:\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 42\\n\\nA análise deve tratar apenas desse fragmento isolado. Preserve a dúvida sobre o 42 como dúvida, não como acusação ou explicação. Queremos levar uma pergunta bem delimitada à próxima reunião da cooperativa, não receber uma decisão sobre os preços ou sobre a contabilidade da loja. Distinga sempre uma regra de negócio desconhecida do comportamento que pode ser observado diretamente no código.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0074"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "69b40e39a6fb65610a66abdf18fab11e9e155a3a86041f57ba3ed2fd907639fb"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "787762b0b2672b1c885a140e596d6b4d9d1b5d853546c13f334396b7ca26d49c",
+  "started_at": "2026-10-28T23:29:39.668918+00:00",
+  "result": {
+    "id": "gen-1793230179-PDXnkXZAE8nXZlJtiSFH",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0074\",\"row_sha256\":\"69b40e39a6fb65610a66abdf18fab11e9e155a3a86041f57ba3ed2fd907639fb\",\"critique\":\"O pedido de entrada é natural, coerente e suficientemente delimitado. A saída organiza um prompt autossuficiente em português claro, sem realizar a análise solicitada. Preserva o código integral, as citações, os exemplos de preços, a incerteza sobre o 42, os limites de contexto, a distinção entre observação e hipótese e as restrições contra execução de testes ou alterações no programa. Também mantém os dois casos de teste obrigatórios e a ressalva sobre regras de negócio desconhecidas. Não há defeito material de fidelidade ou formatação.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oVrIpLlyfdHDfu8tiaz9q7mMmzhBa08HKVyH8f3_FkC8ZYRjDeXaoas1x8IMveAU5OufgwpBEyY2iWwVdDFm2XwCK7ui8460xdaNbNRUSzSodDOkG-YUnH3xVSj_MBUs6PCPign_DP5bi0bxEi6Z4ses6E-niyQX0utaESUJl2sZQ2EXSCi2GMzxobUMYeYsAbli30hacKNonQiW0kinO5n6xZV5ZOJjGHvCL_Nc1uHYuoseJQgzGiVx8t1WsgaA_szpWsQzO28g7oPhRxOZyMHp1vaEaJoqbIAfVPfjni1QDeQhWoUTCqMPI8xb5Wbaol6Wr1PAG-btLl-xWDuzfFN9qK_8mDxPmNPJMmdU-4AmjuAAGV_wdnLPHWxh1iCWlsZRHrZkfMlJEd5MHmcudvXnsxPlr1jO9QmPjpmZTyWBFh1D-ENNw3_FrwTlPN-Kv34ssqRrYG97mFdSBIJ0x20pzC3gxma9EVDbXlqqPCduiRBGkuY1veOSaJgq2SZigpLYhqRCZewTiaZNqgSQHkXKuU1-MTC5p3Zg5-QHA3kHDOorjjsehL2TUbA8rr0xEikemBwDCC4OlLmlD7ANb3xir-v_pWi0gP0LeIGfMF0yVH-hEIoFKqHdqGgWtv8hQCAlRSWHZ5xrjZKiJlByWHaM0nfB6lAOphHSJVQQAHnkdUf69urmaPwgUhPw1sTjGhoFn6oDUjDu2Av_oLHWTqg8wux95sceUS7YPKB0fVlwvB2df75FsnoFPyqn-q0fqvWWOfNPYY9fnEv6iq-IiBEnDND2h6s8z3mzFJjqepwS5w8DelBF9AjYXewqlDSuZ_CNcnjk_0RcRAsIcd5ILuXTK5M4DRyHFMQCFW9PShBkmFmEcVxp-PuRzTo03nVwtp9IMZ9v3yNsKFp6pUhsywdS_UD8wYe19rbGVU2S87aUZSrlsmsqNItlFpEeJ5xWXUB3RmrbK_9oxY3Y_an2Ay1ni7WqmgIwv4cd5vkt6tgqvTbdsA9XPLS3ZJ2KuzLot-y5VR06NbNn20uVc--qx4CYDgprGN_fDpx0hcmw_oHKp_gZtKESK5LdzLYHaAEPEYrYPudrlfl0jjToTxO4wTJ8vxnWdmp3rdER0UX1Epf7Oq7k4od-_jGEJ6jNaAFpXBx5ad2yFUofa7G3FAltwx7UkVQC7ldAwFxE1bs3X55mOAhfcHpjKRXadch5RkpoWg0qI2K67E4ShTKbnZk6DK-lSkT70xttadjx6Zn41TD6Tb5UoHcUH5aInR2IJUjK0vsqWpXmEYlyIBIJ31R0p3OPfY4d0_QJa2YgyeM7VdRobtKxIqH7cLqGi7b5Wnv8rgZW5lZuLyGSAglokqnZ8o0lT1LbFWeBQIdUcfFHjXqAbwM0358G3pEG2Iq7_c5miGoHhEm8SzJsCxl65tiDW6V8Cc1UxSe2hq-89N26Kbmj1HKY0xAmNNaYxxmozW3dkU4gAmdxs-G-crQ25Amu0n1s2JgzwVr5HZbGZ4UOllOfxK3BiSIfBwwxa1p44G4ito0XC-yijJepOkP81BX5WObepHimD4HB0cIKL5xsC3maCIrBk1TQxvQiX75f9tOuaHg1ecX69CvGdW12AaNSmBYnEvztHrPm30r2CxKPO9-aHkyKUHHUrTkaDD95KzWAmirDg6_aBEOBRNvYsJaURKgaVETn9ViYjTM2ozuyl4egM_jZZ4oT1XIWDuP_rK3CVo7Ji02P-5huTCHquU33EU3hcW_nt2jrB0WFIKloDZTw0-V9aZeKWs7OUnExqRkVjyrVjq4XsKu_5Sh4it8ly8gMysOunDdG8xbmx4WYCBVUejO7pA1yrmRqxvQM6BayJbVQVCHp2pHkpIdN0NtgtRxnPuG1eez3z1wu0f1goAcSoFnkXWmKx_sSFY_iXpmo3fIYwYKmMxNtnzOCZ9av_cvEoyu6yV9ai1JB6m46c9tNmR6qd3EdHKrN86yagRrf4UCsdGCs5FFsR_L8EI_A5yT43qf0RhSr9Uiet16CTJn1hlZuDhgoLYuvqwqavjiKM2arSCUWf8llEpcmfhv4_GcBWiZkScvKrkf3oDE2sulotLUTNWA20pXYZczPAcljqEGaLo69mKXl5LEYHf3HURyx2UyuqPdGPKYXUyS7nnJd5oT1rJGbojZD7lG76CDmZbQw52wWzUEuIghALRs-aryTukF38LHmhu_eFelF0u5q4OGRLy31rbN5ViN_UxSEJaL89_TpqmgXDJSnW8eXE0KWq_T6rSbVIUb8YTwEayVfxHcjR_zqBariPNty_VQ_jSV91SBrTilgZLyi-qCKXP6S0mLRKcjSmeP8GadjKsxCl1qp6YbBtg83UqMYCiyI16yEPHU9ATRqfjU5WgONHepD68Cdp7sKqWaDjIPjebxhsqhPiPB61kFXZH2Hv-5vW-LwvHBA1n1FAVYnUXFNjIZtsGtFOn1FzukTBtpT3qr9KMRKsW6W2VicfFLEfxrK3T3WS0sC1tYY4mjIVhzV0omKjh_i36aRLgSDNqFY3jrkaOGIJ6xkXewAkTcwbmQynz1qv9WDyMxm0CXJjVQz5jmm6krw74qXQ6UwR18F7qK7mAcbLwSpK9NhEFfE0DGkMwXu516uQuyLtfLqrYsfeT2JEKh3Er-JgQdkDe4uPfPmKt4MCJb6joeNihoK8XhhHzeb_M6ut9nR6eW5sE8Q_TyADgeTrh9ttQiPnAEc9BDvyUB2fDjRsecJkRhxfoHP-njozd1rkJQDprqW1QQWvkcdnQIkhAbs42HYqoVw9y7BGTddBcb968ew7xIfvjKo5cceKsNBQy-41XbX_9BxWuSDU7Y6JRb0VJudqOWsU6y6sGeMEu-4p5GKSydVsM1rQ5dT-YVux3fdnPtPIndMoLsPTwpNP-6nFgpZDoB1RXRdNvcpTMsYfBZX3g0J9_8UQW7u7zagfqaM6_rusrS1Kyo_osI2JlCtH4y5HD1GLbcm0-e72NXxqLQQIlZYDKvOFofxo36l6NjTsokbENGPSW844A86ALu5SYRXU9trqe4ZQ5bEDWVcZdO7ygiXbXvK-ddqksG5IjiJadxyrOnWbBEjxRWgCo6lgoM-S5ZWE4DTacW3pafdp9Zu_wgLRYiY5fFictwx9K_Z-C0MQLYQ3d87cx64k7X0k5cKhs3ja8yy-TGO346nhqr377RvBOIdLNyHjf7f-EdfCfJ2jUhplraPeNE6ldlDkw1Bn3s0v04VicCizxFO2yyO8rOmpt3Qa6yzXi12lOEJjW5NFcNfqUWUaDqRtRdvOk8QG1g5MVzRivEoKIsxgqSD0a935dlGOnntN0oFCpa4UBJ02wP9KrbCI4gxf4DhRE-APNT_1d1z2jAqKJo4AoMhoifHikQdRf4T8LLnuTv91j2mj-zl1hjLkaP3amUsCWX-aNCmzkWb0PgHN1n2PryGOfbtQUeHlezJgKWFbXSTxn8Fx4W0o9P59500PbJ8pSMghC5k70Pr4YT0wx50Lj8WqYqZuWqd-HbwkR0k151QadsRqPVzM8RFZnMsWNA27gxtBoK0vDeWdBZCncUvInG8X6GEIWJxdzwvDD2ABoV-xc-55l2yvYkALPpPF1rrJuXcknrMQSwxdr8K0Lwte4rrIgBJCg6nwvIi11-cmU7IdbVe7STEbaGVJJxlx4Wt85SfThgW18I8EbmXjKEPPVgkaqZ_WN-gFdIYNKf2_OXjuLi6fQFs4iMSmCzerCq7z9tAl92NY6Wg75PenfEILp8WBwlVri8oNekq_6vbOmx7uZ7AsdDFKRkjPdz73qnX-2eWhhukdAFHerl0j2VBrGpKjAWDjHYCx4PgU3N4IT1gDgghtqT5UR_c3j4u1d4LcG6BI-BtEwKk0AmxxsTXMxUu3gFbPde9Kq0I1IIsdHAUnEutCVIGgYQQbTMOZ-aYQ1mYpbzNx2j1b_0S4aBIpaAPqZeZVMrVze75oCPHN7CG9ltbdRT-zshKLAQcbQX1I3_Xi0CdLt3fqplBlfAPpan9jOadd-JGluPWGU9yRataTDyFcCdVNq0-MLsBhzfbrCdhYOw-3oXHC8jtyGGu1fEvvF0Fk_SIPNQc-THqUCZqDah7TX4fC-liry8LfsSQJ7qY2Pnr7YymgKTHT-t-u_ooZ63SFliFWYhx7O-2U7m_giubSuZBr27G9ypcWG0cUICZESlk7Yw7QyFM-9Rd8spDU99jfTMtEEXQzx7szaz5UfiTNJs1VrtatBf4RfgBPz9G3mQ177TABsE-m6NBzdi7uO8x1SOnOj5wZr9LnAtVDskykJnA3B7G78clBFNlCyZp0OBPNJcYfXnu-zP8PZCKhPZLVmL2Ot6FnPxbdQcbHLKlifNbBfLQuBS5YRi3p06cWxVzc935B7F030Ur_TREQLTc5b7cQgrLYhiUwwYkUyfKUvORKsKT_i6FkghTWGWKqxZLW_bh_xqaTAtFuJpb3m0C6GiVVUkyWhMX5t2sCp4qXbT1gedTR-EmJJZW2MJ75SMy8qe04_cSp-yj7UQMW2K_pUE2IsDQ-5_wbahTQ_LvXOckbbD1Kvg4AQJjtMBYr_8MumzshPFlhhPWHIawBxLX7a1bhthA3do06Dwv_d7TBhy2u2aDzhiiBzk-3VRs5He_5jxnHr6IQNvRpvL3oSBi9XHYYEcndQbgLceUQX_bCvJsdwuAtPflD8HW7Wy_96Yal7kJtzSIylGgyCBtUd5GWXkJ-FAVvPBK7Bgx5h5Vnc8X01INzdLH0Tnwe6yRIFkhr3VLYKg9kJS4oObJM5pcOPCeaa1FzBHfoHh7VSNk6wiwbDQxg90W1YmHr6mOoXwf20yw7Wnx3xXBPne43_IKXH-fERW4CPKxQ2tqpaUz97ZOw2AXqOrAyqSKgr2PmCX8F1WepTdQBB1XwHsr9hHgcJ-Y76Q-Zn-KwLca_NQiVLKDxJWg_L14QkFhI9lid2W-bdcxWMbuhaiVJ9rEi8EAyGd20rDjto3Fynv1u1hl1I809rcPvDdiwRzjZIQINZDm-s0OM7X5Hdm1mf7eDfFX9V-qQKJEmjWmsW0PpqLBV9Y8MMn0XaAlqUsrz8ODs6QdIVr9CLtHj8dR00igSLrwf3aGWF8PblUcAH1iyFUV9RMdQIopr1vMn2slQFpjRETzw5wjEzQyiB6L_1dNAA1pYpHuB2temTbxq2TiJbmSbeysdfXKZl5Ku_91Dm_w7PmydIZkDafitFEZneSufgFLWjZuhISa7nVjLWtXfXIPX4a_jiwn3IGEqHyoCC28Z4tjgyQKEM6igBVyAjOe8QrM6SJq3an14YjYelGlZNKHmP5_KtGavQTB5A2FWxcnd7S-NyqBe7gpieku8K1nHBWPZvGgdC54VLVH-OKQ6upHp8bErEnAwDU5cJpXlJhgDY7E45CovZwjwOyBVIjm5CyH-3q9tpWvUPp9Ot1vnmkHa3gEaNEHcGvlirSENMDnoMl6D8CRtafqQ-t9yFxXIwgzMGz58zV.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_014d32949f3f7c9c016ae2856552fc87d09912d54f5fbf31e7",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230179,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 479,
+      "prompt_tokens": 2777,
+      "total_tokens": 3256,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 269,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2774,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.011731,
+        "upstream_inference_prompt_cost": 0.006941,
+        "upstream_inference_completions_cost": 0.00479
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "0377a7f5a6096ab7a6d20fd673a2a6a3f02ad564d938eb7bb71d7af4d4dde86a",
+  "elapsed_ms": 10344
+}

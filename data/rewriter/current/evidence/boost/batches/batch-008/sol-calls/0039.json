@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0162\", \"row_sha256\": \"21671c4c9c3cd87763441eb240d7d7ffb5d04322ac7223bbd72bd445950b642c\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm trying to understand this routing function used for messages at a volunteer help desk, and want to check my reading of it. please walk through the function in plain language, in the order its conditions are evaluated, and explain what return value it gives in each path. then review whether the snippet makes a message priority only when the conditions shown are met, or whether it has any other path. use only the code here and don't infer additional rules about the help desk or message fields. could you also give a small set of illustrative test inputs with expected results, including an urgent message with age below 13, a case at the cutoff, a non-urgent message, and a message without an age value if the code tells us what happens? I don't need a rewrite or changes to the function; the goal is explanation and checks based on this excerpt alone. Please keep the examples tied to the exact fields and values used below. Distinguish what follows from the condition checks from anything that can't be determined from this function. Here's the full code:\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 13:\\n        return 'priority'\\n    return 'standard'\", \"output\": \"Explain how this routing function for volunteer help desk messages works, in the order its conditions are evaluated. Describe the return value for each path and review whether a message is assigned priority only when the conditions shown are met.\\n\\nUsing only this code, provide a small set of illustrative test inputs with expected results. Include an urgent message with an age below 13, a case at the cutoff, a non-urgent message, and a message without an age value if its result can be determined from the code. Use only the fields and values shown, and distinguish what the function establishes from anything it does not specify. Do not rewrite or change the function.\\n\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 13:\\n        return 'priority'\\n    return 'standard'\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0162"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "21671c4c9c3cd87763441eb240d7d7ffb5d04322ac7223bbd72bd445950b642c"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "ef2fbb5b0861570948a4b19eba2801a38b555f6dcd00b4abd12f8a0dbf62a690",
+  "started_at": "2026-10-28T23:52:27.620367+00:00",
+  "result": {
+    "id": "gen-1793231547-agWeBdU6FD3alyTiWUcz",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0162\",\"row_sha256\":\"21671c4c9c3cd87763441eb240d7d7ffb5d04322ac7223bbd72bd445950b642c\",\"critique\":\"The input is a coherent, natural request, and the output is a clear, self-contained prompt that preserves the code verbatim without answering the task. However, it drops the explicit requirement to explain the function “in plain language.” Asking merely to explain how it works does not preserve that audience/style constraint. The evaluation order, return paths, priority check, requested test cases, and code-only scope are otherwise retained.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4orALMNxGIchcCkFxCycq6k8weP1Md41Xheh3iMRlJZCzwh2xRZbsh5MSR6hZUmucBB7olBMIGx4Z5LBxAHQi7Zxi0qMxhGQO-XTLW_6jw9LXOLR6QY5mtKHb3uv0GzDQPArHSdjn9eKyn-Xsg4WP6BK0xwDxEQ-rlXI-54-tiCwVn-Ia8hfw4mzq9pG3EGNh36KxOTwNGUdix8sEcdYB9mXBjtsbJVnB08BBkqfVndV3LYVgc_RDy2ebnBoeHv0pOtcOGtNhOwgU0KpYTi7c4J_KNq-wn-8U23c02FmJlxeu6K_VW26CVJEa-RSLma09gXzNaQwtyMmWTBF8sX41z-qYg7RpHJWo8Ps6kFOgF8CTNjid0BzjFi37FI1CU3SJh8dzN4HRa6yrx2fuxfVM4rUuMWszDLJ1j__pNpqm4cm3M3cgcE-J0B___50Abo4SOndkSqIaLW3j5OFiCzUox9-EGttW89KcTFIgfR3iru5pwlc03MHg9G20l15z_7MAKYfr62BaRVODnZSLkGyGEbfL9l_AK71VqYNdXb_poMYBSTqXxiI_2iD21oeZdlSXY_LZRyMbDRPv0MKGlG8N-sW1KcGqYwfLKIkMSZZQgVeoT4v2DFc8VQTQkdmWFAlcY5izOdY1Z9cu3gPtTpD5vdlYNR3E-6X0H6DFJ1hhnzdBQFbwVJ-YFzqDNCCbXj-gaLg2sYYLJ4FUxYjhiaYbfayrdKX00mQLvook-Xuf0fDol8fDoRE4vaykAjfGhEh6wrlnRAqI7ljPrFwdpC4AliREwu9U_fEQRHRQL738dNn7mt5jyR5dI_du0pAdOLjAM-uvEVReRfCrbXy-tKpuLx1edH7HgbcREYkAaFTGy-gTpS2belws1ZZ5HaC1B_ep7wOm_IbG4tZpZcBz97bmMcV-SAxB4XByQkTyxxno3dw9hYcnyKrf1accs1uMNZaCqjlKCggyzQZf45iUTASROy9E36rtiqxccBu_L9hNmjJ7Ewsl_2GwU4-95q0FY4SBI9FlwvVFRCZpm4DtW0tlBOvFGpYbDp7IG9y80e7KuTDZZUz3RZfBz6ERNEL2b6VG6gMml0mihW2e8UWbQziKpstfMuuZv-M6PKmmfhVCWck7GmQ0kADbeKu53z_5j7GXz2-_tA8y8kO3GkOaJHP5xKLbzczLwZ8kIoikjHGDgtkYN9bpZaso50O5yR6Wl4voMmKy8X4h45G4oH5ilGKYb3mzaKux840fAzmpIixGmqKt18T5d0py8tguMVoDt65tF2XelaqGv2XRVXTUGOP3J2U-8m11TBRw6lJEUipLFBI0Tcxjd6PL7VolWQXt1Vp2_42skfY9JUpqU50GxFRdfA46H5f0AaCx1Ip1E5x7frmflpMFzXnR1zKRu0DTTYUugCMCV-osYm4Re_GbAcAQag-DdlnBaIHysZXxwz8w9Wdz261jLFDG1QlO0USJf0wHMv1RWYAQmEkLUdRbwLH-ED6QHIC-TEcD0SHtSrNmC0u6rdgNs2FwQlV5f2hMRwmfaJd-CXrh36lnuDs24njNjuCq8MgxpaSXRGCSz0i7hffioNOig7y_-R2HXVQKOqYIFy9LZm9RuwoJDk_HHgrCoBcVYfDNXxnQ-40BYAAup4XVL8OHClqjlvy4lwRLi3BI2yOww-eEDKdLJBOYzUwPcrsrHnAGCWM1ubreaaR1peaMb6izlLi0c9FgCmWiIBLT0OW1hJ--JWzC4LoGKsvbAAYleK_TTg-mo0xOg8BrdSfm6pzq4BaRwPy8Q-shdYQtrZSVeLaLgKOVeYSmYitRjZiuFieb9HXWWMw4wnF-Yy97Fsm7s1jgiLlp7Z_iHFPt-JXklv9S13hgjsfJERVEMWDl6WRX2c7-9D_6zjU9LQuXG8F1UQ8Y0V9QG1T7wib6QfQ-dEzBFSEBy2Fr8_VbC8yZaMVUvSigtPgn8_LFw3PW4DYMZkbjiVJjmkNyc5K9C-9FhuJDUf-3qRVl9FK-NsmNpLELaxSAYfoSzbhuPbzJhiul2yL0Xa9K-VDEd9_0ujDDvTTXc6MktLirO_CI14XNRo7rNxPrJq_S_8Y8zeduG3uTHNFujATrGJhMwXRmCAd6sD-p2Vmo8SE_FEp7SPMjiUwLjswDLvZpbquKdpA7pSiF0DZz8c0_FWRnMBXqH9l4YFE6k_qb1kwgk0-pWb3fF3h2erOzai4_zkBk343uW0MTHcoxUrSVKfgzSR747s7eb_EfCImu1E3yOFH03PsHaEsnNp6-l04_BhjMYSau7kf2JiFOmvffP6UGyjSakwSog6rpvDcSj05deldqv-MzaDwIoFg42XUu-pGl93xeuZ1lv6ZXvykd24zE0klBoXtyepSfDLcMmPE4-S3a3zlTxJpnqKW7rAnf5zt8g-cUfS9oQzbU6wp9DworbXdNLpdyaqrOkTrs8fNGw5stcLAj_yuxGfuTLclYvD82RdR4OCK1dTjyeF3phZ77LGN1jieneQpsgzGCeLUOM4nMD2OM8eSRz3KcaAl9RIztEO_f4l_9DZa9D39fVZpSeBd1n5IBThYIlhbLcfiV983_NUqAyeMsnClNzgzQIP0qEjHPZX3yjUVhqslk0G8xiozBZYUN8C338-lgOHdXE-3XchdMZmKRx-w-PBwxDzME5S267kBPkPH9K0t_M8HVfAdrVdRst6Cs9DjR2yF_EqTBtFthcx9lSelIlad40gekcud9XkdRvs4w4DJg02w8_oMKPtJpXhTjY5JzOEKCW38rAsNhRF4333h4vxS0-ZEKYcdQ4E12erT0_Ma2vO-sFirs1WdVOTzRbN2haAFyko13GBx-yPaFWmvCRtDE-vrmkEzL9r0IxCT8WmIVRqsbwK5jIsgTCEmqh9y-iSEdqHQ2TjMXuzpgnWAD8QCoBM5xCdZXF0fReaN_9qZRnk5vUbjmgpqdVrPIacUPQ5TA_37cnmC116CccjWdCoOxbciNorvPY32hXNcH2Y1KcfUFyI-NuRrMob75Fx1fysg4Rlui9YGVbRJS1PEuLVM2zgQJoVQMcZe2nJouhg1qEIEcMybTH3ijtV5pEkUQeBPFMOiCg46nzi7gptfrkti-BW-Xx_Q_Oib8AhxWiLZ-xh5ipxBoNmkGUGtp6HYglDv1iTcHEbcGDQk4J0dKj7ZzGb7cV48umFHndGhZvKU065wsY03fAXaSLO-kY2Bqk6_cTWTrCw9FBZiOTm1rX2hUi6ApOuHqfbnjpl6hVQj-LZPDmx8YaBVCBNAWL9cW0Zx2IAVDfd-Y3OOY4OJfA3WrXjEf654HzfjMLidEuXvBk8dsOSWTvi_uLuqOcWZVp7nhWJJWXrowemvD8TiBoLiJ9RSW8UHaGwX734A57vHYr48bdG73YdZw9ofnn_F89nSzD6uH8KS1mThMfuvHQzAfoKnxBLQzaoeIrUOCZwNaKZPobcETXJST49t-fJZ1pYzOW3xA1SZKO3gSqSUdo3V0AaA3dcs4vD58vms6ubea4NmMUGbIVAYEEZXMTMjaTjRvUDM3pdr6G5w6phZGLpq5q0Pqpm3D-CKNP2ARLAgngsYpyRQLvZOtpPFMvWpYbjXUl3yXVNsqicsHcCFDakkhO7GVRAB9eMhtbvUfgtyTpM5U1qk08BuSbYdmTFPZgKqSEZiY5eDytj26kfPcnlGqEltLRX9YWGLRueczX5d1O0DtXartOJAjY788rI233oHVD95WiAlJUJD-TT4Kou9e9Ehkp2wmnl62_7aMN5F-V356SuirI65iRwyDEBVOlfAugZ-Sanwv-iiXGawCKAlZKV4Aok2SVanG8rp2J3fs184lFD_SwAxJ1Q9UJto16gpD06to1ToiyuliEyH6me-F8aoE6vnzVHDaPFBAKyD5QLQ4jsbK8KzAIi14Yrtp-8M0ml9WpHR3O_v5rwU9tQ2vQHgN7OIRzMzWZDlfVRRcvqlRBC7-0tF.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_08308c707498a56c016ae28abc931087d083dfb20c0545a75b",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231547,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 347,
+      "prompt_tokens": 1024,
+      "total_tokens": 1371,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 170,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.005518,
+        "upstream_inference_prompt_cost": 0.002048,
+        "upstream_inference_completions_cost": 0.00347
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "70a5dfb459c14202fd4bc0cb4e897a9ee84b82f5422a27aa6133a5a6cb38bab9",
+  "elapsed_ms": 7040
+}

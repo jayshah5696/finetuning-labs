@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0102\", \"row_sha256\": \"314c0947e770e25e783f3445fd65029cc62819400ee78388b1b255b028803a2c\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\nlowercase rough request: i’m putting together a short training note for the volunteer help desk that handles messages coming in from families and local groups. we have a small rotating crew, some people are new to the queue, and the person leading this week’s handoff wants a plain explanation of the routing snippet below. could you help with an explanation, a review, or tests for this exact code? please base whatever you write only on the code here. don’t assume the help desk has rules that aren’t shown in it.\\n\\nthe desk is fictional for this exercise, but the queue details are the sort our volunteers discuss in handoff. messages can arrive with different urgency and age information, and the team wants to understand what the function does before deciding how to talk about it. there’s no separate configuration or other function to refer to. i copied the entire snippet from the handoff note, including the final return line, so please use the complete version:\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 13:\\n        return 'priority'\\n    return 'standard'\\n\\none volunteer described the goal as “help us tell what this little route does without making it sound smarter than it is.” that’s about right. the team uses the words priority and standard when discussing the returned labels, but don’t infer what happens to a message after a label is returned. the code is the whole basis for this request, not a policy manual, and it doesn’t tell us whether messages are read, escalated, or answered differently once routed.\\n\\nwe’re trying to make the note useful for people who look at the queue during a busy shift, rather than for programmers who already know the example by heart. some volunteers will want the main condition in everyday language, and others may be checking whether they have understood the two possible return values. please keep those as questions about this function, not claims about all volunteer desk procedures. do not add details about staffing, response times, or the wider service.\\n\\n1. possible help for the note: explain the function’s decision in a few clear steps, review the code for what it does and any limits that can be established from the snippet, or provide small tests that use only the shown code. those are the forms of help we are considering, so make the explanation, review, or tests grounded in the supplied lines. if tests are included, they should illustrate the code rather than depend on outside software, a database, a web service, or a fuller application that has not been supplied.\\n\\nsome handoff questions are specifically about the condition. the first part checks the value associated with urgent, and the second part compares age with 13; the two parts appear together in the if line. please make clear how the combined condition relates to the return labels, and avoid turning it into a claim that either part alone is enough. for instance, one volunteer asked, “does urgent by itself send every message to priority?” another wondered whether the age comparison matters only when the urgent check is true. the explanation should address what can be read from the code without guessing how the fields are defined elsewhere.\\n\\nwe also need to avoid giving the number 13 a more specific meaning than the snippet gives it. the code compares an age value to that number, but the help desk note does not explain whether age is years, months, or something else. don’t silently supply a unit or describe an eligibility policy. if you discuss an interpretation, identify it as limited to the comparison shown. the same applies to urgent: the snippet checks a value under that name, but we have no separate definition of its allowed values.\\n\\na practical point from handoff: a message might have no age entry at all. one volunteer said, “if age is missing, I want to know whether the code stops or keeps going.” please account for the default shown in the snippet when describing that case, without guessing about other missing fields or malformed input. we are not asking for a catalogue of every possible Python behavior. stay with what these lines establish, and flag uncertainty rather than filling gaps with assumptions.\\n\\nanother question came up about wording: is standard the fallback label for cases that do not satisfy the if condition? that’s what the final line seems to suggest, but please describe it as behavior of this function, not a separate promise about how the desk treats every message. if a brief review mentions a limitation, keep it tied to the code we can see; for example, the snippet does not explain downstream handling. don’t call the code approved, safe, or suitable for a live queue, since that would need information beyond this request.\\n\\nfor any tests you choose to include, we were thinking of a few small cases that make the decision understandable to a new volunteer: a message with urgent true and an age below 13, a message where urgent is false, one at the comparison boundary, and one with age absent. use only the values and field names visible in the code. this is not a request to implement a test suite or invent a message format. if you choose explanation or review instead, keep the same attention to what is and is not shown.\\n\\nplease make the result easy to bring to a handoff conversation, with a brief opening and clear organization. explain only the code and its observable routing labels, and distinguish direct behavior from anything the snippet leaves unknown. keep the complete supplied function in view if you refer to it; do not replace it with a summary or cite a line number instead. end with a useful final paragraph that gives the volunteers a careful way to use the explanation, without deciding any policy or describing a result outside the code.\", \"output\": \"Please prepare a handoff-ready explanation, review, or set of small tests for the volunteer help desk routing function below. Base the response only on the supplied code. The help desk is fictional, and the queue context is limited to what is described here. Do not assume additional desk rules or explain what happens to messages after a label is returned.\\n\\nThe rotating volunteer crew includes people who are new to the queue. They want to understand what the function does before deciding how to discuss it. The function is the complete source for this request; no separate configuration or other function is supplied. Use the full snippet, including its final return line:\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 13:\\n        return 'priority'\\n    return 'standard'\\n\\nThe desk uses the words `priority` and `standard` to discuss the returned labels. Do not infer what happens after either label is returned: the code does not say whether messages are read, escalated, or answered differently. As one volunteer put it, “help us tell what this little route does without making it sound smarter than it is.” Keep the explanation focused on this function, not on volunteer desk procedures, staffing, response times, or the wider service.\\n\\n1. Please choose or provide the relevant form of help:\\n   - Explain the function’s decision in a few clear steps and in everyday language.\\n   - Review what the code does and any limits that can be established from the snippet.\\n   - Provide small tests using only the shown code. Tests should illustrate its behavior, not depend on outside software, a database, a web service, or an unsupplied application.\\n\\nThe key condition has two parts: the value associated with `urgent` and a comparison of `age` with 13. Explain how the combined condition relates to the returned labels, without implying that either part alone is sufficient. Address the volunteers’ questions: “does urgent by itself send every message to priority?” and whether the age comparison matters only when the urgent check is true. Describe only what can be read from the code; the fields are not defined elsewhere in the supplied material.\\n\\nDo not assign a unit or policy meaning to 13. The code compares an age value with that number, but does not say whether age is measured in years, months, or anything else. Likewise, the snippet checks a value named `urgent` but does not define its allowed values. If you discuss an interpretation, keep it limited to the comparison and checks shown.\\n\\nThe handoff discussion also raised a missing-age case: “if age is missing, I want to know whether the code stops or keeps going.” Explain the effect of the default shown in the snippet for that case. Do not guess about other missing fields or malformed input, or provide a catalogue of Python behavior that is not needed to explain these lines. State uncertainty rather than filling gaps with assumptions.\\n\\nAddress whether `standard` is the fallback label for cases that do not satisfy the `if` condition, describing it as behavior of this function rather than a promise about all messages handled by the desk. If you note limitations, tie them to the supplied code; for example, it does not describe downstream handling. Do not characterize the code as approved, safe, or suitable for a live queue, because the request does not provide information to support those conclusions.\\n\\nIf you include tests, consider small illustrative cases for urgent true with age below 13, urgent false, age at the comparison boundary, and age absent. Use only the field names and values visible in the code. This is not a request to implement a test suite or invent a message format. If you provide an explanation or review instead, retain the same focus on what the snippet does and does not show.\\n\\nOrganize the result with a brief opening and clear sections so volunteers can bring it to a handoff conversation. Explain only the code and its observable routing labels, distinguishing direct behavior from what remains unknown. Keep the complete supplied function in view if you refer to it; do not replace it with a summary or a line-number reference. End with a useful, careful note for volunteers about using the explanation, without deciding a policy or describing an outcome beyond the code.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0102"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "314c0947e770e25e783f3445fd65029cc62819400ee78388b1b255b028803a2c"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e4bef63228300e4501d944ead3a775d183afb9be73dd9b921fe1b6b1358b9179",
+  "started_at": "2026-10-28T23:43:17.249967+00:00",
+  "result": {
+    "id": "gen-1793230997-gDGbO0a8gtQaiwUrpnSo",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0102\",\"row_sha256\":\"314c0947e770e25e783f3445fd65029cc62819400ee78388b1b255b028803a2c\",\"critique\":\"The input is a coherent, recoverable request, and the output is natural, well-organized prompt text that does not perform the requested task. It preserves the complete code, the alternative forms of help, the condition and missing-age questions, and the restrictions against inferred policies or downstream behavior. However, it omits the overall scope of a “short training note”; a brief opening and small tests do not constrain the full response to be short. It also weakens the explicit requirement to end with a “final paragraph” into ending with a “note,” which no longer preserves that formatting constraint.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oiekTqwtydJqQiny6G1_QG2BwYP7dS320xN9fK-55JX0ijtYGXcaX4kiGl_9HGMStXKhtGL3Oi9boCG5W9RIqbbEa6oukHUySEXKQrnQiEa5Xkx08523CEwKRHrbLmVAJjiasEn2kq6V1E3786nhsHGN0QxayN36h1VvtWTwMC_L3DAst8QDjyVk-W9KWn7D8sjNNSDzQDDRfgRZlBYEgDobuTSqPg4YArDB-MWBkd5SbVUQO9BCMwsdozXdeRbKKJIEIoO_PpQhj-0yrWejqVNXrvX5zGe_Z6eLzROsYa4k2L5zzckhG-0Ax_AmS4by-tiiucz0nq-WqU-lINZSOvCBIfb4MLCNqzPRzKOkR0_PZuPZEvzq43MbIQvGs7dEjBJxyQrOHqeb_eWi82TEoOMEJPNdUqPK8SEx34-Uttuucs6VcwxXLQbmVRlae8ndFyKXmPSZjeCqO1L_WM7vrTNLEZ-rWN0zqryHj6btVpjf2xML9RM2Cj8xsPWmC_p2di07wwbvou_ZNUfImyBQWbSWpUhg696A9pTnsnJIaTv1EGReYlY9RosTf4GGmJoh8VH5vwgpV8i3mjv8Zf4KqMfiEj1ug57hrT3oX2lZBZ7HpRMiaOgeFecTriXV_aVJtsv1omY0157xJq_5bpSdJ15xOEJAW6LLlyK_tkzOA8bldeB6lsqu75Niiz9-rCy9ltzh6scjcf4dY-BgQ778E7Y-KBnD_EyWegmBPdPjO3p6jQlqhSc9Edirep55vdkPTmPF6E2kr8ojbHQwz9DRxI5g72gZTFAefrI28ALlYFE7Hryts48B2e5r1PaGtaoxOW_0cpgg1o39PcM5M-BCiEhjsJb5YEPqr0cmFPxxHqAezfXULyjuvNpxnBX05oTQkw7a3a2qClgzwgEtdMOq2P8F5pZBqe03WNRTd70tDIUkkLkzfnSI-kcCdearLj-NwAotR7iSJIhI46JD-OcwJdW0nHThFeD4ezGCcVypwadIbYtpyFOPx6J1wf0SLl3DD8Spx_UIoUUDmHMhNn1PJibB3OLO7ynO6xIBFq1saDFLa6Kggn5493LmRlRi_c03NNqOLSw-J0GODpnz2dPUNGPqfoIyTOsVTo6JC7o_yaKrlzximhcBNwXsBwXglKq21EsTieg1GWT0cCUQPTY5vLVGX5tZSEpqIOKE9teibGhWpMER1ng82TjExbyblt3j7OJGdHn0f3QZ_irW6ex5cb3FxjBzM9S-AA-QTDWWpazNLfiYyqC0XUkfFADUAN_edZlwTZYT_tiTIPvPEd9br71zAtak8IDOnwgSL7FcAlzGi9smVTom1sVe8AEZyvbL1nMK_6yr3Uex9rp-acPqQNQUMNlA_gIY7iMqdvwhGqyFxCwJk9V3XS6m2cz1OXV2xOnoe8uIZF50Bxxlpo0PS1giU6RpVLEr1Q08f8RJy0_aX0BwiLP99LnC3RngubHY3MAGk8GotYHcyGdDw5Cwy3p6reHhQ_n8GmpNk68WzPnGRAisXZK7UXypOKscIu3X5OwPheSeN8s8lozrPbCjNgroH5tnKoyj5f7v6bmZOPJS3Ri2GKJSrbzzsYUC2mIn3oD-Tg98jkRVsyeeEuwfpdDVCeF6lUf7F9iQ3P4UaXJ2D5qqhsVZ-SHLrs5axRKnzHent5vhWdQY6RqoUXX3wxK3CaDVakVlDLz9hISFAktYTP2gAz6qY0ToHNkg4I6egyziWVYY4kGHaFaW2FBcxyawQZD9BDb9Mz4RxoxOvJw2yT_wirpocqA7U9JaGT4jmzUgUdbeMtwxyAIUYTw_9fEep493q8mInXE36elojeKSmcqx6T7nAr5TezoEeDddzHLN2YWoHWY-fp-I5ApIo4p-oTokDs30RfJcDWA9pR7bVK27vqhh8d8y2QYe33ZfbI9tSYELFIXBsFzediDK6hKmgVv9v8F3mH1WQ4nzGpoa4CQDyKzn_I76wielxrWVUnLTmtL0wcVSYB0cNenO90GiSl6M2duMLcDhsE6x9kz8Lm4T6iFWpiRRe9JPQt4TLrzQvZG-zPR02RTM2jUC_TNW21QucdRRnhZ3T_OW03WTikXmFMKX_FspAZyKMwiWyXtQrSMESu0SnKd6yQ8axzR1zsX_HUd0xRu-4vPdQyQzWvQEVJy1MDQH-hLzxdzXvQBxB62YjPgjzuXKUjQcaXgsGn05uPfOk7fTiYFrVt2IYGo-rliSZduiAUTGDH4xsUTJEyze6-muh91Yhl6IiF7D75yviIkuFqX--4wEwzkyCFGVWFoP1aILi-RIX38tJqKfmuLtAmHBFaO6YHE27VTMPwXCAxQRlWBOks9anTBwQEOMyRi6yTAzdLjrcBiBo_Gzhh1RQHuvS5nVT9cW08iIWx1nzS5nJuqSG5J8nkp5SFaIlfu4yuuI-vbiyNR9eO2IobQBAVHPKNGHFkfQcCLKLwWYjOBASEc6JHng-8QLF1V_92wUTnM_454N2_wdKZN5fz64LHPjwU7vA9ZNYE62GB3UAJPuDSotgntjclrQ4l8DkBBQV9MJnD8fzdlLpgViZnGITlB6AO1xjCxoxPilosrZVfiApP_fSANMafZAQLxEvn1TDVcwYHCyilU3iECxCKmNeoDydKFtsZsWWsNvkjCzs-s2WKZHr21PvrMJhI9v7uR4K9ODiHfHq_AwwM8wQXA5AmMLHhGwTQJJQa-J7EF7lQOtdn0tSW8BEqvApwj95Fbs9Ak0gisLSZ-ii4m81HaARxKb6UA6XzcojQWJ3pVcP6G8HjZ8NDLCVnW1bNqx0WAGp9cmez2FkRnJXWgsm6wxqrzr8QdKYsu2uXGPXQEaGTVe5IupK4p-usU92geuefsHsE42fsvXuQO4tSFi7--ZVdfCTPay0XUm8mxmNfklHYtbCfCvHosejhfmTufGz3lDixq1fq_oCYCv-BAzkkSqyQDDE1-FvJrcmRRP4oj57nmqd1j_8J_WFhHIQzKXxypSA2OtdG-8xtZnxayP3bU-zrUuATmV5fHBz6A6tFCtpi5Xvm9covvjhJcQ63IYE5nG0Z0LbcdSaAHlvqrtCLnBOjOcW1BKZn0fd5McugXdF7V426BAe8COzH_WpIrdttKxifzgnYjjgz5wxvaRipPVII0TR-88jAKnscRPhYELK8zB037R5AYgkKlRLkY39m2XH-qi1mAtmPixGDwM9JXsu8GSAzBqKE9fTamD0M9qCjqdC7Uj5fpPD64jNRH9zzCRA2nBcxFxnZ9gkOvL0WwrDO5EmRH0smbShMqOgwM2cWqMcfme-rK6871PMbQFSsgHSdfA2ZiAEICknxrtfyVqq1eZkcRbqfsGU397Er3S7E3qlNyFoBgBuVco9imzdoLBrXL49-v6vnDLk1l4EKgKPY0M-cGUdVWu3DQqjOQCZGbSAIBNGQp0LfvE3z-6V7Zwgv6IdqOcGI50cPPs9YbQoLYkPR1X9SYXOFZyGI4gP3F1iF4NRznM6Lv0IfcxFyzPCswKsAaaEzdOyPKu6y8buNSyNAPOUtILhc6t82r11bDTSRFBuZ6fMeUgHOytEjSK-ExostXzifGfgZnU-7ZzGyW2HW9m_Fohrq2upbuBgPeIZeYUb2CiAU4AccUF2KQY1nnwqFiEWaG-h0zaiZmEb4Xsat35wUcAKJ_d6N96CDMbMR3hGro7Y-p50eQMqoZp6n9L3UtqeeuskTz1JyWEHD1TJfytkejQGD1zz72SETGgr06Nh_hQ6t6UiELmtBocAN4p00fLv7t16vp22jC9iZ5IjdanQJTiiedLGRoU3Dtj2TXepunFMUyN5MxJsQ-cqnsI2rE3j7caB4jruxM5hLaVdiw7ZeG-iodEpo5e7hJgutjkDOma4isv42UNavqolZHXC8zLywBVh28p2F-7WUV8aaRgETjuObtCJbMYH5l8BJ6yeCND3u35oKlGOFk6aDTsXaSvkR5bUvbORNR11U3tp1_p5q5Y-c23OUWOydMW4DF6Z4PsPfjo93sakOunSZWp66CmCIpUuciNzlsOCN4htfDkc15q85okP21AkEf1PN5KHAj8kY8iulNaib8kPkWeJSWH9qGfvQXCz12_OyoknEsKtAivaXIjlpvank6XYsz6GM-ZuoK2FVbdocDBE2mrUSAYq3pvKBRCoBozWv7LpUVwuMeSWwvrEwes95kRNwnmyu-n6yStTT7YmXtfWRc9MntMiN0IZn5_h0S2Dn2Sojo2jv24jSGWBaxBbfwb2WQmCs11p6bMQDzlFEltSrMuSxy6EXR0tpJAyLbSCVo7dm9iHXZMaJAfc5O6su5Urk7VkBYcwNEMg8LdoJg5hBt50wWGAah7KR-GrG4TH51qAhA2Ra51I-t8zduFVRHsnpHp28Xyju66-1vUP3EQ66vFza8rR0k5Ro6PaQnxUslDWpzSn3nvJOnQY1ohDds_E07aQD1UUau-OSUu9Bs0PQMgrJAKZVVBHrVuhP464b3fqPa_R3orLFLVCDmATzDO1U4lcFuRWJ5x7F-XzrsXA_ri3HJf5YpjMyoqnR8OzpzztOETImOeZZdi3A7VZW2Ydh1iYeyo6RrdvwFFl0fUGL6KolKc6Dwj9xplYYlTbVzSe2tVgjLCiA2BvDsNd8pXMBnExq0ZGqBP04YCZEfja5DYop-S3kPeMIVFl_xCy5FyIX3633HFzUUeUEsAm8gTQHlo3vG23iXd4QcjKHiZIavfgvHZBNpDv2e76RkNDTpLF5xZgFqZdLSJRBdJr2Q9CCZsCETE9v4QLTGCNLKQgrf0p4vCT8pon6whlHYL83sf0nGXto4SJskmyJzNnVzt8eR0W6--w44iwjetUyQfya67GrmctezAvzFKuknu6rK86_fGCst_dRyn6Ffa-Eorv6uGgb5a2OZ9l7VvljL1TDSRukiPoT2uPh1YfZKcOU4WUaGj32KVC9SZktugLLZxNpgF935CllFUYlTQpcDWU1BZuRZSZYzmsXKn0DWh04fP1VStNS0y6pZtlnL3xBe8p8aqKXpbiAQ361fiXZOATzMddKoqU9lDjISO18m_baWcE_NDXSwxCHImdbgMvM_TVDhs98zJ6NjFx4OixAbQe3jEYhF5zYVo-pha0HQt9IeR6Lkx71dtcFHcDgI30n_0GyVFa6mfjKUURrGCVA4WMdOpkE_W9wlBxJlwO6n90guzpR5yv_OilbiHj0zTgZ5To3VP46G5nyK3T_yM3caEN3JJDRdHoyJg4RIGz041f611YLHi2Q6Yj3VsmR7wA8FeEFXSmzp5VEqZQE68HoU3tU_0YunbKnwi24evWYLAioPaIOjpvP4unfdRJrkY5W2IJ_a_EmIdXoU1XBCP1JXH_zG9qIlr3RTiKrgd8wDfALPVGBk6FUdqtSuiRzumw7-KYdkzR4OHOMqqnmL_v9bWK8c9o0QdoM2DCdInseZBTBYd_dTfsiX1uWFKcz8JhXz9zzmBjaTanFtXfXEzh2Qawkt8AvW_COPiEo_ELS_jsvHtW5PVDOZ62R2DwprrPN3Z_cjqkqLpMaXdaRIuWKdnlmT2bn6n3U39VNJ80kCA763f5PCYzEEnYxs-rSdgJxSBRix9DT0rf7h9218LgB1y30W7eGHIeGK3Y-XOhTbpxdnt9Mm2ql65tGMFeG5HKQoWXK7QihsbYwZyiXFUH_VmtxJiAhW-CUct3R_rtPr-n4Co5kbEUCxdPfRJ3xFgW3D5U2mxYtrQKgELWpO2d603ETH5n-36tjXL1JmNhwZeJiJt4HmlU-T_wZqOrdscbcHB9GS34y8cgsG4M4ZyrTlcoE5Nb8VPvWDO_9x_7COEPaWqmuhSpsuVZxppS6hKkkK0AruOwitEiWtdi6jxTtcnNb4nWM5qpEAsz42P9Aggio3sq3BWtNkrWwZJYo0W0UJl73E5hffPgNmmMbHX_7GmVVTpkQiI-LtMVuHMdBxPLL4Lg_m3STwBUNdjgwUK25v1-9nKtMC73hmcX3AM-IIXz9XxVgkqaNbwd2V.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0365bb59c5328f1c016ae2889691b087d0b45256dd869447f8",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230997,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 516,
+      "prompt_tokens": 2646,
+      "total_tokens": 3162,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 306,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2643,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0117735,
+        "upstream_inference_prompt_cost": 0.0066135,
+        "upstream_inference_completions_cost": 0.00516
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "033a0d39c28996631a69ab7aba48f52f960fd4cb57bd0b549b2fcd4065745cc8",
+  "elapsed_ms": 11691
+}

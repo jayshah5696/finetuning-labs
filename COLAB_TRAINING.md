@@ -2,7 +2,7 @@
 
 Open [rewriter_train_l4.ipynb](notebooks/rewriter_train_l4.ipynb) in Google Colab.
 Choose a fresh L4 GPU runtime.
-The first cell identifies the current notebook as `public-parquet-lora-2`.
+The first cell identifies the current notebook as `public-parquet-lora-current`.
 
 Add exactly two secrets in Colab's Secrets panel and enable notebook access:
 
@@ -35,8 +35,14 @@ Run the cells in order:
 
 Only adapter parameters receive updates. System and user tokens are masked in the training
 loss. Assistant text and its EOS are supervised. Oversized examples raise an error instead of
-being truncated. Train has 1,000 rows, dev has 100 and validation has 84. Checkpoint selection
+being truncated. Train has 1,500 rows, dev has 100 and validation has 84. Checkpoint selection
 uses dev loss. The final validation pass does not select a checkpoint.
+
+Use a fresh runtime for this rerun. The notebook starts from the pinned base model and trains
+a fresh adapter on all 1,500 examples. It does not continue the previous adapter. The data and
+model repository names stay the same. The last cell uploads the replacement adapter to the
+configured model repository; earlier weights remain available in Hub commit history.
+The notebook pins the updated data commit and checks its published split counts.
 
 ## Output
 

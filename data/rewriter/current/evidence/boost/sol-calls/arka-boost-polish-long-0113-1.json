@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-polish-long-0113\", \"row_sha256\": \"348896abb7cb8634b89d4c2fea82d925604361c821ac20b0e79f0ed13705638a\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"profile\": \"Friendly and conversational.\"}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"we're getting the northline youth services payroll export ready for the finance team, and i'd like you to help me tighten the setup notes before i send them to our payroll analyst. this is for the regular biweekly run, not the separate year-end file. the point is to give the analyst enough detail to build the export and flag anything that needs a decision, without changing how payroll is approved. the file is only a payroll data export; it is not an instruction to release payments or update employee records.\\n\\nfor this run, please use the pay period ending april 12 and the scheduled pay date of april 18. the analyst needs a comma-separated file for the finance team's secure folder, with one row per employee per earning code. please keep the date fields in year-month-day order, and use a dot as the decimal mark for hours and amounts. finance will compare this export with its own department totals, so the file should include the payroll batch number and the pay period dates in the first two lines as metadata, followed by the column headings and employee rows. those first two lines are not employee records, and they should not be included in the row count.\\n\\nthe main issue is the retro-pay batch for the two outreach employees whose shift premiums were corrected after the prior run. the batch is still waiting for the payroll director's approval, so please keep the two possible outcomes clear for the analyst. if the director approves the retro batch by tuesday at 2 p.m., include the approved retro entries in this export and label them with the original earning period as well as the current pay period. if approval has not arrived by that deadline, do not include those retro entries in the main export; instead, list the two employees and the pending batch number in the exception report. this is an either-or instruction for the retro entries, not a request to include them in both places. the normal hours and other approved earnings for those employees should still be exported either way.\\n\\nplease include employee ID, preferred name, legal last name, department code, location code, earning code, regular hours, overtime hours, gross amount, and the payroll batch number on each employee row. use employee ID as the matching key, since preferred names can change and two people have the same last name. the export should not contain full bank account numbers, tax identification numbers, home addresses, or dates of birth. finance only needs the last four digits of an employee's bank account for its reconciliation check, so include that masked field if it is already available in the standard export view; if it isn't available there, leave it out rather than adding a new source or changing the view. please don't replace a missing employee ID with a name-based match.\\n\\n1. keep the earning codes as they appear in the payroll system, including the distinction between regular hours, overtime, shift premium, and mileage reimbursement. mileage is reimbursed through payroll but is not an earning code for the finance team's wage subtotal, so keep it on its own row and do not add it into gross wages. also retain the location code for remote employees, even when it is the same as their home department's location. the department field should show the cost center that was charged for this run, not an employee's permanent department if those differ.\\n2. finance asked for negative adjustments to appear as negative amounts, not as positive amounts with a separate reversal note. keep two decimal places for monetary values, including whole-dollar amounts, and don't round hours to whole numbers. use the payroll system's stored precision for hours. if an amount is blank in the source, leave it blank in the export and note the affected employee and field in the exception report; don't enter zero unless the source value is zero.\\n3. sort rows first by department code, then by employee ID, and then by earning code. keep the column order from the analyst's existing template, except that the payroll batch number needs to be the last employee-row column. the metadata lines at the start are the only lines that should come before the headings. we have had confusion when a second heading row was added for the earning categories, so don't add one.\\n4. please include a separate exception report for any missing required field, unmapped department or location code, or source amount that is blank. identify the employee ID when one is available, the field or code in question, and the reason it was flagged. an exception report is for review and should not silently correct a source value. if the analyst has to make a choice about a code, please leave the employee row out of the export until the code is confirmed, and explain that in the report.\\n\\nthere are three department codes that changed at the start of this quarter: 410 is now 412, 530 is now 534, and 611 is now 615. the payroll system is expected to use the new codes for the april 12 period, but we should not assume that every imported timecard has been updated. if the source row already has one of the new codes, keep it as supplied. if a row has one of the old codes, use the corresponding new code only when the finance mapping sheet lists that employee's location under the new code; otherwise flag the row for review and leave it out until finance confirms the mapping. the old-to-new mapping is not a general replacement rule for any other department or location. the finance mapping sheet is dated april 8, and the analyst should use that version for this export.\\n\\nbefore saving the file, please check that the employee-row count matches the count in the payroll preview, excluding the two metadata lines and any rows held out because of an exception. compare gross wages by department with the preview totals, but keep mileage reimbursement separate from wages in that comparison. the preview can change while late timecards are being approved, so please record its capture time in the notes. if the totals differ, don't adjust individual rows to force a match; identify the department and amount of the difference in the exception report. one of the finance reviewers, Mara, said, “I can check the department totals, but I need to know which preview you used.” Please make the capture time easy to find in the notes.\\n\\nthere is also one timecard correction for an outreach employee that may arrive on tuesday afternoon. if the timekeeping manager confirms it before the export is locked, include the corrected hours in this run and retain the prior value in the exception report as a replaced value. if confirmation comes after the export is locked, do not reopen or alter this file; record the correction for the next payroll run instead. this timing condition applies to that timecard correction, not to the director's approval deadline for the retro batch. the analyst should note which branch applied so finance can understand why the hours differ from an earlier preview.\\n\\nplease return the prepared export and exception report to the finance team's secure folder, and let me know which approval and timecard branches applied, whether any rows were held out, and whether the department totals matched the captured preview. if the analyst finds a question that isn't covered by these notes, have them flag it for me before making a change to the source or choosing a new mapping. i'd like the file setup to stay close to the existing template so finance can compare this run with the last one without having to interpret a new layout.\", \"output\": \"We’re preparing the Northline Youth Services payroll export for the finance team, and I’d like you to help tighten the setup notes before I send them to our payroll analyst. This is for the regular biweekly run, not the separate year-end file. The goal is to give the analyst enough detail to build the export and flag anything that needs a decision, without changing how payroll is approved. The file is a payroll data export only; it is not an instruction to release payments or update employee records.\\n\\nFor this run, use the pay period ending April 12 and the scheduled pay date of April 18. The analyst needs a comma-separated file for the finance team’s secure folder, with one row per employee per earning code. Keep the date fields in year-month-day order, and use a dot as the decimal mark for hours and amounts. Finance will compare this export with its own department totals, so include the payroll batch number and pay period dates in the first two lines as metadata, followed by the column headings and employee rows. Those first two lines are not employee records and should not be included in the row count.\\n\\nThe main issue is the retro-pay batch for the two outreach employees whose shift premiums were corrected after the prior run. The batch is still waiting for the payroll director’s approval, so please make the two possible outcomes clear to the analyst. If the director approves the retro batch by Tuesday at 2 p.m., include the approved retro entries in this export and label them with both the original earning period and the current pay period. If approval has not arrived by that deadline, do not include those retro entries in the main export; instead, list the two employees and the pending batch number in the exception report. This is an either-or instruction for the retro entries, not a request to include them in both places. The employees’ normal hours and other approved earnings should be exported either way.\\n\\nInclude employee ID, preferred name, legal last name, department code, location code, earning code, regular hours, overtime hours, gross amount, and payroll batch number on each employee row. Use employee ID as the matching key, since preferred names can change and two people have the same last name. The export should not contain full bank account numbers, tax identification numbers, home addresses, or dates of birth. Finance only needs the last four digits of an employee’s bank account for its reconciliation check, so include that masked field if it is already available in the standard export view. If it isn’t available there, leave it out rather than adding a new source or changing the view. Don’t replace a missing employee ID with a name-based match.\\n\\n1. Keep the earning codes as they appear in the payroll system, including the distinction between regular hours, overtime, shift premium, and mileage reimbursement. Mileage is reimbursed through payroll but is not an earning code for the finance team’s wage subtotal, so keep it on its own row and don’t add it to gross wages. Also retain the location code for remote employees, even when it matches their home department’s location. The department field should show the cost center charged for this run, not the employee’s permanent department if they differ.\\n2. Show negative adjustments as negative amounts, not as positive amounts with a separate reversal note. Keep two decimal places for monetary values, including whole-dollar amounts, and don’t round hours to whole numbers. Use the payroll system’s stored precision for hours. If an amount is blank in the source, leave it blank in the export and note the affected employee and field in the exception report. Don’t enter zero unless the source value is zero.\\n3. Sort rows first by department code, then by employee ID, and then by earning code. Keep the column order from the analyst’s existing template, except that the payroll batch number needs to be the last employee-row column. The metadata lines at the start are the only lines that should come before the headings. We’ve had confusion when a second heading row was added for the earning categories, so don’t add one.\\n4. Include a separate exception report for any missing required field, unmapped department or location code, or blank source amount. Identify the employee ID when available, the field or code in question, and the reason it was flagged. The report is for review and should not silently correct a source value. If the analyst has to choose a code, leave the employee row out of the export until the code is confirmed, and explain that in the report.\\n\\nThree department codes changed at the start of this quarter: 410 is now 412, 530 is now 534, and 611 is now 615. The payroll system is expected to use the new codes for the April 12 period, but we shouldn’t assume that every imported timecard has been updated. If a source row already has one of the new codes, keep it as supplied. If a row has one of the old codes, use the corresponding new code only when the finance mapping sheet lists that employee’s location under the new code. Otherwise, flag the row for review and leave it out until finance confirms the mapping. The old-to-new mapping is not a general replacement rule for other departments or locations. The finance mapping sheet is dated April 8, and the analyst should use that version for this export.\\n\\nBefore saving the file, check that the employee-row count matches the count in the payroll preview, excluding the two metadata lines and any rows held out because of an exception. Compare gross wages by department with the preview totals, but keep mileage reimbursement separate from wages in that comparison. The preview can change while late timecards are being approved, so record its capture time in the notes. If the totals differ, don’t adjust individual rows to force a match; identify the department and amount of the difference in the exception report. One of the finance reviewers, Mara, said, “I can check the department totals, but I need to know which preview you used.” Please make the capture time easy to find in the notes.\\n\\nThere is also one timecard correction for an outreach employee that may arrive on Tuesday afternoon. If the timekeeping manager confirms it before the export is locked, include the corrected hours in this run and retain the prior value in the exception report as a replaced value. If confirmation comes after the export is locked, don’t reopen or alter this file; record the correction for the next payroll run instead. This timing condition applies to that timecard correction, not to the director’s approval deadline for the retro batch. The analyst should note which branch applied so finance can understand why the hours differ from an earlier preview.\\n\\nPlease return the prepared export and exception report to the finance team’s secure folder, and let me know which approval and timecard branches applied, whether any rows were held out, and whether the department totals matched the captured preview. If the analyst finds a question that isn’t covered by these notes, have them flag it for me before changing the source or choosing a new mapping. I’d like the file setup to stay close to the existing template so finance can compare this run with the last one without having to interpret a new layout.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-polish-long-0113"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "348896abb7cb8634b89d4c2fea82d925604361c821ac20b0e79f0ed13705638a"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "7683d96077acdf04ad0c9fdf837e5fc6035ee2841fa0b4712d0d968b12570b56",
+  "started_at": "2026-10-28T23:58:23.879469+00:00",
+  "result": {
+    "id": "gen-1793231903-1d2B7DdH7T0d0vwVoBeZ",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-polish-long-0113\",\"row_sha256\":\"348896abb7cb8634b89d4c2fea82d925604361c821ac20b0e79f0ed13705638a\",\"critique\":\"The input is a plausible, coherent draft with recoverable intent and no artificial padding or leaked authoring instructions. The output provides natural, conversational polishing while retaining the paragraph structure and numbered requirements. It preserves the mutually exclusive retro-pay branches and Tuesday 2 p.m. deadline, the separate timecard-lock condition, conditional bank masking, department mappings and April 8 mapping-sheet version, exception handling, reconciliation requirements, and Mara’s exact quotation. No material omissions, added facts, or changes in certainty were found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4owmsI8_08iXw_ooTgTvrw0d0WPTZgybd7yDRqL3i4IdoJjNZ4Kf2GJnMNFZ_eFZL_HWT7_xSZPP01yd4YRfunGcjOk2IaUutSgo25xBlv6baNF7YaneXky7JYASv-vM5so2uwS4CBUy7xrNNYQvVPQLLKgZA06w4u5eddL22FX_MQQV7CmIoTPfmfTv7u_4f80t5U74WZIXQX3lMSOV0QIuQJMSVrlgH_Mh2CV4rxlHivjhgRpiGcJ8MzqyQSh-x5_i5etPTNPIuf4dcmQ5SnCLUjLQvwp2Ahh9KSHM7e8pflrM5N5_rk2Q7U2ghBL-sdynCP7pPqOaNK1591GS502sK3wHB1mz7kY1X7uTyqRBdr_4kdPuvpzcgI5qL26FlpddGZQ9WfAfm3I6E6_1Pis6w_aAJ-LmJ2I1ovZoiZixQIDz_O9YkiIMh2GbOqfnMggia7XemWA6HdlPIfldCl0Cm19LKAZXt3chbrcp63tOMZbfEpewmUGoWXZGgKWzoCkl8l2_5QHXxmnfu8E5v08a9FOEmYKrPRN-WC4rF_CE37deKgGVVOW8-a1bc8uzETQV9SH-T7rvxr4qwlpONpTdDitl_usn5CrDIn4qVJL1XJQWno6NjV9-YFtwn8ylj1uZ0UrrtolZEjc2B1_1csLT4tXr7eSxl0BRqx6dmfobE8opSBPeiQtajCVa2boJZMgwkxgNHWJOuknn2hjzX32Cy3kfuSBIQF3GdKQqX0nowEqQzUrdLY3RzvnhhEnataSalVF_11xg9iohYbwU8i1iyWjBvEPzHT6aIeGpNDzCnp_NTyzwxGJ6zo5kpq21k5ocnS-ovWGYddcSK1XvnF2qwtZtDcmmhwCCQT-ovTGhQXyxNnhZeL-VhENCrWJYg7dW9P2yFl7I667CZklUMxH3fu46u6ctrDFWLo8mlHOna-M9wAaj1j3ql6eD59eIwKTZ7eoUkoNoqTv3xJqPGScWQS369uJNVCLcwl9yp2WVGPU7jCcY_BrhIxdUo3oqy87x28k_R0A4WJ2-GLbyOFPw-wOpsYiTID1KwpkqwZV4EeOzFUiQgtVFt0d_HNS0XvGnzKAbcXL1T8USF4K59m7T3FlF-M1yg0PTL3KEUkC1W6QjAqX-3aJ9x3X3wao3emNMT20BRLzp3g7s-EHsF8ZQJJ0h9-7OtaFJKZDY6F3pt7kNOQxDnWU85DegxTRskw__DH2qRwnhI_jKJ449CFigrRCpbBOF4p3Ar-Zu8GdhZRrN2xvLshSsa2chhoCCzCJzcAurlrE0iLxFV5xk6SyDxVHGMBgsIYT-HJAhTZxWloyaimWRmCm0c2t1mgQU10DyBmDTooeyOcQDUaplPlElbRD2x08GFNeiijn3i7rHTz6aBua_BsjaNk41CVVmavESMA2UHAutDLhjSSZNIsT3aQg4pNotwUXKIWe1Gj0DTQMpXAzDIPOHFqknVXqNN15JqXV9Md5stx0AXSG0G62CcOObyAWawazVRyCbYwjjBcnK_5_wL3v6wK4aMf1CuGCJHiidtOv5aheivncu7M11_wgEe12Jo15mIuoEwyKQoOgSG4mUmXTbngo16nUk_sIbtBr51vL4SPHE_tbW4yTDrlr6-sgm2Urj_0vSXUMifRpS2JdNMrxhdFFZyRR8w9Y9I_9oqq-HFP0on0noQDnVtBnkkF9koTVZtDzWtNpnixijudToQoSoz0q8ts132BBOYQki0TE8FkOn949X5VWvoPBbBmm-JeVZrpiLEwXZbMp3YEir1RYfFCTDyTDCHh6ggJAC1A5H_7NW7MOxNppNv79wIms7gjkLPYtTUGtRmpQkyxeZiNRo_rPJq-GOm4yhHARZ8Qhi-uPRyVIfUJYSqja98-Rriz1rpNVGe5t3sqAretnByieq3KR5QJ6YHiW7slIrGXFa7J_4lptgx1ylL6EGBraopo42-AHRbx_qiMfb8IjWlT4oPd4AQf0MdGwear2UmPjuwxB2jffhg5lMVMt7Saqh7MM_PRKs35EY4LVyovRpkV8ESdZzDBE3t5mXJSBv3xR13Nq8JXHQITxtd72dXMpP00zTtEWZyFoFKlyi9KE73mbPQIdaal0ZpC24RjTSFe0ELZPR7HvZKJbiAc-Yd1-0XegERzchawYgHWjBwHDqtGIXgiQfWl5TxoZNHuaI7STMkKAIOQrMlYnqrw-ZBb4wXJu_VbCQXVZ4xJtSF5nhbnlYOQh0ES5g_Vse6NXTA2Avdtk6eZ2NX1lOoMjYeueM8n9Y92B1xQcO1v13blKhFLv1VE3QF_5fpL1vGeoovfLNRtgiI6Khnv4G_LE1vn-f1I0OM7Sfc_jraWveAkYuCJEZ3F-9-vXo_b3ImDifBvdTi5qPY1CsGkY3Mfbr0C8yrHfxVSfphHXxhdYp04g1diLxXl6Ku2ub-MbUAM3OI8im6EFDeCLKjpvBUx0FA2sS7TwNw4-mMhl_3xoDYsvRVhyYdA91VskaRoB7JFFUqFgmC1E6mqjobkBY0WnP2rbRAJV8bqDFoC-Fhmpmol58OcEcNWOVwm2dsECQ3aVyyy_R_g5B1KyvdpBTuPbxsGGEs-YccOdR2_bA67kYUpuq5uBvQ0kbpjdO9UWuYyR8kl1s74Dl3LzeuIcm-Yw9nQbXN8H_CHkn_FlxSxeUR99gv7_J_KuUDPm-T5mGZiPweXJNB54hTJ2gMCUUMAoZvNDwqwX_NgVGGpP_2M6U_66LQiUzGIZHxVtzNHlDsDWnOISZu9YsseplN8lNUhUyOAF4LdoNqC0UjlskTY1FShK0Pwzz3dbcTNIAD-deEHkX4dugW5qqosgSMf159OXcqxUWevZlX6AuYliwQSZOjvePZFHeVbjI9BqVvzNv3dylFjd7I285olHjs8cB2oGdPmWe78iIBHqxC2paoakx_Dhoz_vuDIh5Z7gbrFu7xGCY30ZcQqAtdcCjojUGaiASOj5xb76Z1dUfXiKYEUp6De5weuF8falvlCfCJ34GAKlLWhSp7dTWxvY0F8x3vji8sY48EkTDcUbQyenVhft0RJIbOPcKgUucEvz4nXbxWvDIwSRoYgdDkN4BZMMdJoVzTFVNjltogS4wQEOzJkrq6JjYhyxCREA3n7yUOtAYGx_7mkxvWym0Npj2_ewhcIfxUfcHYufB43AcTwCnRX9wntTLG9GA9O1NRhW0KrgRIDul6D6sVxOLgMp79meAnK-tvPLRjKxS_OarvQ1Rfj1DTbLjxxVmQWajwUDRdGlU0vpdd2Ur1pglDcZY_ERL14d03Td-InAvtVp4FVxyc4rINgrMWq1zjFDgjqqfjWKReKUvds7b-SyYG8tE2eFKKzAcG2t2YjMXN2EyVqEpVhBATh-0Z4gwZZi3gFkfe2Uhvby0hn2GmsoYMQU-75jbb37YAdp6IRhQTTJCQGSavNesReKN8-7l-mUlVUrXHFFdxUT6hfBnwkhhjeW08DgBo3jqKPCZUMuYPjX8kVBsjhNwh7ZltghUlmpdASpr0QUOSectnB0ievWhAJi84dGMa75kYtOAa-KKfEysoRN70m2PUK3zFfqwC2gNGn_sISxty3f6zsNaRLP70w6mPT_NodrqmsrDVjzaxSTqx7W9833eqvhJGWos_d74O4DCmtRr3uf8XnSSfrn5sD4RdHKVk0t8sL5ydi7my3DxVMBMhdk9BO2X4DHNo3-Lm45CtDUMHYM0IwPuX_aX2z8nYJdz0n8G8wTAbdcpxHrQzXLyfASTiTzo6FK6DRbEOpeXFtxb52LX_1YyEbPnYHT5IJ6cJqDEemR1tVSgS7cskN3pNI_sQd8n-ql2tNKEsIGmkSV_xrtVhIgqhQThBOBJdjdMUyYz3M4YFMis2dITY9HrLlFgyl0Ywqd72vry5YEkcKWLZFWEB7B4yRqRccEfZEwRhn_gG5yWub_neD5vyaaLP4R_wwNI6Lu1PuHYG9MakVmDWfMamU2dlgTUlwTQjwnAHLyqfUceQVoG20mj2a40tltmIvt23U-PMjTWby5DrtRTyEI04m4SSAauQUb5nQOQijU3vFFWWg5-jqFglVOIfyyPOogBt38-DutPVyCVhi5EXPoGxWip7VSRhGPDQkWZxJ6a5WHFqx0KQkPq5j49aEAMxGrwlF0c3hyWSTxXW2Ul0oqHwzCG5YnQ3t6etBlMX6UOOR3_1QdUeOBr5rBoYj0=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0f57affcb5f7c3f4016ae28c20ddc087d09e142f06af252441",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231903,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 368,
+      "prompt_tokens": 3579,
+      "total_tokens": 3947,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 174,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3576,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.012626,
+        "upstream_inference_prompt_cost": 0.008946,
+        "upstream_inference_completions_cost": 0.00368
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "70c89b999fc0a650a9f8bf88bb9413500def2933c8f838a0c16abdf3f7361e6a",
+  "elapsed_ms": 8940
+}

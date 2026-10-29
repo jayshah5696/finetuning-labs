@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0126\", \"row_sha256\": \"76598c42b68f9e65e73f501fefbefc1cf5d584b6ec557027642991a7e5a696d5\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm trying to get a clear prompt together for a small review of the message-routing function our volunteer help desk is considering. I have the whole function copied below, and that's the only material I want the review based on. We don't have the surrounding application here, so please don't fill in how messages arrive or what happens after a route is returned. I need something a volunteer coordinator who isn't very comfortable with Python can follow, but it should still be accurate about what the code says.\\n\\nThe practical question came up during a handover conversation. Volunteers sometimes receive messages that sound time-sensitive, and some messages concern children. One coordinator said, “I want to know which messages this little rule sends to priority.” That is the question behind this request, not a claim that the function captures every help-desk policy. Please explain the rule in plain language and connect the explanation to the actual conditions in the snippet. Don't turn “urgent” or “age” into a broader policy definition that isn't supplied here.\\n\\nA second volunteer asked whether the function treats an urgent message from a younger person differently from an ordinary message. I would like the review to make clear which values and comparisons the code checks, and what the returned words are. Please distinguish what follows directly from the function from anything we cannot tell without the rest of the system. For example, we haven't supplied a definition of an urgent message, a unit or range for age, or a description of the message object beyond the fields used in this function.\\n\\nThere is also a small practical concern about examples. People might read “priority” as a promise that a volunteer will answer immediately, but the snippet only returns a string. Please explain that boundary rather than implying a response time or a particular follow-up. Likewise, don't assume a “standard” message is ignored, or that a priority route guarantees anyone has seen it. Those details aren't in the code I copied, and I don't want them accidentally presented as facts.\\n\\nI want the explanation to cover the case where the urgent field is missing or false, and the case where age is missing. It may be useful to compare a missing age with an explicit age of zero because the lookup in the function has a default value. If you discuss that example, be precise about what the code gets from the message in each case; don't guess whether zero is a realistic age in our records. We haven't provided sample records or a validation rule.\\n\\nFor a review, please mention the condition that must be met for the priority return, and what happens when that condition is not met. Keep the account close to the order and logic shown. I don't know whether values such as the string “yes” or a missing urgent field are possible in the actual service, so don't make claims about production inputs. You can identify that those details are unknown, but the task isn't to design a schema or settle how the service should validate messages.\\n\\nI would also like a small set of suggested tests that can be derived from this function alone. They should cover meaningful branches or boundary cases rather than inventing a database, user interface, staffing rota, or help-desk workflow. It is enough to say what kind of input a test would use and what return value the function gives, as far as that can be read from the snippet. Please don't run anything or claim a test has passed; this is a request for an explanation, review, and possible test cases, not a report of execution.\\n\\n1. Please explain the function for a nontechnical coordinator, with the actual conditions stated clearly.\\n2. Please review what is and is not knowable from this snippet, including the missing-field and age-boundary details where relevant.\\n3. Please suggest a few focused tests using only this code, without adding requirements from outside it.\\n\\nHere is the complete code I want you to use. Keep it together when discussing it; it is short, and seeing the actual lines is more useful than a paraphrase standing in for the function.\\n\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 13:\\n        return 'priority'\\n    return 'standard'\\n\\nOne person looking at the note asked, “Does the number 13 itself count as under 13?” Please make sure any boundary discussion answers that from the comparison shown, rather than from a convention about age groups. We have no separate policy text to compare against. If there are assumptions you can't settle from the snippet, label them as unknown instead of resolving them on our behalf.\\n\\nPlease keep the final prompt focused on asking for that explanation, review, and suggested tests. It should preserve the distinction between a return value and what a volunteer might do next, and it should leave the wider service context open because none has been provided. I don't need a general essay about volunteer triage or recommendations for changing the function; the material here is the function and the questions above.\", \"output\": \"## Prompt: Review a volunteer help-desk routing function\\n\\nExplain and review the complete function below, then suggest a few focused tests based only on this code. Write the explanation so a volunteer coordinator who is not very comfortable with Python can follow it, while keeping the account accurate to the conditions and logic shown.\\n\\nThe practical question is which messages this rule sends to `priority`. Explain what values and comparisons the function checks, what each return value is, and what happens when the condition for the priority return is not met. Keep the explanation close to the code; do not broaden “urgent” or “age” into policy definitions that have not been supplied.\\n\\nPlease cover missing or false `urgent` values and missing `age`. Where relevant, compare a missing age with an explicit age of zero, being precise about what the lookup gets in each case. Address whether age 13 itself meets the comparison, based on the operator shown. Do not guess whether zero is a realistic age, whether values such as the string “yes” can occur in the service, or whether the message fields are validated. We have not supplied sample records, a schema, an age unit or range, or a definition of an urgent message.\\n\\nDistinguish what follows from this function from what cannot be known without the rest of the system. In particular, `priority` and `standard` are returned strings: do not present `priority` as a promise of an immediate response or assume `standard` messages are ignored. The snippet does not say what happens after either value is returned, whether a volunteer sees a message, or how messages reach the function.\\n\\nSuggest a small set of tests for meaningful branches or boundary cases that can be derived from the code alone. For each, it is enough to identify the kind of input and the return value supported by the snippet. Do not add a database, user interface, staffing rota, workflow, schema, or requirements from outside the function. Do not run the code or report test results; the request is for an explanation, review, and possible tests, not execution.\\n\\n1. Explain the function and its conditions for a nontechnical coordinator.\\n2. Review what is and is not knowable from the snippet, including missing-field and age-boundary details where relevant.\\n3. Suggest a few focused tests using only this code.\\n\\nUse this complete code in the review:\\n\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 13:\\n        return 'priority'\\n    return 'standard'\\n\\nKeep the response focused on the requested explanation, review, and suggested tests. Label unresolved assumptions as unknown rather than settling them. Do not write a general essay about volunteer triage or recommend changes to the function; no separate policy text or wider service context has been provided.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0126"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "76598c42b68f9e65e73f501fefbefc1cf5d584b6ec557027642991a7e5a696d5"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "5eb32e98184652f386d068b6281bf12caf6ca72c83e5c9b907052ad7b0d815d5",
+  "started_at": "2026-10-29T03:32:52.139891+00:00",
+  "result": {
+    "id": "gen-1793244772-mEgQQvG88RNHxJnKHVBH",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0126\",\"row_sha256\":\"76598c42b68f9e65e73f501fefbefc1cf5d584b6ec557027642991a7e5a696d5\",\"critique\":\"The input is a coherent, self-contained draft request with recoverable intent and no contradictory constraints or artificial padding. The output appropriately reorganizes it into a prompt without answering the review questions. It preserves the complete function, nontechnical audience, code-only scope, missing-field and zero-age comparison, age-13 boundary question, uncertainty about production inputs, distinction between returned strings and downstream actions, and request for focused tests without execution. The language and structure are natural, and no material factual or constraint changes are apparent.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r5qOdwfScGDIFO-KarLpT6vkrMGEwWyeDhyeQ0HaDS6vWVbXIL-dBe1MdkN9TIBZUyielHmOXqrPy0jcefJHgg3GckUuKyx2epDbvAdwF6nvLyOR9csHIHg8FP6HN38aXiDcvdp7i7Guv-9hI1LYEURtPCxGOm0-NM01hC7JTGd579Oy5e_wvcwBQ9Hozd3N6tZ6CVEEPzafXQ3bDqVuFDkpVf44v_1Wa3qX_ZPapkvITvW1taTev1doIRl4yhHUD-sIywjbzGOsOPmc2aHToh9Bz1Uq_80euK9jfX_lhy0bxQAvRUUld2seM_EazHV_nr96mFkaicKZ7KX3SNkn0UgiG1Zd7BPHQETjbj9oldC2TGzM1qHjJuHGPRy9TxwLAIyHW5eahQRkPh9NhXYO5lG2YIZWfQrpHGDdxMPpuGfPQU9eG194YVty5RSZlRDwY5Icas7KrNduYhPlKSszBUp-Ox5B8QF9gk0gC-zUCc0C8rLKtovhA0dDVBQ16A7F1Qel6G5UBk6vML0CrlcZrvVRRQWzwlwK0ZIVNq9xcttjH6Fbqv41EbBkGd-ATMlgRcFNSG8cba-4hrbCRma3QB1wJeRNtteZ5g9Kf4nh3uOH7pj_4FeU7L_4Kl3WWNBI9ZKZ-2loz800dSodf9Iwd-BebgUwiimFv8HSTiQ9isqpN8UZQcVMSZWPsmzp4D9p4jq8bE17zDZFVOLqmSkkfsnVkbcz8hDCIjTUm5LQL4NXU6U22nOBNWP2hNG5KcUPGHXH7Pv-CMD4tqstY0-41MXB27rIjRbisBJs1yiezJIalKQQIF3qYPDc3QDH9BqQLLMnI3WR1D4n1QVhqudyKHOHficcBFdthadYakzqGELm5qpI4unPpYW2r6qndTQdqG9PF0pyXvE7B55LujyK3-LCnSa9o5O2Gd3N5_TFpbJtVe8N3rBsqFN_FQUR0oGNcLTmKlNDhw0036uKgWQ_hmGuU-4hxxGThkJbk_i7qod1meeWx38Em5E3lwjARTSNgLPseemPFlFZVrX5gkvWOlNGvXy6X8CnecP4Ox5MoF1WQpOo1FTEYDfiBIqn6bMUPxQ3ATzCSy5-Rof7wZsj0jF9p-9VZTzr-Awys5VB0LSd35tuDKJbsUCIMBLjGEVSh0qgLff_TZd53Z5eTmX20A-2SPgD06goUEr7hES39QcPatp_OZtbQ-lOo58-ul7xQDasxBVQaO8KBpfL0DyuvwvkZrTIL1bxvaKYUDS31qRQEaoTS2ZAdf9b_wHyloSoppkzQcJirWouuZz0Y6Aj7ADQK6HDBYJ4le2iPq0WMf6P1oox4irXuWjwQtYyiWylFXni9xbVvFwm2A0MSZ9vTbwP_VkgXGrQzWVUyIcKwjKdlJCUD_y65O0pCDtmlUYWLb3rpmDVDobcbvECtCcTXr72GcLkTG7o1oJ1ZRMhya0omo02GKRVh-rphxsbu4U3wPMgj7r5cTRrDA6zJudqbfMCXrgVLYtXNqGWpgYwqpata7--0G_h53Dh_09PEhVdTPilu6y6rcPfFC0VFzCCnvx9_yCdxiZkUZyOYZTJ4aHbQrqqh4D2XCn07qOme6c5x6tbzZ2nJIvADN25gZ6hSLbBKE0AXBWQofbC3sRVQ17kJyrtR3zuEUUJWyQlAZldiXX60RMNtGb7XvW_-l3XnS0PlVGjW_jiIdDAy6q3h676cmmeU2zZtzNs5zFpus77p4QELQbDXxfr-9tubDTI1FGV7VEEIbsUNlxgkiLSLT7MGG7FTk7k9jKlqFazPvSnBFqYlqc15V2ZD-hZguNa_l9V1B0sedkZoXin9VstgKcyXIb45z7kFECXkNLUZnRH1EUAg3_7qCx3QYgfiYpa3bfDxdPRevlBgq9XemvyBnUvIHGgW1o_7Mm16egPrf_j08oKEUmzMCaey8eSnVuGQiINKw9KdfRwmpvWAY60de-EzWM43zWHxfDY71Qw0zeDrnzUSh2pqPP1qj1THJC99sJl694s53IphtzH_Z4QjXNp0tRgWkALNAXD-eO5i8NqMplAWkMoXtXBSfr6NJomyjxDFchHD-LMGfjKEGKORLXt8vptLkhlJ3sX3tMe1q9Talkz3F5FQHDzZdeJEwUCF3Mz9ooLNbemQjDBXh-EbtnFNwR9zr8IX6gDInKijnT2pyHZE2CBlo6vBmIyvGwviTEm-vetGBHkFmp2yEHp8y1LEo5QGDKp0jjhTSzCYVgsQ40LrSB0bGDrswDEpuIjswK6bluVJ6KA4qSV5sPszc7yFk6ej_UjCPOnCJvbfEKIjW-MHowXOp5C3vy93ZcH5qGGA6ZJ1G_SNAAKdEA_pkbyCgp95TkDrk8GWj87K5j1wQu8tHWxp6gGvnFT437cRSPgx1ddo8xtjuqf1SIMhZRBeULK8Vhs-HNd92sX37KBRLdILAajwMd8sn9k3Miy7w8J_L3Pt2ASZalvOY7JjphXdibZta5d_7Wmk7LuBFOBBUv7uMPOdgNeNagjE2ru3QZA6ITSX2PWV75HmZQSUpOfnazUbWYw_U2Jr7ZUJa7WkhpV1umW_NrVTgtha4wvVqDz0HIFceebgk65wEnHjhqbL0kIPKESh44LoFADn4J5r_5UVgsm-VdyayTOe6Pz7AVrAPWT6kli2oIKUHUJLtFd03Pr8Cx9X0oJxZ8cTo1Qt5r4-pf0euvr8v7Zbu1zRmH8taTbLUwknfNwEiC-mUaLdt4tAk4Xt-RlRqUwIHeqXAA9uklMUaft_f7Jc2-5mWzOXksG1fQx9RJbbgB33qyA0ItJrlgLLysZPQA3pc3HTZZxcYyTmL7RxchiBMGhnV2Vzq07OrS4rEbzV_pn9BmgjRyL5nPnwldg4-bf8nqRZz1fKx6C9ItjaxKARhAw82c7I5Gq1KnN8jTbG3IUlquKUKQZcJlDrojagiJwzNbE2mVYYwI5bMCqpxRVa4dGnQPMA05CHRcBp23Tmij0eresHoplSAy3mKZQSEcCLrXX2toAXryvfgc7Exw61Tp4qXEj3B9b8DQ8S5D1l5fbid_3oqfmGY4LuWbpuszuS-f3uCR6R5l6QHeuexucsB2yqceEDGh2PjuARO0U38T1BPt9H-DyP-VPVBmPx702iY6Ku2gQotLslD62XVsY23q0vAHv3pkxYv2lm8OlzVAbUobrRb7DH8tqNyMj3JlFgvD15FSptglN2bhHH5NKVjud8BmyE_KLoYMMIQFGDf5g5_rSjk0P7deo4Z8Cqc1CAuXez8tcAdQ_MLj0gik39HKk8ZMqbcEvwRLkRNrxvKE1eNiZq0AqNo29rnOVvkn0rVEjweIhVQYp5GNg_1ZZE1dualFt0_DyMYbqPGdAzewYU_n06ZaWttTbDAtRBT4MKQE5j0I93r1RGpks_PrfcTHAzKki0O-Tliq-WcfVsYhePFAxsM_HDR_gd9_Ds7mJSvwqoq2QVp-OhwaaosOGPCFmXV20y3ebXqkBlPhPLr1xENzKEe84UsdC_TTLabnXWDAv4Uj8bAg96ctRgLy2ui03rSbxpEaS-QsBVW79wFSHd4ozyoW1JNHNCr8P7RD7QJ00tojfyrKsQS30dp3ahYYujx4XW1pkLvAfOgca259LxINLw8SoVTNVGjVelq5aJQjxmIPKGWbSuxBAcINFLBkLZ51Tw==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0e65f4dd4fd7de6f016ae2be656f2087d085ed97fc15f48f9e",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244772,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 341,
+      "prompt_tokens": 2207,
+      "total_tokens": 2548,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 143,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2204,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.008926,
+        "upstream_inference_prompt_cost": 0.005516,
+        "upstream_inference_completions_cost": 0.00341
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "af3385ad10b72ec60c7d8fede5b42037b188d29cd3010ca840edf189f556550a",
+  "elapsed_ms": 8486
+}

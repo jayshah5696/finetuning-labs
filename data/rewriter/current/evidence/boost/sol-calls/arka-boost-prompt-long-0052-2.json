@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0052\", \"row_sha256\": \"41caef9c82ea95d9aa7d4d63905886a3bdaee22d3983b14c83642b43830f5c88\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"hey, i need a prompt put together for a short review of deliveries at north quay depot, and it should use the period april 1 through april 14, 2025. this is about summarizing deliveries for the depot, not writing a general warehouse review. the ids in the extract are D-14, D-18, and D-21. please keep the summary limited to those ids and that date range, and make clear that the supplied extract is not a complete view of every delivery event. there are status and unit filters in the query, so don't describe its totals as though they cover every row or every delivery.\\n\\nthe analyst's extract gives summed units for the qualifying rows: D-14 has 227 units, D-18 has 178, and D-21 has 119. those are the supplied figures, not something to recalculate from the notes. don't add a combined total. the extract doesn't give supplier-level totals, arrival-time averages, or a count of all trucks, so don't imply that it does. i want a useful summary of what the figures and the depot notes say, while keeping those two kinds of information distinct. if a note gives an explanation for an event, attribute it to the note rather than presenting it as something the query proves.\\n\\nuse this query exactly as the reference for the extract; keep every line as it is:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 9\\nGROUP BY depot_id;\\n\\nthere are a few details from the operating notes that should be included. at D-14, the gate log records late arrivals on april 2, april 8, and april 11. the april 8 entry says the seals were intact when the truck arrived and that it waited before unloading. the log doesn't say why the truck waited. don't turn that into a claim about a supplier, a route or a failed delivery. the information is useful as context for the dates, but it doesn't alter the units shown in the extract.\\n\\nat D-18, the loading lane was closed on april 9 until 10:30 a.m. the shift note says unloading was moved to another lane during the closure and that two trucks were delayed. it doesn't identify those trucks by supplier or say how many units they carried. keep the note's wording and limits clear. at D-21, the receiving notes mention one damaged outer carton on april 12; they say the contents were counted and the carton was set aside for inspection. the note does not say that the contents were damaged, rejected, or missing, and it doesn't record the inspection result.\\n\\nplease have the eventual summary be a numbered checklist. this format applies to the summary itself, not to the prompt or the quoted query. each checklist item should put the relevant evidence first and then, only if the evidence supports one, give a recommendation. don't invent a recommendation just to fill out the format. keep the recommendation separate from the evidence, and identify which depot or date each item concerns. a reader should be able to tell whether an item is reporting a query figure or an operating-note detail. keep the language plain and concise, without claiming that the notes explain a change in the unit totals.\\n\\nthere is a condition that matters when describing the filter: records with status other than received are outside the query result, and rows with exactly 9 units are also outside it because the condition is greater than 9. if pending records appear in any accompanying material, they should not be described as received; mention them separately only if there is information about them in the material. no pending-record totals are supplied here. also, don't call a row over the threshold an entire delivery if the source doesn't establish that interpretation. the summary can state what the query groups and sums, but it shouldn't pretend to show all delivered units.\\n\\nfor orientation, the notes are dated operating observations, not a complete incident investigation. the D-14 entries record dates and the specific wait detail for april 8; they don't state how long the wait lasted. the D-18 note gives an end time for the lane closure and says two trucks were delayed, but supplies no delay duration. the D-21 note records a damaged outer carton and an inspection still pending in the note; it doesn't give an outcome. use only those details and don't fill in the gaps. don't turn the dates into a trend, or say the lane closure caused a change in the depot's total, since the supplied material doesn't establish either point.\\n\\nplease frame the prompt so the writer knows to summarize the three supplied depot figures alongside the relevant notes, keep the period and filter visible, and distinguish reported evidence from any recommendation. don't ask for charts, rankings, extra calculations, a supplier comparison, or an overall performance judgment. retain the exact extract above in the prompt as reference material. the final part should remind the writer to leave unresolved matters unresolved: the reason for the D-14 wait, identities and unit amounts for the D-18 delayed trucks, and the D-21 inspection result aren't provided. if a recommendation is unsupported by the given evidence, the checklist item should simply report the evidence without adding one. that's the scope of this request, and there isn't another data file or later update to rely on.\", \"output\": \"Write a concise, plain-language summary of the supplied delivery information for North Quay Depot for April 1 through April 14, 2025. Cover only depots D-14, D-18, and D-21. Make clear that the extract is not a complete view of every delivery event and that its figures do not cover every row or every delivery.\\n\\nThe analyst's extract supplies these summed-unit figures for qualifying rows: D-14, 227 units; D-18, 178 units; and D-21, 119 units. Use these figures as supplied. Do not recalculate or add a combined total. The extract provides no supplier-level totals, arrival-time averages, or count of all trucks. Distinguish query figures from operating-note details, and attribute explanations to the notes rather than suggesting the query proves them.\\n\\nUse this query exactly as the reference for the extract:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 9\\nGROUP BY depot_id;\\n\\nInclude the relevant operating notes without extending what they establish:\\n- At D-14, the gate log records late arrivals on April 2, April 8, and April 11. The April 8 entry says the seals were intact when the truck arrived and that it waited before unloading. The log does not say why it waited. Do not attribute the wait to a supplier, route, or failed delivery. This context does not alter the units shown in the extract.\\n- At D-18, the loading lane was closed on April 9 until 10:30 a.m. The shift note says unloading was moved to another lane during the closure and that two trucks were delayed. It does not identify the trucks by supplier or state how many units they carried.\\n- At D-21, the receiving notes mention one damaged outer carton on April 12. They say the contents were counted and the carton was set aside for inspection. They do not say the contents were damaged, rejected, or missing, and they do not record the inspection result.\\n\\nFormat the summary itself as a numbered checklist. Each item should identify the depot or date and present the relevant evidence first, followed only when supported by the evidence by a separate recommendation. Do not invent a recommendation to fill out the format. Make clear whether an item reports a query figure or an operating-note detail. Do not claim that the notes explain a change in unit totals.\\n\\nThe query includes records with status 'received' and units greater than 9. Records with another status are outside the result, as are rows with exactly 9 units. If pending records appear in accompanying material, do not describe them as received; mention them separately only if information about them is supplied. No pending-record totals are provided here. Do not call a row over the threshold an entire delivery unless the source establishes that interpretation. You may state what the query groups and sums, but do not present it as showing all delivered units.\\n\\nTreat the notes as dated operating observations, not a complete incident investigation. The D-14 entries do not state how long the April 8 wait lasted. The D-18 note gives no duration for the two trucks' delays. The D-21 note gives no inspection outcome. Do not fill in these gaps, turn the dates into a trend, or say the lane closure caused a change in the depot's total; the supplied material establishes none of those points.\\n\\nSummarize the three supplied depot figures alongside the relevant notes, keep the period and filter visible, and distinguish reported evidence from any recommendation. Do not add charts, rankings, extra calculations, a supplier comparison, or an overall performance judgment. Leave unresolved the reason for the D-14 wait, the identities and unit amounts of the D-18 delayed trucks, and the D-21 inspection result. If the evidence does not support a recommendation, report the evidence without adding one. No other data file or later update is available.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0052"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "41caef9c82ea95d9aa7d4d63905886a3bdaee22d3983b14c83642b43830f5c88"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "a863eedbf4d6cc71097f9edba6b65c0bf2fb13ae8e87fd41bdb70040612738ea",
+  "started_at": "2026-10-29T03:21:42.195305+00:00",
+  "result": {
+    "id": "gen-1793244102-tuJ6YmscwbNsQfJVIEWd",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0052\",\"row_sha256\":\"41caef9c82ea95d9aa7d4d63905886a3bdaee22d3983b14c83642b43830f5c88\",\"critique\":\"The input is a coherent, self-contained drafting request with recoverable intent and consistent constraints. The output appropriately reorganizes it into a prompt without performing the summary. It preserves the date range, depot IDs, supplied unit figures, exact four-line SQL query, filter exclusions, and limits on interpreting qualifying rows as deliveries. All operating-note dates, quantities, uncertainties, and unresolved matters remain intact. It also retains the numbered-checklist requirement for the eventual summary, evidence-first structure, conditional and separate recommendations, and prohibitions on unsupported calculations, trends, causal claims, and performance judgments. No material omission or invented requirement is evident.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing inspection omissions**\n\nI need to assess any potential omissions regarding the D21 inspection, which is still pending. The output mentions setting the inspection aside, but it seems unresolved. It's important that I don't generalize the warehouse review but provide a clear summary of the delivery. I should clarify the exact query. There’s no issue with the input, as it seems repetitive but still plausible. I want to produce a polished output that includes a concrete critique and summarizes all key checks effectively.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing inspection omissions**\n\nI need to assess any potential omissions regarding the D21 inspection, which is still pending. The output mentions setting the inspection aside, but it seems unresolved. It's important that I don't generalize the warehouse review but provide a clear summary of the delivery. I should clarify the exact query. There’s no issue with the input, as it seems repetitive but still plausible. I want to produce a polished output that includes a concrete critique and summarizes all key checks effectively.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rvKWFucaD8XGu-AG-HalHxKy26SowMmhJRbfg-4VTxnKMKqgc8AuvW3RwpKAzMtTDTZlmB3NFORBGZigjM925OChHMlHG-6z2CvZb1bAPp3jWy7KCvKrgxYHMG30_R00RQFf23XER7hShjdkL1BEPCTtuqyzFHhg7En9ByqUMn1qLRi4lkdj7IvIwVjhgpFnZ5f07xiWh9FOajA-F8gXh802QlmCPorRQdZM8nIS-QfW2HewjTamjO4OR3NB3Uaf5i3udxAvgXxTJyUJVhTvkKUNOqZDN5_icysWcsFEf-_aEE1a7TvBJSYIyDbq1FbH16pFvJ6LdpKcFwWj753IEvRpnb71r7v1_QHWvh3hEY5kld_-dY3N0VG-xHmtAwmu-OAgEbYLeoh3IOF9ekWY6Db315cEXACBy9LuN9OsHYZuzUO9Z5Cv7jsqNf6apR14-08RhhZUAN_5OzDF1RIvNrTNENpVEIwT9Z3YBHYb-CgMwqktgvkTMnxtPACK-M45dMBG1t5hNYfOMdpV-r8o6kPsnX4kpCa2KMM9rChtVb2NnyW1cTxcAs0MeP4ZHcp6babrKQWWtsZL16mkzQdZtvl3NJAwLNbIP9-8ul3sNTsZ9lJWF_BJHZZEPQLUeo6bUMPfNFUau2WM7L6oKg04FDfDh-fWTqqxVlTbSB4tXdkjwHEl2LgdPTWKsWKnWXe8cJEtuQmL-kh5dOMOC6MqeOfjsV-xYEnFGE-Emm3MOgVra7clqXHIfC0y1tcuYrhGbxdd7QcC8UjEM31d7eWGAcjo9LGgjsOx_k0yJVCjvntnT0QbMetXOVzHrqHCVSo6SQeTrReEttRy7G1Q_4jzMx8yUIjG_ATPcMTtYJv8MhEnx7br5QCFoDSfhFYQggXN1JX24goxpCIc54hMnJy2pgUufdjFMAAfoxSgJxzY671nBVOIk3JItlhs4eKFB2S_wdhOPAPqX0fR8suQb496GqyOjm7w_xcLHr6m5rNrnysB-jKR1N3JMgO9BhVhjci7ZCdjiYHmm_MJN2YSzlT5PB8Q0xxeCB_46zkJYvDYwyErg8gXmDN_c3WOb524LnbWKhXY2cyJ3ua2MemYPtglJJgqIivt4QVPMmOJXu-UI72b7iXlk9iKpzm5deEUZGkWbXYuUPOqJ-0b4x5DcYeGXREMVhC43Rj33nT8ELcZExqQGNT3iha3w79ZUCXjvg3Swn2htcSekh9E5bXzEKC5BXb4Bi_Y6P-2j5Y5KL69-Hz053ZAyXs27H0-droN6nQZsfrZxGdSHu_HAWmceimKFFAOOLOlv5Y1AahgasvKKEnTtfGFk7xuDQ7TkRiLb6JxjdwU7X-_FzRQY4iQnQw9IUeYNqXNtsZBqC30gRUUWSzJAN8-mW2_Z9f43dRmxGZhrow1P6hkqZ7uMFRu3ga7YYwhlifj8iX4n8yDIbW9WRcSiFmVUFWU8C9LEBruN7UPbqMbAc-_TvI30YhJgl7XYdySLPs1Ah5nNckWoMIulvRTJ1MltNe2yyjjQ5P2MqW32cLfYc5UJH4mnfh9sK12GELUk3c_2d7WNNr0DRPV1hB9ORVTi0GyNsHLKAOcXvQE4U5SBix_5kmwYUmNQkjkT5CIocsfoqWKRel65gwMa8IoM_bUmPgtGy45KYu6SUGd_JQQfW3KBus1nFf27dlRsBVkcVdYpVgpd2-GYO4JySQ1g3lt_1Ofnz9Rbyi6IFgKVCjT_NnoxpEr_lmewrN2fc6FbTKLYpzBFQL_YsOrup4h_AocgrfOvloIR6e1LHp3DHbmqjA6ongk88HgpoCBVMtMhKaw4-YqaFqcr4CCK-xRVp6CVK9lFwoqoW7lciharYyuxYIfquZhA-3CkpKak-P30AxEMsBC9bOcWO6jcM9ztqMn-jgnBjy1u0lJ2JAHSbwLshNAO8Xmu6tNt4DD20d9SnQsUGkV_UA5kNSMfvJm1FAydKTDHEH13GUwDX53AotSC8KTp5hJaZjoKZilFFxpg6c1bSaK4E99KKVD2fvfqh0OsR6thEQFhXcA_DVWbO-4lAJG1Bo1F6BlErQUZDoLD2b-DeNLVOK3u9fCpuvy40__AHbOK-heHVL_yp-1dQeKvaSgbtSYgBNK2Ff0FA63Ddp9P_V9txfdkYazoWPAw8CnBoW83ueELluIqpIW4ea3ivyzibZOd8CyvMt90YaM6MGji6YwhX1R5JmKfD4zw3R_9HHtKTfMVt-6OUe1HhwRUL7UDnBCJ9PQCjdfSQHiA3jygA68dhiCsW51w7wO6zN6XWZS65B5JcwyScN6otDunGq7nLJ3uINm1bJSkND9j0Qz0vd-VDid98iSwLn2kFBU-ZRr02IClPZ4OTIHIJ1QZ-Y1JJxUfUIDAAwVaqECopOpl5rr1HFXIMpDUznyVyOLYoo6PkvbpOaaxxPe77NoSLIJCD-ZRL5Byyj__7GloLAP3iohjdbiT8jvObbA4hSoNkmysOJNMyDcMLUDQmGyRPAfzLY9RRlmVV1OrSS6Q==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_09b6090d8616193d016ae2bbc764f487d0a30b4e7cdd8f3b9e",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244102,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 286,
+      "prompt_tokens": 2518,
+      "total_tokens": 2804,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 64,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2515,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0031175,
+        "upstream_inference_prompt_cost": 0.0002575,
+        "upstream_inference_completions_cost": 0.00286
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "ab2cbaab974b964419756fdeaf00a52b6fb033a03d7795213043fc3a7cef2d71",
+  "elapsed_ms": 6403
+}

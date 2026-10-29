@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0079\", \"row_sha256\": \"06222a35b7f808051792600174792170ecd75e04184fb2ca0b968fab1a70d983\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"can you help turn this into a practical engineering prompt for the batching part of our photo importer, not a rewrite of the whole importer. at North Quay Image Desk we ingest photo records for the local history collection. The importer runs at 01:00 and 13:00, usually handling about 8,400 records per run, though the spring fair upload once reached 31,000. Records arrive from a vendor CSV, a folder scan, and a small corrections file maintained by archivists. The folder scan follows the vendor list, but the corrections file can refer to a record from either of the other two sources. We need to batch records before the importer sends them to the metadata service; batching should not change what counts as one record.\\n\\nHere is the helper we have been looking at, and please keep it in view rather than silently replacing it with a different example:\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nThe metadata service accepts groups of records, and our current setting of 24 came from a staging test, not a published service limit. One archivist said, “Twenty-four feels manageable, but it is not a promise from the camera team.” Please retain that remark in the brief. We do not yet know whether the service will publish a maximum, so don't assert one. Ask for a clear explanation of how the proposed batching behavior relates to the default width and how a caller could choose another width. We need the author to call out any assumptions rather than present guesses as settled policy.\\n\\nThere are details that matter for the records themselves. Their current order is meaningful because it follows the vendor manifest and helps archivists compare import reports against their source lists. Do not sort records as part of batching. Each input record should appear once, in that order, including the final group if it has fewer than 24 records. A record must not be split into pieces. Empty input should produce no groups. Please ask for discussion of invalid widths, including zero and negative values, but don't dictate an error style that the notes don't specify. We have not agreed whether a non-integer width can arrive through the command-line wrapper, so identify that as an open question rather than quietly deciding it.\\n\\nThe team also wants the batching boundary to remain separate from validation and from sending requests. A missing caption is a metadata issue, not a reason for batching code to remove a record. One archivist put it this way: “If a caption is missing, keep the row and flag it; don't quietly drop it.” Keep the quote exactly. The importer currently records the source file and row number for each record, and those identifiers need to remain available after grouping so a failure report can point back to the input. It is okay to mention that a proposed interface should make that possible, but don't assume the service accepts source fields or that the batching helper should edit them.\\n\\n1) Please have the eventual response cover the main behavior and edge cases in a useful order. First describe what the helper does today in plain language, including the default width of 24 and the fact that it returns slices of the supplied sequence. Then explain what should be checked or decided before it is used in the importer. Include empty input, a short input, an exact multiple of the width, and a final partial group. Include the questions about zero, negative, and possibly non-integer widths, and say which points still need a decision. Don't claim the helper has been tested or that a particular change has already been approved.\\n\\n2) We have one failure-handling condition that has to be carried through the discussion: if an image file cannot be opened for any record in a group, that group must not be submitted to the metadata service. The importer should still continue with later groups, and the report should identify the affected record IDs. This is a condition on submission, not a request for the batching step to discard or repair the record. Please keep that distinction visible and don't promise rollback behavior for a group that may already have been sent; the notes don't say what the service does after a partial request.\\n\\nSome practical background: operators see a run summary in the morning, while detailed diagnostics go to a rotating log kept for 30 days. The run summary currently shows total records read, groups prepared, groups submitted, and records needing attention. Ask that any proposed reporting approach distinguish groups prepared from groups submitted, since a group held back after an unreadable image would affect those counts differently. The diagnostics should connect a failed record ID with its source file and row number. Do not add a new dashboard, change the retention period, or suggest that logs contain image bytes; none of that is in scope. The importer can be rerun from the same manifest, but the request is not to design deduplication or guarantee identical service responses.\\n\\n3) Please request a focused implementation brief, not a complete production-ready importer or a large redesign. It should recommend a small scope for integrating the batching helper with the existing metadata-service call, explain any relevant tradeoffs, and list tests that would establish the behavior described above. Include examples for preserving order, keeping a short last group, empty input, and the unreadable-image condition with a later group still considered. Tests should also cover invalid widths once the expected behavior is chosen, or mark the expected behavior as unresolved if it is not chosen. Mention the relationship between batching, validation, sending, and reporting so those boundaries aren't blurred. Avoid writing results as if the tests have already run.\\n\\nSource note from the ingest checklist: “The folder scan follows the vendor list, except that a corrections entry may point back to either source.” Keep this note exactly too. Also, the vendor manifest can contain two visually similar filenames that have different record IDs; records are identified by ID, not by filename alone. A corrections entry can update descriptive metadata, but the batching request should not specify how that update is reconciled with the original row. That is a separate unresolved importer behavior, so flag the boundary and leave its resolution open.\\n\\n4) End the requested brief with a concise list of open decisions and a short explanation of what information would resolve them. At minimum, include whether the metadata service has a maximum accepted group size, how non-integer widths should be handled at the wrapper boundary, and the agreed response to invalid widths. Include the unresolved reconciliation behavior for corrections entries, but don't invent an answer for it. The final section should also distinguish a recommendation from an approved decision, since this is preparation for an engineering discussion. Keep the audience to the importer engineer and the archivists who compare reports with source lists. We want the eventual brief to be concrete enough to review against the current helper and operational notes, while staying within this batching task.\", \"output\": \"Create a focused engineering brief for integrating record batching into the North Quay Image Desk photo importer. Address the batching behavior, its boundaries with validation and submission, relevant reporting, and unresolved decisions. Do not redesign the entire importer, claim tests have run, or describe any change as approved unless it is explicitly a recommendation.\\n\\n## Context\\n\\nThe importer runs at 01:00 and 13:00 for the local history collection. A typical run handles about 8,400 records; the spring fair upload once reached 31,000. Records come from a vendor CSV, a folder scan, and a small corrections file maintained by archivists. The folder scan follows the vendor list, while a corrections entry may refer to a record from either of the other two sources. Records are batched before being sent to the metadata service, but batching must not change what counts as one record.\\n\\nThe current helper is:\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nExplain in plain language that it returns slices of the supplied sequence and uses a default width of 24. That width came from a staging test, not a published service limit. Retain the archivist’s remark exactly: “Twenty-four feels manageable, but it is not a promise from the camera team.” Do not assert that the service has a maximum. Explain how the proposed behavior relates to the default and how a caller could choose another width, and identify assumptions rather than presenting guesses as policy.\\n\\n## Required behavior and boundaries\\n\\n- Preserve the input order, which follows the vendor manifest and helps archivists compare reports with source lists. Do not sort records.\\n- Include each input record once, without splitting a record. Keep a final group even when it contains fewer than 24 records. Empty input should produce no groups.\\n- Discuss empty input, a short input, an exact multiple of the width, and a final partial group. Discuss invalid widths, including zero and negative values, without imposing an unspecified error style. Whether the command-line wrapper can supply a non-integer width is still an open question; identify it as such.\\n- Keep batching separate from validation and request submission. A missing caption is a metadata issue, not a reason to remove a record. Retain this archivist’s remark exactly: “If a caption is missing, keep the row and flag it; don't quietly drop it.”\\n- The importer records each record’s source file and row number. Keep those identifiers available after grouping so failure reports can refer back to the input. Do not assume the metadata service accepts source fields or that the batching helper edits them.\\n\\n## Failure handling and reporting\\n\\nIf an image file cannot be opened for any record in a group, that group must not be submitted to the metadata service. The importer should continue with later groups, and the report should identify the affected record IDs. Make clear that this condition governs submission; batching should not discard or repair the record. Do not promise rollback behavior for a group that may already have been sent, since the notes do not describe what happens after a partial request.\\n\\nOperators see a morning run summary; detailed diagnostics go to a rotating log kept for 30 days. The summary currently shows total records read, groups prepared, groups submitted, and records needing attention. Distinguish groups prepared from groups submitted, since holding back a group after an unreadable image affects those counts differently. Diagnostics should connect a failed record ID with its source file and row number. Do not add a dashboard, change log retention, or suggest logging image bytes. Runs can be repeated from the same manifest, but deduplication and identical service responses are outside this request.\\n\\n## Requested brief\\n\\nProvide a small-scope recommendation for integrating the helper with the existing metadata-service call, explain relevant tradeoffs, and list tests that would establish the requested behavior. Include tests or examples for preserving order, an input that produces a short final group, empty input, and the unreadable-image condition where a later group is still considered. Cover invalid widths once the expected behavior is chosen, or mark it unresolved if no behavior has been chosen. Explain how batching, validation, sending, and reporting remain distinct. Do not write as though tests have already run.\\n\\nRetain this source note exactly: “The folder scan follows the vendor list, except that a corrections entry may point back to either source.” The vendor manifest can contain visually similar filenames with different record IDs; records are identified by ID, not filename alone. A corrections entry can update descriptive metadata, but how that update is reconciled with the original row is outside this batching request. Flag the boundary and leave its resolution open.\\n\\n## Open decisions and audience\\n\\nEnd with a concise list of open decisions and what information would resolve them. Include whether the metadata service has a maximum accepted group size, how the wrapper should handle non-integer widths, the agreed response to invalid widths, and how corrections entries are reconciled with original rows. Do not invent answers. Distinguish recommendations from approved decisions. Write for the importer engineer and the archivists who compare reports with source lists. Keep the brief concrete enough to review against the helper and operational notes while remaining within the batching task.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0079"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "06222a35b7f808051792600174792170ecd75e04184fb2ca0b968fab1a70d983"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "fdbd48f4c93da56d6df4ed2cd4a8bb477fced07484c3bf2fc233c0cbdae25275",
+  "started_at": "2026-10-28T23:39:56.654634+00:00",
+  "result": {
+    "id": "gen-1793230797-SPNfTAyxyaqO4VVw7dFJ",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0079\",\"row_sha256\":\"06222a35b7f808051792600174792170ecd75e04184fb2ca0b968fab1a70d983\",\"critique\":\"The input is a coherent, detailed request, and the output appropriately reorganizes it into a prompt without performing the engineering task. It preserves the helper, exact quotations, operational details, and most constraints. However, the opening instruction says not to describe a change as approved “unless it is explicitly a recommendation.” This introduces an exception to the input’s unconditional prohibition on claiming that a change has already been approved and conflates recommendations with approvals. The later instruction to distinguish the two does not clearly remove that exception.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating review requirements**\n\nI need to carefully weigh the intended review for this task, considering all constraints. It's crucial to present my output in a clear structure: \"Context... Explain...\" while preserving the necessary rigor. I can mark the response as a pass or fail based on whether it follows the guidelines. The user has clearly stated to avoid any claims about previously approved changes, so I need to be careful with my wording to avoid confusion.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating review requirements**\n\nI need to carefully weigh the intended review for this task, considering all constraints. It's crucial to present my output in a clear structure: \"Context... Explain...\" while preserving the necessary rigor. I can mark the response as a pass or fail based on whether it follows the guidelines. The user has clearly stated to avoid any claims about previously approved changes, so I need to be careful with my wording to avoid confusion.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ofW-auVj_u2UQwCnSmKzXZglDesgB5sGWjSqc_3J58GiN8wZH_PbA3lBCMklUjbTitmEUOWi31T4WBeCRGsgmxngbnCyYW6odP8q0_PnwyKrHnhdqHVvXa8aCourX-Y9YQYU44gEG5yYvaEuye4zZSKelyb21HbLYL3eD4V_2W_UWFn1RfMh_bySc9o6XP0SysktChMUBFwwN_0WcWS11n8kvg1OvFkezi1onD5r2Rlg8RSOFh2mdtpstJvKcX6zAx7VOEvCBCY9ozoatIta9EiFGRbId-LF9eDB2HzdTBJeIYMUq_LfY8pFTjbTjzqa5rqHwM5P190gZiQILKoEvItvhg2Jj_20_ieFxGB8VLedkM9Mvc-afLM0fNNRr9dnORL9NUt925lNhYgEl32EX2Zptg2q6-bXLFTsNeamCiT0uC2iLP7dQismG4jbcrjjP6vbSFQpp64ng11v8YZP1oCfYqAXC0hItsOt4tpRLuUIEVuGoI27cDVFd1W8plEw_59XeCG86ceJVY4Klu2rTbPfS_INCDWd4tpH-qYDMjbLCh7EHr8Ygwy20IMqYv8NhRAk9Iw3t-Ii3MMalRW9G1eVpoQYrop0mZmcXWlMSQRbZoMEsyIURyR-jgmGGGRbaN7WkSGdti1ekHdmUN1csaoRUoZUh2dT579R5ZnnMgBwNzFLCBb2l4Ppqbd5mQ_5wUCJjGhsvovvMoCTduO-IfiBFuBi1A_uFcMaxhzlDTJr2-KhTOgXlgLwmMjfUx_V86tKS3QQ-jeGJ5T1VhlUO_Sjsh5Owx1Kc78iQOhDl6jqEX19DRMl0Z0T_1UAgHUfMSCIanHWezu6CILbdgbxBNZe4fI8RaonCZ7CCMPZuD7rJQmPJP_ZfMq_J43RhBrw8xjaMOcjLuacllGTpMGEYLI7R2-_yJ_S-P3nFYQ8VCckpBlYaRmPi-gROr-hAdXRX7BwfcDSgn9oW3Cy2_agDuhmJrwJDeqJLi02udX2t26vVRiouWdqwXOCOlRDAKdhNmen-DpIWoeYGeTM4x-OYMqW0eQbMhvbmVISnNbeHADd9o77Eu9s-JqFesGjrU35TDSRS3wMD72-Z_OgXPdY_izBOEEbBk2C8WP0Icia4PdmLBURHIiCRIfCLU4cCT3VqNKMHChCj9UJp-R7C_os0rW-TUMiF53DqErXp79wbp2oc2ossNynGXqiO6cefKBbmgn4cZsQAmVpzlAerwB-b0u7YMehJL9L3nnKJ3awnh0DpP6mxp4NIye6DwFT9eM-3cW-UoJ4Pk8KjPDj65eEPjE5Yc4NzLjgNPfeZeOWqJ0Afo6AlSdUjRW0f2V6OIX91bh0DdfLwT-le2-q-2tnLUTGrEjpM8JoTCEpw3-8p-LxsejOJ0G3Vei0Kdsed5VFUBIgYK19i1lk1AucEkMQpJWLLTnWK6MSb6ZL1tdPHKVZWf-jT7rs8qJwFEOts3G1Hf7aoBJ2ZxD4J_TUMainVpDQ_zBCxWLJUO4-y22XYdxpIAs6CjIKUWJ_OXosgHSD0mdojdYN5LZakxjzX89UsGmpby7GIN7PUjRimINysI52rMy_yRPnMcSgPcYg38bhzHVYeZKt_huxHl9KAnDOqibePApNaTxUSiylnYZ3_YKbgljfpvqqBMkun6PRUrwiE2jAwwG_yDZp91Gz5VSbl7bdfeUYqL6kp_fDNVszQu-11e4jGbctddIFe7ekggtquX_AZCWoOV8jwAbyo0M_1tMf8ZEE_Y64hzL7GtU7yQzweTaapCC8Qt0x4q7-CwSB6iDqwKvBsj5qBhRCS63ve2XfvV7LiaXTo0t_KAcGVqSUNqY2Q66WJvgG7t_t3A6k5r-kC9KIhomxahwdv7klsR-jQswK42IdPKtkc0EGnFe3sO0YP2x3LMrh_VO-S6tCMs9dm7XsxBmbYE_TSYz_RO1dzMdwWW3Nl3k_60NMcO08LVZFXf92RqH0DXR6FTQGVn9gusfRTpX2AhFGhJEH8IiTqQXFstRA79-cvec5v4_3DVVLurAdVya6qyhG8geFx_fL5Mj8qCmsWYJK0CMUktSoXB0nt12ApIYi0PvNLgvjpPMKWNO3waBj059Zj4MUdlyCCp98V10aDE6OPkP3j4jAKnVeOGZG_5gT0YHgCDSL4y7Slm3uhLYzzvxI5Efg5veKLG_Hc53yLO0JjQZ2gjDr17yPnjGsvisyeC-woYerf36nEMCQlEEZjChEobQG5FcQEPMZ70ZwimNW-kteRDBm9l3KKLKMeI3pWjuasTz82ZybNygT3sbvxoZKHigcrT7nDW5xf3d4f2FV9M0TCrEuUtrSA3coO4mDKi66lhkFJH2SWfnD8P6NIdvRCl8K5tAINjs3B8HwsjlF1OQCxcCSAlAGJFjb00MfkiZVagJ-DfNjbUu_gZniy_tmQkDhPkXMBnUVxp6Nk9stDKg3ndt0HQFNMPHrOgZG3zJ32tzedsK9KGTEVZsGCsIOhaD2i5u3CBn_S7SgMIEbElJn0b_lCa03M-ooGKVbr85sOVRVG9JR1Af-Hxc9Ua1qalGvVBZ4ztx9xp7x7KCkw4TKtf_c-x91m11ny_qfxnSNB3m09MdQYe_KkUqTL3S9sqSv-cpbC3hEEBR1RefcU4f3qbYGJ5NYdaganC-VSSZJjDz9M946n8P1vaBXM1Pf8OyPUt6VmVA7lbBfiiPrdEto9EsexzSCgORkh0sPQ5LORj3zTHANQ1jkYJQ0sA87OVQbm8zaVmh_4YqScJTok6DwXzjkKf8alAHmqf6Y9IBZ7k1bqMI18r0yDFvgkaN4qd1skc2pTgUhXYXhtPLs7WzdnA3UqDSZ8fWx7BHbMh68O-4uLyywJSEuxmfZEgRjzFi6wjuWtnSAuG-K8Qu7GaIhrj5vPAyqmUIwYWeWY89xQhbnIZ4V1UUk9b882Ew3UiW52SdNrYphp6H4milKQOa4Yerk2w8itS9bHPYwsQWZP9CXzeNzlOT9kGs3Um1Wwzi6dPVxKT1QOywMe-EuDRkkHu2be-71EbtrRLJ-46od-6X3v_BFQ94slFgOzDCutk4TJSdGaIK68oIAzHoSmV8OUsAOguOLxU_SwRFJXhDCArt9jzjeifNE5tTPf6BE_g28UVKk8aOq2jbSMkU29E53QJMq5oQ1iuMaqsjzwKaOyoFf3J2wkecG3naXqBHjGUK0hktX9g1hvj6Cr4fdXn90U2wT3Ednm0jd0I-0iYcYE_r9XZXZN7Jj7WTgYjo4nOFjvG7MEagLK8BRH0EVH3AFRP02ILUQwznA907kBZGnSMEdB2kHMB-EGPvxgecoZwbN1AmiWYY8tVlGkFQXDXzPLFLJCEKU_GPk49mFH-kdAgpFyNcIB-52tlL_7ksQ5Ex556D79TOzSlCmyQR3xxDFkxLVPEy8SFeiZjuNTrimx4T9kPylAqhd_LH8KSupWEc6nun3iHS_EN_XHWd4ol_VLnRelqVOQBmT-HOdVuEUyxHThmYUu6ubeSuz8fJndvJnNw63suBEcRGWVCda6ADQk1UbwGnvyf8MsUQ1Jgq33kHqE39korvoMkvp9zTZ9ws0qnJvHyvyKUBoxzKAgensLU9rmNo29RDRUqby8Z-HvJmnX4bYa7PH8p4Vvkf0LCKuFntXD8IL38t8SdJEK2sDxiz_f_IerTVWqsexFqQe5MYAyEdB5ru6XJ7J3671I45T1tf95D6UU3eKIQn2E91RCmh0tWIrs7M-rPZFjPab-T_yz_3_zGDdzG_4JKvgdSCiPJl8j8S6x_JA8FzcIpescsAQKFgDUdp6TVkxGRXaOVAaWbpTXhe8e6RUUmQ3fh9ARcojwCn2U7Rjp7pL2L4Zis2Ddbfr2Egytp4u8rwAFOyqvnSgYZ4sEhqbMVelfR4i6YjvLF6gRI_yhFbjaaUdRreKCbJV56QnArPsbee6HCF-Dzxy7ZwzHYmhr-o7DX-4Cz0M6yCooBfYJtZ6mD81LssfpKM4_GTWLK-3zBAbVjnmBK_1oqs7yG4vd1YPlT1GIlOwa8wEKtVrIvhnTD1lDQKONv9tjwWUZiOD2-2oNjSvFBRvfyyMYSCreI-9LBCxRP7CdOx_-RY1QwbZoq-VjCouaKlfd4uuex1IVn5MGaoGdy4288oO8vqTEx2c_Hdqh3e71KXq_0513unNo24PgaOFJqCbKS2EKid4aUd9yo811PeNzHc_ALK6Mgn_JZ6kSd9jW61V7D1Jl0gyJuLpv3FTWNoNvzlvtsOUgNk7TUYcZtBDCLPw2yucePNUBacLsoH7v-AJXQ80m41e418F1nC0mNp317A4G42MXucvz7MgKHJMd9jURw1pkk3TnQkjGR7N0Yl4SPhgVh29WDyV6XWGNi2oTofwW1SJtey4x2pQb6z5u7QsaVCNISWQRUJMJZ7H_OSqVGWuJ1VXlxSOPO4MfZg-zkLzU0VUd3qozKJWPNJ4GbR0_EJ6d2RVQDNyEOjGQY8TjLVEcffybVi67-909P4rmaQp0d_gbkAVo-DJONL3o_3TnQyliCZJhhJkXZI-0vo3hKADJ13mw2dncAtlRfCAJ9rTALlK0H0RhO3AuxxvycyLnk3Ov1SBJ5n-Ay25Hce9XedJWCD79WY6y3MmwJFvdTrXqoLXQxbYftqVelM1A2Sjtxvss7z497vU2uMNCvGC8pTcRhyFpA3yTIsf6RgpjtnWXCt6E5kLG8vYuwuP4eLizzJBH9luh2qWZSagnmJBg7qklzHzWhonXOJ2YS4F8h-Ayz2BVEbo5BaKtv3oZSKAlyk4IdUTESOXFJ3Yk1XLhaja0Emykenr3tu510LOmcKBNLNhoIGGpsKAh1sub5wXtyHIhVJIJ3i6nCLIrKajboDjSE3thZ6q9WH-8uX55WDBiEi635j5az9Ub7eLIa1kZjxadNc3CBIb0NYzDPTq94ayk3DVd2e-ibwEbMKCAazssrbqii6m8yXMzJODrOAHwkD413IEgVn-FXMGcpMdhD8b_9_a5qXyDeoJ3nNRUgI7-Y93pjdHhyPrgOsvBEtn-9B0d1WJOCSv0ny-fYvS31NzaHbesoCSFvaPpdsw02hAci29qEjmdvHZlGe26nF2VuSEt6c-5L1PJO1v_wzZr_Wp4KDCiQkN32yMrq4Og2lM8pIs8m-bA8SnCQNxF43Z5pk0UzRcO1xpuUWq5YqcJTvQEvV6s24BD_1s3Y1Lf6BS3-qe1WxtNzqCCQ3KSOTWe-mRUG0csKtLYXtC3RnRfrcYLWbrhGQrAwP8D9a2qdaOOmJfwKIXGXfGATgNdTdqWMG-lpixbx5o4KNh7p9w8reqVc-Jdhyk7nIf0xRR0a4uUdLtnqRQ8aXEFc6Nypv6Wbc7RSf51xt6HWVoq_lzrLRLcePGTvuS6L_uH4VcvSSnn9Gvh8_sj9PFOeiX5iLzMte2j2_GG0C99PQmRuQfyocKXxCHIetMfsMd3WJKFT2lVmaQY44wyIXrHQu3Jj-gxw3A7_f5DD_kQlazxmz87Max8lHXxEcBC-LkkCrM0lGZNhLdJ9dvs6dAHFdwwspdD_trnOQycbK__qBsOkjxk3FFou4Gd7EyjutSJq0VyU5by4PU7SQ18ksdxOLYgoX7DpAyAwhqAk40bwLeDYkOzKTAorJkZnEeNpk1Q785GxrvF_iT80pO7gvyP4IJ6Z8SUgwdB2I0C02SsQZ.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_04500415e708039d016ae287ce132887d0a3ed3c6b6e47d83f",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230797,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 465,
+      "prompt_tokens": 3074,
+      "total_tokens": 3539,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 275,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3071,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0123335,
+        "upstream_inference_prompt_cost": 0.0076835,
+        "upstream_inference_completions_cost": 0.00465
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "696263ece0b195bf832f666475a6e614dcb714131c1a7bc59d9faca45bfc6ea8",
+  "elapsed_ms": 10554
+}

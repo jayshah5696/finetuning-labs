@@ -20,6 +20,25 @@ PREFIX = "reviewed-v2"
 REPO = "jayshah5696/finetuning-labs-rewriter-training"
 
 
+def plaintext_for_secret_scan(data):
+    """Keep raw evidence unchanged; exclude only provider ciphertext from heuristic scans."""
+    try:
+        document = json.loads(data)
+    except (ValueError, UnicodeDecodeError):
+        return data
+    if isinstance(document, dict) and isinstance(document.get("result"), dict):
+        for choice in document["result"].get("choices", []):
+            for detail in choice.get("message", {}).get("reasoning_details", []) or []:
+                if (
+                    detail.get("type") == "reasoning.encrypted"
+                    and detail.get("format") == "openai-responses-v1"
+                    and isinstance(detail.get("data"), str)
+                    and detail["data"].startswith("gAAAA")
+                ):
+                    detail["data"] = "[provider ciphertext]"
+    return json.dumps(document, ensure_ascii=False).encode()
+
+
 def require_script_review(review, script: bytes, notebook: bytes):
     if (
         review.get("reviewer_model") != "gpt-6.1-sol"
@@ -59,9 +78,18 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
         for name, expected in FROZEN_VALIDATION.items():
             if hashlib.sha256(contents[name]).hexdigest() != expected:
                 raise ValueError("Frozen v2 validation bytes changed")
+    if manifest.get("role") == "current-reviewed-data":
+        from .boost_data import verify_holdouts
+
+        freeze = json.loads(
+            (Path(__file__).resolve().parents[3] / "data/rewriter/holdout-freeze.json").read_text()
+        )
+        verify_holdouts(contents, freeze)
     for data in contents.values():
-        if re.search(rb"sk-or-v1-[A-Za-z0-9_-]{20,}|hf_[A-Za-z0-9]{25,}", data) or any(
-            needle and needle in data for needle in private_needles
+        if (
+            re.search(rb"sk-or-v1-[A-Za-z0-9_-]{20,}", data)
+            or re.search(rb"hf_[A-Za-z0-9]{25,}", plaintext_for_secret_scan(data))
+            or any(needle and needle in data for needle in private_needles)
         ):
             raise ValueError("private content in publication")
     required = {
@@ -79,11 +107,31 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
         raise ValueError("publication is missing required data or source notices")
     support = json.loads(contents["supporting.json"])
     quality = json.loads(contents["quality.json"])
-    review_names = {m["opus_review"]["report"] for m in support}
+
+    def data_review(item):
+        return item.get("data_review") or item["opus_review"]
+
+    review_names = {data_review(m)["report"] for m in support}
     if not review_names.issubset(contents):
         raise ValueError("missing exact review report")
     reviews = load_reviews([root / name for name in sorted(review_names)])
+    native_documents = {
+        name: json.loads(contents[name])
+        for name in {m["native_evidence"] for m in support if "data_review" in m}
+    }
+    from .training import LeakageIndex, validation_index
+
+    heldout_texts = [
+        json.loads(line)[k]
+        for split in ["dev", "validation"]
+        for line in contents[f"data/{split}.jsonl"].splitlines()
+        for k in ["input", "output"]
+    ]
+    heldout = (
+        LeakageIndex([*validation_index().texts, *heldout_texts]) if native_documents else None
+    )
     ids, groups, total = set(), {}, 0
+    new_rows, new_texts = [], []
     for split in ["train", "dev", "validation"]:
         rows = [json.loads(x) for x in contents[f"data/{split}.jsonl"].splitlines()]
         guides = [json.loads(x) for x in contents[f"sft/{split}.jsonl"].splitlines()]
@@ -109,7 +157,7 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
             if previous != split:
                 raise ValueError("publication source group crosses splits")
             review = reviews.get((item["id"], digest(row)))
-            saved = {k: v for k, v in item["opus_review"].items() if k != "report"}
+            saved = {k: v for k, v in data_review(item).items() if k != "report"}
             actual = {k: v for k, v in (review or {}).items() if k != "report"}
             if not review or review["verdict"] != "pass" or saved != actual:
                 raise ValueError("publication row lacks its exact passing review")
@@ -117,6 +165,52 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
                 raise ValueError("publication has unresolved checks or false human labels")
             if set(item["decisions"]) != {"labeling_engine." + k for k in DIMENSIONS}:
                 raise ValueError("publication is missing native decision dimensions")
+            if "data_review" in item:
+                from .boost_data import SOL, boost_issues, verified_pair, verify_saved_review
+
+                report = json.loads(contents[item["data_review"]["report"]])
+                if report.get("reviewer_model") != SOL:
+                    raise ValueError("Unexpected data verification model")
+                paths = item.get("verification_calls", [])
+                if len(paths) not in {1, 2} or len(set(paths)) != len(paths):
+                    raise ValueError("Missing distinct data verification calls")
+                records = [json.loads(contents[name]) for name in paths]
+                raw_reviews = [verify_saved_review(row, item, record) for record in records]
+                second = raw_reviews[1] if len(raw_reviews) == 2 else None
+                if raw_reviews[0] != saved or second != item.get("adjudication_review"):
+                    raise ValueError("Saved verification review differs from its actual call")
+                if len(records) == 2 and (
+                    not records[0]["result"].get("id")
+                    or records[0]["result"]["id"] == records[1]["result"].get("id")
+                ):
+                    raise ValueError("Adjudication must use a distinct provider call")
+                if not verified_pair(
+                    row, item, raw_reviews[0], second_review=second
+                ) or boost_issues(item, row, heldout):
+                    raise ValueError("New data lacks completed fidelity verification")
+                native = native_documents[item["native_evidence"]][item["id"]]
+                exported = json.loads(contents[item["native_exports"]])
+                if item["native_accepted"] != (digest(native["payload"]) in exported):
+                    raise ValueError("Native final export membership differs")
+                if (
+                    native["id"] != item["record_id"]
+                    or native["payload"]["instruction"] != case.user_message()
+                    or native["payload"]["response"] != row["output"]
+                    or native["scores"]["decisions"] != item["decisions"]
+                    or native["scores"]["judge_model"] != "openai/gpt-6-luna-decisions"
+                ):
+                    raise ValueError("Native Arka decisions differ from the actual pair")
+                new_index = LeakageIndex(new_texts)
+                if new_index.matches(row["input"]) or new_index.matches(row["output"]):
+                    raise ValueError("New-to-new text overlap in publication")
+                new_rows.append(row)
+                new_texts.extend([row["input"], row["output"]])
+    if new_rows:
+        from .boost_data import verify_overlap_report
+
+        verify_overlap_report(
+            new_rows, json.loads(contents["evidence/boost/final-overlap-check.json"])
+        )
     if total != len(support) or Counter(x["split"] for x in support) != quality["splits"]:
         raise ValueError("publication contains foreign split metadata")
     return contents

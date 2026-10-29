@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0028\", \"row_sha256\": \"503336fe2fecd5f64720aa92f201b4be371d9a98c1d0262afe61ef3fda8bfeb3\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"need a prompt for a delivery summary for North Quay Depot, and please sort this out because these notes are from a few people. It is a summary of deliveries, not a plan for changing the depot or an audit of the carriers. The period we mean is 3–9 June 2025. The depot code in the reference table is NQ-04. The export was made on 10 June, and some of the comments on it were written later that morning, so don't treat the file date as the final date of every delivery. We need a useful account of what the records show, and not a claim that we checked the physical dock or called anyone.\\n\\nThere are 42 rows in the export for all depots, not all for North Quay. Across those rows, 36 have status received, four are in transit, and two have status exception. The received rows across all depots total 1,284 units. For North Quay itself, the depot worksheet shows 17 delivery rows, 14 received, two in transit and one exception. The worksheet's received quantity is 463 units. Those are different scopes, so don't swap the all-depot totals into the North Quay statement. Also don't make the four in-transit rows sound like missing deliveries or say what happened to the exception rows. They are statuses in the supplied extract. We have not supplied a carrier explanation or a follow-up result.\\n\\nOne thing people keep asking is whether the query counts every received delivery. It doesn't seem to include small quantities, but I haven't checked what that does to the total, so don't guess the result. Keep this SQL in the prompt exactly as written, and treat it as a query to inspect against the summary question, not a result already obtained:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 9\\nGROUP BY depot_id;\\nThe units > 9 condition is important: the export has seven received rows with 9 units or fewer, and 29 received rows with more than 9, across all depots. Do not quietly describe the query as covering every received row. If you mention the query's scope, say the filter excludes received rows at or below 9 units. Don't calculate a revised total or claim which depot has the largest amount from this note.\\n\\nThe separate North Quay worksheet was put together by the shift coordinator from the same export. It lists 17 rows and gives the 14, two and one status breakdown above. Its note says the 463 received units are based on the received rows in that worksheet; it doesn't say that this is a count of cartons or a dock-verified tally. We should keep that distinction. A small receiving note says that one North Quay line with 8 units was entered after the first export was saved. It is already included in the worksheet's 14 received rows and 463 units, according to the coordinator. Don't add it again, and don't turn this note into a claim about why the entry was late.\\n\\nThere is also an arrival file dated 9 June that was sent to the reporting folder on 10 June. It's unclear from the current notes whether that file was included in the export. Keep that uncertainty. If the 9 June late-arrival file is not included, describe coverage as through 8 June and say that the file's inclusion is unconfirmed. If it is included, use the 3–9 June period and identify the file as arriving on 10 June. Don't choose one of those conditions without evidence from the supplied material. The reporting period requested is still 3–9 June; this condition is about describing the coverage accurately, not changing the requested period.\\n\\nA short email from the coordinator says, “The counts are a useful first pass, but I have not matched them to the gate log.” A dock supervisor wrote, “The two in-transit lines were still showing that status when I saved my copy.” Keep those as attributed comments if they help explain the limits of the records. They don't establish the later delivery outcome. Another person wrote that the exception code “can mean a damaged label or a schedule mismatch”; that is an example of possible meanings, not a confirmed explanation for either exception row. Please keep the uncertainty and don't write those comments as verified findings.\\n\\nFor the requested answer, I want a numbered checklist, rather than a narrative memo. Put the evidence and its source before any recommendation in each item. If the evidence does not support a recommendation, just give the evidence and leave out a recommendation; don't manufacture one to fill the format. Keep the output about the delivery records and the limits of these supplied sources. It should make clear which figures are all-depot figures and which are specifically for NQ-04. Don't present a status count as proof that an item physically arrived, and don't add a cause, a resolution, or an approval that isn't in these notes. We are asking for a summary prompt, not asking you to produce the summary now.\\n\\nFor source attribution, call the first set the all-depot export and the second set the North Quay worksheet. The worksheet was assembled from the export, so those two sources are not independent confirmation. The comments are from the coordinator, dock supervisor, and an unspecified person respectively. The notes don't say that the export was reconciled against invoices, purchase orders, vehicle scans, or inventory records, and there is no supplied list of delivery IDs to match across files. Don't imply those checks happened. If the response mentions a gap, phrase it as something the supplied material does not establish, not as proof that a process failed.\\n\\nThe checklist should be short enough to scan, but not so compressed that it loses the distinction between 42 rows across all depots and 17 rows for NQ-04. It can include the received-unit figures as provided, with their scopes attached. Keep the 9-or-fewer versus more-than-9 row counts tied to the all-depot export. The query can be mentioned as a filter-limited aggregation, without reporting any query output. No charts, tables, carrier rankings, or depot comparisons are requested. Don't infer a trend from this single reporting period, and don't invent a previous-week comparison.\\n\\nAt the end, include a final checklist item on coverage and limitations. It should retain both branches of the 9 June file condition, the fact that its arrival in the folder was on 10 June, and the uncertainty about whether it was in the export. It should also note that the worksheet repeats figures from the export rather than independently verifying them, and preserve the distinction between status records and physical confirmation. End with those qualifications; don't append a separate overall conclusion or recommendation after that final item.\", \"output\": \"Create a numbered checklist summarizing the delivery records for North Quay Depot (depot code NQ-04) for the requested period of 3–9 June 2025. Do not produce a plan for changing the depot or an audit of carriers. Base the summary only on the supplied material; it is not evidence that anyone checked the physical dock or contacted anyone.\\n\\nUse the following sources and keep their scopes distinct:\\n\\n- The all-depot export, made on 10 June: 42 rows across all depots, with 36 received, four in transit and two with status exception. Received rows across all depots total 1,284 units.\\n- The North Quay worksheet, assembled by the shift coordinator from the same export: 17 delivery rows for NQ-04, with 14 received, two in transit and one exception. It reports 463 received units, based on the received rows in that worksheet. The worksheet does not describe this as a carton count or a dock-verified tally. Do not substitute all-depot figures for North Quay figures. Because the worksheet was assembled from the export, it is not independent confirmation.\\n\\nThe coordinator says one North Quay line with 8 units was entered after the first export was saved. According to the coordinator, it is already included in the worksheet's 14 received rows and 463 units. Do not add it again or infer why the entry was late. The export date is 10 June; comments were written later that morning, so do not treat the file date as the final date of every delivery.\\n\\nRetain this exact SQL as a query to inspect against the summary question, not as a query result:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 9\\nGROUP BY depot_id;\\n\\nAcross all depots, the export has seven received rows with 9 units or fewer and 29 received rows with more than 9. The query's `units > 9` condition excludes received rows at or below 9 units; do not describe it as covering every received row. Do not calculate a revised total or claim which depot has the largest amount. The query may be described as a filter-limited aggregation, but do not report query output.\\n\\nThe notes do not confirm whether the arrival file dated 9 June, which was sent to the reporting folder on 10 June, was included in the export. Do not resolve this uncertainty without evidence. If the file is not included, describe coverage as through 8 June and state that its inclusion is unconfirmed. If it is included, use the 3–9 June period and identify that the file arrived on 10 June. The requested reporting period remains 3–9 June; this condition concerns how accurately to describe coverage.\\n\\nPreserve the source and uncertainty of these comments if they are useful, without presenting them as verified findings or later outcomes:\\n\\n- The coordinator said, “The counts are a useful first pass, but I have not matched them to the gate log.”\\n- The dock supervisor said, “The two in-transit lines were still showing that status when I saved my copy.”\\n- An unspecified person said the exception code “can mean a damaged label or a schedule mismatch.” This is a possible meaning, not a confirmed explanation for either exception row.\\n\\nWrite a numbered checklist, not a narrative memo. In each item, put evidence and its source before any recommendation. If the evidence does not support a recommendation, give the evidence without inventing one. Keep the summary about the delivery records and the limits of the supplied sources. Do not treat status counts as proof that items physically arrived, or add a cause, resolution or approval not present in the notes. Do not infer trends from this one reporting period or invent a previous-week comparison. No charts, tables, carrier rankings or depot comparisons are requested. Keep the checklist concise but preserve the distinction between the 42 all-depot rows and the 17 NQ-04 rows, and attach the correct scope to each received-unit figure and row count.\\n\\nFor source attribution, call the sources the all-depot export and the North Quay worksheet. Attribute the comments to the coordinator, dock supervisor and unspecified person, respectively. The notes do not say that the export was reconciled against invoices, purchase orders, vehicle scans or inventory records, and do not provide delivery IDs to match across files. Do not imply those checks occurred. Phrase any gap as something the supplied material does not establish, not as proof that a process failed.\\n\\nEnd with a final checklist item on coverage and limitations. Retain both branches of the 9 June file condition, its arrival in the folder on 10 June and the uncertainty about whether it was in the export. Also note that the worksheet repeats figures from the export rather than independently verifying them, and distinguish status records from physical confirmation. End with these qualifications; do not append an overall conclusion or recommendation.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0028"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "503336fe2fecd5f64720aa92f201b4be371d9a98c1d0262afe61ef3fda8bfeb3"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "85576be2281a40136b081f872c6c67384d234085747863c2d3f0b708fed2d623",
+  "started_at": "2026-10-29T03:26:56.337432+00:00",
+  "result": {
+    "id": "gen-1793244416-ITdov8726QY3s2dd2MND",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0028\",\"row_sha256\":\"503336fe2fecd5f64720aa92f201b4be371d9a98c1d0262afe61ef3fda8bfeb3\",\"critique\":\"The input is a coherent, recoverable request, and the output is a well-formatted prompt rather than a completed summary. It preserves the SQL verbatim, scoped figures, quotations, and both coverage branches. However, it omits the explicit instruction not to describe the four all-depot in-transit rows as missing deliveries. The retained prohibition on treating statuses as proof of physical arrival does not preserve this distinct constraint against interpreting an in-transit status as a missing delivery.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r0LDEl7PMU2S7D03YQbsGW-XTUvI7nNc9yDoU4ZdrWfvMpuCvhM6hlONcyqnX_JE8iSNSx7L3YmaKeq07EOzdYsdhvdEvxthctYVjsjx6zBgyXeSb1UJq9JUWRtiT9dwjNdIf_LyKInGpWLkx7Hdje4iML7TdHSrCFaaCr6p0-GHOFH3Niipy40HX2FeTmBIts1kC46sWkMzOhhJri5PqER25-fah5YZU47IbBXmVwzLMO2kQdjdTw8UUhdQ_LnV7-me2aUPWpQESM2kns_grRFOPdh1QJ2rzWpqLZ98dv6_upwx6fzhGWaQP9IjyADIXX_vG4-qcEMPUoOHgiGHDFCCrLxZXVnquxY4qJuZFdEvGjypN-7aIgE6znVMMVw7psqpmgmp1ganMO-19agUQV71LKkoqU5mDwQWPOjYO6RNkuak9VhR3ayuvl_lbMcxrdDxgo3WhVLHyrbIGTUHgOSiM1dPK2pqvKDNCQQs6pwQpVAFzAllVDDlIKqwLl-vpNmUI_pPXSOwGaIGwBiHjNqjD7gqHe9DZ2i68WwgKRTfic9Ca61dfKsh3a0hQdldcMMuSbyJfeQJloLGPwxVUSUfMTnB2UukxLyTLdtiy5Rw_4EwLhDDWjz_GUsPgBgRiHAQhnCye4OESkdlS0rJpd6RCEHe4jqvbRRNuGNQqTvzH0xHF0WGXjRlHff_3bGLkPS6zQwSqBbSjfuFC4NG_mciQq_bz6BEiifa9ihZqVdRGWvXREgUXKr5RMinxONb5JYYLDyMrfyMnS4mkSTHGVxq6GzB_3Kwjf4fUxNn8YVVUJJUw2EjufZtlME20LrbAdYMG3__zmPnDutjpiUa-8YizbNbgsb0nNEJypLp8NaDHkE_FRa4g9el5p4DuVoB4e4__bQv8IiXDDYGz5DMWdyfsbZI89F0HeJ1WPFcPyJLzvVM8RzIymjSKzCBTv6_pw6h2UHMIj9MYX8evig646EP_e0DQI-eg-71lSkJUmzcO1m-qPaWWd31oLrAHR_Icteb4FQ0mifE_ZP_MG0d3e8KUAtMlYimm-le2JsIqn-5WtrCzIRr8kMlXz5tWWKRp0K9ISPrqrXvdimPshezB7gmH1Vzv5z0sdBNVe7gHy8_YRO8mgx3NJg2Aj_kBCFqVyEnnBZWb4cO2xcpMzlzTq1SGnKzZDJPc_LAtQr0-mVcwdsn07uyq5YKU4-nr42JRVADugfd94UKvf8vOiytJHzhwQP-iSYyIUhrdUvtXVqrf9s6AlsuXEzILcoQH28Ok7kqRhnng7stqmZ36ZUvp4cCBEeWoJ6oFIHtjvolwLEguHvuXJOfSqsvGrSc-WvBdSSug0aTj2Y1gK8u7V971OHFv7SSX-PBdxPS84v5ssCo-uwGD8mcCpfxJloWoqRI3iWwwrILOVPe1BNZho3OOgIFApBomX5Ms7caKb-wVnOqWCNIHObS1kRDLEv4PscGXfq5SnHu7c0OnDqeNHkryzgZjVVIATb-2Zb9cPhLoycP6XtGjbrpnq0XybxOTstfItSJFkElon7I_4dc8w7H1k_pFm1f_KcEGm9Cuphl--L-TNS39Ib08v9xLWwo9SAD1d3Le0s507KmkismDLGGGvvlS-CwxdYBTjJJbRxSbXmE-a4fCB398EIMeYLakMPMMySWFe_T9fPAZQM6ux62KGrB5icrT7S4JMPm0_O7YR3wWm6_2oOrPjQriK3UhqutKLj-ZzW06A9u5tHqi-89dfTCOXhNLYkMrp0oaZML2WTGFVMfZjyD_0CMA01OQ2Q8J_npG157Wf1FJcJs-Ng7ddKve4c3EILqBcMuD16x-K3es8QZyCxGaKn37PyIyGcqvtBSaGXs45D3Z_8GZcdhE-lMfMmbYgeO1p0YxbC2J2DMqIa8hvlJGrSb42JUGQVcGiRoPCkAsMb5wlMy44vblrAEbqLoO6qM-Gt0oD5zUE_nZ_IeG-nfGp-jnSMe-r4DCfuaC3c8gyIDxmckx_J9nagVfTTInfHc28cLxOZdKHZEhzmA9hthSAPfBt_A_NOBnMjaGFx1QiAWi4Nw5C_hW64WDi5yomuKD6mtYz5LOU16M6paC372-S4egjLzfbWxfV2OeVbupVEzvxnNpcG4uJlISEEI_Te07LP_D78lPpxgDRn_MecewnL_V9LhxZXgS4L0tmaKEmIeMclOaSngVCM1WeSJdr_QohMq2qYLd-Q1-BzFpdLV9h4o4UOyNC-kbMNUmQssK0OYPLG1Y3BYINRbRXl4iDqZigN-p5dy5K-53pMvMjte2R9Df9Nu3YVmUPrxQ-V4ckuxvzuC-viEqWPrtAyDjwXt8Giahuawuf-8sC5tUyCMBnursGU5UHCoiG8iqveN0PN5OfUbjvxah4kJREeyzdL0kllWOFdRX8SNoKkcK7Rmd68fdhQ3w5Y78pVUxtTIrhhiS4ZZcG8uS4i-Z40yG2OR1j0vbE8Fm1LceqXtniNIrh1DfJHAXobUi_R0-lNCX8cRYYl_sKi0iv0Akjf9dul6V0WmHA_vyLRYiUNP-sd8FnkQBkgXqv1OL46lnDOvSQoYSxFXqTqYHI2KPiW1DQwhnCnINNQgijBw_CDP9AHusXSjcyKHxKxIoWJBVoAbGQUknVYywrewgMQOhUdtds8Ev-M0CkMyY_vwt4x6VgJWgjJNiCemmzdndIiTOt66xv42Pe4bL2fhVgalhchIU5thoZjeboRdxD8NNF_k9vKLcDw0XdVsHmnqnr0iidcYdOybZGSLRVR_D0DC2GQIeNWAtoAmMNFBcs6pOyre1Bn6693i7MqbufrI5Yqp0HbcE5zzNWBKYQlUzX8ffWKHAKEk8zrmPKs53Ltj6Rllu_pPmh8gMJosLNGv5Tzx2NKHbvwlFwG3jqdJEaLzPIivSN9bpg0t1jCryBrtm0H1Nk1wSmZGumYvxEiqIu-4gOtDfxzop-Sre-XYbjLLfWFz8rzK69fhReH6H6MNIA8VKfrfFZD1Swd3vl0KXBadpB_HFramkjjVsXynHXRL1WVogYBjW7BT6KaCBcoZ3-ICp-tkJFmc0v4Ej-IKyuz1SP4-jQmXjT08NAPK_0ODzOSoXReOSEwAwmy-dmisAaCtlZ-xrrmVx7AuF437DjODFEKcO7jZLwjSNQsHyYD0DYjCgA9idPfTjcF0Y_e_NU1wfPe10_sf3Oc928wOyp8HyWn5Exz4U3PGzLyEpk4TMCyXGm7Qx6VGwyIG1OI4z_pI_JXCC8KUwtXjOAt1O1ED3O3ZffgOAa6fVSqs0qiJa-OeW9rjT-4byHURT5FdxWAeFPmBzNA-dzmVVr1lTbwJUihLXij48fNNXaK-e7GyNmZn6XSdFojj8J7-sFwgEcC5LG9Z_GqTm0jZkVSoFpPBYauIUw8NjtecVRr4i23yodRaFcsbqRD8uAsQy5nyp_m473IBadxgXZgQvuId0JT9QTFn5SKNV6r1L9Gyo418zMN451MEmkAUnwWhB4Fv_XszgKkW70_HxKCw_VSNj9URPXjrsH3yiNZYadHNK11aLidpVeUEwu6VBRB0Sq2gP8szmC_39aq9urcBKFpqZAPrhOTKubqvMH_j9_VjaQYYGf-wxq21kA5RbacVNVoi1KgcSDYWBuXEkUErtlMb_X-yyRXhGHvF0nhJ3UmDwGOBVR2dhufqQM1CBc99Ys4bl5TySfK4ehOmRcbUkQRjmYH2KwGeGoaUuiHq0CrqaO1xhyw_wWHw-NrWukTkyKWJ_7fZ8HUz4brUQzh-FhX2WU_dWTI_R3_pVOc5L7bTjPb3rMAT2hOu8gGsDi1iIFotc9249GtLdEMWdSHk6uFx7s0vuwehB8LxoxCoGtxYqmMrVdi9v3KMECemUrZVmSISTGsx-UXpnkkBkR_pmJ3gUYc7wFIyCOfKTilThqtJlt3tiMZZzq5D5-w8PIJqtL55Foj5Iu6wc5UE0xlZWL1MdTmZpmSd9D4S_M7AZP59NRmQeeAC5uPW5jTPr170Jm67ZIAmB1QRdETMiIJ3IfyVOAbF8PHBhNf9VO6uDRp62Y9fpVcGfC0tlKCs7pb4W-1RB3PivcQQulfzNv8h2KA-AIqu1d5NJGzq7-SemPcNIE-DyaAm-Zfc4XGnoQteL7WS1m-GsiKp7BVSgw5zNRv2nXT4iDIQyQWhHPR6IMMfdl4ZOHdTFCgYkdD0m_NUm_uEMAju19YCBs5J0Zf3ruhUZl6Xj4nl3w73H0q44iRgcvWNMUy5rmGhRZDOaeoz9Xpa5KqTWuaXTRGbS0FO6Xl6Z-AJ1Z_-wm2lmKINBKC7oEAinnAInalfwVIO78J-usdTF03Kv16wmmeqcNP0ir6wDspX06IatC7crTSPJx4I1fbC_npYbyshKGAUfVq57cKAe-EqnM4I2R4zpwxAjnpBpFC41giIPEI-IfR9xrSjbP1NRxIxEQlFsg7JVx_VzoI2kzRpIkAbBlIMV-e0-GE5O4iWAJnIu73N-cc9FCguDLp16M7yeSo9feAu23-qhDYt94v_GrqeDC3ya73lsdeXXsPZVDoQJYwIEov2kyE7Rb6E5hKXNZ8kgjbuibUQkAZYrFL77a1AAEk9DWlZkqPUpIr2GI7hzUABPt0Gcg7qqzocWb3kWoR5cfVs8clz0wfrJXWc2bJdSzc1C06WqOI7YexdYpDl7oXasmF_J7uFW7imAfa4xo56AmB9lB0aCT9Ob_NqNgSTDL74l7AgG3HItH8NxGW789iOkod7RHAp5sIJ2Ud66gXIAGkH0YPGCbF9E7qmGsv8cz7cgesE7U_paP4sTgLAtZOJCHDSotaCBheWrnoZfcOIONrn6gzgguSQw3G1CFzsg3Svs4MMELhi7exB1JABEU3JgcWf8J8dOXRnGSaNslbLgIY6FP0DO-inBUzM2sLlehLkAjuSz6dhcl4iLsOJp5qPzlzRRwcYd25ZseYOG3MGuJ_oxB-UEkqwIkuruVoBDnvbBLShnwUVTDBJnqvQ7X6Gr-BnB-jFjXUJQcpt2PyiNSQvIyutpc-xecl0-oAAQwf2vwy7CsNUW7UsXp4NcE7_zeesHalqxfyHDR0zI6d4QUzbg9N0nfrZvYoe75oVYqa6vSeDYRbYE1WTGfdHq0p7ElUzTHtsTQ80Om_TpHBC9kKe03FkMdopAT_ym6IDKMDZjjfJw4uExFiY_7fadLgTgybWG4QQIRjv4Y0mPfqMPFvUJJRqWS_FUnbsXjf3M39dYgDo3n8OHvK1sxoNT2AX3hheyTroADSgNkLtXMSkeWMkQwvlOUMGU0C0QkxAGW-eI1maZ3nZR2Wl6WaCOh95tj3EeMJCVZKT07XM6kGzq_JXji_uGKK3eIUl1W89WSQoUQ-wXuwkVvm2FMoDjkIMtmcBpujJ6tFeSoxNVkk7DL3CSY4TLTjIBOq4K1hSNV9wtgDZqbfCOwj6bX4pKfwkzjoJ04tx2rGphkicDl82kLCCWh2PQ1KTEslgNF0LDGZVJ6ukCbcJRtNlcHEjVBro0IFaqMEHD8B3MOSkF-Zat3h2qv240A7MJ82nZIL-LuI7X7NGkbUbfQPetZtVuaS3B_xGWK1PR2dRXkZTqU6KnPlY50eQWsEwQj8HdQsq0Woo87Md8sx6zuJ8VG_DZ7LcEUe1i01YU2H8IhIdD2zGJ0xdw52aRpmvqUKwlJshV908gY45nmzn-YY1YQso5z4sxXzqaeeLw5QHplsfrLaUCwXVqhClnfYFJqzNmiNhtCoQR-sdp9j8tgSg9ZcpvmiM8eQ0lGewIsvHBYwHSQOa2Xffr1ywfJhvXTxR4jDUBg7psuw58W-4cMIClZy5frLOtdQhncCCnspNBQs82iiIdoK8G27Dx60NBi33BaVh7Vl8q3v0dtJUhxtyE1oVfgxn6LuMUNvcexsFg3clia1RjRM_UBpMtLekKDuINC-XxCBQmu-Qo-xWNSegHeo_lBBbrSe0yyHOoS5Dx7FGHZEGu9QG-TzHfi0FHBlbvKIEzc17FouBduRRps7tQC_IOyAMBbLSOZznDfSQxo4NBqCwe__Fv0QL2-MMldSED0z2ijoReAuDd8GqvWYrjeE4qP7iiXsEcTOsfoS0zR75t331JY6KTt1s-rcCN7bMkj9Y8n2pHPz_pa9w_1v-D12OXSPIrkLI5fCmilwHu9xtruXVe9Q4jeevhGe7_Aa277Sl_pPZ--J1jtczuIJ6lKk1slVHqhUf9TanUDAtEREG08Nj-v7Gq9MdLkCPPtT22LL7ejYRRep3-C8qPM6n3BA5uUOGcE_XdaXW-_rUGs-4vj--4M_DiMJhXwxT75YRNmE8TRDyKkRYelnNKn4yabpmAu6Fnk1jZ8dh3a47myextUpYxOo5nrrrCDSXyy40oUsWvONKhVcOTyoo2t410sbeXs_MqAq04dWu5D4gdP1PymvsY4E-CsHxcGTECQd3T63HOMPJh2_eVszU_jThc0hqmpzI6sJEQzYLJe7EFKfw9T057fWpDRfgidFMNvw27vMZq8On75eOGE18U6rlRMbHfqRMpXIg71jIVtWpZxdBTdcolzPUoZ7i000U6eDLy5dp0Otk8bYQJTizHEv.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0b15caff103879a9016ae2bd015cdc87d0ad79ad840ea17926",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244416,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 531,
+      "prompt_tokens": 3023,
+      "total_tokens": 3554,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 341,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3020,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.012866,
+        "upstream_inference_prompt_cost": 0.007556,
+        "upstream_inference_completions_cost": 0.00531
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "5d40a1f85c1208901705197be87a9879ed2399f061ed4a2fb4b19958b21f24e8",
+  "elapsed_ms": 14209
+}

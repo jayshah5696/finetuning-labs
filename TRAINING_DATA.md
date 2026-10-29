@@ -1,9 +1,44 @@
 # Rewriter training data
 
-## Current 1,000-example release
+## Current dataset, 1,500 training examples
 
-Use `data/rewriter/reviewed-v3-1000/` and [the L4 training notebook](notebooks/rewriter_train_l4.ipynb).
-Training has exactly 1,000 pairs and development has 100. Each mode has 250 train and 25 dev pairs.
+Use `data/rewriter/current/` and the single [L4 notebook](notebooks/rewriter_train_l4.ipynb).
+The existing public Hugging Face repository is updated in place. It has 1,500 train, 100 dev
+and 84 validation pairs. The original 1,000 training pairs are an unchanged prefix. Dev and
+validation data and SFT files retain their exact original bytes.
+
+The 500 new fictional episodes target failure categories observed in the original adapter:
+changed main actions, mishandled spoken corrections, missing conditional branches, lost supplied
+code or quotes, changed actors or hedges, and missing final sections in long documents.
+They do not copy the validation cases. Training has 300 Slack, 450 transcription, 400 prompt
+and 350 polish pairs. The additions include 180 long inputs, each with 1,000 to 2,000 tokens
+under the pinned Liquid tokenizer. Long examples include paragraphs, numbered sections and quotes.
+
+Generation uses the pinned latest clean Arka pipeline with GPT-6 Luna. Luna Decisions checks
+candidate input, output quality, facts, intent, literals and mode. Exact literals, identity,
+token limits, transcription words where appropriate, and overlap receive mechanical checks.
+All six native decision results must exist. A score at most 0.1 with confidence at least 0.8
+blocks the pair. A native final export with all scores at least 0.8 and confidence at least 0.2
+requires one passing Sol review. Other complete, non-vetoed native results require two separate
+passing Sol calls on the exact same pair. These probabilities are not calibrated quality scores.
+
+Each GPT-6.1 Sol call grades the input, output and pair separately, with exact row hashes.
+The two calls use the same model and rubric; they are not independent human labels.
+Failed and uncertain Sol verdicts remain excluded. Only incomplete or malformed calls may retry,
+with the original attempt preserved. Raw calls, rejected candidates, plans, configs, Arka scores
+and exact review reports stay in Git under `current/evidence/boost/` and `current/reviews/`.
+Only Parquet data, the dataset card and license notices are published to Hugging Face.
+
+`quality.json` records measured counts and separates the original selection statistics from the
+new expansion. `holdout-freeze.json` protects dev and validation. The public publication receipt
+pins the notebook to the same data commit and expected counts. The final notebook check encodes
+every row, then exercises real LoRA training, save and reload on a tiny CPU model. GPU training
+and the new adapter's semantic comparison are still required after the user reruns Colab.
+
+## Original 1,000-example selection
+
+This section records the original selection, now retained inside `data/rewriter/current/`.
+It had exactly 1,000 training pairs and 100 development pairs. Each mode had 250 train and 25 dev pairs.
 The 84 validation data and SFT rows are byte-identical to reviewed v2. Source groups do not cross
 splits. Training has 1,000 distinct targets and source groups. Dev has 100 of each.
 
@@ -38,8 +73,8 @@ semantic quality scores. The exact report binds the training file hash in
 
 ```sh
 uv run --locked python scripts/data_distribution.py \
-  --release data/rewriter/reviewed-v3-1000 \
-  --output artifacts/recomputed-v3-distribution.json
+  --release data/rewriter/current \
+  --output artifacts/recomputed-current-distribution.json
 ```
 
 Data rows still contain only input, output, mode and checks. SFT rows contain only system, user

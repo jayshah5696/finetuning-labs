@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0046\", \"row_sha256\": \"e86be1bd2a3fdb067c55899cb23af6b2ce7f1e7e6dd8496cda5f532d472efcf7\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"hey, i’m putting together a request about a small delivery rollup for the north quay depot, and i need help with the sql below. please explain it, review it, or suggest tests for it, using only what is present in the code. this is for a handoff note being prepared before the depot’s afternoon operations meeting, not a report of what actually arrived. i have the query but no sample rows, no database documentation, and no output from running it. i want the prompt to make that boundary clear without turning the request into a general depot-planning exercise.\\n\\nThe discussion is about a fictional depot called North Quay, where staff compare delivery paperwork with a daily rollup during shift handoffs. The person preparing the note is trying to understand what the query includes and how its grouping works, not asking for quantities for any real date. The operations coordinator said, “I need to know what this rollup counts before I put it beside the dock notes.” Keep that as context for why a plain explanation or careful review would be useful. Don’t turn the quote into a claim that the query has already been checked or that the handoff has happened.\\n\\nThere are a few details that should stay connected to the code rather than being expanded into assumptions. It names a deliveries table and refers to depot_id, units, and status. The selected expression adds units and labels the result received_units. The filter asks for status equal to the literal received, and it also has a units threshold. The rows are grouped by depot_id. I’m mentioning these so the request can direct attention to the actual parts of the query; they are not evidence about how many depots there are, what a unit means, or whether the source has one row per shipment.\\n\\nThe inventory lead has raised one recurring point from conversations about similar-looking rollups: “thirteen is where people keep reading this differently.” In this query, the operator is greater than, not greater than or equal to. If an explanation or review mentions the threshold, please make that distinction clear and don’t silently restate the condition as at least thirteen. The question is about reading the written condition, not deciding whether that rule is suitable for depot operations. There is no supplied policy explaining why the cutoff is there.\\n\\nHere is the complete query to use as the basis for the request. Keep it intact rather than replacing it with a description, because the person receiving the prompt needs to see exactly which expression and conditions are under discussion.\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\\n\\n1. The request should leave open whether the help takes the form of an explanation, a review, or tests. Those are alternatives in the rough request, not three separate deliverables that must all be produced. If it is an explanation, focus on what the selected fields and aggregate express, how the filter narrows rows, and what the grouping asks the query to return. If it is a review, comment on the written SQL and any uncertainty that can be identified from the snippet, without inventing a defect. If it is tests, suggest checks that relate to the conditions and grouping visible here, rather than making up a test database or fabricated results.\\n\\nFor this handoff, people may read the word received as a description of the data, but the only concrete basis available here is the equality check in the WHERE clause. Likewise, the alias received_units is the label shown for the sum; it does not establish a unit of measure beyond the column name. Please keep those distinctions if they matter to the chosen response. It would be useful to say what cannot be established from this snippet, such as the shape of the table or the values in it, while still being specific about what the written SQL says.\\n\\nThe note is being drafted in a shared operations document, where a short answer may later sit beside delivery paperwork, but there is no need to write the note itself or reconcile paperwork. The request should stay centered on this query and should not ask for a new query, a dispatch recommendation, or an estimate of arrivals. If more than one interpretation is genuinely possible from the code alone, identify the uncertainty rather than choosing an unstated convention. Keep the response aimed at a reader who understands basic delivery records but may not know SQL aggregation well.\\n\\nPlease organize the request so the available context, the requested kind of help, the points worth checking, and the code are easy to find. End by reminding the recipient that any explanation, review, or test suggestions should be limited to what this query supports; do not add a conclusion about actual deliveries, because there are no result rows or run information in the material I have.\", \"output\": \"I’m preparing a handoff note about a delivery rollup for the fictional North Quay depot. Please help with the SQL below by explaining it, reviewing it, or suggesting tests, using only what is present in the code. This is for an afternoon operations meeting, not a report of what actually arrived. I have no sample rows, database documentation, or query output, so keep the request focused on the query rather than general depot planning.\\n\\nThe depot staff compare delivery paperwork with a daily rollup during shift handoffs. The operations coordinator said, “I need to know what this rollup counts before I put it beside the dock notes.” This is context for why a plain explanation or careful review would be useful; it does not mean the query has already been checked or that the handoff has happened.\\n\\nThe query names a `deliveries` table and refers to `depot_id`, `units`, and `status`. It sums `units` and labels the result `received_units`, filters for `status` equal to the literal `received`, applies a units threshold, and groups rows by `depot_id`. Keep any discussion tied to those written details. The code does not establish how many depots there are, what a unit means, or whether each row represents one shipment.\\n\\nThe inventory lead said, “thirteen is where people keep reading this differently.” If you discuss the threshold, note that the operator is greater than, not greater than or equal to. The question is what the written condition says, not whether the cutoff is suitable for depot operations; no policy explaining it has been supplied.\\n\\nUse this complete query as the basis for your response:\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\\n\\n1. Keep the requested form of help open: an explanation, a review, or tests are alternatives, not three required deliverables. An explanation should cover what the selected fields and aggregate express, how the filter narrows rows, and what the grouping asks the query to return. A review should address the written SQL and uncertainties identifiable from the snippet without inventing a defect. Test suggestions should relate to the visible conditions and grouping, without assuming a test database or fabricated results.\\n\\n2. Keep the wording precise about what is and is not established. The concrete basis for describing a row as received is the equality check in the `WHERE` clause. The alias `received_units` labels the sum but does not establish a unit of measure beyond the column name. Where relevant, identify what cannot be determined from this snippet, such as the table’s shape or its values, while remaining specific about what the SQL says.\\n\\nThe note will be drafted in a shared operations document and may later sit beside delivery paperwork, but do not write the note itself or reconcile paperwork. Keep the request centered on this query: it does not ask for a new query, a dispatch recommendation, or an estimate of arrivals. If more than one interpretation is genuinely possible from the code alone, identify the uncertainty rather than choosing an unstated convention. Aim the response at someone familiar with basic delivery records who may not know SQL aggregation well.\\n\\nOrganize the available context, requested help, points to consider, and code so they are easy to find. Any explanation, review, or test suggestions should be limited to what this query supports. Do not draw a conclusion about actual deliveries; no result rows or information about running the query have been provided.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0046"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "e86be1bd2a3fdb067c55899cb23af6b2ce7f1e7e6dd8496cda5f532d472efcf7"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "a8f7734164bf6364f599a38ade8f1e77999e0deb9fe62c71eaa4b88aec6ea6b0",
+  "started_at": "2026-10-28T23:36:37.002792+00:00",
+  "result": {
+    "id": "gen-1793230597-a5jYUQyo5Fh5afcVgfTq",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0046\",\"row_sha256\":\"e86be1bd2a3fdb067c55899cb23af6b2ce7f1e7e6dd8496cda5f532d472efcf7\",\"critique\":\"The input is a coherent, self-contained drafting request, and the output is readable and remains a prompt rather than answering the SQL question. It preserves the query verbatim, the alternative forms of help, the strict greater-than threshold, and the limits on inference. However, it changes the note’s status from “is being drafted” to “will be drafted.” It also omits that the inventory lead’s quotation is a recurring point from conversations about similar-looking rollups, presenting it simply as something the lead said. These changes fail the requirement to preserve the supplied facts and context.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating tense shifts**\n\nI'm noting that the shift in tense is real but seems minor and not material. The definition doesn't show any material defects. It’s usually relevant during the stages but not on the final output. I think we shouldn’t over-penalize something negligible. However, there are strong reasons to suggest a failure due to timing and context loss. I’d lean towards a failure because of those specific issues, but I don’t want to overdo it.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating tense shifts**\n\nI'm noting that the shift in tense is real but seems minor and not material. The definition doesn't show any material defects. It’s usually relevant during the stages but not on the final output. I think we shouldn’t over-penalize something negligible. However, there are strong reasons to suggest a failure due to timing and context loss. I’d lean towards a failure because of those specific issues, but I don’t want to overdo it.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ocQTvmg2cJVJTyIVZQQSbWArVxTCjM2ipiHyT-1i7r9lmibmwZus8reDqRz1QTboNYszypfnjSXD1h12JmNE8FH6zDZVMZ0hO2ydZWWFITsFNmxWqhEp4uCKpOHcNf23aUSppXaxjYfuWmUVt4YBFUplPfli24iRk9SF2WQBvzIcuDLWrH9hu6cXAYjhhkmGYYZAMkHAQ-PZOa-W7fAiTMTwtE5Bjq8lmIlLAhoMoM9nZgsT9Z1AOsYcJXddHk6d9UlPaZZ_t7uH2XFdZ3Fasx4ElohZVYC__iM8UDXSlU_e5DtanmFnPxTVhCpAr164U-2hU6ncf2TioBr8OnL_8MHr-m9m0T2UVXocX6HX0_DncUJGGSMVskPWBJnv0deoFA44AhrwMn3cX0fm8GCjQiAXRCoxIRVNzBKfEuXlp5xWuDq53yfLoUYLbvHBVND_2yj1rDIJNTiWLR3xEPZBRJfsjsmIpVRRe7-Srlm_I9bm3pcqxuC1W_AHJ6qNXMZ7FvPLdnah98fRjv0ctpOonKgrsEKU36vbEY-vGYGOK_e-HlTO_VFeaVEF0YrLJpCJPS_Xa06a2vugUNHlTPyTPE_kykjIXKUqQ5Op6hc2ygm_uxSxEMvoWUG0rKx2bTlU2lxOAPi9Dd6gaNmYIhml315ynrD5leulWJmNy_ZlqjfVKjWPcPk_2vMjUrXavPHVGuIGL7-6AcuPWvsDpLLBhsNmqbgnIFvNfgMGWfguOvkCDNQ6kGiuDjwCUo87lzQaCwAmLXqrz7qaSexC8TaNqICglGL_1acdXCVnU-4a7zH4VYFEOpOqYc9X7Zo1U8fJqeZM9viPfXoGXluxXQJL6iE7wJM_1k1axJaBwaVJWMI_VNldJk0GT9jFDu-nQRfKZGHLXf_ovw3JryDg0pjDNoTbmQNX1KsKPHy55URGtYj0ceZJD-1GbqVuID0RFKqJ6GWwaBpNJ0tuEMNZJGdD2Qeo8vzTdw9InUsLq16Gtu_2xkC-v-c_tjU17-h77GX1es7n6_vNnaZYB36MEkV4glLJxkRMC6eu2Wg88p2HCx-LBr9y6ZXty5KfF0B_QQB7uL9aBEEZjczbAvx5B9pOqmbNwXNhHUN7Q63VOIFh2xUFfJ72ugb104IWDoyTo5my9W9mr9lES1w28CuaQmGS4uWu-TfKtAhXc_TQmTo5CsTCixe4vX49gR_Bg4hS4KzEoQwdUShfeW3g_uQpkArPJ70-W8cVjzNaLSKYdi0M715HG8XO1fSyALWm-dV6T9Nk3HLrLfV7EXWIz6odzgu-Z0_bnIy771xbuGoPq4mURcM7kYyx9R6RkuMCXtTcPNJ1CgP22MXbugptK6n6t4aXnmIC9sl0K-I91wZ9j0F3cqSw22NiWvHW3a5c34uJOhQUKcpGHFsiyAP9oqhadYjEoKYPe-1EY_CwfipIcja8slzKLk-9THT3GJw9NIsHd3WFTbqYxKjZP9UbMaEXsc-GRdA7Vtkm0NdqQ7y9x5uYjUKAbe8P96nEBgZTU4V0S1u7ixZuxtJapivd4szI2l4EfRw6UwUS0N8RR2rfZNnaHpQuF3EQ-RCzQa9dwtgKgGUhLCRtaMaf6iEYETD3xu5WIFpNFn7hSCZGFl0wuofgYt8EBMP9flvAYX9F7YZwTnWnME0dwOLre9KXQCAp8c22CtjnxRAm27pQoUhk2QNdBXzSd2AcOnr8AbEUuURY6qQZS44pVRKfDNMpd8-pkpleU7LUCtr5VqVqS1mz1ToXo4ZFPcZEP7tFF5HOWUTb_RQgZgngl-vp4k8CwthPNrrC7k_BuZFej9sx2ef2kpBaGW5DVhVXpOsPIJOjXZnMhx-zqZ6pvFJRP7XCq-ziiURWadqZcmyzjzgnCvZu9EL1br_ImZIVN3Ii9aMQymK24gLU0pfE287goakPfVzBPX8WHXpY_gquAiDmDBt6w_nni0oNv6Hvs3p1NOmAAvcsoxqtCqlmkhVIoKTu93IqV-nstQ-0sdATDvYSIGsMRQq-g39KPFoB7pswSF017skkGrYIeXCv1ZiGadlEAL-iinoCmH30Oiv7-YHRfvx4mU4U62VcwxF4oiS5kM11MPiR0b_PVk3e7SX6Q2jX-f9AUdyq7-jFBryWWa4sXAMup_cbJZ9BuYvHt505nCafXpQXh4zlELElu4f6HtyLeevag_TSdQKec9rVtDn9B8c6L-b15mQRDw9QmKt6SFCXyvhPedGhRETPXuc5rJ2SokzLqq9ddM_uiHRBC9azliw-naAmWtS7RJD3tlvX7W1kH4zVoMb7JMKLX9mv2f5f7CPaki9F_d0R4foCuQyTQS4lxcpQkZ5aartYkMe6cWkcdJd2sxzpUVnJ_2JTnW-8shNlj38WslM6up_b80SdeDC56iUdNyX0NpDobKNY9a6TFMYCZeVHCoQD7BMQlo9hIBuls_55WvfR1yyZkJJpNnRwxwLlF61dk6Oh_0Ef29uaqQskZIZGdVI97FXJiA0y2aGTvesc0Peh3RmCB1urGFkimwT44sd8mjsuVtDCe245zuJxD2ahKVw4_5-B8YNofFgbqP--A0pXy6KNmLGho2aI0jIyF9kEabWUYF1C4ECaL-5_1enVzYYFTPTBD9XBTcOaKj3vJ5S6yu_SzcXK2dvgX7xgDh32DutGYrEHDGY9443199Hck4M5gnvSDg6OrY4iqeReK_FoLgyvAZDaaCMiTz4qAbJy0PioECkbliRVefhe8HdMwVNEd-REQQoPQ_vgX8YCOYR94wwlU3GXgnRuS6QGxgiaEImKT0gJPkmah8EQJ3xuna9xK-oe3_z7UEf_x0XQ-Ua7R4yfpNGCtCC54WQsn1KfSTIJgrLGkBOecNYKthV30879itf5hcE8odbjdgJkzsMZ8865nxalMsGwmECuDc47pRIMu1KXyBcPQVB0Dq1XaDJdi3gYV0Q6tObMH0aPhnJ7RM8NXdiybjXK7gectciQ-P2bIWobKqGVPbhWT_X-WxgXfZyowEp_qo9a4UiJ8Sp9fu7XgvMf0VcVyAivBXnmNS233sFJFCbWtnE3cu_hp9XDmaqu9sBJLPxBTxKP0-ckEIdyCEjJVPdBIfq8ec2jYR9ki_B6Ok91Cpb9PlKdZw0iSia-hgZKH0oQFFERhh2SbUNeuGsYRgVZjQruhk8gtWxXAzaKV6-ACdj7QXiHC1-jDwocqWd0Tr5aTpE_6UkQ66yrs2xK18uubGgs4DZEmZOXrejnc3t8xWspSs_dzQ6bSfOekc2l_8i0Xux7RwqDV6gYaEXUXI9_VGqOAwobvm1G6b9vECbQdBCQ-af6jLJ2WlmvnuSu3lgms3yrL0nIWxcEYg8dlzSpRMgBQez8uB1LueIPXMQk2LIahvY_B5Xe-c3_mZWCaRcorLQ_9Iv4zLKrh0Iv5MNEaprqjbthQGwfOZ6vZvgNRmtFP9Q1V4YEw368f2IKJsfIqRYRbI5u2xNHiquNZDHt4MGSNe-J5vH0CbjyoiUT756MYrGJCfpaWM7mijExMXQtmPHbafkhWFwEXuCqkxi2mZPyYmyhD_6SYRfHyWuagE4KuCAOOvqOaaKd2mOWd-PHfTg9LgT5Sm9wgFON9MhPWrAuPGAc8cDhlu9uLewmv2YkyBbvcR79wLoJJWCOjVWYn1ZjKEIZDAGmFbiDcNdVqk3l-bKWstQOvL0xmqi8WsMt6vESKZgfQbkbmXPRtczztG3_AI9OZA4RX1lZjnz0xk9jc7LDzTE9OytbrmrZE9wQhha7c1htLicxr6UPiy81j7InVJG9HVUYD39WQqbZtxlmcQytQ22X3iYK6KuQ3RhCxN1NSeNj-De6PHz4MHDNuU9Ns8hTH_yXQ20I6nkqxF1V8imuynwp4OYQDzAfo5gO1hM9xaXM1lioeWVO9PkP4_xnIRPS25PSe2nmJnXvmM7QFarNm1MI5t7hWxk5a2ayMD0GyBx26TFEOYjoklGyNWknXam2IE3LAbxuit2RR_6EQcZ40G4H-Gdsso-AiB12pT3O-xN7NoZXg1HB63C9KkmzLq5JzYql1Oao0jXSffnxHcZzxWooXpXIlQybZiE3JAkU8bSdj_x5WSr6Sxw263A2QH0U5TW--ju5VuqcFqgR63kNv7AmP56AsZ5ylv4EesFkrIOj0NjFe-y9waAsGqr5IMx2WFzYYIp4g0r8ekNPs1-FBvGoph5HKUDxzvCBOWZZocAvB-sllDX2udjLH6DEefSub2Bt9q6Br_g98jCT3BDqRdMHl84Cw-pv9pRW_jV5YUFJniuUF_h28fk54Sa1m1jYJrjU8em_1614UrcGSaw1LozjE3o5Dhp4InfkoX7Doq1FzvHDK4LvDvEKi5bdNWKoHzStuxJJEr1kXW_8dMCpmqdSY6G-YzwYTPWmqManeNHK-77XVqIoc9UqugxI6B80fHN3K-zMhdswHIf4VSEDzY9fXggkL0LTtrPj2N_p3fJxHO03DM_IXDjAO-JifaxLTsGWfR4Xz1KNfSj7qMIZNHjma8zqJqyvtpXEn61FQPps1sj7BT3v5tG44yaoQg1SWHSobS1Kv3L80FGF_yRucQ6brWonCsyeWK8FiopdighU4bmQlmruVvvnQiNsfZnDr1XSh_VXTb_rqDfysUI3l3HZsy4Y0ucVZHq7mn4lRMe4Bpr_TKa8FVarGvjz1LVCOQYQdW1xXntLHSasFcr0d6qOsKIvQjyyvLdiduX8lr5pHkE-KKIjyfTIRjP0K7LlP6ogQF_QKX2ST5obmJhnNfvTjy0q8lvmSMxuBzdaa2D_zsiQjiJOnDo48koWPl3Lc1h_bBCo21IrGyzzkgvcLBrSyzNu1RdpV0FlOxWaejeDVIe-UpLuNdKobdvsJy-QXH5CE7gU-2Nv8P8iHv5PP1fHk9oLRDGrtxynnxVt8O2R8mnw6A3ZVr15d1jxuh5f7edfXPkgQiJCn4pfFrFDtyZHv0bWFT8mqq1Y5UVRfD5OFOqALDNEUcyk04m0I7sKtuKUc9JGCooTYRQGjJffJGUKTGsedJhbeAfc8WyRIju5CCw8-QzbN1Bl5eSbUPsARSWHP8UGRd_QiwoLeJvXvl_vsTxwBPHLsw9yQJ2AI4CfNMYY8ELVaJ-n7LQ4-vqH3LNJG3DKVlLXMkMd4PlismwMVc8JxjvRgClVFTh5eVN2fxXJ5thxPtie0lRf5TH_XHjQmaFwi9VCNOkzVTQfqBRTiWc5dtT8EaYgG_X5La5_llitSKzBOlCZvH4IIqOQExwXJft5jEViojmtOMmljCN0rW9Z9VOjZGOPFCpXDGtzvHw_HUiVCuAN6Ufx7qK5T5bUQDfMLGlnbkm9wPzlO9XwXxf8Al6B_I2xmZoJ485xUIaPmec3rDvsZER4NxnSBUd1IhCKYncXZMivOa-99FzNQN8xaVRy2VWGy1QEzVciArSQ9hQp7xmlV73c1qiX_8MIltMAZ2GacGgSMdZKrdVUeDN4fNvOfU_JcSrIjqSo7g0xQM8dEO9u2eZYtVb7TT6MCWCF1qD-Xwp2O0-wC4Xohz4pgMVXWXYfB9pK_H4UHIO0Fpk2xxihVPGfHDcuccqCqbJPSSdvpSFZh0x7XmUiLyO4470vAZQIesHvN4b3xHKAWN_k-Bo1U2bAMb0pSkEwvJ73XG5IBT6F0-r_Oc=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0d47f62bd0235a42016ae287065a3087d08d3cb0bca4f16958",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230597,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 506,
+      "prompt_tokens": 2311,
+      "total_tokens": 2817,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 291,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2308,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.010836,
+        "upstream_inference_prompt_cost": 0.005776,
+        "upstream_inference_completions_cost": 0.00506
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "b9c61babd5ef6365fcbecf9a3e892b6f42dc6880f8369d257074580ea55fbb53",
+  "elapsed_ms": 12344
+}

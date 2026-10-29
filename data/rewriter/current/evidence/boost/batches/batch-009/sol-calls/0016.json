@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0104\", \"row_sha256\": \"58e8dfa69a830f291c006f89e0012a9a6d70d8933dae47917a4969c0c3c4b2f8\", \"mode\": \"/prompt\", \"language\": \"de\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"prüf bitte unser bestellformular für die bäckerei und sag, welche beschriftungen für kundinnen und kunden unklar sein könnten. ich will vor allem wissen, ob man versteht, welche angaben für eine tortenbestellung gebraucht werden; bitte nicht den ganzen bestellablauf oder das layout neu entwerfen. im formular stehen diese felder: „Abholtag“, „Abholzeit“, „Name“, „Telefonnummer“, „Wunschtext auf der Torte (max. 30 Zeichen)“ und „Allergien / Hinweise“. Bei „Abholzeit“ steht darunter „Bitte Uhrzeit angeben“, und beim Wunschtext steht „Nur kurze Texte möglich“. Für „Allergien / Hinweise“ gibt es kein erklärendes Beispiel. schau dir nur diese vorhandenen felder und hinweise an. wenn du eine stelle für missverständlich hältst, nenn die konkrete beschriftung oder den hinweis dazu und schlag eine klarere formulierung vor. bitte keine zusätzlichen felder erfinden und nicht behaupten, dass du das formular mit kundinnen oder kunden getestet hast. die ausgabe soll eine nummerierte checklist sein; bei jedem punkt muss erst die beobachtung zum bestehenden formular kommen und danach dein formulierungsvorschlag. wenn du nichts ändern würdest, sag das ebenfalls in der checklist, statt eine überarbeitung des formulars zu liefern.\", \"output\": \"Prüfe das folgende Bestellformular einer Bäckerei darauf, welche Beschriftungen oder Hinweise für Kundinnen und Kunden unklar sein könnten. Der Fokus liegt darauf, ob verständlich ist, welche Angaben für eine Tortenbestellung benötigt werden. Entwirf weder den gesamten Bestellablauf noch das Layout neu.\\n\\nVorhandene Felder und Hinweise:\\n- „Abholtag“\\n- „Abholzeit“; darunter steht: „Bitte Uhrzeit angeben“\\n- „Name“\\n- „Telefonnummer“\\n- „Wunschtext auf der Torte (max. 30 Zeichen)“; darunter steht: „Nur kurze Texte möglich“\\n- „Allergien / Hinweise“; dazu gibt es kein erklärendes Beispiel\\n\\nBetrachte ausschließlich diese vorhandenen Felder und Hinweise. Wenn eine Stelle missverständlich ist, benenne die konkrete Beschriftung oder den konkreten Hinweis und schlage eine klarere Formulierung vor. Erfinde keine zusätzlichen Felder und behaupte nicht, das Formular mit Kundinnen oder Kunden getestet zu haben.\\n\\nGib die Einschätzung als nummerierte Checkliste aus. Nenne bei jedem Punkt zuerst die Beobachtung zum bestehenden Formular und danach den Formulierungsvorschlag. Falls du keine Änderungen empfehlen würdest, halte das ebenfalls in der Checkliste fest, statt eine überarbeitete Formularfassung zu liefern.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0104"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "58e8dfa69a830f291c006f89e0012a9a6d70d8933dae47917a4969c0c3c4b2f8"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "ed1359acb4001434c933aee13d6f935339b7dce2a490aa3ecf12d91093909eed",
+  "started_at": "2026-10-28T23:55:25.317068+00:00",
+  "result": {
+    "id": "gen-1793231725-ZanTPNjTCYYtcnPmj5hk",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0104\",\"row_sha256\":\"58e8dfa69a830f291c006f89e0012a9a6d70d8933dae47917a4969c0c3c4b2f8\",\"critique\":\"Die Eingabe ist eine natürliche, in sich verständliche Anfrage ohne widersprüchliche Vorgaben. Die Ausgabe strukturiert sie als eigenständigen Prompt, ohne die Formularprüfung vorwegzunehmen. Alle sechs Feldbeschriftungen, beide vorhandenen Hinweise, die Grenze von 30 Zeichen und das fehlende Beispiel bleiben erhalten. Auch die Beschränkung auf vorhandene Felder, die Verbote zusätzlicher Felder, eines Neuentwurfs und behaupteter Kundentests sowie die nummerierte Checkliste mit Beobachtung vor Formulierungsvorschlag und dem Fall ohne Änderungsbedarf werden gewahrt. Sprache und Format sind angemessen.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Reviewing output specifications**\n\nI need to provide a concise review about whether “darunter” supports the original phrase “beim” as something placed below. It seems I need to clarify what “Bei Abholzeit darunter” means and how it relates to the wish text. I’m considering whether I should include spatial references and if they provide enough meaning. It looks like I should make sure to mention all fields in my checklist as a fallback.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Reviewing output specifications**\n\nI need to provide a concise review about whether “darunter” supports the original phrase “beim” as something placed below. It seems I need to clarify what “Bei Abholzeit darunter” means and how it relates to the wish text. I’m considering whether I should include spatial references and if they provide enough meaning. It looks like I should make sure to mention all fields in my checklist as a fallback.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4otxItNMXVhdDevBfuDrO2WiAdw3VdShWvqZbeQaxA0xWFqdVmkXXwsMlrHnnOfg71S8AdNRSAjvU5cHJarymwBElEKkS3cnNDGuDSliMA8wBSDCJ7yeSFGUzEUIrsE6S1FoFDBsouYxXsjr5aFBeMETDyY5J3jb_-J7wyczS9DQzFy_kvGYryBfIiwFCklrzzJszzwV_xAG4vQ_FcfFGvyVvAnXdsgVFAgGW0nhJ53Yll9TW9ZLqy-LDWk-AfCJZdW4j1X7stNi6ELU29SrOFjWpTs-XDoZRPgPwKQR501Oes6nCLwhCXmVI5lFJu5TNkznkdvS97nCMPtJ3tDtPt5h975z4RM9GYmaUKHqRZaV6k9TA3tx8oO1T8CI2-NMwpJYrcL67cTScfeIcGk8ftxmIOLfMUCliOMAd-IoaGGGKsXs7q6F5ZARTfk9w7QM5gm2v1Pkk1-tZMOeVlWECTxj8631zxJ_pYlcpK3j-kkCi08POP-2xoFdcUxPPXAemfItBMCrgRs6MHhOp93FMSTkRFa8ep23_YAxvQb3BqbOnqEAlM87H7Wsi5rr3pcy5HYklvmyk6RAgxq7rZTwytxRz_It8wV3z9RfJd1bnvitfg3S5JxoOrO-GhmaAG_yQDqszjbhneQPX0n3bOr878l2PlGRMRZg418RNmrcsao4-0UVpxdU9PeFsZ5O2cuS4Cp798iBmPUgoOlgiYuhfagkjqLX5y5KVuorzBu0LHxiSocp9GRWKv1TSoNWiHIr53kRhuK3wKI4m5SWJOM3knZ-dRXSn_mAVB-Ds1tppYHFcrRm6VbrlVRURcI-HNkQE5E0ADtpF6ZyR-FxXBweqqbmYzDBRVViRF4PvUptGKBg7mdwsBeDrzOwHjKgjywfoOK9U6v5TLgqUvDUTkHUByDCgDKSoSTjDi3d6Wy9w-amV4ODStj3jdFtl3aVTnwhoVAvVwAh92MZ6K1SbVv-sODLLdJ2Ki-_IJoXnAbazGSERzGAQVKQ0LACCgvZTZyeuJ_fVdpwYC6hcqNONy6xqkteKWTAZexEHNHc-_MY7vkB2pWOrTeQvwlxkbn9SbEQjTRb7t2thuQq0LeLQU-3CSZZ_SJZSADL4bIYY_ViEB_SVwmVBNJbY3xg5cjy4Z088AiK--0fUim5janVJAzIVsu7JXcbIL-W3fLklL9UPNA1wJWM-dj377vd2jzitBd1MgXPWA9eU0JFfJAfbn9lyxZQshqeVatu2OFZ2B5o-TW3tzIYQBZVldfeBRoO92gju7Yxn4X73xPXT1hiODZzO9LffLqrdu7UbrE2IknpHs49SgPPuUSy615YvW1lL6szJNhKKJNCdXTfSQff3rR5Bb2dGHPlQwUOGMktAiLZnbaDAB9FnRCSNQHiMsfJ-SKjdUyo2pB_TlyVsdQbBqI22sWjNR6rY0YGzKY4Ruy16N5s8dXCgSBJucRu0zJCSajTJwrUpSxTvdQKG96PAHcvg0IRGXeAfv_mR1EHrvJ3ML0X-qhgf7rTNrot3ZKfJkjETPStuYlfZ97Q1OdbToZn5K3czIkmMhixeNHRvyeyFH9T-tt3KqIE-ogEPkTp1JJGtpZVH-MDYvw7nuuH2CWDYBd_c2jbMIzbgOPFDiZKubezdFzh56je3WFfCF2iih8mflviuRvgS8Cqgfos5bvrAC7Cc51UPTSNQXQ9UCwy3TnQwBlmE2orMubMrK9Pp7At3WcdyxMVYBuLpGwLqhw_YTqo2NdxHzO-8HefbK-2qY6U4n849-EFxMHbsk1J0N2t-B7gdi72DFi6qj05wYeca7z9J2qN1t8wb2lb9oFDGHmSb11XvhHomrtURmA47ZH28LoqIslK6qoRL3YudBJ10KsHvI_u7I7_fmqgfKf-Gv4tRV9hdTLsjmN7GW15dTHU_7_W6yYYTDKcw-xFSkyaJxb5KVbvjfGzdWrHAYnx6OZsFZrSwCMuTzz8Cvy2Al6-YaKFDUcPHopZpxae0LKYQylnPZTcAB0kZEHgSHzu-y4-PHjtd1Z15U_sUrG_akmTrZDd-ijzv6XWL75m8EF8jsYM1_-5PGmpQRJO3Z6SKGBy6odbuyaBGHFhNH5IUm3Qp_jA3dDoYdRbskoI2DpXCZLyVoCq9SaT7DuYErzHiYfgekceWmuuAt8mgTEQiXYknGMe46_36oLfGtErwKYkZL7I_UtgU4ohlKSaDY7jtA9dIqYscN3HaVYqnv1OVlpH1Gy2aK34MOPvjOYpza9IjIBog3lLC8jz-hVXaXPk3HEhyE7fFywF6oEKMOOhCup7mgdrBVVl8acFyzUmHEzcUZyhWCSlWtvuw4eHwE6dIu9XsZTjvZNeyLOuVw-fRagoHB0-9iPdbMvLutQsniNUy8d1l7M2UN_NZLX5b-uoVsfnFqeLHYLav0gEPEX8CW3KjC-8EsVnMlT_exc7IPBoVXemuApezsZ41_qVv-qf6K7gyoKBUGqnYHzfFT0QtYK31eqdu0R6hwvJFF0yzacnKIYR66B7DQnfcldCpmJkeqCVwUI=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_074700113ca0f9f3016ae28b6e66c887d08b5abd1becb53a78",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231725,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 299,
+      "prompt_tokens": 1185,
+      "total_tokens": 1484,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 69,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 1182,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.005951,
+        "upstream_inference_prompt_cost": 0.002961,
+        "upstream_inference_completions_cost": 0.00299
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "6d0d86ce212faf287cda3ad1dc589bb6e442af611f509150046993a71c0e9171",
+  "elapsed_ms": 6160
+}

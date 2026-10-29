@@ -27,12 +27,21 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset-revision", required=True)
     args = parser.parse_args()
+    receipt = json.loads((ROOT / "data/rewriter/releases/public-parquet.json").read_text())
+    published = next(
+        r
+        for r in receipt["repositories"]
+        if r["repo_id"] == "jayshah5696/finetuning-labs-rewriter-training"
+    )
+    if published["revision"] != args.dataset_revision:
+        raise ValueError("Build the notebook from the current published dataset receipt")
     config = {
         "model_id": "LiquidAI/LFM2.5-230M",
         "model_revision": "40cb2ad3b3044d5a41eee083a6103c8b523afa45",
         "dataset_id": "jayshah5696/finetuning-labs-rewriter-training",
         "dataset_revision": args.dataset_revision,
         "dataset_config": "sft",
+        "expected_split_counts": published["splits"],
         "hub_model_id": "jayshah5696/lfm2.5-230m-rewriter-lora",
         "hub_private": False,
         "wandb_project": "finetuning-labs",
@@ -61,7 +70,7 @@ def main():
             """
 # Train and upload a rewriter LoRA
 
-Notebook version: `public-parquet-lora-2`. Training code is included below and generated from Git.
+Notebook version: `public-parquet-lora-current`. Training code is included below and generated from Git.
 
 Choose an L4 GPU in Colab. Add these two Colab Secrets and enable notebook access:
 
@@ -126,7 +135,7 @@ from transformers import AutoTokenizer
 raw = load_dataset(CONFIG["dataset_id"], CONFIG["dataset_config"],
                    revision=CONFIG["dataset_revision"], token=False)
 print({split: len(rows) for split, rows in raw.items()})
-assert {split: len(rows) for split, rows in raw.items()} == {"train": 1000, "dev": 100, "validation": 84}
+assert {split: len(rows) for split, rows in raw.items()} == CONFIG["expected_split_counts"]
 tokenizer = AutoTokenizer.from_pretrained(CONFIG["model_id"], revision=CONFIG["model_revision"],
                                          token=False)
 if tokenizer.pad_token_id is None:

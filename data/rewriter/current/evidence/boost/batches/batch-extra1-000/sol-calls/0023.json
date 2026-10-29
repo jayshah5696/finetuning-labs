@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-extra1-prompt-long-0062\", \"row_sha256\": \"39435106bd0f3eace21ca51c6876b04f74571e7bc9a88e4c51cd340d2672126c\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm preparing a small review request for a volunteer help desk that routes incoming messages into two labels, priority and standard. the volunteers use those labels to decide what to look at first, but the snippet below is the only routing logic i have for this request. please help me understand and review this exact piece of code, and suggest tests that follow from it. i don't have a larger application description to add, so please don't assume there are other rules, queues, or actions behind these labels.\\n\\nat the desk, messages arrive as dictionaries from a shared intake form. the form can include an urgent field and an age field, although the age unit and who enters it aren't documented here. sometimes the intake record may leave age out. the volunteers have asked what the function does when a message arrives, but different people have been describing its behavior differently. one volunteer said, “urgent messages always go to priority,” while another asked whether a message that is exactly 42 should be treated differently from one that is 41. i'd like the explanation to stick to what this snippet actually says rather than settle those questions by assuming a policy that isn't shown.\\n\\nhere is the entire code i want you to use. please keep the discussion tied to these lines and don't substitute a rewritten version or another implementation:\\n\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 42:\\n        return 'priority'\\n    return 'standard'\\n\\nplease walk through the function in ordinary language, including the order in which its checks happen and what each return value represents within the snippet. explain how the age lookup behaves when the age key is absent, and distinguish that case from a message that has an age value. the volunteers are also unsure whether the urgent field has to contain a particular word or whether the code checks it some other way; clarify only what can be read from the expression. don't assume that the form validates either field, or that all messages have the same shape.\\n\\nfor the review, point out the important boundary and condition details without turning them into a broader service policy. age values below 42 and an age value of 42 are especially relevant to the question at the desk. if you discuss the boundary, keep the comparison shown in the code in view. please also note that the two parts of the condition must be considered together, rather than saying that urgency by itself determines the result. the coordinator's note was, “we need to know what this small function guarantees, not what we hope the intake form guarantees.” use that distinction when explaining what is certain and what isn't established by these lines.\\n\\nplease organize the response so volunteers can scan it later. include an explanation, a short review of behavior and limits, and a set of suggested tests that are directly grounded in this code. tests can be described as cases and expected returned labels; do not introduce an external test framework or claim that any test has been run. include cases that let a reader compare an urgent message below the threshold with one at the threshold, a message that is not urgent, and a message with no age key. if you include additional cases, keep them relevant to the fields and comparisons visible here. don't quietly assign a unit to age or invent a meaning for an urgent value that the code does not specify.\\n\\n1. In the explanation, make clear that the function returns one of the two string labels shown in the code. Do not describe those labels as a destination, a notification, or an action, because no such behavior appears in the snippet. The volunteers call the labels “priority” and “standard,” and that is all the operational information available for this review.\\n2. In the review, separate direct behavior from questions the snippet cannot answer. For example, do not infer what happens after a label is returned, whether messages are stored, or whether another person can change the result. Don't claim that the function handles every possible input safely; the supplied lines don't document input types or validation.\\n3. In the test suggestions, connect each expected label to the relevant condition in the code. Keep the missing-age case distinct from an explicit age value, since the lookup supplies a default only when the key is absent. Don't present the default as a documented age policy.\\n\\none more question came up after the coordinator read the first draft of the review: if the urgent field is false or otherwise evaluates as false, the age comparison does not make that message priority under this condition. please include that conditional point if you explain the interaction, without making claims about every possible value accepted by the intake form. likewise, if you discuss a message with an age value above the threshold, relate it only to the comparison shown here. the final response should remain a prompt-like request for an explanation, review, and test suggestions using this complete snippet, not a replacement function or a description of a wider help-desk system.\", \"output\": \"Please explain and review the following routing function for a volunteer help desk, and suggest tests based only on the code shown. The desk uses the returned labels, “priority” and “standard,” but no further routing behavior or application context is available. Do not assume other rules, queues, actions, or validation.\\n\\n```python\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 42:\\n        return 'priority'\\n    return 'standard'\\n```\\n\\nOrganize the response so volunteers can scan it later. Include:\\n\\n1. **Explanation:** Walk through the function in ordinary language, including the order of its checks and what each return value represents in the snippet. Explain how the age lookup behaves when the `age` key is absent, and distinguish that from a message with an age value. Clarify how the expression checks `urgent`, without assuming the form requires a particular word or validates either field. The function returns one of the two string labels shown; do not describe them as destinations, notifications, or actions.\\n2. **Review and limits:** Address the boundary at 42, including the comparison shown in the code, and explain that both parts of the condition matter. In particular, an urgent message below the threshold and one at the threshold are relevant comparisons. If `urgent` is false or otherwise evaluates as false, the age comparison does not make the message priority under this condition. Relate any discussion of ages above the threshold only to the comparison shown. Separate what the code establishes from what it does not: it does not establish an age unit, an urgent-value meaning beyond the expression, what happens after a label is returned, whether messages are stored, whether anyone can change a result, or whether all possible inputs are handled safely. As the coordinator put it, “we need to know what this small function guarantees, not what we hope the intake form guarantees.”\\n3. **Suggested tests:** Describe cases and expected returned labels, without introducing an external test framework or claiming that tests have been run. Include an urgent message below the threshold, one at the threshold, a message that is not urgent, and a message with no `age` key. Connect each expected label to the relevant condition. Keep the missing-key case distinct from an explicit age value: the lookup supplies a default only when the key is absent, and that default is not a documented age policy. Any additional cases should relate directly to the fields and comparisons shown.\\n\\nThe desk receives messages as dictionaries from a shared intake form. The form can include `urgent` and `age`, but the age unit and who enters it are undocumented, and a record may omit `age`. Volunteers have asked what the function does, with one saying, “urgent messages always go to priority,” and another asking whether age 42 differs from age 41. Explain only what these lines establish; do not resolve those questions by assuming an unstated policy. Do not infer input validation or that all messages have the same shape.\\n\\nUse the complete snippet above. Do not replace it with another implementation or expand the review into a wider help-desk system. The requested response is an explanation, review, and set of test suggestions grounded in this code.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-extra1-prompt-long-0062"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "39435106bd0f3eace21ca51c6876b04f74571e7bc9a88e4c51cd340d2672126c"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "38f117daaaf138f30c25b9a5914807c4f451eb993e2959febc37e76579ad4a96",
+  "started_at": "2026-10-29T03:21:57.842040+00:00",
+  "result": {
+    "id": "gen-1793244118-MlFIXB4S2liWmaGFowGS",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-extra1-prompt-long-0062\",\"row_sha256\":\"39435106bd0f3eace21ca51c6876b04f74571e7bc9a88e4c51cd340d2672126c\",\"critique\":\"The input is a coherent, recoverable review request, and the output is a clear, natural prompt that preserves the exact code and the detailed explanation, review, and testing constraints without performing the task. However, it omits the supplied fact that volunteers use the labels to decide what to look at first. Saying only that the desk uses the returned labels does not preserve that specific human use. This context can coexist with the prohibition on attributing destinations, notifications, or actions to the function, so its omission is not necessary and violates the /prompt preservation requirement.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rvaTlE_BBLSUTUekZ4T09KnjFZcNNaiM_HJN-mewYjh7He9iWSZGnYOF2YJaMF0wPqVsbl3MvlSgKOo9bpuvusoIPFjhsg68ioLG_MmoeZ7UhgxZ9bIfO7PzLx-sMTvlK6XI_3h5ScgD8UjgMM0ghwArN6ayXW3zfA3N5TMNwNYGQlQjTdGOiAMHvAPFGATY5TfI3fYlf0tqMAR4zbFEQMEGkZIQLOxE3t2vebKNjjPgRE4Vy0pF4OLmCLr8TA8P2Gv73DwHKC6Gg39MOvdu9q61m5mFIYeS7iIkaPWNNQPwqN1__g9nD1aWP8GexThjzuW2b20l8pOWCtkx5NPauwvbAIE8RYCN387uI3O9dh_8foJcPmdl0_Rl2v_T-1XKSnHZgxyjtf-LLhcYgwBeGo_MWMH443WS4cSUygmDPy9cwMxdRGsQoZkeVNRkDk9mANV6689ruC5OtNEsi65zJJ2VbbwHkDconlD3mEG-S03XG6N_5Q_UBVTQIWMqauTWq-sdzG5vPBgXO1w0JBT2MQvRVDjpiGPK7fIZlyvv_HmCyMJZwwzR6HBbUHg4B0OtUV1ELMhXaShrOKv-Ush7JvGIfh8Ae5KDJePz-Z2FtSepIF9nLNI0cbUB4vXFvMRb8CGqziop6ed3jCF2RTeyZOkRK0ZHaljyLE1nKq2Kqxc88ls4w5Q7SkZ50tEWS0GsIPwhcqXU2geZm5-MLBOJzLhfdPi0wLVwOmtutroSUlfOJbSjslCib8JlBbzugfHXG6Hxx2BzJ6dexUVTZL9ZQp9cSmLjJMPcZTXvhswc_esRmJPG0Du28MphdH6JQK_7BCH5m8q2A4DJXLLNjXekKmLYW7jMw236uVSnA89KqfcvvwZZcMSuPQHm4nOrWpohzm9Srdmt2aHWOpR3P2wTSadWyxz5SJnqNchnmB0P9i5lcPpizYPcZsXiIcVZM4OR84_xMIfDNu1QVeMxnhjyyob4Q7JM1FmZQw-q2VEyTQxlf93EoF2xlhVkRQAYaA8PTGZlyjZSbab6lsVnor9ZcdIhuPPZS7tnaCQaAgwj-RQhWQyEfJXfJkhGAc3nvxSNQn4rd9Yd64r7rAKxuZ-8xQJndGuyNJopCwDhoCTK3npM5_1WS-_knEfs0XHCtHRcqxMDMo_YHFv0vtksm8rne80ZlFVdOSHK97m0mQ-NVHjUZvJBvIoufe77M_nLD1zvl9ofaVv8olYhez3IyT8XITUrDQ6oHnpU39vP4fwqtwc1-KFZy1lltoSE0CsTlTvCKMJez-VD2KX90deCAgaP3zph8wOlSaeZKlVuGnl1oAxiRjHuLORaZbvnnyjHDtN02k6WOKro4yrZlRR0IkKDf6v58bPVu00l-3ziPDfny3qv-bmGVKJiFjymJMhUbiB40fWJCVLHtWsZhVkjZ4UHiBQ0TnjJ8Oavn3cNZ9p6qbsSk0M9KTf1p2h-K0ZN3cOCboixctXxHYKG7tXpFQ9tkjxvkRBtBZNAxdMlWKOzXFRvcea6DYstCXpbkR8HYWIJhiIT4qufNfiZ1h8SX0DzuMk2Y9UrSYbFPzsl3ZgKXxfQ20VUxfFuSDFd3wN-Bm1n8UPCpfPSf3W6R1tcPRw1Z0xs_NVlgVMDqBepJSzKUgYtwsTkTaeeBxB1By9u5r4WiLrz_RW9BKiN4PhxbV4F31GoJ9EKX8RA3OebvzJ7hz6R7lepMo00T84lkdY13kOTwtyCLuf-9wQ64z-aBVa2Mg8MpylPYskP8lvAS8wyhRvOTrSlYVzw3gv6vuGgTTLOuYUzxAMYZaOqbRU3rgeZVMhnzXv3pRK7PQLqJb1OhgXZLXP2-md5L1MmgNX2xsJ79uHPSE-rjKGMQK99X_qkg5g9dOM9am7q1RBn_a6cU1bqrdV7Zfj7ELa9lAllYVTkneNOuJsYx-BAh5P6BkF-BShk-8zy789rzykrz-Fv0g1RVUnfC6pv5RmyJrLjoJXll2XgkFDPwEf3n0YlYKCSlgAhA2GrAAi0HBGQ17IjGKEjzisiDQjS3vjy-khXdk9IYAjiEkiU5Y6i_FNoPtAJZwZKMyyfCCUWvSN6c3pPTGlTyceFc4MPpiBmpXGHrT1JSV6z51PcGw0STr54-5HZTSeJRz1h3wCHXH7aFfgXUzx42_uspYaCfHwYMStNhpF8V8V96uT59hWkwjDqKHEKp5R4MBxJpYO1Xcxeg8HqJT9vvfy5Ip219yRaW_u6GH-JbXg4fbcdyGfwHUSSwFSuP3BasYZj5IT0YJHneP7gW8Zq_Eux8eC3weEYFS_PpUO07j2A2Pky8aDEDWnr-S3tEInbA9Na2UuwWckbZa0U7VEcgufLyGlKM1s_8VXC4tt_ZmJi5E1mCW3WrDwwcTzzsJYJ-jdNM4PVbqZZrQKcejG2WxCxK0m5EhSsNUc7YDKF9KrLH38Su10XKiVIZsZlonF_NiPEBGu2n5EhYo0crVi7TZXcfJfcTVnXeNEHNK9jbyZO856SHHpGDWw-ri_gr0CxQyJafmzYPATqdvCDxRrnSKXPKYjnYK6qAUWp_knM_pdl-eQ61On8dvTx-PPQS9VDRK1XPI7CQozrFwMqv8Tflqcgr-RKs1OOLJs4Enbu9MqFlI1N1X1wIrOtAnMIceBJeuRb4gs_x-TP_6bafktfFToUj5GhGHLlDS5VBBvf-1wxB8h8OmId5UTLLvH_Rd9M8hsHJ1c_TI-Pl6swneZBOe-E42Vu0mjV3UP8TufWyIszRAprasrtuYcRRGFxaa7A9pgvIB_lgFRbGC6yUzL9inVzQ_pPcE5iavoUdogFvJrLjUtPb5RBa2GAd81cSpWlKjHk-V7ilVFNMvp38yng2rzMjNH56E_1iNmmdDneVCuK8yR9gXW_MaEVSILCz-2VTAGy2nA63vDzipGMsq-ibpsWeeL88Dp4JZwx47NQNS9eFg8FQWHgDxcaxMpYpIQEoe_87Zhko5Kz7FVY6VMG9R63qpgy-9KuEvA3G6ZezuDzHYNkBFeB0GvQUyGHU5ybPl5_fnK6ZnAWHEFDTtOp55ZUlp9IDxn7K8jx_Zq25GqPq40PC9rNr-eCzwsf8xosnz_BiZ3ol0tngckrxNpsBKhq-2YI69RPMik7lxw847F1txg4BoPAkIAVWeV_kclUJyMpi7onPjGjqXECe3bDyYg3t42-ORcC6_ICUL8WfTL75gugFZljMSEOAOnhSjL3Dgrh-Qa_p1A_O17fWOwq7ZVAN5mEQM9b3auakoSvaTjFpMSNaJzIGz55NWhYHgt2YYABzSyDx3CYW1c7_pSnwPCfDsqG1ANaLRaTh1ONHwTbhYZrMtgIaqqQdyAJYRrJbbeSg6W5aLoemRWher-R80oCcWt4BiCmcVgX7K9i71RNn-N_VNPAqYF9FAMeyegj1_0woVk7LHPFPwmnCBFBdbvpTVgXwL7njpMSDGG0yNQjx-CorsRDQZ6b3AQ9ZTl87-Sw3VpbKWO6t4KACLZidPkk-kv29a5CNTm94v1YzciD2LIdAZT31wp4S2bVlZ9yf_cMYgiRZBNUeCm8k2QWy-eSe1-Jk9EBBdJG0nGc2WcOqhXKN-BFAtLC_0sa8uIrvKkZsa1YGNTYkI42ra1ZXmj5uExs1zdigEvR1Nl6rqDYYUryp118JDqHwKO4k6FYR_YBJApuc2SQSLbQjvv3TiN6NDBX5I_Mlr2hPXqGP7jvFI-bK9RPZ3lp-GxqW572P6z4lohDNF2pe8GMJr4dG4qMPQ1JXj11uIs0dTeFAi5qHVGYBR2k7TvE4DnzD7cr1LDRdvRNYo2u0eN8IVrPfG-sgRlviKyB7HIvA6hgUieOJZiKSvVixqujYem3mTYA2-sDw5u_uuuZSkGCCC_uRBgkhVsz2JL34mLWczw0Z6-i8f5GQvKcMArCE-cRIA4pMsSVOx6Q7T9ZIIG1HgMQfpdW1YuWUqk1X_bgsoPf3gzQE2xBcLLaLtu5I3FRYCYVHHJqa1l6pAdtTcGx4tAQ9COrIQ81ZNhdl6fGNDCMrlMwSiE2YMJ2D8lD8sIatUk1CzCt3nxKbQHidQEwmfPEFrk9OXy9wAEr84H8K6pqSBbuDtNoeCbS4OPWdHQ4LxsEA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_078971a9d8e1bd65016ae2bbd727a887d098563fe10a0e1a0c",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244118,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 383,
+      "prompt_tokens": 2280,
+      "total_tokens": 2663,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 174,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2277,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0095285,
+        "upstream_inference_prompt_cost": 0.0056985,
+        "upstream_inference_completions_cost": 0.00383
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "7838a36a94ae93dbcdfe0c290d1711d03b99f73e16586715bec0aa93cf943397",
+  "elapsed_ms": 6747
+}

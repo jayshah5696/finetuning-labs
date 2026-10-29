@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0002\", \"row_sha256\": \"0f2d61b93d3f7c4eefb2d65bb8064d6e3a9d103aa1e60773f50fa72ad397b9a0\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i’m putting together a review request for a small cooperative shop, and could use a clear explanation of this one function plus a careful review and some test ideas. the shop sells pantry goods, cleaning supplies, and a few locally made items; members see prices on shelf labels and the bookkeeper keeps a weekly sales sheet. this request is only about the code pasted below, not about the shop’s whole checkout system or its accounting policy. please don’t run the function or claim to have checked it against actual sales. i want someone to read the code as written and tell me what can and cannot be concluded from it.\\n\\nThe shop has a compact till at the front counter, but this snippet came from a shared notes file rather than from the till software. The bookkeeper says, “I’m trying to understand what this little piece does before we decide whether to ask for changes.” A volunteer who helps reconcile the sales sheet said, “Please keep the review practical; I’m not asking for a redesign.” Those comments are background for the requested explanation, not evidence that the snippet is connected to the till or that it is currently used for shop transactions. The review should avoid assuming any surrounding application, data source, or business rule that is not shown here.\\n\\nHere is the complete code that I want reviewed. Please keep the discussion limited to this exact snippet, and refer to the function and its visible operations rather than imagining other files or helper functions:\\n\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 42\\n\\nThe shop’s labels usually show prices in dollars, while the weekly sheet has a column headed “amount.” That heading does not say whether values passed to this function would be dollars, cents, or something else, and the code itself gives no description of its inputs. If you discuss the possible meaning of the values, keep it conditional: if the inputs are dollar amounts, say what follows from that assumption, but do not state that this is definitely how the function is used. Likewise, do not assume that the number of prices, their types, or their range are restricted unless the snippet establishes that. The shop sometimes sells items priced below a dollar and sometimes sells a multi-item bundle, but those facts should not be turned into claims about what arguments the function actually receives.\\n\\nCould the review cover these points in a useful order?\\n1. Explain, in plain language, what each part of the function does, including how it starts the running value, processes the entries in `prices`, and forms its return value. Distinguish what the code visibly does from what its author may have intended.\\n2. Review behavior that a reader can identify from the snippet, including the use of `round`, the multiplication by 100, the accumulation, and the final addition. If a behavior depends on Python’s input types or rounding details, identify that dependency instead of presenting an unsupported certainty. Please don’t silently “correct” the function or rewrite it as a different implementation.\\n3. Suggest a small set of tests that would help someone examine the visible behavior. Give proposed inputs and the kinds of outcomes to inspect, but do not run the code, report test results, or imply that any test has passed. Include ordinary values and at least one case that helps make the rounding behavior worth checking. The tests should be suggestions based on the snippet, not a claim that the shop has tried them.\\n4. Mention any important information that is missing if someone wanted to judge whether this function is appropriate for the shop’s actual price records. Keep such missing information separate from the code’s directly observable behavior; don’t fill the gaps by guessing.\\n\\nThere is one condition that should remain explicit throughout the explanation: if the intended inputs are dollar amounts, discuss that as a conditional reading of the code, not as a confirmed fact about the shop. If the intended inputs are already cents, that would be a different interpretation, and the snippet does not tell us which interpretation is intended. Do not choose between those possibilities on the shop’s behalf. Also, the function name alone should not be treated as proof of the units or correctness of its return value. The request is for an explanation and review of the supplied code, with test ideas, not a recommendation to adopt, reject, or deploy it.\\n\\nPlease keep the response accessible to a shop volunteer who can read a short Python function but may not know all the details of numeric rounding. Explain technical terms briefly where needed, without turning the response into a general lesson on Python or a broad guide to cooperative bookkeeping. The review can flag questions that would need clarification from the code’s author, but should not invent answers to those questions. In particular, don’t infer whether the final constant is intentional, a temporary adjustment, or an error; describe only what is present and identify intent as unknown. Please use the code exactly as supplied as the sole object of review, and finish with the missing-context points rather than adding a verdict or a proposed fix.\", \"output\": \"Please explain and review the Python function below for a small cooperative shop, and suggest tests based only on the code shown. Do not run it, report test results, or assume it is connected to the shop’s till or sales records.\\n\\nThe shop sells pantry goods, cleaning supplies, and locally made items. Members see prices on shelf labels, and the bookkeeper keeps a weekly sales sheet. This function came from a shared notes file. The bookkeeper says, “I’m trying to understand what this little piece does before we decide whether to ask for changes.” A volunteer who helps reconcile the sales sheet said, “Please keep the review practical; I’m not asking for a redesign.” Treat these remarks as background, not as evidence about where the function is used. Do not assume any surrounding application, data source, or business rule that is not shown.\\n\\nReview this complete snippet as written:\\n\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 42\\n\\nPlease organize the review to cover the following:\\n1. Explain in plain language what each part does: how the function starts its running value, processes entries in `prices`, and forms its return value. Separate visible behavior from possible author intent.\\n2. Discuss the use of `round`, multiplication by 100, accumulation, and the final addition. Where behavior depends on Python input types or rounding details, identify that dependency rather than stating an unsupported certainty. Do not silently correct or replace the function.\\n3. Suggest a small set of proposed tests, including ordinary values and at least one case that makes the rounding behavior worth examining. Give inputs and describe what outcomes to inspect, but do not run tests or claim any results. These are suggestions, not tests the shop has performed.\\n4. Identify information missing for judging whether the function suits the shop’s actual price records. Keep missing context separate from behavior directly visible in the snippet, and do not guess to fill gaps.\\n\\nThe shop’s labels usually show prices in dollars, while the weekly sheet has a column headed “amount.” Neither that heading nor the code establishes whether values passed to the function would be dollars, cents, or something else. If you discuss dollar amounts as a possible input, make the discussion conditional: explain what follows if that assumption is made, but do not present it as confirmed shop practice. Inputs already expressed in cents would be a different interpretation, and the snippet does not say which is intended. The function name does not prove the units or the correctness of its return value. The shop sells some items priced below a dollar and sometimes sells a multi-item bundle, but do not infer from these facts what arguments the function actually receives, or assume that the number, type, or range of inputs is restricted unless the code establishes it.\\n\\nKeep the review accessible to a shop volunteer who can read a short Python function but may not know the details of numeric rounding. Briefly explain technical terms as needed, without giving a general Python lesson or a broad guide to cooperative bookkeeping. You may flag questions for the author, but do not invent answers. In particular, do not infer whether the final constant is intentional, temporary, or an error; describe what is present and leave its intent unknown. This is a request for explanation, review, and test ideas—not a recommendation to adopt, reject, or deploy the function. Finish with the missing-context points, not a verdict or proposed fix.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0002"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "0f2d61b93d3f7c4eefb2d65bb8064d6e3a9d103aa1e60773f50fa72ad397b9a0"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "f6b42d703d9fd0bd9502cd96e6ba835e9531f1f9b16116025c96b8ecd884b14a",
+  "started_at": "2026-10-28T23:52:08.088864+00:00",
+  "result": {
+    "id": "gen-1793231528-UdWqt06OZgiiVNMbWyjo",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0002\",\"row_sha256\":\"0f2d61b93d3f7c4eefb2d65bb8064d6e3a9d103aa1e60773f50fa72ad397b9a0\",\"critique\":\"The input is a coherent, recoverable review request, and the output is a natural, well-organized prompt that does not perform the review. It preserves the code, quotations, conditional interpretation of units, test restrictions, and requested ending. However, it drops supplied background: the shop has a compact till at the front counter, and only “a few” locally made items are sold. It also omits the express exclusion of reviewing the shop’s accounting policy; avoiding a broad bookkeeping guide is not the same restriction. These omissions violate the /prompt requirement to retain supplied material and constraints.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oqwESXkwVbpCRqkDJUh4H4O21Ss9zXt0uoITeQ59bzcKeR5MuSvE8hT5PVZ4j8WnC202Cz9XDezdwwUVo44ThfLMxb5nQqhnKrHXTp7xZV-WwT2VDH8oOfXDbmLhRqNFEIkiZNMLEduHZaIIsUnloBpZ5xyutYoUp6wqc7cJ9f7jxuCCZM8JAbJeMN2d_5it6y5FpLJJYq5fHJNO_ducjizqWzhdOtOySNl6fGUlj0pffCpIE9mRzeqReom2-kSn5UK6GlA5UfcCIVjVddaDGe9dQk7hxKSa-mtyVDejnWj3XQSa7wBkwPfWaA5mCXoBop0J7MBgFwepxZcft1otJLt4UuG0aZAlWDZ5uwpd5I5mXK0cgiKvVEiR3_ISr2fnMwpDciteBLLnkZ_natljkADMRfzJeQ4elpAWGmVoHb37HlH7mvI7-_kkzLQB8NW4pPX3dfO--t3m4aYNhV_VvlhfH4fGNDLQrYbiq74PIUT7ZlfQSPTV3zDUkU677YW6nYGbpDscY9qCdTQB3LCWvQRuLWdp6ivObHYVrLY8NyhEBPaTyh4OhiLfM7zUsGkJVf3wsyJnbhcuwbA2oRu4CFkMLX9d0dKDRn2tPvw-4qre99t0IUOD8QX0zvbq95G0cVZJN1_uIV4Ilq2Ugajy3BmVKwtcvpnXqY05V2cLxDRRh_M0g7C4q_JNwMReswYk-gkcXN5AhoAUqosLiy9PSlWW5s-ySnX6f5NZW95mTbZLb83zAiFKDG7z3_pVps8eDiPYfLUlW-w2-DAsjB31LQxC5UgcE-PklelEhpGWVdpmAz_zB9QHm_wNR2AJmKI8vNJkOiYVKlvPeQyNTcKzHfKKxTG2WERaXGCTZ1VBSLgTsQk7Tlil5CBy-AoS8PAvi_0g-qTbvM4jzOWkaHWA0Kv3Cyi7XAZRWYf44IfG91FZ1g5CY8NHbpjet1iN8eVP1elgfQoefYIRFpYBlC9bGcqBrhtjp3pYS-8PX6-XkwxnVdK-_8QThdkgoY6tlMl_5EMB7wjI88u2DeuhO08GqYpEUzt4GvxyFbh01Wu8_xhi3Ga-JI8Kp-_Jm_9Mg04_a46b4Hk_T5k16RN7X-6VGMtSVp6D6vMiAeHISWKYnwmtzT4moeERAPXOjHBot2uI5Ad5nFJ-PZeLlm1y4_-0Z1oGUGDLAslLz3W1YNuOORkMj6LggKClZ4UOtEmSrvSwTbhZS_p9kr0Bb7NbZ6YwC73lAR-qJIONX2mkwt_rK6qXHUUVgkHEbi-Vpoh6MGQczjk8YeBZp-xc34jx0n0VqIPXVX_zr40JZ3QG64ru7GcW0B6lzJ23qyiE6oAZGJLqkQjgbelm3KUtEq2yfj_vSbpPDi5qw5YatsbvRlJx2bQazAo6ihxlavjm-Jo5yExjAas9oJclqDyCVcir6b5bGWE2WazUSNoRstIU5aoOYFlCTa-moKX2bRg2jZKzrh8VlD72OOJfCSRFwqKosLDmal0xVoz-xv1xhGHa0Vmzl4FZutKzr4OlOQR5s1bPJt9C8MrdXsVqvcaQ2-rgqRCIswezgtMSHkvSd2jWAM21HIt7hD9kDEi9p5zuQ36nSG1hUts868P95fFpEfRcSbOdz5w_TuBSRzx5ZKlww7ijKBQHWcqvflRj2zU5Fvl885wFQNeJNiZD9y17iOpKWHXl4XauUU912_KyIMVF6rUuoENizkXUZwCAtXqOAzEwwPqrCDACywh7tGGDz5THhbGjWz_gwGKKXyBzDEAkYM8odrmAHSetzi1YgP1HLKx5fEpLNMaVHBvWppAqXl2OyoYxYLD1vDzuJJ0p_ve13tiV2ltvpWJOPdzT1ObkBQ4hHyoCm6Xr4AcsxT7K0izq8Uy-XQHsjdlekAPJj4s9Vkv9KcJmOK24NmfYDVOXgKiH-dKeYLJHlDi8YIUwNdsmCYc2u9zhaEs2cTcD8doVF1mICZAa3veUVavuK-m8vuV7v4tyQdg8UVlBfkY2O3Ni4ULpVsoz9ep9jM9X9RQ_GqvFOj-DAAXW5rCxJe0HwK0X_YLmenTrX6vbNHpOotKwpoK4pf_myfoEcRd-8l3JMNp22jvfcxk4F0bO93hgXQKHpA67rCS-aac9CoZdI-CQSQzVn50FUOlO4GigD76gzcNBsgofbQSl5lXork4HDzRukLhfwijbZeCn0zqZG2-UAIVbTKq-tp7dSsefPujmFk6Ss4XuEacKXhOKjvUm3S-z_w9Gl6RwqJtoGmL8N13qMW6xGpYGraP57l4JqdmOXyoKXkyOw5y7agvtr6eWW9i6dEsgNSWvciP5Z5wAJ6KSyfa8Xsd87eLN4jWAYqt5VmeRUIRkm9o2DtfzMvFDCVUtEGeoUWONMJOvJ0hb6KhlOqG3fYKwWQM-o5_plN6X_3bqI3jrXf-Q1MQQGfybM3n9p7v69F4Cu7vRO0rInJt9EoK_amLWipVLIyrJ-JCQeYrP5yPfRMy8cpR45yq5XqN4YsxiSPVllemN4BmME7j8KUWKfbf3_0SE49Dk6Y39ZOvViabCJ7LbcmDdjh9Zv-mPZKwG2P1BUWtDZ_ju2FOPnCNl08FFaP6VkGoodticakznG-CZdXMR4UHnYIJM_N8-x1VlPDZqtQlHE_VXndqJCq1EzxRN0AUBUFpAsX4QJt9AQbU_u4wJ8j0v-d9xCIUsSpNuF-6_59t1XkAjfBUvhdorV_T0tBST99TKYfrvYoI_2a1xrk3Ss6PYWroobCJ3_bwhxapcShVtuCwgKLgJJYZVHKkyHGwBilvyneGbMuWIKCT6x85ESkEXZM9JjKfrsvblwwGc9P6sAmacMoqznGFQ1n9y32YeF5DyD6po9Ke8nxDe3EHp_uvgC4a_hLMt0SgGM9ZgIbo6wYcWpwBiCK17PA4awX4Hj-9c3qLIs2J6GamzrP6eYvO36HNHnRMjdp7QnK47dLm6cOkN3LtKPrNgcdquaHd3ZCucp3uEkUS9-9D9Z8KtHkFFcp6UENydc40wamqxIzMTBhRzd6N6o_KmEon2FDKninCcXu5Vhj6lb0IiV07wLNnW72i5VHRBdzY2ycCVFGpig9ZSszPBiIbk5tTKwdalcV5M5LeTqOz-q8mZiNyKLyUbDoyERjFCNoBxLYLgq685Gf0Lyxg7i1vR-kdLCWl9kBNQg_dQ1onvb0nqcen7KjR0fyC4oiLKn-BLmt4PZUljp6fFuz3L_rP7ZV_w6QqaDDG37uBkwamDGogj5aMuJdB9fmfXQrfawfZrOJVWzn0QUQKdhtUv2G1_AAB1YJUu2pgPAg8fbc6Obj98sqVAlp1n9ja8P7X9GdGoKozmq8rBXt4zAspBQNcC2AfhBOThk3CDe2BXc5N0BT37WtlciUmzSVJWQquj44FDulZRqqFPCnWCjq8-kR7h4h5UzXa0LEkAtMCDHRx2rhYBBkeDO6AO8fdM7pzRfYtZkz6L7V_ddNLKVtdurq8avQRIT21HjIvaggZHWBVhgdxxTeoX3aSKeQdppILUVPEoh_RvO-UjDhx58a1aascOwQONhxGSXfdeeH8TRnS1gChYZpDdEjkFeZuYc_RROI-97P7VtQlr1-I7PFPknV0OBbcfojZLHfo8fs48QxelTEWxTMMhUjxgouPs9Jl24l7fYeOjvrzCSCOvLrcLY3Tgoa7I8HWiAywva4E5eoEzeSqRJWqIFp9x1sX3AD11W41KAGMup_GyNZFV-pkwpyNR4cMYFZ2GfC93QWoFOcJv3xHplklN0lVv-YqPbLi1ZZGs5bgI7nonUSHoAELAdaZOBlHUB3p1wbpBFxBZSSKAJT3CvMhknWMz6hDJiFt1m6PfDr0sTF--gCQFL5pLaB2QzE4JF_xDAaWm_wDL5_4NiN87IcE9DbosdzVmKKcrcpDUHuGLtLK2yj1bfUuilSWrqiagVzf342-1neb_9f06Z0L0H9cP9Z2I1O-azXHMQJua-gnlr7Lh0fjndEWTkofIsTgws0G4BFyoaNuSwcrVRV2wNnKllNR6sCP_4sSxpbqWWnoStIbHITylPkgZM4JzRzB7pUiJMaOVEi-4Quy1R5y2GG-qN5jSSsG4QV4uTqKTM4qItCtGHJ_-R5Yg8_x6BF83We5u0TwqJKcrKMPIMIqVhVWzN-asTUXi8Izsma0IkLjDkKReqnXOiFA85t820HfYlEDMjfJ11v40XenQphW_wKcpWhMkaVb5hBejdgyExvBbVUAV1vQclALWMVbL5OnHaXfke-tX-do8Y-AmJ4vqX4838g06ERB8g2RoWP6dPrLGOeHW0y2c5ohzQU-3dd0DHTo5pr4jUPHaFDpA3_EtWMejjrTa2uiZ5XMFhg2MlRF02mxNN6EGA15MdVLGsD9Z1M13uSNxKrVSqiuALuVlGcDC8EzzhFY7itNzhi86gj7JHgONG1D9hB_I5mYbc91zXRwaE18xHGA7ooHj_oPw2t0NqThnS3-lRHgYShpfXx0rA6r4JsH6WDjg-iz2vHGciU-tT_T1eoqZQak-9yvvo93_5R075ybazOv39vcA4CBwPzsSrl4oS4BcVpSE7s2EyoZeNkIdws9zeXK5FSvK_gOdzAO7dfqcwvma-0bAXfrECLQgdCQ_9stJnlp-7zdr_zd7kpmeNM4jtad5XUEiYQ-PCqG0LK2hHN7tDzWD9wWo34HPnJqs8kn3DinzNBJ9FG_yLrvHbXxRkftWxW_orW8s3NR6VMH4DTcilevDNA-3tEbCYXUDYYQUoI4T8TZbmmJ6qzV9grxWdyqG4nfJigViJENCQqHH6dqEN5pSmYNWVvoRNcxB9CLbddre89xAZd2ihzp3tjUMIkmnfFfqDuBuDtSo8QRZfIFYry0VLlQ0ZBy5T7v6Z-yNf5xm-OCme7WUDh3C9BFAc83k0X6fVucjyRuLdJiL4FZQ5v4hb8l-G8C44tsAP7HicWeyLhbng==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_071f25ca2271dabf016ae28aa94a4c87d0945a3703db0441cd",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231528,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 441,
+      "prompt_tokens": 2375,
+      "total_tokens": 2816,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 221,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2372,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.010346,
+        "upstream_inference_prompt_cost": 0.005936,
+        "upstream_inference_completions_cost": 0.00441
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "ca7ee6f04388428756619cecb4fde6d9fd489782bcef6ddeaf36d65f24cc3b4a",
+  "elapsed_ms": 10176
+}

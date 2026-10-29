@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-extra2-prompt-long-0413\", \"row_sha256\": \"df6f820a77b13785362479ef47dfc10c203b20ed4072dc9b9f42240e22e41b9d\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"can you turn this into a solid prompt for writing up the screen-reader audit? ask for a concise but useful audit summary with findings and next steps, not a redesign. use the conditions below: if the production build has a missing accessible name on the trip-search button, ask the team to pause that release and fix it; if the button has a name, ask them to document the evidence and continue with the scheduled usability session. Also, if the departure time is announced only after a result row is opened, treat that as a discoverability issue; if it is announced in the row summary, don’t flag that issue. please use the notes as the source and keep the whole notes block in the prompt.\\n\\nREFERENCE NOTES\\n\\nThe audit covered the fictional Harborlight Transit booking portal, a responsive service used to plan bus and ferry trips across the North Quay district. The team reviewed the desktop site and a mobile browser build on 14 and 15 May. The release candidate was labeled “RC-6”; the team did not test the native Harborlight app or the fare-payment kiosk. The audit group included accessibility lead Nia Solberg, researcher Tomas Ibarra, and support specialist Erin Wu. They met in a small training room at the ferry terminal and used a shared test account with saved trips removed.\\n\\nNia used NVDA 2024.1 with Firefox on a Windows laptop at 100 percent zoom. Tomas repeated the main trip-search flow using VoiceOver on an iPhone 13 with Safari, while Erin recorded timings and read the existing help-center copy. The group checked keyboard navigation, focus order, names and roles, headings, error messages, and a few high-contrast states. They did not run automated scans or test every route. Nia said, “We should keep the notes tied to what someone can actually do in this build.” The team agreed that the write-up should distinguish direct observations from proposed fixes.\\n\\nOn desktop, the home page landmark and heading sequence were easy to locate. The “Plan a trip” heading was announced as level one, followed by “Choose your route” as level two. The origin and destination fields had visible labels and were announced as “From, edit” and “To, edit.” A small swap control between them was announced as “Switch origin and destination, button.” When Nia activated it with the keyboard, the values exchanged and focus stayed on the control. The date field opened a calendar; arrow keys moved between dates, and the selected date was announced with its weekday and month. The group recorded these as successful observations, not as proof that every form field is accessible.\\n\\nThe desktop trip-search button appeared below the date and passenger controls. In the first RC-6 pass, the accessibility tree exposed the button role, but Nia’s notes did not capture a spoken name. Erin later checked a saved screen recording and could not tell whether the recording had started after a brief announcement was missed. On the second pass, the team opened browser developer tools to inspect the element, but the session ended before they recorded a confirmed accessible name from the production build. The mobile search control was announced as “Find trips, button” by VoiceOver. The desktop observation therefore remains unresolved in the notes, and the two device results should not be collapsed into one claim.\\n\\nAfter searching for a trip from North Quay to Bellmarket, the results page showed three services. Each result had a route heading, departure and arrival times, duration, and a “View details” button. With NVDA, the route name and button were announced in a sensible order. The departure time was visible in the row, but Tomas’s timing sheet does not say whether it was spoken while focus moved through the closed row or only after the row was opened. He wrote, “I was tracking the two-minute delay, not the first pass through the row.” The group had not replayed this part before the room was booked for another session.\\n\\nThe first result showed a 09:20 departure and a 10:05 arrival, with a transfer at Old Mill. Opening “View details” exposed a transfer instruction and a platform number. NVDA announced the expanded state of the control, and focus remained on “View details.” The platform text itself was announced after the route details, though neither tester checked whether the platform number was repeated in the collapsed row. The result card also had a small “Low floor vehicle” badge. Erin could read it visually, but the audit notes do not identify whether it was included in the accessibility tree. No participant attempted to book this trip or enter payment details.\\n\\nThe portal’s alert after an invalid date was tested on both devices. Choosing an end date earlier than the start date produced the visible message, “Choose an end date after your start date.” On desktop, NVDA announced the message after focus returned to the date controls, but Nia did not establish whether it was announced automatically or only when she moved focus. On mobile, VoiceOver announced the message once after the search attempt. The team did not test invalid passenger counts. Erin noted that the help article still uses the older label “Travel date,” while the current interface says “Start date”; she asked that the report identify this as a copy mismatch rather than a screen-reader failure.\\n\\nThe mobile layout changed the result cards into a single column and placed the “Filter” button before the results heading. VoiceOver announced “Filter, button” and then “Three trips found” as a status update after the search. Tomas could reach the first result by swiping forward, but he lost his place after closing the filter panel and had to swipe through the page again. He described the behavior as “annoying, but recoverable.” The panel’s close control was labeled “Done,” and closing it returned the visible screen to the results list. The audit did not establish whether focus was restored to the Filter button, so this should be described as unverified rather than as a confirmed focus defect.\\n\\nThe team logged four follow-up items in its working sheet: confirm the desktop search button’s accessible name in the production build; replay the results row to determine when the departure time is announced; check whether the low-floor badge is exposed to assistive technology; and verify focus behavior after closing mobile filters. The first two checks relate to the desktop trip-search and results observations above, while the latter two were not fully tested. Nia said, “A short retest is better than guessing from a partial recording.” The team reserved 30 minutes on 20 May for a follow-up, but no results from that session are included here.\\n\\nThe audit notes do not include a severity scale, a compliance determination, or a release decision. The portal is planned for a public booking campaign in early June, and the product team asked for a summary before its next planning meeting. Erin has permission to share the help-center wording with the web team, but she has not approved revised copy. The scheduled usability session is set for 22 May with two frequent bus riders; their names and individual access needs are not part of these notes. Any write-up should keep the tested scope limited to RC-6 and the listed browsers and devices, and should not imply that the unresolved desktop observations were confirmed findings.\", \"output\": \"Create a concise, useful screen-reader audit summary for the Harborlight Transit booking portal, using only the reference notes below. Organize the summary into scope and method, observed results, unresolved questions, and follow-up items. Distinguish direct observations from unverified details and proposed fixes. Keep the audit scope limited to RC-6, the browsers and devices listed in the notes, and the tested flows; do not imply that the team tested the native app, kiosk, every route, or payment. Do not make a compliance determination, assign severity, or state a release decision.\\n\\nApply these conditions explicitly: if the production build has a missing accessible name on the desktop trip-search button, request that the team pause that release and fix the issue. If the button has a name, request that the team document the evidence and continue with the scheduled usability session. For the results row, if the departure time is announced only after a row is opened, treat that as a discoverability issue; if it is announced in the row summary, do not flag that issue. Preserve other unresolved observations as unresolved, and do not report follow-up results that are not in the notes. Include practical next steps grounded in the notes, without presenting proposed fixes as completed work.\\n\\nREFERENCE NOTES\\n\\nThe audit covered the fictional Harborlight Transit booking portal, a responsive service used to plan bus and ferry trips across the North Quay district. The team reviewed the desktop site and a mobile browser build on 14 and 15 May. The release candidate was labeled “RC-6”; the team did not test the native Harborlight app or the fare-payment kiosk. The audit group included accessibility lead Nia Solberg, researcher Tomas Ibarra, and support specialist Erin Wu. They met in a small training room at the ferry terminal and used a shared test account with saved trips removed.\\n\\nNia used NVDA 2024.1 with Firefox on a Windows laptop at 100 percent zoom. Tomas repeated the main trip-search flow using VoiceOver on an iPhone 13 with Safari, while Erin recorded timings and read the existing help-center copy. The group checked keyboard navigation, focus order, names and roles, headings, error messages, and a few high-contrast states. They did not run automated scans or test every route. Nia said, “We should keep the notes tied to what someone can actually do in this build.” The team agreed that the write-up should distinguish direct observations from proposed fixes.\\n\\nOn desktop, the home page landmark and heading sequence were easy to locate. The “Plan a trip” heading was announced as level one, followed by “Choose your route” as level two. The origin and destination fields had visible labels and were announced as “From, edit” and “To, edit.” A small swap control between them was announced as “Switch origin and destination, button.” When Nia activated it with the keyboard, the values exchanged and focus stayed on the control. The date field opened a calendar; arrow keys moved between dates, and the selected date was announced with its weekday and month. The group recorded these as successful observations, not as proof that every form field is accessible.\\n\\nThe desktop trip-search button appeared below the date and passenger controls. In the first RC-6 pass, the accessibility tree exposed the button role, but Nia’s notes did not capture a spoken name. Erin later checked a saved screen recording and could not tell whether the recording had started after a brief announcement was missed. On the second pass, the team opened browser developer tools to inspect the element, but the session ended before they recorded a confirmed accessible name from the production build. The mobile search control was announced as “Find trips, button” by VoiceOver. The desktop observation therefore remains unresolved in the notes, and the two device results should not be collapsed into one claim.\\n\\nAfter searching for a trip from North Quay to Bellmarket, the results page showed three services. Each result had a route heading, departure and arrival times, duration, and a “View details” button. With NVDA, the route name and button were announced in a sensible order. The departure time was visible in the row, but Tomas’s timing sheet does not say whether it was spoken while focus moved through the closed row or only after the row was opened. He wrote, “I was tracking the two-minute delay, not the first pass through the row.” The group had not replayed this part before the room was booked for another session.\\n\\nThe first result showed a 09:20 departure and a 10:05 arrival, with a transfer at Old Mill. Opening “View details” exposed a transfer instruction and a platform number. NVDA announced the expanded state of the control, and focus remained on “View details.” The platform text itself was announced after the route details, though neither tester checked whether the platform number was repeated in the collapsed row. The result card also had a small “Low floor vehicle” badge. Erin could read it visually, but the audit notes do not identify whether it was included in the accessibility tree. No participant attempted to book this trip or enter payment details.\\n\\nThe portal’s alert after an invalid date was tested on both devices. Choosing an end date earlier than the start date produced the visible message, “Choose an end date after your start date.” On desktop, NVDA announced the message after focus returned to the date controls, but Nia did not establish whether it was announced automatically or only when she moved focus. On mobile, VoiceOver announced the message once after the search attempt. The team did not test invalid passenger counts. Erin noted that the help article still uses the older label “Travel date,” while the current interface says “Start date”; she asked that the report identify this as a copy mismatch rather than a screen-reader failure.\\n\\nThe mobile layout changed the result cards into a single column and placed the “Filter” button before the results heading. VoiceOver announced “Filter, button” and then “Three trips found” as a status update after the search. Tomas could reach the first result by swiping forward, but he lost his place after closing the filter panel and had to swipe through the page again. He described the behavior as “annoying, but recoverable.” The panel’s close control was labeled “Done,” and closing it returned the visible screen to the results list. The audit did not establish whether focus was restored to the Filter button, so this should be described as unverified rather than as a confirmed focus defect.\\n\\nThe team logged four follow-up items in its working sheet: confirm the desktop search button’s accessible name in the production build; replay the results row to determine when the departure time is announced; check whether the low-floor badge is exposed to assistive technology; and verify focus behavior after closing mobile filters. The first two checks relate to the desktop trip-search and results observations above, while the latter two were not fully tested. Nia said, “A short retest is better than guessing from a partial recording.” The team reserved 30 minutes on 20 May for a follow-up, but no results from that session are included here.\\n\\nThe audit notes do not include a severity scale, a compliance determination, or a release decision. The portal is planned for a public booking campaign in early June, and the product team asked for a summary before its next planning meeting. Erin has permission to share the help-center wording with the web team, but she has not approved revised copy. The scheduled usability session is set for 22 May with two frequent bus riders; their names and individual access needs are not part of these notes. Any write-up should keep the tested scope limited to RC-6 and the listed browsers and devices, and should not imply that the unresolved desktop observations were confirmed findings.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-extra2-prompt-long-0413"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "df6f820a77b13785362479ef47dfc10c203b20ed4072dc9b9f42240e22e41b9d"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "9e600ba498209c481dd9c0eb57ecd3afe1a95f31e7a937834c278f5104390507",
+  "started_at": "2026-10-29T03:35:52.834503+00:00",
+  "result": {
+    "id": "gen-1793244952-I334zMwZ9YtnErttRZR7",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-extra2-prompt-long-0413\",\"row_sha256\":\"df6f820a77b13785362479ef47dfc10c203b20ed4072dc9b9f42240e22e41b9d\",\"critique\":\"The input is a plausible request with a complete reference block and recoverable intent. The output is fluent, remains a prompt rather than performing the audit, and preserves the reference notes and both conditional branches. However, it omits the explicit “not a redesign” constraint. It also adds “Do not make a compliance determination, assign severity, or state a release decision”: the notes only say these are not included, rather than imposing blanket prohibitions. In particular, the release-decision prohibition creates tension with the requested conditional recommendation to pause the release. These are material constraint changes under /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing design clarity**\n\nI need to determine if there are any defects while noting that an explicit redesign is not necessary. The next steps shouldn't imply a redesign either. There’s a need to clearly focus on the critique because conflicting statements create ambiguity. The output's structure is fine, but missing context around redesign and prohibitions complicates the message. I should ensure that I don't introduce any false flags and maintain clarity in messaging, especially around decision-making. Finalizing my thoughts concisely is essential.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing design clarity**\n\nI need to determine if there are any defects while noting that an explicit redesign is not necessary. The next steps shouldn't imply a redesign either. There’s a need to clearly focus on the critique because conflicting statements create ambiguity. The output's structure is fine, but missing context around redesign and prohibitions complicates the message. I should ensure that I don't introduce any false flags and maintain clarity in messaging, especially around decision-making. Finalizing my thoughts concisely is essential.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r8geASg-hVEWJbUi3hcmB6tnK4kJXWAFUxNONPVLwoBqR3dIEmOuX2uL3IXsACsw74-mQwRfQuUGa-M_-yinUrbdoy0C3mWJifu9e3iKxIOgTSYpWWdxrDKrFuDirILROa7RD4nBy3ntj6PS6VvZFSuV1qzhQ6tbNtWNS1m4geAqzuMQ-RMTnJzAguD0iIYrJRBV7WRxsrV5V6uzzJiemHA9Gkwgvf4KKzJaYXgPN7YJshJhTZczjDoHs6Qj2uJnHFVNQxCwMywaH-KSxLTs63RXioLu84iugvRcgtG2b5HTauB-igq7BgGcWWdrprMBVvAmpetMd8DjdqPtN2EBlrWFLwCbEDGLw_VjrJDMNeqLfdYwHb9N63Kh3vNMnIFMfaFVQQAQQ4fbLNuqRVuAYwSsRPlhe7BtjeeNw2S6P5_MO_7MV7ZFvKaxeQaMa8tCNkwZ7V1qCkra5-MoTM5Px_iSwXsCCFiC4i2-bFxd7Ca72oXB2FdYSlOo436xnq0OxJ4hvEkTSxu5UCB501u8WKWTyUKYNINqEChReYjCExi0gy0WfPUqIR7A4STTI1riqf0mNQTZs1zL5oqDEHcV5vleTI_B9BKDkwYvTOUdtAI4u8Gl6GH1FizF5qQqYSDGCk9n11_H1IRMmB1VCHUHQICIyOkv2PhSUPBcWLr0rgClm-EMexzomE-cJlGnjOxewGvoGM35ZQuVKWxxdysLyLXASDbE2Z7fJO6XV1O8Mgfe9jYiGXPaEV4ghYI5ZQ3pcNPLjcKnzoHYK26OCjm0QVQCS8jouSpIBdq37IkpxOX-eUJ3fdurFIzf3ZJ4SZfNKeT33ddrMDPS9NHic4Bpme4CcdwXhHD1U6icy3nfvYAZ-PCSvKWY76M1pvryKla7sqe_Px6w9080jjMzcwIVXLU93un2gN6xki8PPeVh3zeIoHr8rICgIx7I6PhXPi6dT3LKwI5KaBlOLUy6VAki551dZriMHAGxUrSzofKTQ9nDhd17eI1PvrquijxluR6FZTwJjOSfSj24EnLk9cdm_vd-W5-5HfGeTFLZfhLjjA1vFQ-vSJetXF-im2BIMF2zjWdZBxiPiTm3jL3evO242p-26NIvAHbnxqfX_-blNVc9uUjmhdycFHDf0Wsh4RA4qb37Gz8BeVa2We-OH9pFzfifaCTxJTr8HcNq3tR-wBvTSJOZJZLyjEcyJXpRChuZ1nK7wT1hCL2QxQW2JrMtmpJ0sbTi0dFdEh5V-hg2kzLvSuci5LetMeNECbqqoZtL_b8OxcXKFVgspWcQVABPRsHDR8lvHTYyYwNcXUVL23lqcpu-Yu2fQWeRJndXXXhv9i-VWHAm_I0DlacK9FkZxpTeB__FD3CcVOZxMy90sksG57GOooqLBC2LvHdrqAFK3n1ZnKmUcXXHmB9tUSYphXJHSRvuTZ0u3VCWK4ibtK_yAoh4l4Fs7GYlSLrvmC8Yhr_l-Tc2WUWNFOrSUvsYhmsK7RW7H-18-0YX8H7Wl85fpYq6OCIsrD3dUy3CfYnpF1RaqcSJI70yQNiZYWn43GXg9lET-ekGjPvqO6ltP3fkP3zRCf8mhj-o9iNrocUZOxSm58CGD1lNHydBDYI8tFQO9btiJzdgJwhG4-fICR7WWYAEFlKtfjwa8Qyjj2cPX5DzZnixF68rQQa7TGwYlMjCCmDaEztT4NxOHWFw49dIm0wdYjpzxiIDctMTa_Vd5wfsdWK1MNvWMmveXlnq3uQqjKPpvFodKfLApelDIHs2TRjBCga1k71v8nCfmCOatJC9PhF1NhKcsSPPkbFdsvTWKa7U-kJQKl9gAkceOlTE_4weCxZmYPs1_Nu_iMc1Ms9ymcOKi_L9bHfagbPPwn8KVlAsPI4MQxgrF3o00WAIGv5OCAJeyo_l7vyIPxcgQT-yYbh4_-DjKW6ASMbSXxpqLA4jgmyAzJC0CQ4RxKau5WHophTqdKa-nr48z3z3xc0TcB5Q5WiMuiJ4F45lXzkiOx9NFyEwkzSU2nRSsNB9OWnUmVfz2x1xRB4jqXeSc_SK7B2gYLnWaK1vTYI8x_hqWiMl16zFEzR6g78kUZUIgWawFO_VE-z032HwTkhPYB5FITeI-vvlXwQSDg4S17z_frkDwyWU9Zb4HDSS4SCgM0TqFfXTizDZYIDNtLPXsRtfQ84EP_fmeZ7eXTzWMofYEgpW4pNxID-SqPQno98-a_PGiwkTpmWrh3gr7dW6zq6b1GyZ3W_pn8FltDKdqDvM9idtE6Nb4X6v6cNskkkoO8XiyG0NqaMQ-s6NulUEjzrxXOPduV2ylpmKFbQrl2Fr7ToSrxwJlPR-ecWuCwv3VAi-FnYhFOEPKgzeH29363sYEz01uftRJu6Zeu71MMnK0S70qZCdMbPOkSinrNkowaej6bDAEQiJ34T-8idUpEYDxgPTGvYp8aGiOOUx1saGCExSrEab0S6VVP9KyIpgCXnpAnIIEoURfHLkXvRvbSd8Pk4abqW_mYPu4xL3LyEuBEbJVU6I_vR38j2u5nypcZw7A4e7qMZesEcCdpqb_IZz_Sr64FTfLDsqvbK3_L4WirmaTstVfFdxjMl_pptDw8Y8hLNGqdTmoz1DC8vxtDbTJzEHvNtqlUK2s114OHIYlr4f31PMqoiY_Gi5GcWAXE4F2zVXb85pboMDow68_7tRHdTo3TyRGrE6mnAG-QDl1hvTyCw7C7AWBuJT1d8ARRzBB175KAHxTykp9cMOOL5C7m2WZRFTAH5UM1_xDfdnMoxMddgg1fv5OrWLXnVUEuGJzoGr0eDxwIPXe-NNJUGAczmQ5oQb0zT6L9Yo9STDF-Hf4rLOm0rZ95FvB8G1Ec8nQsElpa0lNURwxBe3yCFBuKaow5CJR3lcDCFw7oNJEsg_T9PKqOjDfkJkkQuGLrGEF7d5up-4sUg8Jg2Zm594HrKFYN9y9MyLXhQgpOvTciOT85xpF9jluqFacZtmhVVZYi2u4SPuwTmRmBT9T8RJqo3lJSPrayeggunOIdW9f4mtDBjvVoNUA3aQA-0yDWFjPDvu8w4Mf7lepLpIkX3cwa2OXapEbJwbAW2PmOzbcqqhQLxpwWnHm8D4WPh_LdHXufTzJ_ERe_Cw96TUBS5TEsW-osGlRmDgoSuuGy11u6rqVEceeGEIU-LLRtdUM7BLS_zB6JzVNM0rrnWhdpfy2qc86lGm6pylKUEi_-jWHvyKy2-pJMEWvjf9c83vqKF8nFGKIw2zdDV-QIh4dHiMe9StEm1qrwmxmZvLP4of8e4tGlrvV6DawWIHQBaQAw1PAaaxJ4xUw1Hg22h5HpWv2sF-4N8loAL9B4Tr9IPKALNRpOHudu5EPHg6A0zoABxmu9gB6r9iNhz4t1f-BUw2Y_L5-Bny2pcnA5-kizpQBjxwyfOc_MeflM8Po7YoSAQYAwgvp-o33xAWlq3dVMQiB6KQUSo0FzUyfwTD4VRiA2azIVkXzfnJXD-08px56KlqikUDYHje5AvfS_Jk7cefMx88v7Qhld4WAOnlbxr6DUUNghB0hcd9Y00UsmyEJXKOyh_ZLjWUO3xgCiulb9IqQZ2FYG101FBVi2xGPPhA49DYMcYZrO5numEHts3EVhhP25z82wDm97Qxfp4GHGYYBou2M_NOwlAgeVd8tLUambNKCZcLwbywYwH6vMnTJTVItpjzl4DHku2cA6fQc8p8gH91oqNsXXTH21VKXQSSKM0UJFcoKwgojxB9YcEFijzQgYQOr-RmsJQNHnavE6cGx52SowKHr8919TKuz3KAZGxgy1fgGLceZdsrtQXqO2ZE3ttHBC-AR3OpeM3mgia7Lx8IAotVJgN2H-uUg0S1cgUBs20Z7a_K3DdQahNLurodwS1EwfhODb387zJ6wEAr30XL2lf_XKdEiAx2KMuxXbsRJRYRCz7n8Uo9c7oYSuKJpJDKt0OKuuGP-6iB0aU.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_039f0396f471b0e5016ae2bf1a2cc887d0bd1418c35794efe9",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244952,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 376,
+      "prompt_tokens": 3686,
+      "total_tokens": 4062,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 160,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3683,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0129735,
+        "upstream_inference_prompt_cost": 0.0092135,
+        "upstream_inference_completions_cost": 0.00376
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "a2d3dc81f4da46820ab39a88c9c28cf392e6fb00a5e91df6ec060171065f4d4d",
+  "elapsed_ms": 8947
+}

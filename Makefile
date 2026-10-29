@@ -28,7 +28,7 @@ training-audit:
 
 # The target above audits historical mechanics; that pilot failed independent data review.
 reviewed-audit:
-	uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.reviewed_publication --release data/rewriter/reviewed-v2 --prepare-only
+	uv run --locked --group data --group hosted python -c 'from pathlib import Path; from finetuning_labs.rewriter.reviewed_publication import audit_publication; print({"verified_files": len(audit_publication(Path("data/rewriter/current")))})'
 	uv run --locked finetuning-labs --bundle data/rewriter/reviewed-v2/validation-bundle audit
 
 # Evaluation and publication commands have explicit output paths and run IDs.

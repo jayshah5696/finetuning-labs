@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0010\", \"row_sha256\": \"60b8c2acb60400c5461a5f5df1a6b23cf839c9d3f82778e43f16866ac6df788b\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm trying to understand this depot deliveries query and need a clear explanation, plus a quick review. can you describe what result it produces, what received_units means here, and what a row in the result represents? i'd like to understand how the status and units conditions work together, and how the grouping and sum shape the output. Please use only what can be read from this SQL; I don't have extra database details to add, so point out anything that can't be determined from the snippet instead of filling it in. If it makes sense, suggest a small set of tests for the behavior expressed in the query, rather than tests for assumptions that aren't shown. keep the explanation focused on this query itself. i'm not asking for a different query; mostly want to know what this one says and whether anything in its logic deserves a closer look. A short explanation is fine, but please make the review clear enough to follow. Here's the complete code:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\", \"output\": \"Please explain and briefly review this depot deliveries query using only what can be read from the SQL. Describe what result it produces, what `received_units` means, and what each row represents. Explain how the status and units conditions work together, and how the grouping and sum shape the output. Point out anything that cannot be determined from the snippet rather than filling in missing database details. If useful, suggest a small set of tests for the behavior expressed in the query, not for assumptions that are not shown. Keep the explanation focused on this query; I’m not asking for a different query. A short explanation is fine, but make the review clear enough to follow.\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0010"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "60b8c2acb60400c5461a5f5df1a6b23cf839c9d3f82778e43f16866ac6df788b"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "970561cc22ed7343052cdb307959f0e0152be44271dceef8da4d6eed96af2bd0",
+  "started_at": "2026-10-28T23:30:20.286423+00:00",
+  "result": {
+    "id": "gen-1793230220-SqXXLdoGF5N7AG4VV84b",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0010\",\"row_sha256\":\"60b8c2acb60400c5461a5f5df1a6b23cf839c9d3f82778e43f16866ac6df788b\",\"critique\":\"The input is a natural, self-contained request with clear intent and no contradictory or leaked instructions. The output appropriately organizes the request without answering it. It preserves the complete SQL unchanged, the requested explanation and brief review, the SQL-only evidence constraint, acknowledgment of unknown database details, conditional suggestions for a small set of query-grounded tests, and the instruction not to provide a different query. No material change in scope or certainty is apparent.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oWPfr2nMKzPQax-YF3v-psUWiCpMWYcg8Z_OYMvPuM4NLuUZRtQGrEHmz31jZTOr4qqpOfhIF5trpp_uoCBdCuoAkrrd3utKuo02DwrwOY_ubiDHaE-EPPk5Qlkgnr1PN17a8kUDt7_P_6QtKd_8lKPOc0wyNO8PHRQZ4a6NvfoLZ-94fVAtvcUJXRsItZ4brnUuoSBspAcfOr5O158aPyzXvxpuGnvIBQ_5SaS9mJPU22f63_-5vN8hppvBMMj3Na0gRXP7Zfah2zlPFr8ssbc5ttTUfyrZzyAiSPTKyAdrW4-M7FLdbm9vigRLXikYYVs3DrKwQUmsDFXXPNOI3sZLpKTzqelRQvrmm6dQlXTb1XMnPV4k9U_wZ37jsedmcH229014wDjfiNTEwGmVUYg6CFcq8MOqcWGIdpo2K9GbVq7TDG9VDi8WNtNg8NYqmaljbNPv4WWBujeZFctew-gjhVniZtmvuIs0w_R0NJwhJRv_oVLxMbGjIj5cGFTWyJ9_zhFqrV9zBMK7gODSg_uEyyMpsz0HLuY7r3hzCo6KeFtOYX6RYwNEJSczb4J5V4_vm5kWDPk6Cs9t_KUBQV0t2yXsxQPfqU0Y1QPKvyla3yzXLsOu-sctwZ1wgLxQ2F6jTuZNDAWI2rsYwv0iPZ6W9kALrmlRTKBMzgRLlS3Q2YXG16RE8Npk8fl9vqub_Bl_pq9uon0jyqTLPei_m7M4qfMhug4w74IlHnuQrvNE_8TL5iVH-p2TTnHpoyWQ9wRP35x-fbNeIMvASZxIz4C6YbeN3d1hloYGFIzo0hu7cwomzQPP6Dk69YrUukt2zDtz8ZFAg3fR9PhnEnoFO7YVyHAaNqGhyMxuaaJ-Ob7SvGFWIrRu7Po-QNlb1axxdJ2U66dUQrguni-r-AMiw2RGQu9A_hx97-jE4Ng3msQjoNsBnwK57VfEFSBHmBklUUA0qnLT0gqN1ZcLWIp-ISj6yVKk7qecdL0GGruNy_aBOdQ7G9ZaHrCU3WlLB0G6pVAtxFM-rEJRt8wkErDPYMn5bNRTNFwBIPfErZwS4pa4l0wbEQVNu71GAELQtZRBl65lKtNVcx1SyOwq6ctKnTTK1CZjlM8JKntMMRM84WSX42A3FTR365_Iy9xHfbVIVDlhyS_G9YlM7ubTqYLjlWT_NZoxX1AYLC3A0PR4mVKR8rbCDOkFaKA4jrXZXp2Ryme9ZTMSmpt7jA6bbtvFcEtxjGMTO3f5nJdeGoIISG-4InVLJsBlKi3-LUOYycKpH72ENMHI538neZVI_3vqcr8osKJBPApQVnqvy2ORrIk44EYi7jGM_gfCFe6Tgz0gDOTT7P2tlHC0YWTLwfr3Jl2E7Qq3F8tDv7yeFAXd3tg9-wHFMxq2dt4AgqZyjKczKkvRSAzCtldelX_CPp1DLLlAMCvL3jqTo7sTiQlfaSwYb-cz4Iew1BDAawMTfA__kVMLHcCGFpSqop482lvd8ed6A83S2A2wA8aV7R_-5dekAkTGvJxmNVJ7eT2AZcwE9hGYCEEg_c6SzwZWWh7r9eV0UNEIYdYCz6qF4eoaVMEOiwXlhR5m1zsSY_yPcx5f1UO8XhhdhNq53ozPxH4PhHUpH4fJXAf4g6Kne1NNOj9BMX-xenot5cYQJ0P_sEC9_38HPIXOZaw3dBJLVJB0F50bPu5YXZ7rpVOXvg21e6cTRixPU6Pz3i25a5zk3LNGeA_sBDKx0bWBQhikSkrK3yONwTBp9Ef_-OouZeSpKT9Gi4MlSfxJOz6G54S9pO_vh4a9Jfe3pLOSdYAxe0nEJxcqbSelEHliggEOIcUObFkt2LZ30WJCJnaEvjFri6CBzXikls8WHnUpS1TPTpZYfes2DOhoev51PZjGOKMg4R0cYx4pcmPCPzE74sC-ddogkfN3dcYdVlhrMMbURdat1OWE0uONRCa0dTBAu2eRQtooKvufobvVFBgoevleK8QJ48GElA7QRMkyLnBbrIbnA1USzbI2ilIgOzb00BGmm-WjRUSmWRdg6dBKBtXv_vgZ57YIX20waF2STH-y3y1IzEWg1seQZ6I82sLG8HVKBW3HeDNM2dxHmrY-nW_Q6izPKTe9KJ7SjESK60zcPRi8rMjXkPYFVgQZgXwjX4jSQJ1RsCfY_SJarOCoUxx07n5aEtf0WGdzOGO_wRTrQoy2yl0mBOvucuHw7BYJf1IxKeXRDOMJQduUhA2kcvJBVcApEZh5D-5colBoMeCdcdnJAkiFDbetbtS_grUnzF8aHtpT0Yi5Hrq9YWnBbmlvTJwhygUkzhic-wpGA9ZyM6dVjAZnlL8jslbnNMNoU5xDjH-dKF-3c-7fmtpMCM0dcz2N7qMQFmamfgwUD4XYCMkqvBVysZFCeb9B40-3SzHgo3nSSA4WET8XcfizU2NM4zmLPt52WEvW6D_v_RDRwql9GlrUvexAvIXSZugeFTuYm6tFTdZuIKPL8YHGovFPP-KuwqdLEaLr8dvT9ZVcjM2OrVGPDYk42rEyMPNBVepvyW3hLaj9LAPD4gw24YQr2YYWt66BlVvr3IkYUhefNoKB51Bxqab0BMovJrSdRu_3heyNteM_4JqxgPC4n7xoXOVqHDAxZtWWKOU6xu4CPVRIStiGynaf2E0USQtReIHBurQvTcFn_BZ9z-jt924K1wbPn_mEFQRfhgovZ5DxQKpN8Wp2KtioA4n7Q64HlksHi4a446mZZ-umttWgVnsvS9oFHUwlK1DtVyNynAK2JPouEP9by9bODTu2u_W7vJdQh4n1BdOWBeT5_U9A6b6o6GqwQgoqH-HoaGqush9ahFCoOvukruYgnQwIB_3dl7wn2UctFEMKYkewLdCH2lbseyzfUsX.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_073e5310c6d04430016ae2858dcaa087d08692fc1af39187f2",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230220,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 278,
+      "prompt_tokens": 1001,
+      "total_tokens": 1279,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 92,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004782,
+        "upstream_inference_prompt_cost": 0.002002,
+        "upstream_inference_completions_cost": 0.00278
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "1594b9d2e2a8326e342b1924fdd8c340b5a1fb87eccbdab187e532b6bdbf81ab",
+  "elapsed_ms": 5835
+}

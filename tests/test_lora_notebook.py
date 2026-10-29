@@ -10,7 +10,8 @@ import pytest
 from finetuning_labs.rewriter.lora_training import adapter_files, encode_sft, push_adapter
 
 
-def test_public_data_cell_runs_without_auth_environment(monkeypatch):
+@pytest.mark.parametrize("train_count", [1000, 1500])
+def test_public_data_cell_runs_without_auth_environment(monkeypatch, train_count):
     notebook = json.loads(
         (Path(__file__).parents[1] / "notebooks/rewriter_train_l4.ipynb").read_text()
     )
@@ -25,7 +26,10 @@ def test_public_data_cell_runs_without_auth_environment(monkeypatch):
             return self
 
     raw = Dataset(
-        {s: Rows([None] * n) for s, n in {"train": 1000, "dev": 100, "validation": 84}.items()}
+        {
+            s: Rows([None] * n)
+            for s, n in {"train": train_count, "dev": 100, "validation": 84}.items()
+        }
     )
 
     def public_load(*args, **kwargs):
@@ -51,6 +55,7 @@ def test_public_data_cell_runs_without_auth_environment(monkeypatch):
             "model_id": "public/base",
             "model_revision": "base-rev",
             "max_length": 4096,
+            "expected_split_counts": {"train": train_count, "dev": 100, "validation": 84},
         }
     }
     exec(compile(source, "notebook:data", "exec"), scope)  # noqa: S102 -- exercise trusted notebook cell without secrets

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0055\", \"row_sha256\": \"59c32a2ee5f86ae371e980cb9b0b1f77c731359bcffdeba48d73c10d91cc9e58\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we need an engineering design note and test plan for batching records in LanternBox, our photo importer. Please make the request clear enough that a developer who has not worked on this part can respond without assuming the batch helper is also the whole importer. The helper groups an ordered list of photo records before the importer sends them to the storage service. It does not discover files, validate image contents, or decide which photo belongs to which account. I keep mixing those pieces together when I explain it, so separate what batching does from the neighboring work.\\n\\nLanternBox reads records from three places: camera-card scans, partner manifests, and a retry queue for uploads that previously timed out. The record shape in this discussion has an account ID, a photo URI, a captured-at value, and a checksum field. A checksum can be absent; the sidecar containing it may arrive later. Do not assume every source has the same arrival timing, and do not turn the missing checksum into a duplicate decision. The ops note says, “Please don't treat a missing checksum as a duplicate; sometimes the sidecar arrives later.” Keep that as a quoted requirement in the prompt, rather than paraphrasing it away.\\n\\nThe importer currently receives its list in a defined order. Camera-card scans are ordered by the scan, partner manifests by their listed order, and retries by the order they were queued. The batching helper must group the list it receives without sorting it, and batch boundaries should be understandable from the original list. We have a comment from the ingest owner: “The ingest worker owns ordering; the batch helper only groups the list it receives.” Include that exact note. The design request should also distinguish preserving order inside each batch from retaining the order of batches when they are submitted; both matter to people tracing a failed upload.\\n\\nHere is the small reference implementation we have been discussing. Include it exactly as written in the prompt, with its line breaks, and ask the respondent to explain what it does and what it does not cover. It is a reference, not a request to silently change its behavior before explaining it.\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nThe default width is 24 today because that has been used for the overnight runs, but operators have asked whether a different width could be passed for a particular run. Ask for an explanation of how the width parameter relates to the returned groups, including what happens with a final group that is smaller than the width. Also ask the respondent to identify the assumptions and edge cases that should be checked, rather than declaring unmentioned behavior to be settled. Empty input and a list shorter than the width are useful cases to cover. Do not turn the width question into an invitation to redesign the storage service or change the record schema.\\n\\n1. Please have the engineering response cover these connected areas, rather than treating them as unrelated questions:\\n   - Describe the helper’s responsibility and the boundary between grouping records and the importer’s other work.\\n   - Explain how the supplied implementation partitions an ordered list, including the default width and a smaller final group.\\n   - Discuss whether configurable width is useful for a particular run and what should be clarified before a caller supplies one.\\n   - Describe how a caller can submit batches in order and how the approach helps trace a failed upload without claiming that batching itself retries or uploads anything.\\n   - Give a focused test plan for normal input, empty input, a list shorter than the width, an exact multiple of the width, and a final partial group. Include a check that records and batches keep the original order.\\n\\nOne condition matters for the retry discussion: if a timed-out upload is retried, the retry batch must contain the same records in the same order as the batch that timed out. The design note should explain how that requirement interacts with the retry queue and the helper’s grouping boundary. It should not claim that the helper can guarantee a successful upload or that it determines whether a timeout happened. If a proposed design depends on information we have not provided, call out the open question instead of filling it in.\\n\\nPlease include a compact worked example using a clearly stated list length and width, so readers can see the batch boundaries without needing a real photo URI. The example should illustrate grouping only; it must not imply that the storage service accepted the records. There is no need to invent a benchmark, production incident, latency target, database, or new API. We have not supplied performance measurements or a decision to change the default, so separate any recommendation from facts in the request and label unresolved points as questions. The response should be useful to both the developer implementing the helper and the operations person checking a timed-out run.\\n\\nFor the test plan, make the expected observations concrete enough to check: all input records should appear once across the output groups, none should be silently discarded, and their relative order should remain intact. Include checks for the current default and for an explicitly supplied width, but avoid prescribing behavior for invalid widths unless you identify it as an open question. Keep validation of account IDs, image contents, and checksums outside the helper’s responsibility. Do not use the absence of a checksum as evidence of a duplicate, and do not imply that a missing sidecar has already arrived.\\n\\nPlease keep the final design note scoped to this photo-import batching question. It should present the quoted ops remark and ingest-owner note as ordinary source remarks, use the code above unchanged, and end by naming the concrete open questions a developer or operator would need answered before relying on configurable widths or retry grouping. Do not add a conclusion that the design has been approved: this is a request for a design note and test plan, not a record of a decision. The final section should still address the retry condition, ordering, and the limits of what the helper can promise.\", \"output\": \"Write an engineering design note and focused test plan for batching records in LanternBox, a photo importer. Make the response clear to a developer unfamiliar with this component. Keep batching distinct from the rest of the importer: the helper groups an ordered list before records are sent to storage; it does not discover files, validate image contents, or decide which photo belongs to which account.\\n\\n## Context and requirements\\n\\nLanternBox reads records from camera-card scans, partner manifests, and a retry queue for uploads that previously timed out. Each record discussed here has an account ID, a photo URI, a captured-at value, and a checksum field. A checksum may be absent because its sidecar can arrive later. Do not treat a missing checksum as a duplicate or assume all sources have identical arrival timing. Preserve this ops remark exactly: “Please don't treat a missing checksum as a duplicate; sometimes the sidecar arrives later.”\\n\\nThe incoming list already has a defined order: camera-card scans follow scan order, partner manifests follow listed order, and retries follow queue order. The helper must group the list it receives without sorting it. Explain both the preservation of order within each batch and the order in which batches are submitted, since both matter when tracing failed uploads. Include this ingest-owner note exactly: “The ingest worker owns ordering; the batch helper only groups the list it receives.”\\n\\nUse this reference implementation unchanged, with the line breaks shown, and explain what it does and does not cover. Explain the existing default width of 24, how a caller-supplied width relates to the returned groups, and what happens when the final group is smaller than the width. The code is a reference to explain, not a request to silently alter its behavior:\\n\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nThe default width has been used for overnight runs. Operators have asked whether another width could be supplied for a particular run. Discuss whether configurable width is useful and what needs clarification before a caller supplies one. Do not redesign the storage service or change the record schema. Identify assumptions and edge cases to check, including empty input and a list shorter than the width, without presenting unprovided behavior as settled.\\n\\n## Requested coverage\\n\\n1. Describe the helper’s responsibility and its boundary from the importer’s other work.\\n2. Explain how the supplied implementation partitions an ordered list, including the default width and a smaller final group.\\n3. Discuss configurable width and any questions that must be answered before a caller uses it.\\n4. Describe how a caller can submit batches in order and how that can help trace a failed upload. Do not claim batching performs uploads or retries.\\n5. Provide a focused test plan covering normal input, empty input, a list shorter than the width, an exact multiple of the width, and a final partial group. Check that records appear once across the output groups, none are silently discarded, and their relative order and batch order remain intact. Include checks for the current default and an explicitly supplied width.\\n\\nFor the retry case, apply this condition: if a timed-out upload is retried, the retry batch must contain the same records in the same order as the batch that timed out. Explain how this requirement relates to the retry queue and the helper’s grouping boundary. Do not say the helper determines whether a timeout occurred or guarantees upload success. If the proposed design depends on missing information, identify it as an open question rather than supplying an assumption. Avoid prescribing behavior for invalid widths unless you explicitly leave it as an open question.\\n\\nInclude a compact worked example with a stated list length and width to show the batch boundaries without using a real photo URI. The example should illustrate grouping only and must not imply that storage accepted any records. Do not invent a benchmark, production incident, latency target, database, or new API. No performance measurements or decision to change the default have been provided; distinguish any recommendation from the facts here and label unresolved points as questions. Make the note useful to both the developer implementing the helper and the operator checking a timed-out run.\\n\\nKeep validation of account IDs, image contents, and checksums outside the helper’s responsibility. Do not infer a duplicate from an absent checksum or imply that a missing sidecar has arrived. End by naming the concrete questions a developer or operator must answer before relying on configurable widths or retry grouping. Keep the final section focused on the retry condition, ordering, and the limits of what the helper can promise. This is a request for a design note and test plan, not a record of an approval or decision.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0055"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "59c32a2ee5f86ae371e980cb9b0b1f77c731359bcffdeba48d73c10d91cc9e58"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "326228eca7b8dca8abd77d4af0648576fd71e5866f4e798ccb4ac0122dc0870f",
+  "started_at": "2026-10-29T03:21:19.779418+00:00",
+  "result": {
+    "id": "gen-1793244080-e78xf92P7OunJ2Z7RHSg",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0055\",\"row_sha256\":\"59c32a2ee5f86ae371e980cb9b0b1f77c731359bcffdeba48d73c10d91cc9e58\",\"critique\":\"The input is a coherent, self-contained draft request with consistent scope and constraints. The output appropriately reorganizes it into a prompt without performing the engineering task. It preserves both quotations verbatim, the reference code and its line breaks, the default width of 24, source-specific ordering, missing-checksum uncertainty, the exact retry-batch condition, concrete test expectations, and the limits on the helper’s responsibilities. It also retains the worked-example request, restrictions against invented context or settled invalid-width behavior, and the requirement to end with open questions rather than an approval. No material defect found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ru0HTGkX2NULQHQZcgboiH-uPclZJcDNLVhkGtROU5Jj-_UVWW0qjubdECl-SQf1eui8lAkbihcxd8zp4IdOeOWaHd15d_uLuKdACUmkVArmAgt4UjVUw_8flZxmmr9hsWLWHl4EeDVG45qWFPmca2GtuPMAFj9l-vxOqnhcd8b4UNOkVtlLDeHnDHT7lvAhuB21rNykHXW3RAff6IP0Kwjva_u71XN3ddsv7tmr14aIQHGOHUZg5V2_tBPDb6qg0907ENNlRVi3HBlbNdvPs_dBaTQnG5zhG5JZfxWzAxuIaLTBJrF18BHOb9AR6RXSwGQ9mulEvjt8iVB8nytucxmk91-qwT0h-JyS6HYdJHkkORYXx0jPKNpk6WIdsf89Fc9XL59OOH-wqgbyIGzxbp6VZeuSN_MwmH8iZwC_gjvtHLaALGsIcMAJXzow6GUd-rSpSU8xmEi_WVthCh98zFCa-qgU9wyk9q6igpBSsiZ6yYd-4-eYnW5wTiM0tVSzYnQjcmUmtky1Y67fRBWmzo9VFhoQlIWnEQhXEizUUhqp2K7HxnaNTFrw6138IGkjxzAu1sBj7XPFiiefZofVwK5EuZl5Ogb7l57gGhGGHGOqV3RDkSprM5D1jlRf0J_GSMrDQJAzitfkt4Gp1FwYyw74Cp8TRQZrz7Ffayx2R_H54iy4RZeKvhsjVZ2ykMNkwCylxaOnjkku6VfHCDRpms6NsZcBGm19EQn78z_tI73Ie4TPRG7s1zLGXVWu9r4ctrp2SXRi4lUb-29FaxEotlsed7gQsTQjj9qzjtKtRPattCh6MFuJhAe-gY2GmMTSAxXKpxO-5EiXbVgxNiNBuuEpUEIYSCN6-zXs9XuTGKr_3ecaW9H_AAZ46Gqae_3b2GNufbEcicGrHCb0BNyC3IcrFdTE-6b2KL2hHLxH37p2xW9vezDF1nKi-NDe9KRYPRSlpzpzw8GhjFXN0A-yq5dcW441OsW-NbUo96768V2hKBrOrhStdS3qMiqoZpwti5nekrE2lhFQP2BFHi2xHhJT3qlwKWz3nJFNQFfMRAKkj2_OyR_Ij17fjPdP2uJVFHaKadAuWVsCWELbLaXO7ax9_gP3KVcxCo8f6R3198XUg61w-PycXcEEo6J-PA1EeQO6bmOva-dPm9wrhnSLAYTENKjkoWWL7npeOSVJVAQQaJ08rB9j3I-Hd948g7imqu1QXQVFmcCeYP11Ylq7KVkdiifoux1M0sw5VXrL_VeBxGvdyaWQV17XYDqjs_8Htp8xBVRHBpEukhHmYBfLZPOiOIE7RaOiKcYSP9ZSKcziHnNQpGxXzXsMLesa6DYxb8fUwxWMkZbgLcsYqeUN_u_SHpUWGf6w1CHXkDEFRRV_EYd33yD1FTUoDp2S2yvp0d7S7HHZyVysRkCOyqm_IYJPC5KQ9Md6wG1VarzGq1aB2qAcE28SMl0gBJzpV2ms7Cukc1MTQppoBSvbYzzFnmEmQlUU4rD-dUAlitnSSTpeo_dandi3_cznRE8lhuLw-kJXIn1O6WWr0xszZJTzFMO40pkW5NBy-LLbfHqRWD6RPdTGJ3gED0ZRS3Nzgc1nmJ26kmfasCC68zhLeosdm6Z6majlBNqHtW2glbOu9NN_QVTJ4gA5ScoWkHwROAesqp0GTfgBar-OQPefHc3flNbfrXkxhMKYvkB_fDK6OtLhrfj0vOtW0apkBi8Q5ST-aCD2liPK6cMbiULwKGoYeYEgrRYaU_rdmwUqfAoB8Z5_5sSJZSMdu_tAQ8dmYGxQMXuJJpcOGm1VTIj2AaDSCRBe4GKOWVhXh-wbATN-ryZcGU0dKyqVbr3__p6B_BfOQD7zrOtNw81KiEMx7R-PZhA9OwMqP01QG3O52UJLSGYGgrJJ_V3E1o_WUSkIGArao76VMU66CjW_PHMygRUd0QCSsq205Ppeq-mn96h9-VKzNHOCD8ASC98Lb7WmSR-ecbfQXn5NxHPdlUSu7XLlrxy-PgOYPsay4RD2UMj8J5L6pnIjW_eM7Mn9oCsOUcd0E9Le0aBpMcR7keCpfSOwnNd7_S8Ws6Cz-KPTU6tYzZ6b9Qnsz5rJ1hGhvHEUzSpEDB8l_nUEZNZKHG744CszAFIIrOtiPGmb8vEvERnPcwrGJuZMMrDNTtWBe7gd3tZeMSevnJlzT1reXz5hf_jnR9l08B1l2LBOfDhfa0geXUT7H5UoSE2pZQ9nLtdzH62jDlOzSRvrBZrTt-9OHcHHqRSdl9pJNKAChfws2ngErc1bhxmbkfSyGSSRalqiRLicLUHnnrYQgfZDJ87c-rsp157DbdjBTqnMDJMAjDtt86rUOJY5UQTiMzz7UVRrK3eKlVVAVXi_xFVmJoujg1kTBmsEFUnBH0mjHdPyPyqqgK5TQ5OSZQQVp3cUyOFzzG7G_EObMa9dgp67CAzYuQwmPqZwjbXYhAOPLlg2HHP0phK58NnnbBH3UP6KICyeruQsan3Go9X7kD5h8gKo6wnN6ZgjosClxJ6A_ZViHRu-VXnDV9uwTBVaR-U98KDYtTh9thMjZyIOlTKuWxBRI0KjjdoqIIhoRdgsT4soMShX-74rGH37fK96mp9hzHN9tYJCpA6h0p4xFrpcb9ER-3B74jxtyVRk_ruKOea5G4kfnd5rwCouO9w46Hv36lXVXsUOq0RtNEDd5_LQw1BJ-Lf_pW35N7r8PCYHZNzVYLBdZHRop-DAGLwNU8aOQU0z5uYlk_nrQdGmAb3uwVcj24_SGDx5SjsBmbWW4pq-Ib-nPqibV7dWH98W9MKKVpLKH7Vt5sSNlITkWDWwfOmFnLXNslIbFFnRnRTafvkGqi_Wz05ZxBaqcRiFcn43bKOF1AOi5Mx3cY5nqtVIbUo2-H8mkht5YK0222YrZKMlra5fn6PJTiVDyfRINgQ45qqS4xql0h3TSvQgjHgumIvznVnJOZE_U9WQArsAO9U_yHI6wFMkSxGOSS_mfwlxGYBJRFuDnOfGMQB-IzVNZC8dRTW2-ZS4GmqVr9BG5YcuMiO8ZqoXdK2ywdqBjt9lE2gKO1e9Xkz46qV68wb4byO9HF_jSZF2JhnRbZ6hyUhfdYJMGfAUWjXrfKNHYDFUoLmFIcWxUP3Q51Poqranobb6iB2fVPtQ3w2D5esq_IUEvHCXIrdeAB1S2_NOoBFazyqhoOrcdDUgjZHciBzWoLiWgdQ0F-rMODq2Tdtqe2vDFVgHw5bpYBXoTmMlYPs51UXGTcpg6mUGMzJmkvTYODb1ejczyHDVmJnEMeLhewLjMMqRRfLnk8=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01adba0fc4229372016ae2bbb12e3087d0b9e4bcb772c921af",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244080,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 337,
+      "prompt_tokens": 2770,
+      "total_tokens": 3107,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 122,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2767,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0102935,
+        "upstream_inference_prompt_cost": 0.0069235,
+        "upstream_inference_completions_cost": 0.00337
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "a3604104204846bccca5d06aec6f496711c17a26c1c180351ec9b9da2b5e9f64",
+  "elapsed_ms": 8145
+}

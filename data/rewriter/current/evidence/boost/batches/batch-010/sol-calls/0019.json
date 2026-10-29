@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0127\", \"row_sha256\": \"84b4acc9c14c436c48301a9f0c9d5aebcf04c9a6e69e1e73e8b13493332a99fc\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i need a prompt for a technical design brief for the next North Quay Archive photo-importer run. this is a fictional project at the small harbor museum, and the brief should stay focused on batching metadata records, not redesigning the whole archive or writing the importer. the import team has three collections coming from two volunteer scanning rooms and one staff workstation. there are 4,860 records in the current manifest, and the counts can change when a corrected manifest arrives, so don't base the approach on a fixed total. the importer reads metadata records and references existing image files; it must not copy, move, rename, or edit the image files. i'd like a useful plan someone can review before the October run, with assumptions clearly separated from facts we already know.\\n\\nwe have a small python helper that someone on the team already uses, and include it verbatim in the prompt so the design brief can discuss its role without silently changing it:\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nplease ask for a practical explanation of how batches should fit into the importer workflow: reading a manifest, forming groups of records, submitting them, and recording what happened. the helper's default width is 24. operators may choose a width from 1 through 60 for a run, but nobody has agreed that a larger group is safe. the design should say where the chosen width comes from and how it is visible to the person running the import. don't claim that the supplied helper checks the width, validates records, writes logs, or handles errors; those parts need to be discussed separately. we have not decided whether batches should be prepared all at once or generated as the importer advances, so compare those choices in this project's terms instead of presenting one as an existing fact.\\n\\nrecords can include a stable photo key, collection slug, source file path, capture date, rights code, and caption. not every source uses every optional descriptive field, and blank captions are allowed. the stable photo key is required for matching a record to an existing image reference and for safe retry behavior. keep the design centered on metadata records and references, not image processing. the importer stores a thumbnail reference separately from the original-file reference; it must not assume that a thumbnail path is the original path. the records come from the North Quay catalog export, whose collection slugs are `breakwater`, `net loft`, and `winter pier`; preserve spaces and spelling in those values. the request is not to invent field definitions or prescribe a new catalog schema.\\n\\nsource notes from the scanning rooms are sometimes useful when a record looks odd, and they should remain available as ordinary notes in the brief. “the card is still in the camera bag” was said by volunteer Mara after finding a paper label that had not been entered yet. “we only have the back of this print” is a note attached to a record whose front image is absent from the manifest. staff member Eli's note says, “date copied from the envelope, not the print.” keep those remarks exactly as quoted and don't turn them into verified facts about all records. the brief should explain how an operator can see a note during review, without implying that a note changes the stable key or automatically resolves a missing field.\\n\\n1. for the workflow, ask the design brief to describe how a run is identified and how it moves from manifest receipt to batch submission and review. each run already has an operator, a run date, and a source manifest name; the team wants an audit log keyed by run ID that records batch number, record count, outcome, and any reported errors. no image files should be put into that log. the plan should distinguish a batch submission from the overall run and explain what information would let someone locate an unsuccessful batch later. don't claim that an audit log is already implemented.\\n\\n2. for matching and recovery, use the stable photo key for idempotent retries: retrying a previously accepted record should not create a duplicate catalog record. do not suggest hard deletion as a normal recovery step. explain what the plan should do when a batch partially succeeds, since the current importer behavior for partial success has not been confirmed. make clear what must be checked before retrying, and identify the unresolved behavior as something for the team to confirm rather than making up a confirmed outcome. a failed record should not prevent unrelated valid records from being considered, except for the collection-level manifest condition below.\\n\\n3. for tests and operations, ask for a compact test plan using representative records, including an empty manifest, a manifest with fewer than 24 records, a record count that does not divide evenly by the selected width, and a run using the maximum allowed width of 60. include blank captions and distinct thumbnail and original-file references in the examples. ask the brief to cover operator review of the run ID, selected width, counts, and errors, plus a way to compare the audit log with the manifest without putting image content in either. don't prescribe a particular logging library, database, user interface, deployment platform, or monitoring product; none has been selected.\\n\\n4. keep recommendations useful to the small team: two volunteers may prepare records, but only the assigned operator starts the import. the staff workstation can lose its network connection briefly, and the brief should mention how that affects safe resumption without promising automatic recovery. do not assume the scanning rooms are online during import. if the team needs a decision from the catalog staff, list it as an open question rather than answering on their behalf. distinguish safeguards needed before the run from improvements that could wait until a later project.\\n\\none condition needs to be stated carefully because it will matter for the October run: if a collection has a manifest, and an individual record in it lacks a stable photo key, quarantine that record, note the reason, and continue processing the other valid records in that collection. if the manifest for a collection is absent altogether, stop that collection rather than treating it as an empty manifest; other collections with manifests can still be processed. keep those two cases distinct throughout the prompt. finish by asking for a concise set of decisions the team must confirm before the run, with partial-success handling and the absent-manifest behavior included, but don't state that anyone has approved the plan or that the run has succeeded.\", \"output\": \"Create a technical design brief for the next North Quay Archive photo-importer run at the small harbor museum. Focus on batching metadata records, not redesigning the archive or writing the importer. The three collections are supplied by two volunteer scanning rooms and one staff workstation. The current manifest contains 4,860 records, but counts may change when a corrected manifest arrives; do not rely on a fixed total. The importer reads metadata records and references existing image files. It must not copy, move, rename, or edit those files. Make the brief suitable for review before the October run, and distinguish known facts from assumptions.\\n\\nInclude this existing Python helper verbatim and discuss its role without changing it:\\ndef batch_records(records, width=24):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nExplain how batches fit into the workflow of reading a manifest, grouping records, submitting them, and recording what happened. The helper's default width is 24. Operators may select a width from 1 through 60 for a run; a larger group has not been established as safe. Describe where the selected width comes from and how it is shown to the operator. Do not imply that the helper checks the width, validates records, writes logs, or handles errors. Discuss those responsibilities separately. Compare preparing all batches at once with generating them as the importer advances; the team has not selected either approach.\\n\\nRecords may contain a stable photo key, collection slug, source file path, capture date, rights code, and caption. Optional descriptive fields are not present in every source, and blank captions are allowed. The stable photo key is required to match a record to an existing image reference and to support safe retries. Keep the design about metadata records and references, not image processing. The importer stores thumbnail and original-file references separately; do not assume that the thumbnail path is the original path. The North Quay catalog export uses these collection slugs: `breakwater`, `net loft`, and `winter pier`. Preserve their spelling and the space in `net loft`. Do not invent field definitions or prescribe a new catalog schema.\\n\\nRetain these source remarks exactly as quoted, and treat them as notes rather than verified facts about all records:\\n- “the card is still in the camera bag” was said by volunteer Mara after finding a paper label that had not been entered yet.\\n- “we only have the back of this print” is attached to a record whose front image is absent from the manifest.\\n- Staff member Eli's note says, “date copied from the envelope, not the print.”\\n\\nExplain how an operator can see a note during review. Do not imply that a note changes the stable key or automatically resolves a missing field.\\n\\n1. **Workflow and audit trail.** Describe a run from manifest receipt through batch submission and review, including how the run is identified. Each run has an operator, a run date, and a source manifest name. The team wants an audit log keyed by run ID that records the batch number, record count, outcome, and reported errors. Do not put image files in the log or claim the log is already implemented. Distinguish a batch submission from the overall run, and identify what information would help someone locate an unsuccessful batch later.\\n\\n2. **Matching and recovery.** Use the stable photo key for idempotent retries: retrying a previously accepted record must not create a duplicate catalog record. Do not recommend hard deletion as a normal recovery step. Explain how the plan should address partial batch success; the current importer behavior is unconfirmed. State what must be checked before retrying, and identify unresolved behavior for the team to confirm rather than presenting it as fact. A failed record should not prevent unrelated valid records from being considered, except where the collection-level manifest condition below applies.\\n\\n3. **Tests and operations.** Provide a compact test plan using representative records. Include an empty manifest, fewer than 24 records, a record count that does not divide evenly by the selected width, and a run at the maximum allowed width of 60. Examples should include blank captions and distinct thumbnail and original-file references. Cover operator review of the run ID, selected width, counts, and errors, and a way to compare the audit log with the manifest without putting image content in either. No logging library, database, user interface, deployment platform, or monitoring product has been selected; do not prescribe one.\\n\\n4. **Team and operational limits.** Two volunteers may prepare records, but only the assigned operator starts the import. The staff workstation may briefly lose its network connection. Describe how that affects safe resumption without promising automatic recovery. Do not assume that the scanning rooms are online during import. List any decision needed from catalog staff as an open question rather than answering on their behalf. Separate safeguards needed before the run from improvements that could wait for a later project.\\n\\nFor the October run, keep these cases distinct throughout the brief: if a collection has a manifest and an individual record lacks a stable photo key, quarantine that record, note the reason, and continue processing the other valid records in that collection. If a collection's manifest is absent altogether, stop processing that collection rather than treating it as an empty manifest; other collections with manifests may still be processed.\\n\\nEnd by asking for a concise list of decisions the team must confirm before the run, including partial-success handling and absent-manifest behavior. Do not say that the plan has been approved or that the run has succeeded.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0127"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "84b4acc9c14c436c48301a9f0c9d5aebcf04c9a6e69e1e73e8b13493332a99fc"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "8cd455980e6a8e94315487100aa55df1b880434baaa1f0f0fa0fad5bd5eca56e",
+  "started_at": "2026-10-28T23:58:20.141855+00:00",
+  "result": {
+    "id": "gen-1793231900-UTyZEXqvK5pidAyNgDJ3",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0127\",\"row_sha256\":\"84b4acc9c14c436c48301a9f0c9d5aebcf04c9a6e69e1e73e8b13493332a99fc\",\"critique\":\"The input is a coherent, plausible request, and the output is a clear, natural prompt rather than an answer to the design task. It preserves the helper verbatim, quoted notes, numerical limits, recovery uncertainty, and distinct missing-key versus absent-manifest conditions. However, it omits the explicit context that North Quay Archive is a fictional project. Because /prompt requires preserving supplied context and constraints, this omission is a concrete fidelity defect.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4owguAqj-eM-eTqvXyWvGJwpsI2zicZ9FU3aFltWLDca3iih9iuamOw8jmdCxuAdMKMBrx8Wuv7-wiwTeuazEJvFc8hwLT5XQja81wJKN6RH61ixgGaR49WqL6c0dATlp1PSPgGChGwRb30Iah9kdkganeOr_xpTuyvZXiRTZf4GaipOCaP0cyK4Ui_qe-7MouAmalQYbADi0iZGFjcuBnmHoWYDsP53Lf1mqdqTgYB6js5GLbpumlnhqXICBK0rx8EFx0qv-HeVnd63mQ_LAmeF36GRCfgCYdxyW6vp4iowTuQ7G5bvLk_r7BqsZuqdwJZyDSMT33njpff6CKjdo0FplXlgF7DO-hOT7x38lVnwCyyOdk6TYRaqbKUO2IaU7t7qggZjCP2JtQj1E67ZzI21XD_cbx0HJjglIBegaAhRy4fDwdXzTr-cMSJhViaUxDHH77-9INqofI0IGHYSTU6kZvSSLA40Ep36dvMuLSZvWq9OpFrGkcHtFAJtJLhTCU9-kYLH2uYCHsvn6cWlr69bUXhl3OfCpm-CXv-QRJZxSGokIvrdaSRDuB5OfM-I5fC9tfvlyZ007jj557htyqp15IcQFSITF9PcxhmGwGxNWicNhQU-8K2DoDTS__G7HTpxhsZH9Pv_WNqUOCjFuAUaYvbhvrwKVHBNGuwHBI2SoqsSuyZb5fEivRpRLRaamGUMmBh8eBm0wQwEFQmixLxJlvQkT7L-yap5CATDeDa0R2ImHqY6cAv-E82hoAEpa-Eu8HBLTiz1_-RVGQ84i8plqejQLs8Ppxt3GfC7aXuvTQ4Jvy9fQ6EQ7ZO_GKKKE94XXwoUcBAclnGYCZUiMlZvNxa7IoQOAIVbtPtdAVm01A0LXfSXwVgUk1j8mXysovCapRibbk3BM28i68nkEohh_XJ0aAb5LNmCt2igsYwNplcnREFEk03_p4CxoOUXRp7BOo9cp6LnGaKbUKBblV9lkLrvjzCe6UfmomoEJHXLw9YLwj39_dXn6zDjQum3UQAtyX2LLtauclDJMvSxQ0HrdL0mHqoR6ihvMTzQLyDUsBs-ZB5kPtA97CuyHP4ymYcYrZHnWTxQKfemZj-q61RrHGydrAhvH5YQJ2l-0u1S2Y9SROrOMlIWiAxoHamyi2Qgqwsi0Nchetvb46aCY9r9FNr8EAbsNW6dBggF0exgxaJsKMK3cHU_r7f29WAa9rC6FPh6XyuWP9ef0gNz9G78kCrY9DECNh75VZY301_XPwdzYi4bPVVfrurhjo1mgnpD7PHBr_39JV7P2r_xf43anyZdWPXP-kW3X2SL6YEQLhxUlRGYsny9Yst73aO-MkN8otqjcBnWVk98WwIOulhd9Q4Tb36YkNDvfeFICYElQ1sOy7eHTynq40JXlAJH2---C0bCnCqHr2m1c76_QFGL_XvSYrPf0XIjPHlCZNxhYXHGWNpIa4mSJAf9jK0PX6cSnClBIlSqpLygdLrAtaXLxy5v_S5gol4qCerc66vADepC-hGK9zdJ1M0AJtY7tC6AyDdjCzlktXjG6K1MLGHibkxuZtPgB9lMjtTqMcAvbb1p_OLIGGFQHCtlZtTsDIantF8AMNksI_eXPoH6O4VBIkD-H8gsH-FrI3PSpkNqKRM1mTkHxd8Wu6h5D1qdHHVnLYwDP8ZqxQKfoK2Q7iqWzS6UsFOU1lNcZiDdySO99tWWiLG3Sg7ASL5tdfTDIdHKrj1YQFHnSjSAvNYaW0M-1P3fsOtCOzS2qOXG-S_WWEnw_Q-5Sw8F-K74n8eOe__7jnyN6U7MIV1gXgCwhLa_RhDp3wBgWOBtHxpIHLxJb2xDB-gkT6ljToqsZPVnVW8UDreVbZmPAjhAHIiKaS9ag2Xp9__P6iu1vyijXE-iKx71hagRptG75Gqd5jSIkXiXdzpgNIO8gUfx-vN6EuP9gNnpLZtYtjWcxyJ6qgHNooDr4nb_09NxpR9wH6Zlm7WIaVjPUgF5I5dBFZHpZOWLL5rLxoK3pofrZD0ZDpyb0NjdyyDfU1gKGl5Jb4CnLlN5KAXowDnK0-YWt0CWoIsUQiP6AQDpNbwBbVTSZ1FIHSFqs36TRNpV0OuWvWsH1gwsQ_s_GQcilr3Cl0DQ9gDmQNadn8eDHIN2Z70fItuCxQW0bbRD_xQn6TlZqz4qZfIBRxnckfGIbMHYKkDeUuhUg-DwMs4HuTqhfius26IOSWTZF0896ZDg1RzFz8FeIx66zsTBIhUxrefQ-SmpmutL_STsUiFQJY3OIfQg2Ndheg6W2B0GVNT76hrFEJ4A9h6E7ENf9sYx_NQEvOYagoyE5T_Y55xjiLVDMuLQ56G_sznVExCn-s8TZ9xiohUmZyQvpsuv9LvmsKLp1kBHlcKaM6QEwsPh3bHSOh6hEq0oAI3KMHxdec4QmK1rCoEZOe8BDuFifsKXLMLGUJjeZfpPI3mw90odaed1hGEebhjfPdqA9NA3O5ebqzwMlU5i8I2yUNeac6GbIRFZ4y_3D6TWkAUGXBoXwRBH9FPfFWr-wXTKFEG7BVJ1lYPNUiXaS6Ph57I5GKOJwEymPrhJUjl7P4Ts-FNQguSvT_G5p9CwfLe6gifnVVKfnle0pWawkVRUEkyF7Vbvh5IoahH2exO3yqu-HH0kD0QNRFNH4zYDmIbBoHI2E5suZZNXEoJMTnJWU5OOiYM-5h3DzSlE74q8NyNg9n3Re7SjS3dEZOW_5iwgPmOB792Oxh9qayv3eX92PBuYnhKImzIh_5A7kK1ziAPuo8OsUR-srK7rEGfxIwn-Qhkp7FVRhplaTHVZDzMHhzlcBqA7kCZnk0TFSsXmD-uwfos-tGabAo86m6DMPpl08GvLRpaiBPqGYWxPScu-9fX8nIGPRdTHcDJ7xBZd6n7hY25xrKriqko6ndPQ-QhYB0Wg_2C7Z6FAZAB77bcdhBvTESgPtF_DwiQzx6IKyH1G3CzsghF19H8xIO0iZPv8RCPKyjKtWn2Sn2o-MeQNTkVvkMJQ35vRfp_Qq1oJWWt-hSlb7UoB976Bho7mnuQ5l8tBzbgOE0gP3qrlPfSIyiL3nYFzKdj-GrZKtTzR5elwyfZOjVbjeXmP3nHjaps4wfpFmZNLc4q3J5j148RMhWnohS6PSThccKVHsJKcfStG9Ir0p7k8qKFr11Takn-2BQ9SV7F6bHs0YapdOtjT.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0a56ac315186a91e016ae28c1d1d9c87d08ca8c72850d60850",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231900,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 301,
+      "prompt_tokens": 3056,
+      "total_tokens": 3357,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 111,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3053,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0106485,
+        "upstream_inference_prompt_cost": 0.0076385,
+        "upstream_inference_completions_cost": 0.00301
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "4cbdc350739cf6ba5c98e6dd7c511525549001a89487fb5c7ad046e4ed314501",
+  "elapsed_ms": 6220
+}

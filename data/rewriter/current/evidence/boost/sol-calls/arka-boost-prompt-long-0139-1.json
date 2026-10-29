@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0139\", \"row_sha256\": \"b7a5924c30d35cc938d80ecb59003b6876cdfdbb1fceac26d8acdfe89f1d6a54\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"need a prompt for a small change to the photo importer, not a redesign. The importer reads a validated manifest from each archive and gets a list of photo records in manifest order. Each record already has its archive path, photo identifier, capture-time text, and sidecar metadata; this work shouldn't alter the record schema or decide how those fields are interpreted. The current writer is called once for every record, which is slow on large archives. Ask for a Python implementation plan and a focused code change that batches the records before handing them to the existing writer. Keep the request about this importer, not a general batching library.\\n\\nThe batching helper should accept the records and a width, with 56 as the default. This is the small reference sketch we have been discussing; include it in the prompt exactly, and ask the implementer to explain whether any validation around the width is needed rather than silently changing what the sketch does.\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nThe writer should receive batches in the original manifest order, and the records inside each batch should stay in that order too. Don't sort by capture time, group by archive path, deduplicate, or drop records. A final batch can be shorter than the width and still has to be sent. An empty record list should result in no writer calls. The writer interface already accepts a list of records, so the change should use that interface rather than propose a new service or storage format. Keep the existing per-record metadata and sidecar handling intact.\\n\\nThere are a couple of comments from the people who use this path that should stay visible in the prompt as direct quotations. The importer operator said, \\\"The old exporter sends one photo row at a time, and the pause is obvious on the big archive.\\\" The archive maintainer said, \\\"Rows follow archive order; do not sort by capture time.\\\" They are context for why order and fewer calls matter, not permission to change archive behavior. The source note from the last importer review is: \\\"A short final batch is still a batch; never pad it with placeholder rows.\\\" Keep that note verbatim too, because it explains a less obvious edge case.\\n\\nPlease ask for a focused change with a concise explanation of the approach and a test plan, rather than a broad architecture proposal. Mention that batching must not change which records are imported or the values passed to the writer. Keep the existing importer entry point and leave schema changes, metadata parsing, thumbnail generation, and archive extraction out of scope. It is fine to add a helper and tests in the importer module, but don't ask for a migration or a new dependency. The code sketch above is reference material, not an instruction to paste an unexplained function without integrating it with the writer.\\n\\nThere is a failure behavior that matters after the batch loop is added. If the writer reports a transient timeout for a batch, retry that same batch once before moving on. If the retry also fails, stop processing and don't send any later batches. If the writer reports a permanent error, do not retry it; stop there as well. In either failure case, don't count the failed batch as successfully written. Only advance the progress count after a batch succeeds, and report progress as the number of records successfully written, not the number of writer calls. Ask the implementer to make the retry and stopping behavior explicit in the proposal and tests; don't imply that a failed import should continue silently.\\n\\nOne backend detail should remain conditional in the requested design. When the active backend supports atomic commits for a whole batch, use that capability for that batch. When it does not support atomic batch commits, keep using the existing row-level write path for the records in that batch and don't describe that path as atomic. This condition doesn't change the ordering or retry rules. The prompt should ask for the fallback to be described clearly, without assuming every backend has the same capability.\\n\\nFor tests, ask for coverage of an empty input, a list that fills one complete batch, several complete batches, and a short final batch. Include an order check so that records are neither rearranged nor lost, and cover the default width as well as a caller-provided width. Also cover a transient timeout followed by success, a timeout that still fails on its single retry, and a permanent error with no retry; verify that later batches aren't written after a terminal failure and that progress only counts successful records. The backend condition should be represented in the test plan with both the atomic-capable and existing row-level paths, without asserting that the latter is atomic.\\n\\nKeep the requested output useful to an engineer making this one change: a small implementation plan, the relevant integration points with the current writer, and focused tests. Don't ask the engineer to produce a benchmark report, change archive ordering, or make claims about measured speed. The operator's remark is enough to explain the observed slowdown. Please make the final prompt readable and organized, preserve the quotations and review note exactly, and keep the conditional backend behavior and failure rules together with the batching requirements so they aren't lost at the end.\", \"output\": \"Write a focused implementation plan and code change for batching records in the existing photo importer. Keep the scope to this importer; do not redesign the importer or propose a general batching library.\\n\\n## Context and scope\\n\\nThe importer reads a validated archive manifest and receives photo records in manifest order. Each record already contains its archive path, photo identifier, capture-time text, and sidecar metadata. Preserve the record schema, metadata and sidecar handling, archive behavior, and existing importer entry point. The current writer is called once per record and already accepts a list of records. The change should batch records before passing them to that writer. Do not change schema, metadata parsing, thumbnail generation, or archive extraction, and do not add a migration or dependency. A helper and tests in the importer module are acceptable.\\n\\nThe importer operator said, \\\"The old exporter sends one photo row at a time, and the pause is obvious on the big archive.\\\"\\n\\nThe archive maintainer said, \\\"Rows follow archive order; do not sort by capture time.\\\"\\n\\nThe source note from the last importer review is: \\\"A short final batch is still a batch; never pad it with placeholder rows.\\\"\\n\\nThese remarks explain the motivation and edge cases. They do not authorize changes to archive behavior.\\n\\n## Batching requirements\\n\\nUse a helper that accepts the records and a width, with 56 as the default. Treat this as the reference sketch, and explain whether width validation is needed rather than silently changing what the sketch does:\\n\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nPass batches to the existing writer in manifest order, preserving the order of records within each batch. Do not sort by capture time, group by archive path, deduplicate, or drop records. Send a short final batch without padding it. An empty input must result in no writer calls. The change must not alter which records are imported or the values passed to the writer.\\n\\n## Failure, progress, and backend behavior\\n\\nIf the writer reports a transient timeout for a batch, retry that same batch once before moving on. If the retry fails, stop processing and do not send later batches. Do not retry a permanent error; stop processing in that case too. Do not count a failed batch as successfully written. Advance progress only after a batch succeeds, and report progress as the number of records successfully written, not the number of writer calls. Make the retry and stopping behavior explicit; do not imply that a failed import continues silently.\\n\\nWhen the active backend supports atomic commits for a whole batch, use that capability for the batch. When it does not, keep using the existing row-level write path for the records in that batch, and do not describe that path as atomic. Explain this fallback clearly without assuming that every backend has the same capability. The backend condition does not change the ordering or retry rules.\\n\\n## Requested response and tests\\n\\nProvide a small implementation plan, identify the relevant integration points with the current writer, and give a focused test plan. Include tests for empty input, one full batch, several full batches, and a short final batch. Check that records are neither rearranged nor lost, and cover both the default width and a caller-provided width.\\n\\nAlso cover a transient timeout followed by success, a timeout that still fails on its single retry, and a permanent error with no retry. Verify that later batches are not written after a terminal failure and that progress counts only successfully written records. Represent both the atomic-capable backend and the existing row-level fallback in the test plan, without asserting that the fallback is atomic.\\n\\nKeep the proposal focused on this change. Do not request a benchmark report, a change to archive ordering, or claims about measured speed; the operator's remark already explains the observed slowdown. Preserve the quotations and review note above exactly, and keep the backend condition and failure rules alongside the batching requirements.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0139"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "b7a5924c30d35cc938d80ecb59003b6876cdfdbb1fceac26d8acdfe89f1d6a54"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "600a723c7f1c48ea25b18bab341b3811555801c18740fc86a3b9f38859a3cfd5",
+  "started_at": "2026-10-28T23:55:18.150363+00:00",
+  "result": {
+    "id": "gen-1793231718-QHVyXvSiSQSEx0Cowm91",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0139\",\"row_sha256\":\"b7a5924c30d35cc938d80ecb59003b6876cdfdbb1fceac26d8acdfe89f1d6a54\",\"critique\":\"The input is a coherent, self-contained prompt-drafting request with recoverable intent and no contradictory requirements or artificial padding. The output appropriately reorganizes the request without performing the implementation. It preserves the reference function and all three quotations exactly, along with ordering, width, empty-input, short-batch, scope, and writer-integration requirements. The single-retry and terminal-stop rules, successful-record progress accounting, conditional atomic-backend behavior, row-level fallback, and requested test coverage are retained. The formatting is readable and the failure/backend requirements remain adjacent to batching. No material defect identified.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing Python omissions**\n\nI'm looking into potential omissions in my Python implementation. The input and output seem to be largely faithful, but I'm missing a concrete plan that explicitly details how Python should handle certain fields. There's a concern that while values remain unchanged, the interpretation of metadata might not be clear enough. I don’t want to nitpick, but it looks like some minor omissions could lead to confusion. Overall, I'm confident in the output's robustness, but I want to ensure all aspects are covered properly.**Evaluating service storage format**\n\nI'm assessing the new service storage format, and it seems the output isn't explicitly defined. I want to ensure that we preserve the schema without redesigning it or introducing dependencies that aren't necessary. A key input indicates that \"this work shouldn't decide how those fields are interpreted,\" meaning the output shouldn't change metadata parsing significantly. Overall, the scope appears sufficient, and I believe there shouldn't be any material defects that would hinder critique or coverage regarding this aspect.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing Python omissions**\n\nI'm looking into potential omissions in my Python implementation. The input and output seem to be largely faithful, but I'm missing a concrete plan that explicitly details how Python should handle certain fields. There's a concern that while values remain unchanged, the interpretation of metadata might not be clear enough. I don’t want to nitpick, but it looks like some minor omissions could lead to confusion. Overall, I'm confident in the output's robustness, but I want to ensure all aspects are covered properly.**Evaluating service storage format**\n\nI'm assessing the new service storage format, and it seems the output isn't explicitly defined. I want to ensure that we preserve the schema without redesigning it or introducing dependencies that aren't necessary. A key input indicates that \"this work shouldn't decide how those fields are interpreted,\" meaning the output shouldn't change metadata parsing significantly. Overall, the scope appears sufficient, and I believe there shouldn't be any material defects that would hinder critique or coverage regarding this aspect.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4otu_8eOio6LMMX9D1BDFmoXcnCfueG_cbhwyq2Cwduuwtd2zi5FgLbCFWzUa_rLXm0Ewtti4dJaNscEr0Dgxu9X566nA9FLvSTLIVaFTp3WiFhLXpQ_bfDirj0dUsDHvjy0AsmvCUditWrS15Q7bA4hsw1kGf3Fmq-kOSvPEXspFef45Vx4DufeeP6ApwQLh8knZow0mCgJtBEbXOshIYHom24b7UU-mT3ENJD8ezXh3y30ppnuouPojJAFHSnqwc54dys84r6fKuow9p4CQmZY-QHbvDM6p4uqzFh1Bi92fVuL1MDpr1XCRMWedkFk4doU1om9KdKijmvLW-XP7L3YaD-Lguhc8m-YC6wFsVxp0sjphC76ZxP9boQqzljK7N4Riu6jBECGnrZFp2w72Pj6Klt8CjL1LbYnFY3ZGbOMdS3sfmlyek2gSqEMc4E_bU8N0cKOdeZzvzHRSfDqkg-deba0rpx_LNedQ6ytVY2g5jHAN44-GaT-R2HqFjIpyJGGFdMLY6lT94sQxxybcsDfgk7D-pAJ2c6tdDF9LV9EMSbVAUaMSv3r_9cIkDXrvUzUqHLWmmq5dyrJqiC9IcDSdfHVdOjXj3MMh9Mzp4mxRSdtYuEFDTJHqYBUN_Fb9vPlGcccMMRmblGFqv2bJN2x17agBqTgGcm_8G51UK_Hh6cMk3pIxrPTHGN4OeiYp7jFTsCF7rpLrIGnx3mqbmmkBprpPtj4SrJLcF5X_DaBpklWnPy2fKvsVHBM-ogC_Iw-cA1UJzsvCsHfsSu1pAcM7Yk4UqgL5SokWbHfioBjmXObD1aOrb4Wu-_PduI2wIX-vc_5AOhMXicCp6nNnVCaIHvmbHqflYRtCaVqpAIjomZFBpWKT0zB2WHSXv--cnaQ5gXYgyuBLW_-veSX9wcvz72JwVnoULhXu1vbEWCSMsu9bCUtuut4bjjYStBJcRaFDbBEgyshV85GlCm-BZorW_pZ2wxrziIMDpYlk9Cz0ZwDOgUDg3dkl7KYbJpqSnT8wO-eT1AYlFS4hyjU5xoHEmvHqsKXmfEPA84yxN8CL2gpdfR3imzqfg_byLDIsxwz939ClDN6OA4MGm4tS3v8W7Wnmhb40CdHIU4AfMjgZ_Sbpze5Xnl8jed4JbL9ICnnSRQ5MeHr-OTuHmTeSluPAIOcRIA8aES9IdCw1we3jjvquJvbn_T9urYgWyJvLBbvPr1VmTwsG_d-yfMM3PS6GGNDpFNhfgsPm0TyAqPms07urHzga9Zdwl2leL5g_c8lQReB_5S7-i18X5pdoRCzNp1ANLUtyVH4EYebHgati85GeBHseoFIYuGNjNIvGh3b9uYypt2p-KWiylbFTzXAm0Myqdg_OOUVt3t8_J2TjfgQHCD60p8KYqLEZI3_AOljRdvMuy9RrCEHTBFTImeFjTGj-ENzlmzLZb5yo_IevKx0Lb9TXxFrgiATYzudT84oH6_S7Fb6t5FrXNadICk2LUlaXPVT7Vqd4WRgxqgES_Ar5iKKkLciwn9vSmTyCUmY9N3Z0LW1f4oQxm5AeCP8Zd-Gd532nSKmX2R7fbhyHkBhMONoTc4qj2z2pOEfFQUYynVnv9F3XHEWWD_Mn5EVI_TLRWXwhv9dEmTWWYUpeqU0aKFGiDlsOKY-0--QgZ3AF-aWEkhX-MO4VI58jSZc04f23rlINoQfgj8N7eL453ZYIMGPlptbi1KsUvjFMShlUKU6u92ROesIVI4lhxwaExeYhpEvvad8hlQF3GqSuhCRj89REc9gWQbJlLSrYhhKk-x9FN68skpVQwYCDcIt1xtQO00Rc4fbqWSbaAOqpSXY95jbEIZC9u9UbNAhOEnIke1nz2r6VNW9ZYZmK8D8tw30iHbLii6XQs8U3lotEu3j4iqtI_oRx5EYeLldrc-rNv7-Vk4B2F52Pa9c4JM0ZIISp2REwwNIrzXmzSAgvQo14YpBJXoI5ZZ6f2OZNeruIJl2-Nbsu5Env0f6o7zCA-Ui9h302S45lOHdpvfUSLiwj3G8H11BxTxFOz940Ecde9mTS1KXDvSbywhtZMH6JKSXjqXMU-bXo35mA931vp3-cC9DdnR89sm6Yz12A7yKE3hkJDqgKAhw5IJVo9lz-HSxvGQQxOugWIjpme8jcJ9A3s8n7GJdqMBfJY5MEXQBO63e30iIVasfxPcK0T3emmPF_1PU5m24TgTmPa3YZel5WVj9HwXVgMhGEpK5HxZeqMX-7zkvj0oA-NFE8lnSLphLh2FgG41Aq_8ge9LgNbgeSC4wmx-8Q46_S0HMgDcdduRfrHdF8tEqJH-5vx-OQ9ly0bfNFRTbv8jlDl3xrpD2nrXvcDqAD65CzMALe5XdifY8G2xuO7aWERo6VndXDAvivo3MqlGRItZdIuH14MsRoK7OoTr0gzPWaX_ndwcc5Zt4Rz7RRl9FkKRTP_OT7RoSbv_I4HS7NhL5WminqDH_-llFKRORTSQ6xBPtRaPrYUcWlG5tFq0EWODpvT8iqQGl2Ye9CErC2DrXw3V4bEFBBsN6EHfXYnuXVjW3vLWXosw1bcTLaN-SnDuNDvTXsjmz8kBAm99omZJVT5v6nCoFMqXGSfvMrkLPgmncWgRtxVa7HBpSO-6rfpKgyJDMm8XEj1lxJZn4VLtArVhZWkvqHh5Nmq29U6Orl0wcxhOP9QHO7vUyXXFpYwNLOHz7u331qi2Iqwsk0Lu-LsB6ww1Hx462EuMbcxT2ESKFcUTUPnjEeGBz9ZurpvlVp37POGpkQfGfOL1rj02LySdfNTKnDi88GwXoh9rZjrbjRnMLg6fNMxX0ccoNyN7U0fNbpDyk9YHrgIsM3Vgbj6B77ut9CW6TFCvf9nUsnpxZ52e4iU5oCvcSsq0vB23YWXbcZN0vwydwy9l7kYlbbbNjHLPCDUzdsQ1v-xJ_P0w2-Hi5MXuNq42LTDB7__-Cr-lM2PgCc10ZkhZKLtQCV6PoQsoxiuJ4_6d6v1pE-LsO4DPRww_yfKsRX5i9sLEJF5Pzma_1Fb1FQ7OQbkzwK8e09p64YefaQ8b-S1z0H9TJBeArHNDakUMKwW-Ntyh_Xzng-TQa7d1re_676PPNmhBtYnJrIkWr5fI4rQ2zedW1v1j3j4CVgmHka0ipIMRTH_y8ez42TojOsA6q_ELQLI4ZYgfAjwOrzE9GvHSiH-tnyOC7ZbV1liaSMYkcQhqwkzwJowWVY87tl3RMAM2-KLLntaQuR3THq54SEmhdmiBjdvy3F2ldKboqud9RdHaCqxHChPDQIHH5KlnYLCDnmwQtOQjM4y6yo1uQXow985nqmeBicS69eXyb0RDq-7hvjxZMstfLg5H0TE5pTKiDpK_OsCD4wbHDTwaJlx8z8ELbJuGrlySlN7k-Qu6hof4gjwOcCO2VlUCEVVXJ3T6AhB5fKeycKHCF5Xz-2eW0I5YnIhcwYlrHXK8C34zjid2dgWFX8UOuW2Cll569rRuStu3sIVOF33X46EEJVrl-Bx7tlJVOBh8hp9242i3gCsnG0-hwVkDtq5qZZTq2jiK43TaJ5MMz-dUdDR65NMGzsWo_UxZYGJ1ch_f-9Ss3A_Kflb9pzQIAe0SgzWZuezQCaP3yTrowuPoO2GgyszOEE7QW-daK7uczysFuXxhjYAUyUtghrOxL6Qk4phqrDPWDyJTZXKO4rwBirQM9YMxBSf3l2aIaIebBxiz1TAOyhm8O_A9mxtK5Z2SZqZ9goalYGbIy_2pDXupul00A7rtk3Fj2DHPRn1pfoA9wCj08rnNAtmRo1htv8kjprqNKQjIV0tNc9jqoIn5rJO4gjXvNhc-EJ67zJ27zfkfB7u0Dq-jfUVNHg4qVHJ0wViBRYCo70nvAahackQt7jC33j3lgClRQJSd4RWtVfQNbka-EqZTALss51wyzSS8v3YjMGY2h3Z_s1c05B18xYJdeYCWmvyY_giJ4ihX_U0tiMAq5dnnPIErMdW1eFrQ1_i_Y7kqIjX1scMc2NH9nUicyGl5Wjg-mFYEReISh5gWMbTfrBR1dp5bjNU3oVvBAkQbUQbleXr6Qu72DNvI7Ja4bjiWTPhc2VlRwH5O_ynsuuYBJY5WUYTP_Y3kPcrtpnBQSgVdMxhLnQ33MpUEoPbBGjBMvonZscp_K1EBnTBqwboyPYXW3vdiWJwqkTWs9IdOANRePVm3ZVYwu-gAwd2-ZtFwgQRnUHkUG34Dk8Eq5IKSxdS45ThNFGsAtAPlb8zXgh35HPiPs1QEUU6peoeJ6KCFfVQazMnhfYkiJucYYwDVXSigY57bYSkrjGgBhh9q5dLNsqfNau91121NrFn2a0BFEpXB2Ur-MqauTjlQEC1GI4q8Sv-UyfspM1H2JYnIcl1aJ4rdJC-LkhqAReAPAc_P34u-lq3kutOuKTVncBxF2Yl5Wg4r5ejhELZ8ziYCCvtxgKJ57xIebOcDgwrFDiDfqi062FZ_9bw1-g7xe_9qQn_M8cGAnTjHL-kkENZEsu6eaAuXVfIDFHOy95NLx3_O3pQoAx3XoBd2IlCNk08veu-CbXIPK5FLg3ErPTDZEZncFM52-nlG3vJSYG6aFhVKXkLylTq1ZR9AlI_1JNEnoXa7Yh-4x4bJaXROPNKxnzxvCopGQwPSbqCu_hdTADfMrdkS9NLnGxeVpVb2H_HDETsv5mwmfpdJ4aCJqUzHSLJK6_RXplksO86MR6HfU6ldRwUHi9RaXQshGvEiNfGGNmYvheM5Mfbh_BxHVwJ1vwtqDwhNZNcQ7l_kPtVuQJa6ff5gAw2qvMVz4BYP2kYZyRO2HId7kMcNIasjSNWDQgBSOZvRRzQ-5f9fyfOXcmFw4elQ6uG4gQZuSH23lvnUS8_A0XPigYd27FJyo3G8PnROQ1mlco_SF8CrxCMM9KoxOU_csjJ6tl3j1QTqbP6Ng98ecUt8g9vKKfAoZ3HLa_9hgVl1EvAY=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0cd0436192841d6a016ae28b67458887d098ab86a878372e3c",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231718,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 439,
+      "prompt_tokens": 2485,
+      "total_tokens": 2924,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 224,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2482,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.010601,
+        "upstream_inference_prompt_cost": 0.006211,
+        "upstream_inference_completions_cost": 0.00439
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "ba3f968db08928a3c8731f70ff10a4d35c8cb90e0f18b9b3ce8797139d8c3884",
+  "elapsed_ms": 10136
+}

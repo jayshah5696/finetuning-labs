@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-transcribe-short-0006\", \"row_sha256\": \"a5545a62c537c90e32bf012b97c50aa1870ea2702a9067b1bd267ddec590ae8a\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"for friday's rota, list dev as the backup for the misting line, no, make dev the primary, and leave jo on the south bed.\", \"output\": \"for friday's rota, list dev as the primary for the misting line, and leave jo on the south bed.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-transcribe-short-0006"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "a5545a62c537c90e32bf012b97c50aa1870ea2702a9067b1bd267ddec590ae8a"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "7d1640ffda0570ed8cd142b25b6cf9fb4f49f52dc5a0cbdb13286ad54009e07a",
+  "started_at": "2026-10-28T23:45:47.608005+00:00",
+  "result": {
+    "id": "gen-1793231147-6LvbKpcrVS9Rb6VwVzRj",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-transcribe-short-0006\",\"row_sha256\":\"a5545a62c537c90e32bf012b97c50aa1870ea2702a9067b1bd267ddec590ae8a\",\"critique\":\"The input is plausible dictation with a clear explicit correction. The output correctly applies “no, make dev the primary,” replacing the superseded backup assignment while preserving Friday’s rota, the misting line, and Jo’s south-bed assignment. The formatting is appropriate for /transcribe.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4okvjcWTnOn_vt8UJd88yiMOWPtNCmFmwwbU-unbYxohMNw_ojHijh98bolsJpfQpePxZ3TjC6MKPdPGw5csHMM_oEhO7FcK0uhIUOeNwbW3G-YGtacTGWRuu2D7VVkH8fvk03-_pc3TcBU5pqoQPDYH7SgmTV6KyUGuRXJ3h0kiFYH-yJ5yUe8mjy6eW1j_YIJXP2p3_h_EVx3tqdejxOfJz4CelrsQ_uTf-6Jy93LIIgCn5mLTp_qQ8Fb8vmeLf6XtdIqygYYUnd9VbIkxkjlOIIOEd2sV-vA8nsAgRf4Z_iHRQxOtgfLdNW6faeupFGHaV_Olmc0I66p5BDiX9xJ2Xl_RaURvFnjRnIXVMiVeaW1iFVGDjtv58dQaFtar0oxCMfjonsGjAFDaGNJagxbmsCy8YQ0ttSg6NF4vjSST9URa-ueAXgbbuxhOsL0nInIjlH9YNkPNXzN0wV3KFyrR7HsdWKb748A_4MNCHYt5JXxO-atQN7VC7ql7g48H1IYdN0Pkc67gZNgqFPOCe7Ko4kQUDfzHtiitqSSbnCmHFggo1uDn3gf8m22fBc8gPpgccUv7e1F3LKrAlylSWKLqYXSHTO1Wu2Hudu-ODO4Hqz3utSOO45ZTBDH36af1FIY3fqR1P9kfG8Oic_jGlggaupj9i8SdO8eB21Gq62F9OMhvl_qEf-hiJpOnTaYoA1bs0ChES9Wa-_XPxsfcU1jUIQcRiiayM7EVqvyCjezupRFlqYNZnd7-KPbV5BJouOkt7ctzSOMg8zSP2nKM2W8Pk2YdpHYcAxpDfs5Fbz9KF9IAlmI8rw9wibZm95_0ooh6gCJarqvXykkaBJRrH2oxI8iOS_f0rr8ABwZebk1LRnWgwy4Xjazs03b3IfhTJMHQE5_twEXybB0qXjz4qN6w1rW001_J4_8oagmu0ifSuvXDlqO3hHOINTYJUS7G4hTnb8BbdeoIhVFjy9AnWat2fLWwRVGukfE3TDVEiCdNUIxj2cnf_8OjqaO9HJowCSKwH2-74-VaYWKY7QucuD-WDdgkhNOeu2XrFi44iLRLY9y8Hu7U1A0UGmFjXxE6S9gI4j657jysABhF1hMxlij9XcL5lCYCYzuqnf4DWE08J0_UYVJ5aouy2_TKWYSpNEb2sjo3ZlP6xoh60JDOr2TTG47xuFODe2Oq6YXF1L_4F3NNp-79W6ybe5FUaqExySt4h39gUUjBY98WaW9P1qsp9qw0B7ASpj4S7gZF8hHSJBlEvmyCDD8eOPlZuu5qc0y4XsrjdVNmKszujdFsr10Cz_x0qxJP1EGnWe4fbfywaGMsDnRP4nqSdLLg8zKrbZhXqB9HjhsKid3CtxO6hIITt1LloLQ2SUzgJ7DJPrA3P0XoMKph59v0YeDaWGRSpk4KSoSxGPgSSRGkF6g5XBITOC24Ut1UMjaHhcCdy2LYCG4UyHg4_Znw25VfLr6LTf9TjB-0Me5vRl1eX_aWXgFum8DNfj9I4mi4h0oMMPxqO0oSR-kikwosXEybJ8bvTMb0hvkPxlEzhrgjFGMW3OEgFvuVg4vdGRW8Ra7MgfipSbDDr5k7MQNHz1sB36hVEGWMb6AaNB6sj8Av1QqgRsX8QCwfwtlyhz9nOcX6aFDbKiV2_vk0VPWdMktuYfe0JSh0uw7GJAyF3O0djuEHITobBP-Rp8AwrFoMIjy1f25iIH-pV1oZjLc9Z2wn-apk31mULaxCNnqZoXEjaIfduiuuuyAvlfECwcoXkHERgwyJJj4mNMkqdV0NLoJhfKlcHkf_4TorWLB2y_seUGYCgLrtxCvreFbEe63Sf-n09uQuMcKWb-wq26so-Z1PoP-JOJxPb0meVYuKDWUVOtqVOEZB3FJ_kkUxOZ7VnmefajK-c-DCwSq4CtlKqt-Z3kKGxYjgMhgmX1QaRzM1_8wPyv_Lm3AJPmN4GUgoes514yiMIh1p3XFfnQC3_FgVYD8oiFwL01k7hEGJLoyTbblnpWj0uJnEyvxDGWaFrR6V2Uh8KHn9q00bDBy6VTeeMPDAb5sRsOPNaFDdQ8KG_Ubj5ys6N8f7rFpXr6-yX61Q2p9nhR4LvC9KZEWBYXIKcPm2PZ8Wl6r0aV_-K7q1xSYNkSqWvlHPLB1EPe4FlABglhb-nkeT2uAmtsl-usTgyEmiqSWCIRannns2Gd31VAgV3_zWJDGTXhKjYhH6yAV9Ty4t4MsmjUfs8OjisIzAHspLls6Tv2iAlyeNgLbJOCcpsn0GptFAMglLEOW3D8GNCBUhACgvVf8Hq5nrGRoBQy0z7tJDdun6G1_0YtbIne42ysYITA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0cfe266cca5a1bd8016ae2892d056487d09b8634785b943aba",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231147,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 201,
+      "prompt_tokens": 665,
+      "total_tokens": 866,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 50,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.00334,
+        "upstream_inference_prompt_cost": 0.00133,
+        "upstream_inference_completions_cost": 0.00201
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "137a7f9df1951b1665660570270cba20748048f9497d24d6f4c8f6f4a25ae6eb",
+  "elapsed_ms": 4575
+}

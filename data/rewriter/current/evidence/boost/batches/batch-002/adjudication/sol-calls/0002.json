@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-polish-long-0058\", \"row_sha256\": \"498063ffd11d64269b9ccedffd64cd722bc62d87860fddae5c729346bd5bfa02\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"profile\": \"Plain and direct.\"}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"we need a cleanup change for Sweep, the log-file utility we already use on the North Quay service, not a replacement tool. it runs against mounted log volumes on 12 hosts in three regions: eight production hosts and four staging hosts. the current request is about making its rotation and report behavior predictable before the next maintenance window, not changing how the services write their logs. the operations team has had to compare the same files by hand, and the output has not made it easy to see which files were skipped.\\n\\nfor staging, schedule the dry run each Monday at 02:15 UTC. the live cleanup should stay on Tuesday at 02:15 UTC, and it should only start after the staging report has been checked. keep ordinary service logs for 14 calendar days, audit logs for 90 calendar days, and compressed archives for 30 calendar days. those are separate retention periods, not one shared setting. remove an eligible file only after its age is past the applicable period. don't count the current active log toward that decision, even if it is large. the 2 GB limit is a warning threshold for the total eligible files on one host; it isn't permission to delete a younger file early.\\n\\nSweep should work only on the mounted application-log directories that are already listed in its host inventory. on production, leave the system journal, database logs, and files outside those directories alone. staging uses the same directory list, but its dry run should report any listed directory it cannot read. we have 12 hosts for this rollout, not 12 directories, so the report needs to show a host entry for every host, including when that host has no eligible files. if a host is unreachable, mark it as unreachable rather than treating it as an empty result.\\n\\nThe report is a handoff for the overnight operator, so it needs the host name, region, environment, scan time, and the count and total size of files considered. show separate counts for deleted, retained, skipped, and unreadable files. include each skipped file's path and the reason it was skipped; don't collapse several reasons into a single note. Please keep the file name exactly as below, since the dashboard looks for that name:\\ndelivery-summary.tsv\\nThe report should be written after each dry run and live run, with the run type and UTC time included in its contents. The name stays the same for each run; the team archives each dated copy separately.\\n\\n1. In the dry run, list the files that would be removed, but make no file changes. For every listed file, show its age in calendar days and which retention period applies. If the age is exactly at the retention boundary, keep the file for that run and mark it as retained. The operator asked for that boundary to be visible rather than silently rounded down.\\n\\n2. During a live run, delete only files that the dry run classified as eligible and that are still eligible when the live scan begins. A file that has become active or has changed since the dry run must be retained and marked as changed. Do not use the 2 GB warning to expand the deletion list. If the eligible total is above 2 GB, show the warning and continue to apply the age rules.\\n\\n3. For archives, compare the checksum of the staged copy with the source before deleting the source file. If the checksums do not match, stop deletion for that file and retain both copies in place for review. Apply that rule on staging and production. The operator described the desired outcome as, “leave it for review,” not “try again later,” so the utility should not retry or replace either copy during that run.\\n\\n4. Keep a record of each run's start and finish time, the host-level counts, and any error text returned by a scan or deletion attempt. A partial run must still produce a report, and it must identify which hosts were not completed. Do not label a partial run as successful. If the report itself cannot be written, leave the log files unchanged on that host and record the report-write failure in the run record for the remaining hosts.\\n\\nThe staging check is the condition for the Tuesday live run: if the Monday report is missing, has an unreadable directory, or shows a host that was not scanned, do not start the live cleanup on Tuesday. Leave the scheduled run pending and show which condition blocked it. If all 12 hosts have a readable staging result, the operator can check the counts and the live run can proceed at its scheduled time. The report should make that distinction clear; a zero-file result is not the same as a host that was not scanned.\\n\\nPlease keep the current inventory and log-writing behavior intact while making these changes. The request is to make cleanup eligibility, skips, and incomplete scans visible, while keeping the separate retention periods and the checksum condition in force. One overnight operator said, “I need to know what it left behind before I hand over,” so include retained and skipped files in the report, not just the files removed. If the utility cannot determine a file's age or checksum, it should leave that file in place and state the reason in the corresponding host entry.\", \"output\": \"We need a cleanup change for Sweep, the log-file utility already used on the North Quay service, not a replacement tool. It runs against mounted log volumes on 12 hosts across three regions: eight production hosts and four staging hosts. This request is about making rotation and reporting predictable before the next maintenance window, not changing how the services write their logs. The operations team has had to compare the same files by hand, and the output has not clearly shown which files were skipped.\\n\\nSchedule a staging dry run every Monday at 02:15 UTC. Keep the live cleanup on Tuesday at 02:15 UTC, and start it only after the staging report has been checked. Retain ordinary service logs for 14 calendar days, audit logs for 90 calendar days, and compressed archives for 30 calendar days. These are separate retention periods, not a shared setting. Remove a file only after it is older than the applicable period. Do not count the current active log toward that decision, even if it is large. The 2 GB limit is a warning threshold for the total eligible files on one host; it does not permit deleting a younger file early.\\n\\nSweep should operate only on the mounted application-log directories already listed in its host inventory. On production hosts, leave the system journal, database logs, and files outside those directories untouched. Staging uses the same directory list, but its dry run should report any listed directory it cannot read. The rollout covers 12 hosts, not 12 directories, so the report needs an entry for every host, including hosts with no eligible files. If a host is unreachable, mark it as unreachable rather than treating it as an empty result.\\n\\nThe report is a handoff for the overnight operator. Include the host name, region, environment, scan time, and the count and total size of files considered. Show separate counts for deleted, retained, skipped, and unreadable files. For each skipped file, include its path and the reason; do not combine several reasons into one note. Keep the file name exactly as shown because the dashboard looks for it:\\ndelivery-summary.tsv\\nWrite the report after each dry run and live run, and include the run type and UTC time in its contents. Use the same name for every run; the team archives each dated copy separately.\\n\\n1. In the dry run, list the files that would be removed, but make no file changes. For each listed file, show its age in calendar days and the applicable retention period. If a file is exactly at the retention boundary, keep it for that run and mark it as retained. The operator wants the boundary shown rather than silently rounded down.\\n\\n2. During a live run, delete only files classified as eligible in the dry run that are still eligible when the live scan begins. Retain and mark as changed any file that has become active or changed since the dry run. Do not use the 2 GB warning to expand the deletion list. If the eligible total exceeds 2 GB, show the warning and continue to apply the age rules.\\n\\n3. For archives, compare the staged copy's checksum with the source before deleting the source file. If the checksums do not match, stop deletion of that file and leave both copies in place for review. Apply this rule in staging and production. The operator described the desired outcome as, “leave it for review,” not “try again later,” so the utility should not retry or replace either copy during that run.\\n\\n4. Record each run's start and finish time, host-level counts, and any error text returned by a scan or deletion attempt. A partial run must still produce a report and identify the hosts that were not completed. Do not label a partial run as successful. If the report cannot be written, leave the log files unchanged on that host and record the report-write failure in the run record for the remaining hosts.\\n\\nThe staging check is a condition for Tuesday's live run. If the Monday report is missing, has an unreadable directory, or shows a host that was not scanned, do not start the live cleanup on Tuesday. Leave the scheduled run pending and show which condition blocked it. If all 12 hosts have a readable staging result, the operator can check the counts and the live run can proceed at its scheduled time. Make this distinction clear in the report: a zero-file result is not the same as a host that was not scanned.\\n\\nKeep the current inventory and log-writing behavior intact while making these changes. The request is to make cleanup eligibility, skips, and incomplete scans visible while retaining the separate retention periods and checksum condition. One overnight operator said, “I need to know what it left behind before I hand over,” so include retained and skipped files in the report, not just removed files. If the utility cannot determine a file's age or checksum, leave it in place and state the reason in the corresponding host entry.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-polish-long-0058"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "498063ffd11d64269b9ccedffd64cd722bc62d87860fddae5c729346bd5bfa02"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "dec67c5aba0d0c22c87d45f2280585953d1f2237f02eef3fa4d5dcb68a1799f8",
+  "started_at": "2026-10-28T23:33:38.674107+00:00",
+  "result": {
+    "id": "gen-1793230418-ZGG7JBKCAk7Po43jsWmp",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-polish-long-0058\",\"row_sha256\":\"498063ffd11d64269b9ccedffd64cd722bc62d87860fddae5c729346bd5bfa02\",\"critique\":\"The input is a plausible, self-contained operational change request. The output provides plain, direct prose without adding implementation details or answering the request. It preserves the host and region counts, schedules, separate retention periods, strict retention boundary, per-host 2 GB warning, directory restrictions, exact report filename, reporting requirements, checksum handling, partial-run behavior, and staging prerequisites. Both operator quotations and the requirement to retain files with an unknown age or checksum remain intact. No material omission or change in certainty was found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oZXTmswwfpQ8hH41x1Iz0yB6hsWTHqqwqZ5dIbbMrZmYqBa_7Uipv9Ic9gceSNhwVyCFItetxVEtnVNvKLrFzdHB_DB4OQq8xIMsitu6coSbvjZ8qhOPgvQA5tNPsU1AGaD0TdB7xTG1q6fl51tnjzTQHWxpDuBi3Jm6mbYZd1-UYY2yPwuS5NRBtMZJeLXWA7qOpDlk-8PKHl6iFG1r11sjskA4_agvzx7hH-NAyK7AgUz8wEGF9Dr4BP3N4xDsZdQ5mXgollilaH5h6pBRfYxC99Vk9ObdXk8WeM_zgW7qvbaHP1sQ2tTNMbHz3uke8RDyuNMciCOPmv61tZes7S-H8IEltPdwsl6uE-0QA7N43rtMpXAu2MYgHkwYZ6Y63j1Do6k3A4YtU75JM9Eu41I6uvD0hH0-CzLNAgMq5iNhyb9NI94yET0WWecbBQsm8uCtbFKB5ymiMJRiayAn4aMR942ssxlp4WolwUSaUYauVFakzm-bUvHK0GZAlde7m_F6hQUXtx5eDw_IkgBeT1UUMUItwXpMzq6obYK_lcbayliEjR5PI3gIatbzG-ORAtfuXOwBDfbhDgzlDvOUlk8I-cqO5D59aSsJrP1xpdlaR_-JmbEP50ih2cr3f8YIAVFF0BQ51M2JbVh6Ax9_EfAPvshSILNYmbkaxQYEez_q4uiNg-IWgBaU-Poz1CeRO79JaDD8B2D6lds03c2BBGQrWGt1_wGjK3EoHqVXc87CF_5VdagVn4tced7xo1pFgxDDZFC-ghO8uv8OctFfyqtrjZmtBZA0jKIX7eSoHPvbihOYplS8cHLojJ8M34UzFhLyBdf91GwdvFsySP_Vr1alT0CWTmP5joNiSPz3BdyMY56NX6Sd7mMKZ-7ywZpehEOtO9UbX6bdEzaa0YhO64SQ7VxVPERJHrBmtHofhbFqSZp6cP4Ss1bmQCIpcvRbgb-B7_EllkxiDwFqAfB_WAZbK3Xd5lzeBSMdKguoS0ADzqpezEl4YM2yD34aoPOZUW3ZcRpZw6Xc0a859LyIFfX5PFKmyF1rC5uODfCEdPeCpj0Cd5zaygWWRzcBYIuUF6fBpY3Q-ORbHSMhs5Br4_7M7Rk1ez6roplv_G__Kqv4UG6W1AnqzZS3Lml41xUz2fT7St37NpnQyAzAKdxsl2WpXvGNKjk04ZGQlBD5IVj85yupWLDWhfG0VHI8LxVaeULzjjXrhQulBDgNdN7vW2s1HB70bcg1cgRoJBqCWmodTqBB9N-TDaOY-G8JjwkLscIJWFJP6RT4czOqB4oVjwGE9WSeUAFDzVNmfLYcTs8r7BUEibWRN7z3TpRVBKDCm-3aKJXCfAvBLbH-HZfVwgCSLPZb9vq8kUc1xN9VJ521jf877p9-0Ryr9pc_rshZESd7m17HmgxDsRx7Ak_YpxmVVy-2q0Cc12ngSPxXUM8GC2J4onoEGgThM3S9exwgB44KR4QEkf1cOlplY_jaQCUqTm2W6WX8u6pilWPgU55qmX6N4j5MsRXwgPNjYWCgGpe8xvR-SgdHLz-eSB0BkEV_dbsq-6Wfou6Af5A6lSSFXkOyG5G2PxT13lrQciGZka6dK4CtML8-EcjVFSshhuUz3h501oPFPrqxEG3H_HocFdBAYOOicVrrmigguungLK2MW-PqabKH71MfNtvHQ1S6dF6peEN56Xp87qXSqNxAgKyjBELVpMGvaffwtieK1a6tEetscp6frQo1aSS14vjKMEhco-W7dTms_7uNZBOLMCHIbHzYl7hVWfomfE1vAROVXPwRagV3dqmgX7a99YV0DoI3EHMPaI43HGMc_LsHS9Rh9AlEza4rSDdsRZ6LlTopPGKHSobJllzbxJ3HbMr7m1sVFfmS-YV8FwDdwPHCt4_nVBi0VZSgKAxmfnig5uq0UnhhYLKq0NEtH1oNM5h8Pa66jKSoPeJe6y7xyf3UelWqdV8OutjLCYNsPmTCqCpg64C9eFsMqjVR598kDQICysj_5wXAYR0jAK6fs8pFqIxv_oAQ0VudSB7HQ8UF5kb3fVFQ8kaW9z7b_8lCIN3oKOJGjeQOn32ft8ZkKuZ9a2ixLw_sTi6NWmng0ou3n_RYQZ-wmjoXOIshnQUTLnkssv_rf__gLmTqfCIYae3ksjkxN4fk9vd_3cuhqfwSloBLFnSA8PEJ-4G7JfN_QZgEtUF6EYDEqREUNVZAYaP1MSsbMF6OvRhv3-XPYLSFmZnR-oho_Vl3T8NgQAm63GM4nIizOmKEcMQzo7Hc_qHo_Z-kkINjQnPkjLo5Umr4Tj9h8hPbiXqtbbx9CAfazsaKPD3AIBOqjie3hpkj9jQIIlkuZDP0qzk81NH73Xgp_29g531UGHUrc52PSlOgRKSGikVlwhSZM1Tl9qH7fvxsTjxR0xaOX5sUxkI9CJ96T9SkF3agwS6T57oXs8MwB7fHoaxhma3IOLN4qwWlUx1QG6Z0nkcXWtybKftY-23kMHxJfy6BwXTDwAq21xUejXJOsg-IZ3Z62i7rFq5hfmEYEWerAg6Jizrh0YHCtdNKlHrXqC-Ehi5iIzHi6sojLR3O1QD5iUqVD3WmkleTJpzfY2ZLrdeCVVfqSJJGBWW6ITp1urUc0yfiwLQuFlrDRaxFwoOZOHDKhFLVNjnc_QSMA0btIJgQomK-I4sHlHm2u_WY3LL7g8ocsV4BCM0q2LWKo4xKeJni7pkCzJNlGYyUIR0Om3sIwXoWNk5ICfbj50TkLoWsgpJ3w6xYhVjzzMSl7zLWFsuLr_rGmfL6VitYAR9RQwmwJU0gSc3iTpKtv8K83MMLlWx0Ac6pXVZk0V1La8jwG7ugrVTDcSBjmr9UDwlpSoGkr7MUAgmM4gOMQo-JbDHqSL6LPHWeVH_SsFPyEybeR-o3XXhdNf5OTIaMvpz8FlG0reYASuWOXgcZwpKMXHDnoOBIXvAo6qudSQNQblbCs0J5WEUcZGGjhMHJBwbdSWNq4OhHj9vDVylbP2yxcjn6U6JD-iZZECBqmJxiviUK1ft15KsuIPLCD4YhSkwrVs1V0V05WQWX-lkTc2DnX6g2UE61ZeBNKexCHnVqJh02MO42-gnmOWiLTiqA1X0w5X2PnHbgNpXQE4tzHWRMAmkSbaVJSCld-c5zaCbIPLADs9D9I0um8-TZU0FJKZqrwlZT3nIFmZrt9sR_0PIE8AYZksai0E6zOafyZUCiXjnYE9SilCg_n5F03AH7gM_5OWe7aoUDkXH_s2YRspwUOvfwtgWGqphaZ3bswZ5aWsGx7pRMWkaeDOMjPEFqKPSjpRaiPfHVKzwCrUzLZ1sVWovH8Q7v1vecXKrjKqhKA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_02d1eac3f468c93e016ae28653e04487d0acda4e7e80a947b7",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230418,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 310,
+      "prompt_tokens": 2680,
+      "total_tokens": 2990,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 118,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2677,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0033737,
+        "upstream_inference_prompt_cost": 0.0002737,
+        "upstream_inference_completions_cost": 0.0031
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "7e9509ebba36029824135dee4a064c9fd211faa182354a01be94aae82c4e416e",
+  "elapsed_ms": 7936
+}

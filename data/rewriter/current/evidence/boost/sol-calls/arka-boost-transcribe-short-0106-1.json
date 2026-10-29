@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-transcribe-short-0106\", \"row_sha256\": \"6a70eb40716771319e976abd20724f613a753a8775f7660b0539c6beee81d465\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"ask the building manager to test the intercom, no sorry ask the tenant in 2A to test it after the repair, since the handset only buzzes once.\", \"output\": \"ask the tenant in 2A to test the intercom after the repair, since the handset only buzzes once.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-transcribe-short-0106"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "6a70eb40716771319e976abd20724f613a753a8775f7660b0539c6beee81d465"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "d9c5dabc192d2fd15eb5d02aedf92a5584db2b1f8c12a66f84b4e2ad567a7f48",
+  "started_at": "2026-10-28T23:36:53.837272+00:00",
+  "result": {
+    "id": "gen-1793230613-czxOkEFgkYpuZbmPjoff",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-transcribe-short-0106\",\"row_sha256\":\"6a70eb40716771319e976abd20724f613a753a8775f7660b0539c6beee81d465\",\"critique\":\"The input is plausible dictation with an explicit correction from the building manager to the tenant in 2A. The output applies that correction, retains the intercom as the referent of “it,” and preserves both the after-repair timing and the reason that the handset only buzzes once. The minimal formatting is appropriate for /transcribe.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ocZO5uU_WWxqVCGDYYOJ_2sioA4zwd5pM9LbV36rgYxRqrAJYtJ68CrFAPmS6gjxC4cJdU2rDeTE6xvBl727hfCUikbUivg3l77gvnvO2msSDMRGOXzpytQsGiP5CUcRjWe07Ded1DdMFvJlKT4u9lNSamcfhdoPTaBx7RpDSLLC23XI9rro6N7A47M397uuhA4d1Wy3J3EAIEaSbZAFZ9VTOZm6bZGozTlzy3RD4zKn16mSoYr3gLMIMHt4S73ODm9-mehV6dZPLZw1eZq3VkpsNrUG8dfYZ-kD3qsavxkqTNMVX8LdEHs_99aBdX09mv3VJ0OO-mFDwPDrdGY5pRr6bSw5LpfKZ74C2heFG6tG6DZ3BlzLg32cWjY6_P1jXSUMiiBkh57UfErqpR0QttCNyHNIWFU43HovJlBc2HX3wtMj73o8ti7cVZK3W8C1L12e-sKHYpfi0j4Jkfr9e70q5wpUh43haElgNfCY2bVllylJiiQcoS7ELtJHDXgMRtX2hRbGyC30WXVv4BQQ1DrCupVX1ro56cGwKNRS_mJfsdI-IoTWcItqIQn3dtNC4PZV3TPEJJwbNLSIu30NQyRf-7Jlk8J_ZvzDBYk4vl2SrlEKYnJJ-xkG9K1CEnyr-kBuqx0nUT5hPV2vXjtLWQAmJsBUQceUntnmTOOIhrgcXitBLdYqjzb1AiBjkaLBPmCWjZkIO0iDb4tQMx8HUNftc982JgYHVBTeVb3lhXNxXyn-Py1wVLmhdvG1HOfN2041R2hpd6pZd2oSGWXF4JPapr-NmqYY1zCYKhuXN8CM8dLOdduQHf40KWwqedSTC1VM7pfrosjeq0yxIPo5gGUVC5RWbOa4gZky8KCpDkWf2bYPlyNi14NdO3wAFn6-J7zrnuDgULCfvCIqy1-iZoRcT4vTJYI-iNurR2xHxd1AG6c-KKosGj-P9dHL31_TQtwmPB8Qjm9TPtgrGs4UE9-L9_eiT3ri-6s3xTJiiyXZhGU50SnVK--IAuxzyPgziDsglnusKINe1M40gsVnf8BEGz3y9FZpBs4bYeohIv1IgJcVPcL1yeYoOKzSeOdCkW7fFX3uwVeEK4LWKH3uxSagY_liPRcEo_pl2BL5slqKDxASMHPOwTGMKoIKo41AtPwk-tQXokJmiYSMI4k8Rsage5qPfqQcHLgzjxdo1fW5I8F9xKTw8K9UeBBPTl_S70L4iIt2vYGnUknjl6HoWnHtYI7-kS-hBz0CnuOvInan_3ktLW4tFhijUHM2OziGXC10bWlCHSdhvJOAaAGYo0e3jy2_2q1PJ02GoDvW2hq9Lm2HIvUtZyIqrQOzbWNAm8yEF0cwTiDbDlFULlSj1_kz8SAMqwHghmngWadmloNaYTjwZs3c3jG7o-GFZY45DoFV7b2x2J_BA0LoxnDQrmJ1CYGlr3bWtboRxIfdur9QDDkfA5G1vsDL3UHM99FnmzANB0dIpVB4lYJk_Q05bjFnVwftr9IEcoZXfZpCILua-HwEoBcBakB3D-QDuBSrVBl1xNJ6JxgReJIruysaBmdhPtKknuUKEWKtyl0vvZKJ-1ehwd9FISPQ1G0k19tzWdD43MS1p58XU4njuBXVhiZcKIlzvVsbGFgmDnJW4UWx3M9lT6UdHd8J5Ih3a7AikSmsSdmxz24-TG-vu_Tkh8ZB6BsWniXRTAjCkCdx6u8d-bfX_GClKBRVrJA5zJ3Ve9cjhlTNnHIYApaQp5xDjF826T7RgWbVcCofjNJRCIm6nRfgQHK7kxUs8hL1lLdb9BCVt7LXKD1qoOZS1WyVTg9ylyXzzI5Ddr9tl0BfXNZKlTS3dAhTNjWdAueH0tH8HRCiCWw_ncmjU-fdA5rzcfG5H4yW5yuO-vglE00iFwcNxMrL-qwPh3cotAmiSDvn23p3TkzE6tH6QcFmauZihpllyRZRNwC-s3ZyrbTBmpg80xVjCgzsZw52IBn97e0T-_qlKm2jC_MLmXvU08XdtEAj9Q4chrpMjOwVKBAzbxcskRCQPbWfj7KGBlQCLOazpJmfNkuhpkoeWSLyWRG9snTX8jYySh9FWaNw2zneDdDYN3DQIj2I2l6to4_sSa-T2i1TySsKhG662SHN5cwOvM9aeq_PYqhdT_64vSq8-J4rnHtIXEBZKKq-rr9xeqaYWiozSLZ2Slu4gvuUy18kQYlk-w1gpEjGvve8rrCigQib7kAlevKXSeh_DHBNX99Dhwozu0T0M-xwoqpGqrJshxcfWHdb_WPWrk7JrEDolFYuHw-lVFQJ7zJ6TH6is_Q6nle2RML4vrtbKWrLFJDqh7NiMZXF26oqGDKtniBXvrosSBsYnwlvOHBoaymKam96cMXGFoj3GZ63xjT-A1VnONiWulHsQrhBJmYh2Ut9OhkALPeZjJ_9xl_WN5SJ4k79DXuse1wMuU1XAjHRX-E-WIykJXhh6LL9XReNueynITsP14cnAqP9RyffFYDkp1R52DOu_Df4v6V4YujaqjADguXexH4466NzU50ileiUkNp075q3AD3rpQ4aLIP4J59HRelPahbmUfclu-PB-VyqG4S2-F-YT-AnHYqNP3YNDohCnTyv9z_2EjMqTGsK643sN0Lz9V0pA0eAb6kuwe9hcomxNDE1FgVF-6tuqpQFUw53QefMKNOeTKslek5CPIk2GvK7IgDz1NV0IG5DYVKN5WI8noPWHni1qPy2Cdf8KJhykpYZXNIP80Cc4Icycm5rZqokzT39VQQ_JyTSJlOTzI8iwmknK1yX22DWHyIE_mb-_mWB-ClJ7MoM2t2lu3Z9Mj1wvwGwJl538ILW_zH-7OVE-7H8eTOo76Q48cjt7wT7Rjjniz9Mq1ivrRs3emYd_mwuxebJeDxP3TTFjqghudhe0VT5w82Eo55qCJdm1xU7aKZFf4jAoGOrJ1aNNrwyXhFVhVZS3GITeXLAr4y5hMFEO8MCiXiLHSkd0jOaH-pyt7ziKkY3I_GT5-KuorUElS5wjjymp761uLYW3jTVjuhmw_JSIXldIZJ4anQXUiqFsBxNIds1xWJqFczsh_iq65aBT-kZyMP0__LwHbpj3x8og==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0f58720afdf2fd05016ae28716eaac87d085f612567979ce1a",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230613,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 260,
+      "prompt_tokens": 662,
+      "total_tokens": 922,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 100,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003924,
+        "upstream_inference_prompt_cost": 0.001324,
+        "upstream_inference_completions_cost": 0.0026
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "e1752e19e5fd8ffa9dc1483aa2235d2dbc54dfef8c9394484b990871ad47a7e0",
+  "elapsed_ms": 5268
+}

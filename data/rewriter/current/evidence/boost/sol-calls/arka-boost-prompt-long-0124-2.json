@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0124\", \"row_sha256\": \"e8ac1ba58a5b92e380693083b0de679055d66027c9a5a17c8914ce5d0b9d5ea7\", \"mode\": \"/prompt\", \"language\": \"de\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"wir brauchen bitte einen brauchbaren prompt für eine zusammenfassung der eingänge im depot für die woche vom 14. bis 20. april 2025. nicht die zusammenfassung selbst schreiben, sondern die bitte so ordnen, dass jemand die lieferdaten und die hinweise dazu korrekt zusammenfasst. der export wurde am montag, 21. april, um 06:00 uhr erstellt. die exportdatei ist upstream schon auf den buchungstag 14. bis 20. april eingeschränkt; im sql selbst steht kein datumsfilter. bitte diese beiden dinge nicht vermischen und nicht so tun, als würde die abfrage die woche selbst abgrenzen. die depots heißen Nordhafen (D-01), Westtor (D-02), Uferpark (D-03) und Höhenfeld (D-04). pro depot soll man die eingänge anhand der gelieferten daten einordnen, nicht mengen aus einzelnen zeilen erraten oder fehlende zahlen ergänzen.\\n\\nals technische referenz steht diese abfrage im auftrag. sie ist wortgetreu aufzunehmen und nicht umzuschreiben, auch wenn die erläuterung daneben stehen darf. sie gruppiert nach depot und summiert units nur aus zeilen mit dem status received und mehr als neun units. der vergleich ist strikt größer als neun, also sind neun nicht dabei. in der exportdatei gelten die genannten zeilen als die bereits auf den buchungszeitraum begrenzte grundlage:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 9\\nGROUP BY depot_id;\\n\\nbitte die abgrenzung aus der abfrage verständlich erklären und nicht aus dem feldnamen received_units mehr ableiten, als drinsteht. es geht um zeilen mit status received und units > 9, nicht um alle physischen pakete, nicht um zeilen mit status pending und auch nicht um received-zeilen mit höchstens neun units. wenn du eine zusammenfassung formulierst, sollen die werte aus einer tatsächlichen gelieferten ausgabe kommen; hier ist aber keine abfrageausgabe mitgegeben, darum keine depot-summen errechnen, schätzen oder als resultat behaupten. die abfrage ist referenzmaterial im prompt, kein anlass, code auszuführen oder zu ändern.\\n\\nhier sind die notizen zu den auffälligkeiten, die beim zusammenfassen mitzudenken sind. Nordhafen hat eine als received markierte zeile mit acht units und eine weitere mit genau neun. beide liegen zwar in der exportdatei, erfüllen aber den mengenfilter nicht. außerdem gibt es dort eine zeile über 14 units mit status pending. die ist also auch nicht in der abgefragten menge, obwohl die unit-zahl über der schwelle liegt. bitte die drei fälle nicht als einen gemeinsamen grund behandeln: einmal ist die menge zu klein, beim anderen fall ebenfalls nicht größer als neun, und einmal passt der status nicht.\\n\\nbei Westtor sehen zwei zeilen mit je 24 units so aus, als könnten sie zu derselben bestellposition gehören: beide zeigen dieselbe bestellnummer und denselben artikelcode. sie haben jedoch eigene zeilen-IDs und sind nicht als duplikate bestätigt. bitte nichts eigenmächtig zusammenlegen oder eine der zeilen löschen; in der erklärung darfst du die mögliche Überschneidung als ungeklärten Hinweis nennen. das ist kein Beweis, dass eine Lieferung doppelt gezählt wurde. falls du erwähnst, was vor einer Bereinigung geprüft werden müsste, nenne erst die Beobachtung und danach den möglichen nächsten Schritt.\\n\\nfür Uferpark ist eine zeile mit zehn units und status received im Export. der Carrier heißt Taktfahrt. zum Wareneingang gibt es einen handschriftlichen Empfangsbeleg, aber keinen Dock-Scan. das ist ein Unterschied in den Belegen, nicht automatisch ein Grund, die Zeile aus der Abfrage zu entfernen oder den Empfang zu bestreiten. der Beleg wurde dem Export nicht als zusätzliche Datentabelle beigefügt. bitte aus dem fehlenden Scan keine weitere Mengenangabe und keine Behauptung über die tatsächliche Ankunftszeit ableiten.\\n\\nin Höhenfeld enthält eine received-zeile 16 units, aber das Feld delivery_date ist leer. die Zeile steht trotzdem im Export, weil die vorgelagerte Auswahl nach booking_date vorgenommen wurde und ihr booking_date im genannten Zeitraum liegt. im SQL gibt es keine Prüfung auf delivery_date. das sollte als Einschränkung für die zeitliche Einordnung sichtbar bleiben; bitte nicht stillschweigend aus dem booking_date ein Lieferdatum machen. weitere Angaben dazu, wann die Ware tatsächlich ankam, liegen nicht vor.\\n\\n1. verwende für die eigentliche Ausgabe eine nummerierte Checkliste, nicht einen Fließtext mit unmarkierten Empfehlungen. jeder Punkt soll zuerst die konkrete Datengrundlage oder Beobachtung nennen und erst danach, falls passend, eine Einordnung oder einen möglichen nächsten Schritt. diese Reihenfolge gilt für die ganze Checkliste, besonders auch bei der ungeklärten Westtor-Zuordnung und dem fehlenden Höhenfeld-Datum. bleib bei den vier genannten Depots und kennzeichne klar, was aus dem Export stammt und was nur ein Hinweis aus den Notizen ist.\\n2. ein nachträglicher Hinweis kann noch auftauchen: falls eine geänderte Datei eine am Montag, 21. April, um 08:20 Uhr eingegangene Korrektur über zwölf units für Westtor enthält, führe sie getrennt als nach dem Exportzeitpunkt eingegangenen Hinweis auf. mische sie nicht in die Zahlen des um 06:00 Uhr erstellten Exports. im Moment liegt diese geänderte Datei nicht vor; behaupte also weder, dass die Korrektur bestätigt ist, noch dass sie im Export enthalten ist.\\n\\nam Ende soll der prompt auch daran erinnern, dass die Übersicht eine Zusammenfassung der vorhandenen Lieferinformationen ist und keine Prüfung der physischen Bestände ersetzt. erwähne keine erfundenen Summen, keine bestätigten Doppelzählungen und keine Lieferung, deren Status oder Zeitpunkt in den Notizen nicht belegt ist. bitte den Bericht knapp genug für eine Depotleitung halten, aber die genannten Filter, den Exportzeitpunkt, die vier konkreten Datenhinweise und die bedingte spätere Korrektur erhalten. auch der letzte Punkt muss Teil der angeforderten Ausgabe bleiben; er soll nicht wegen der gewünschten Kürze wegfallen.\", \"output\": \"Erstelle eine Zusammenfassung der Lieferinformationen für die Depots Nordhafen (D-01), Westtor (D-02), Uferpark (D-03) und Höhenfeld (D-04) für den Buchungszeitraum vom 14. bis 20. April 2025. Die Exportdatei wurde am Montag, 21. April, um 06:00 Uhr erstellt und ist bereits vorgelagert nach booking_date auf diesen Zeitraum eingeschränkt. Der SQL-Auszug enthält selbst keinen Datumsfilter. Stelle diese Abgrenzung klar dar, ohne den Eindruck zu erwecken, die Abfrage grenze den Zeitraum eigenständig ein.\\n\\nNutze die folgenden technischen Angaben als Referenz. Übernimm die Abfrage unverändert. Sie gruppiert nach Depot und summiert units für Zeilen mit status = 'received' und mehr als neun units. Der Schwellenwert ist strikt größer als neun. Der Feldname received_units rechtfertigt keine weitergehenden Aussagen über alle physisch eingegangenen Pakete.\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 9\\nGROUP BY depot_id;\\n\\nDie tatsächlich ausgeführte Abfrageausgabe liegt nicht vor. Berechne oder schätze daher keine Depot-Summen und behaupte keine Ergebnisse. Ändere die Abfrage nicht und führe sie nicht aus. Erkläre, dass Zeilen mit status pending sowie received-Zeilen mit höchstens neun units nicht in die gefilterte Summe eingehen.\\n\\nBerücksichtige die folgenden Hinweise je Depot:\\n\\n1. Nordhafen: Im Export stehen eine received-Zeile mit acht units und eine weitere mit genau neun units. Keine erfüllt den Mengenfilter „mehr als neun“. Außerdem gibt es eine Zeile mit 14 units und status pending; sie erfüllt den Statusfilter nicht. Unterscheide diese Ausschlussgründe, statt sie als denselben Fall darzustellen.\\n2. Westtor: Zwei Zeilen mit je 24 units tragen dieselbe Bestellnummer und denselben Artikelcode, haben aber eigene Zeilen-IDs. Sie könnten zu derselben Bestellposition gehören; ein Duplikat ist jedoch nicht bestätigt. Führe keine Zeile eigenmächtig zusammen oder lösche sie. Stelle zuerst die Beobachtung dar und nenne erst danach gegebenenfalls eine Prüfung als möglichen nächsten Schritt. Behaupte nicht, eine Lieferung sei doppelt gezählt worden.\\n3. Uferpark: Im Export steht eine received-Zeile mit zehn units für den Carrier Taktfahrt. Es gibt einen handschriftlichen Empfangsbeleg, aber keinen Dock-Scan. Weise auf diesen Unterschied in der Beleglage hin. Behandle den fehlenden Scan nicht automatisch als Grund, die Zeile auszuschließen oder den Empfang zu bestreiten. Der Beleg liegt nicht als zusätzliche Datentabelle vor. Leite daraus weder eine weitere Menge noch eine tatsächliche Ankunftszeit ab.\\n4. Höhenfeld: Eine received-Zeile enthält 16 units, aber kein delivery_date. Sie steht im Export, weil ihr booking_date im genannten Zeitraum liegt und die vorgelagerte Auswahl auf diesem Feld beruht. Die SQL-Abfrage prüft delivery_date nicht. Mache diese Einschränkung für die zeitliche Einordnung sichtbar; setze booking_date nicht mit einem Lieferdatum gleich. Weitere Angaben zum tatsächlichen Ankunftszeitpunkt liegen nicht vor.\\n\\nVerfasse die Ausgabe als nummerierte Checkliste und nicht als unmarkierten Fließtext. Beginne jeden Punkt mit der konkreten Datengrundlage oder Beobachtung und nenne erst anschließend, falls passend, eine Einordnung oder einen möglichen nächsten Schritt. Halte diese Reihenfolge in der gesamten Checkliste ein, insbesondere bei der ungeklärten Zuordnung in Westtor und dem fehlenden delivery_date in Höhenfeld. Bleibe bei den vier genannten Depots und unterscheide klar zwischen Angaben aus dem Export und Hinweisen aus den Notizen.\\n\\nFalls später eine geänderte Datei vorgelegt wird, die eine am Montag, 21. April, um 08:20 Uhr eingegangene Korrektur über zwölf units für Westtor enthält, führe diese nur als separaten, nach dem Exportzeitpunkt eingegangenen Hinweis auf. Vermische sie nicht mit den Zahlen des um 06:00 Uhr erstellten Exports. Derzeit liegt die geänderte Datei nicht vor: Behaupte weder, die Korrektur sei bestätigt, noch, sie sei im Export enthalten.\\n\\nHalte die Übersicht für eine Depotleitung knapp, aber erhalte die Filterbedingungen, den Exportzeitpunkt, alle vier Depot-Hinweise und die bedingte Information zur möglichen späteren Korrektur. Stelle klar, dass die Übersicht die vorhandenen Lieferinformationen zusammenfasst und keine Prüfung der physischen Bestände ersetzt. Erfinde keine Summen, bestätigten Doppelzählungen, Statusangaben oder Ankunftszeitpunkte, die durch die Notizen nicht belegt sind. Behalte auch diesen abschließenden Hinweis als Teil der angeforderten Ausgabe bei.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0124"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "e8ac1ba58a5b92e380693083b0de679055d66027c9a5a17c8914ce5d0b9d5ea7"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "7051401812680a95a94afac8915c02567984fd538dd18ecace6c60052ced9ca3",
+  "started_at": "2026-10-28T23:58:39.436633+00:00",
+  "result": {
+    "id": "gen-1793231919-DAmFJJBBVRBIaFZDRqna",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0124\",\"row_sha256\":\"e8ac1ba58a5b92e380693083b0de679055d66027c9a5a17c8914ce5d0b9d5ea7\",\"critique\":\"The input is a coherent, recoverable German drafting request without contradictory constraints or artificial padding. The output appropriately reorganizes it into a self-contained prompt rather than producing the depot summary. It preserves the SQL verbatim, distinguishes the upstream booking-date restriction from the query’s filters, and retains the strict units > 9 threshold and prohibition on invented totals. All four depot-specific observations and their evidentiary limits remain intact, including Westtor’s unconfirmed duplication and Höhenfeld’s missing delivery_date. The conditional 08:20 correction remains separate from the 06:00 export and is not asserted as confirmed. The numbered-checklist requirement, observation-before-interpretation ordering, brevity constraint, and final physical-inventory disclaimer are also preserved. The German and formatting are natural and appropriate.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Considering execution critique**\n\nI'm thinking I can't mention anything about confirmed execution since that might not be the strongest angle. Instead, I'll focus on needing a concrete critique, ensuring to retain details and be natural enough. I wonder if a German review would work or if English is better — both could be fine! I just need to make sure I'm concise while covering each point thoroughly. So, let's aim for clarity in my approach!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Considering execution critique**\n\nI'm thinking I can't mention anything about confirmed execution since that might not be the strongest angle. Instead, I'll focus on needing a concrete critique, ensuring to retain details and be natural enough. I wonder if a German review would work or if English is better — both could be fine! I just need to make sure I'm concise while covering each point thoroughly. So, let's aim for clarity in my approach!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ow3gTCH_6NMK-NG_VqZUEKTA9VV_3k13FCebAOsF-eEELtRQgn_nkwOtMUj2_3bJWc-FFrni-8_LAFz4C-vP-i1Ey-_4eMcAyqB6veP5KG7EHw1qUZbMKYPf5skS16iqBnYmHVH3QKlm0VkD-futtJyA3d4pZF1cGsEKo7F3e7stXJoBckM4a4n7CqWbVSwZVadfiQkZblzpQqQl5_8SfGNhkSpNyYPxdaHT5zWK5vmExvvj9UTXSRu7rWi21NdRNdQnCxazBbyTkI_PrsDZwUF1GNgmL4SrRUkeEmDtngqeik8qzsWszYkvDBbs3otabe4lHDcMYFlEC1oV2JkvTsiOVT4SKC4cUx9xlTuuPajttG6Piqo71tIEMuFyS05v1QHrP58MHT9jZWXL-ZTGueSbM9Vi3S-WU5_FhUiJoJXjykt3Ozm7cioCaCtxSbQjdoKruGcDPTzG1KEoSc0SP2ND4-hzNBqie1oNfUc6JhADGxcn7741znQ7-8u185aqICM1wTk7Y65KgsL9YOFVrIKjn7mqCESo6tdNWxX43Db27ktAruz5P3mFyIc6QO_1QKdm-pJV7S-qjkbj-Vl9J2_kUDSwYtrD3DNuKaObwX2UutCTq4PE4XGLBOz6vVaAOTY7Pi4Y6S7aSBtqalXq2vmYtgx6-JZvwytB4utdNQBu2A24BOk_VAuoETUClv7IeBpCv57nlEJNltAdA22sJacHLG5EsH4ANRd6hQbPRlLiEDfFzttGaXSEQ9DzAuOe7hYpHtCA8dAJjD3V3Avo5qO2Q7oBXhE2kh8IwIpPKkpVyTWzZ52Om7IMUVrCOAgAJeEggFVd6u94I3NK48njzvzA-hz0vH4bfmLL_Nx0z3zRx8oGEWhktNLPBqUskZAzk5LRR-RbAC9_E8ZPCh9aMGvTzgduvzKePOOGDQvz9xvqjIvJZP9esebDIfb4C6twtnw9kCepHw583iYuwMrSlaH0P9qbAjPMVj74KiCixLi1K6iDWXrDuCsBYxgRmccqOi_cjEi00GRieMW7Kb1P_7kgFPIuzcQR__E88cOU2kjHT2ZLu3-lYJwX9sWXDEPmTlyr8Ph4u-IVm4OGsqJ-RX-v2UTlfESbbFAM48IjWqc4VGl2msy08k6B8WDqaaaf3mZrv4ee46MDQHqdOoB1pKtcmBr-VhXGkNi46iPkwHarJ_UIKA_xu2_lLIlwtFIT6tcR0GPdnyEWnl6Rsp_4KryMsYNBIgcX0ou6tGtVCrwfUknpOeRCzV6K_D4yI4pY1URWUg876DjCDPggHa8_Qs8x5b_5LerWEbxfqVlcH63qo3xbeHKmywLYFKxSK24ObvT0F3hFt0gD6sN_Ah5FnI6ZowsyxP1AzdANXyo3aCt5UFRYeTJHfcy0luMbamh9kgi8Ifu-h9XCdTksFs_Wqm7k0XmBHub_zIdGBGpQ0D9bFMWkIEnLmQIHLR3gT46Pt0kVRO2DAkiqT3GYimNaTYnh-L6RpdWIU6BMCRQJvIJzJk_o8tMj7xr6HUJ4yzsq9Tpk1Us8RNqpPFICgUmhwgoIVjh5Slz7uakP737CqPaTqHWKmYRl1l-MytCGRg4uxJzgmbIEd3CSre_CXCyhTXdiqk7O1FGddT1_bJqvXdLFNf-fP2DDSjD6Na0_IR1vQ4eR08zYQc5D4V88jDEZNinsNLv7huW4sNg9mP_gfTS1PcCHKKRTybmpYjQAETaYwNOOWXKkV1M1fc49euCrnvSC1sauGhS8tBJTZiQoYGhetnUHZgXC5RDabFUXZOm1VwvG7mfML82Ch7wqltwJQc2kOd4Gc1L9dy2zUwc_DgSL1JCnbo5haA008f_qwoqxkMQQ4U9Icg-lMLpSjCIEJi5WEZdY-P2yRos_6gf-u1_TWlWoaWIkFy6nwm63p0q7zFuBrvtBobmg-YNj8wamryahF_8ClcjmoDilvlN0hQuL17B9hIS-6BDj3mq5k_hZOE2PVB8-Rq5fr0NKbaz1ZkNrIFOYWCtFp1YdjSV6b5MFyP1hHd_JO0QWfo5fSZImg3ytx-z2ufTzwobegIrh4FIdJ2qTFeX3tNpoVp2sotT7pNCo8xu-JWOYxKhKSQUCldGOgYPs77hgaMNYqFioiUNGz0_KnjIo3b3kqs4QYwUsFNkSmJHyK-imn71GBvHtBs06QOszazbtmcx0X1bcRy6aokIxyMvMQvYHDT1Wr3qNfpnG1k0kaIMyjGqD37DiCKK1BmSxtoBg8aFQk9K9KV_8ZbWamWNoy1cDmnVBwgNdYInHVrwgXBUdbLk9cW5VxrBCctjbbJLFahaDlAn2i7A9nFAHngSpbzyvf_jylIIUddeR0Az7--xWx_XiB8ioZqEb7pRVLSrL75kI5dAz5zBx4rUzADqrLotND7Wo2c07fX4O_h8BSCTJx--vFoxIcAVcLO0_ZrtgCs_Si0HysTNsa1Bwr31FZaIdlXbijma27LxN2QQL0n6w-GsTaIe_yhyn8euQ4w0YW3lnzcAd3eY-EY-xa8iBpkwgexAj6izTnJ7GEDHM3CWevtU1zZe0Q8wAi1I1tAz7fQW_GovwYQFVadsiWKR1z9Rfgl18mQ0YJ0UaoAMS7rzomNyQS-G0ywKvbuxRk4Asc6TfIbTX5y9lAX7HZKE_txSxCNVDQYqF_mLP1Q6WMDUSz-M6oAD4V1DdCQDl90lkxRQGwCBe0dSOhiE8PhcHDh1AzevVqbEOFLRRz8_G7TtS50kwdc4NEaqZ_SG362CcS8QJHMFsAtQIwxpzHmPQBQnEFahCFBzZM6alKgZNp9BdMFOoqgAj7tc1zBcQzonaIyCzrJ6JMfJQbyD4txQ1CSvjVUvZ2Uq9M2h6hzY-EXO83Z_CZt9KdtUrD6xJ69Z3mZNZPCZYc9ougm_S7hVE-i21JjUhV81uVEs3IMJPKDQJk42L-hhXENFXmDytOCtQA8wnen5EXAREBEuAUJjim28aQ2w-FC3BIT5ob5kj-hLTU3avYcFgiG40llmqSCKtoX1AJBMIiaWSTM3uJEsw9KDBIS85jEAV0dFXfrfhmnoIxKznq1Deenadule9nyXkFQkSe212w_9D4RnfLTF3mx3z49YVij86AwQBMHyCwix5k3IF_iMO9ALTEeSYO0H_K-jW_9OONnpj0q5636xxOdTqgk3XQg0uGOHxqO06tW0ywmZfGIuEG3Ddm45hBSywOhWuc2dzPz5uEOkhMCC5fdpV6sPUCCcve19ddkH9l90rEm5NgR4ywt-Z-ZdoVfOhb06fmx33NpsFBW5G41E0EPK-ZWxUFEj6SJuxfRKGwYVgmofpd5kXqSNGWhMoqYbnpGt3jLD4ScyH5d-NtYUqdBm81Oq1Sr1CscNohtIKAAfHpt3ITCEqH9WOFejBX5SiotgFr11OAX5Sz0B-eupHPeqTrhNtXnCfHHCGLIpG_TQPoCGtWnO8qmZR2IRt5-4zmfQ1mGgf-wooT7QIIYEVSbyeh-ShYc5rEq1D9i1FEdRGWDGPkgepjzJBuJIbnEMJhJl-pCMuLZSl68pvv5ZDQCtMhHWoL2YHRyiwCReIX_8ULmWKicNQkzaW6TbTIMdZ0yXaPd4IDpn4PpNLBOL3TrDHHtQIqLOueGK5SRFM2XtVtpBjS9Rhg29wBprOUjPuWcTKaPCjmk51CwMohcy4NM-L9aaNXSUzf1vshIqrVd_7FB56lQTf1PHR6XHVbU_8wRV7YUMVfFhlc0tMpeQbF1FytJ-eTIyy5tzCFf_2G8zDmKWdHbuX1M_6mOE_jnpOjOeciMjN9JFm85m8mKipkLlqzOQ9LCDVj7niDzTe9OAX9qs5a1yOwvN07Ilb98hdaiMhQphDzxJg4R3yYRiQGJ81_TgyjA1FN4rxbqn0VGZPKY9bQoI9k4Lkk9cc9xak0FtveMt9q2MeznlXE-Lv64OlC8xyFpFl0-I64m8CsamqpUE0OlQFYZzUSZztj7PPWtcSGeyIRBfX6DOtQIYxPSWcMaNDDWzVWZsLWPs3pt0FZD94-KzoVJD2vVGGAM9W5CUyEhwJtQ4RxZW9OlB9dwVWh6CGTpJGnWuGes4xWnKpiSlbDKL5Tz3NBJ8fQiO_aVABNCAGRe4pl-O2yuPLxaSmaCKz6iKjEc-1t1vzEi7Iyko2FVR9thh97cHMRIwe8-Ni6KTRF3CZ1MFnLqxb1BlPU_6ZG79WiS3OyAM1R7EDkTGNow_miTki56IxHXx0_GADotA2XLH17B9qz53NkN_n1VMnaWBVwUzGZtiY4_aVdHhppqZfBRKKtxTRkAK0ksx1BbJeKN3L3SoRoj2ExmAFIDSLW1tdTAItFTC0BWBbv5RiYKw4XpXf3VI_3i986BcVzXfSWiQcRYufgdsMvIELZBcr8u12_ExvM2GpMc0tIbGiEwxXpfWuEoTWsy7l86UoGT1RPfWK0RhpIWOS-KEhxPeDIav9Mrgl8G85YCzqC33plYTUVCEBTuOmhDSsYS67MXsnqtFBPmxDcq5Eoy8EO2XYIp_6VOxop1NypA1PbmMz2kkzKyZC0Ij3jJUAvxIAwfabyjTOoUwszJXAZme5Qer5zd9XbWgw-1P5-R5rgHSK4KzuUvuaTt2GSYmV_Ttmd1cioVcIDBwqhFYgpxezlD8x6qgAmb81sM3x3oYRSMZhnqunixmaX0szUNsF0EmhGZ_ySm-JbBvRW2x3RisPlIY5I_lT7MH5C4U6a_Rt0afez2qcXTVDvVzpvep2Q6pFX4Zd5CjrCtaogOCXdQZeGie-4jxpe9YQzN2sU0rLHMrXyW2ott1LbVyFvperPiTsumRzvNhfRxRecDwk5zdp0xp0HSTLzwBperFPUR4Ggf-Q0tIfo4MknIxUnrYCokC-1sTmFpmlolzboviO2ua3TFSkolM24M=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0da4b4fb8c8e5914016ae28c313f5087d09c93b2f7d569cfc3",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793231919,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 501,
+      "prompt_tokens": 3024,
+      "total_tokens": 3525,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 244,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 3021,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0053181,
+        "upstream_inference_prompt_cost": 0.0003081,
+        "upstream_inference_completions_cost": 0.00501
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "75782ed70ddf6829bcc0b07330ec37e4f23221d5365dd6287742c3b3f50b96d9",
+  "elapsed_ms": 10475
+}

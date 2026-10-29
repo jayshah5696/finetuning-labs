@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0076\", \"row_sha256\": \"bdd5e92b4f9e1926dc058907373f3ce993122fb6ebf8665c30fff1e464ac6f4a\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"put together a clear prompt for a delivery summary for North Quay depot, but make it useful to the shift leads and not a general essay. the period is 1–30 April 2025, local depot dates. the intended reader is a lead who has to check what arrived and decide what to follow up, not a customer and not the finance team. summarize deliveries for this depot only. don't roll in other depots just because the same carrier serves them. The request is to help compare what was received during the month with the records, not to say that every delivery in the system was physically checked.\\n\\nthere are a few details on how the depot runs. North Quay has a morning receiving team and a late team; handover is at 14:30, and pallets waiting in the marked inspection lane can remain there across a shift change. A delivery logged after that handover can still belong to the same calendar day. show the date basis rather than assuming the late team means the next day. The intake board lists dock door, carrier, and receiving clerk, but those fields can be blank on older entries. don't treat a blank clerk name as proof that no one checked the load. The depot's delivery register is the working source for receipt status and units, while paper exception slips are used for damaged cartons and short shipments. Some slips are filed by the day they were written, not the day the truck arrived, so mention that limitation if it affects a comparison.\\n\\nwe need a readable account of received volume, plus anything the shift leads ought to inspect in the register or paper slips. The summary should distinguish received entries from entries still marked expected, held, or cancelled. Don't quietly combine those statuses. The data extract may not have a separate line for each carton, so describe units as recorded units and don't call them cartons unless a source says so. If a delivery has several rows, avoid claiming they are separate truck visits unless the source has a visit identifier. We have a monthly depot total in mind, but also want the daily pattern to be visible enough that a lead could spot a busy date or a gap. Don't invent a target, service-level threshold, or explanation for a rise or dip; none has been supplied.\\n\\nplease include the query below as supplied reference material in the prompt, intact. it is the query the analyst plans to use for a received-units-by-depot check. don't rewrite its filter, and don't imply that it has already been run or that its results are attached. The analyst says, “I want the receipt filter kept exactly as written, because expected loads should not be counted as received.”\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 9\\nGROUP BY depot_id;\\n\\nthere are some specific things to compare, not just a total. The lead wants the April received-units total, a day-by-day view for the depot, and a short note on which recorded deliveries or dates appear to need checking against the intake board or exception slips. Explain what evidence supports each flagged item, and keep an observed record separate from an inference. For example, a difference between the register and a slip can be described as a difference, but don't decide which source is right. Don't call a date a missed delivery just because its received count is zero; the available material doesn't establish what was scheduled. For dates with no matching received rows, say what the records show and leave the reason open. If the records don't let the analyst establish something, say that briefly instead of filling the gap.\\n\\nThe output constraint applies to the final written summary for the shift leads: make it exactly six numbered checklist items, numbered 1 through 6. Each item should be a compact paragraph, not a table, and the evidence or record reference must come before any suggested follow-up in that same item. Keep any suggested follow-up limited to checking a named source; don't recommend staffing, carrier penalties, or process changes. Item 1 should state the date range, depot, and basis of the summary; item 2 should cover the monthly received-units total; item 3 should give the daily pattern; items 4 and 5 should cover the record checks and evidence; item 6 should state relevant limitations and unresolved questions. Don't add a title, unnumbered introduction, extra bullets, or a conclusion after item 6. The six-item constraint is for the summary itself, not for this prompt or the query block.\\n\\nFor readability, use plain English and keep the wording direct. Use the depot name North Quay consistently, and make clear that the intended reader is the shift lead. Don't present an estimate as an exact count, and don't claim a total is verified against paper slips unless the comparison actually supports that. If the analyst later finds that a paper slip's arrival date differs from its filing date, the summary must identify which date was used and avoid treating the mismatch as a confirmed error. The shift supervisor told us, “A clean-looking number is not the same thing as a checked delivery.” Use that as a reminder of the audience's concern, not as a finding about April.\\n\\nOne more detail for the final item: the April register export may be incomplete for the last evening of the month because its refresh time is not confirmed. If the export does not show whether the late entries were included, say that the coverage is uncertain and ask for a refreshed export before treating the month as complete. If a refreshed export is not available, leave the coverage question unresolved; don't substitute an assumed cutoff or claim the last evening had no deliveries. Keep that condition in the prompt, since it changes what the analyst can say about the monthly total. The final summary should make no claim about deliveries outside North Quay or dates outside April, and it should not turn the query into a result. End the prompt by retaining the instruction to keep the final section, item 6, complete, including the refresh-time condition and any unresolved coverage question.\", \"output\": \"Write a clear, direct summary of deliveries for the shift leads at North Quay depot for 1–30 April 2025, using local depot dates. The reader is a shift lead who needs to check what arrived and decide what to follow up, not a customer or the finance team. Cover North Quay only; do not include other depots served by the same carrier. The purpose is to compare recorded receipts with available records, not to imply that every delivery in the system was physically checked.\\n\\nUse the delivery register as the working source for receipt status and recorded units. The intake board lists dock door, carrier, and receiving clerk, although older entries may have blank fields. A blank clerk name does not prove that no one checked a load. Paper exception slips record damaged cartons and short shipments. Some slips are filed by the date they were written rather than the truck’s arrival date, so identify that limitation if it affects a comparison. North Quay has morning and late receiving teams, with handover at 14:30. Pallets in the marked inspection lane may remain there across a shift change, and a delivery logged after handover may still belong to the same calendar day. State the date basis; do not assume that a late-team entry belongs to the next day.\\n\\nDistinguish entries marked received from those marked expected, held, or cancelled. Do not combine those statuses. Refer to units as recorded units, not cartons, unless a source identifies them as cartons. Multiple rows for a delivery do not establish separate truck visits unless a visit identifier is available. Include the monthly depot total and enough day-by-day detail for a lead to see busy dates or gaps. No target, service-level threshold, or explanation for a rise or dip has been supplied; do not invent one.\\n\\nInclude this supplied query as reference material, with its wording and line breaks intact. It is intended for an analyst’s received-units-by-depot check. Do not alter its filter or suggest that it has already been run or that results are attached. The analyst said, “I want the receipt filter kept exactly as written, because expected loads should not be counted as received.”\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 9\\nGROUP BY depot_id;\\n\\nThe summary should provide the April received-units total, a day-by-day view for North Quay, and a short note identifying recorded deliveries or dates that may need checking against the intake board or exception slips. For each flagged item, state the supporting evidence and distinguish an observed record from an inference. Describe a difference between the register and a slip as a difference; do not decide which source is correct. A zero received count does not establish a missed delivery, because the available material does not show what was scheduled. For dates with no matching received rows, report what the records show and leave the reason open. Briefly identify anything the records cannot establish rather than filling in the gap.\\n\\nFormat the final written summary as exactly six numbered checklist items, numbered 1 through 6. Each item must be a compact paragraph, not a table. Put the evidence or record reference before any suggested follow-up within that item. Limit suggested follow-up to checking a named source; do not recommend staffing, carrier penalties, or process changes. Item 1 must state the date range, depot, and basis of the summary. Item 2 must cover the monthly received-units total. Item 3 must show the daily pattern. Items 4 and 5 must cover record checks and their evidence. Item 6 must state relevant limitations and unresolved questions. Do not add a title, unnumbered introduction, extra bullets, or a conclusion after item 6. This six-item constraint applies to the summary, not to this prompt or the query block.\\n\\nUse plain English and refer to the depot consistently as North Quay. Do not present an estimate as an exact count or say a total was verified against paper slips unless the comparison supports that claim. If a paper slip’s arrival date differs from its filing date, state which date was used and do not treat the mismatch as a confirmed error. The shift supervisor said, “A clean-looking number is not the same thing as a checked delivery.” Treat this as a reminder of the audience’s concern, not as a finding about April.\\n\\nThe April register export may be incomplete for the last evening of the month because its refresh time is unconfirmed. If the export does not show whether late entries were included, state that coverage is uncertain and ask for a refreshed export before treating the month as complete. If no refreshed export is available, leave coverage unresolved; do not assume a cutoff or claim there were no deliveries that evening. This condition affects what can be said about the monthly total. Make no claims about depots other than North Quay or dates outside April, and do not turn the query into a result. Keep the final section, item 6, complete, including the refresh-time condition and any unresolved coverage question.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0076"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "bdd5e92b4f9e1926dc058907373f3ce993122fb6ebf8665c30fff1e464ac6f4a"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "2dcfc8a31ae767d1b431f77e180542cb27a8f5c92c009b46bb7bfb4d752c28c6",
+  "started_at": "2026-10-29T03:21:19.786831+00:00",
+  "result": {
+    "id": "gen-1793244079-r9YtqnxbaidWMHSCHBHQ",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0076\",\"row_sha256\":\"bdd5e92b4f9e1926dc058907373f3ce993122fb6ebf8665c30fff1e464ac6f4a\",\"critique\":\"The input is a coherent, natural request with recoverable intent and no contradictory constraints or artificial padding. The output appropriately organizes it into a self-contained prompt without performing the summary task. It preserves the North Quay scope, local April dates, source distinctions, status and unit caveats, quotations, and intact SQL query, including `units > 9`. It also retains the six-item summary format, evidence-before-follow-up rule, uncertainty about the last evening’s export coverage, and the required closing instruction to keep item 6 complete. No material omissions or changes in certainty were found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ru0Tis8FfFyLnkn7pzd_fzWckEdBGjfBT7UVbh9LaPnlRM8ymPiKIcKALGYtB-Wv8VQBV84knmsOwcW0FWjpaJUQoks6bkx3lgJmFM7tQ-vrb-wxzcTMv6YM34StnqGDZ4G7zdbvAS09YYKXZR8fdrf8RiH1keuYwAQfh-ZW2rFFgA4TtfgQwvhSuNI_lijZVulLd638j-yhU2SF4A_cWsujIsZf_Xk4wTuHORqsWX4bnYD2EQ3IQ8WyfcsIcEtsHAU4c9B9GusiR1EAquyMj7tWrhhPbT8WUVvqG-rBB9Eeri4ioFM74r2X8eO6MCw-0NjkBRKL4231N0VLHeIZXRVtPOBh43aBBpAwmWhEAbcptA1_n8J540Z93dTWMUv7zhCOGCY_GEN5qPfKlUkXQdjKO6WrQfcGcOdWHqy4X7rfyKwQkHen1j6n94Db4NJKpkEHdVyjJyQjjDCLRMF9sK6Hz9Ig3uAQM5u9ZBgeEyAGqRkEcx62gH8vPTtgoQRlZq5BmgEwSoCV8MXP3cJC6dsAITNyJHKVJPD2h_R6xjxNwh41J3AFpftCmD6CJ-xrXWoajoIonT6OcBWgexky-bz79z_VCDn7wCZL7qBY-OZFXsNRlLn6RGjdu0YIFz-1dgUR5ft852w2JSykJ5g0BLvlt1nB03jOeVnomEGbmUeakJ1VzDpU2233UpcxoZcvzwo5LbyTo6eG69ULSCQROI2tE_isKJMXGWhHJXyMQklTeEGtuXX_iYAn3-QMNcE427qpBJFx_Ufh22iUthqsHtefA3S6UIbcNQ887iFk0hk7IIB2lrkyZR6xT0JurbzmCQZGtQfJ0iBhPy-chCzcZyXTF7d_2yqtWYwPjV2Up84i3B8DUvO7oUtTxWXb7tG3G5MhKJQUKHf5TVrvOK_uAB3dQyb2RgQEBq2f8FKRhdqAeoFqQFMZ0sWHexRqFORBG4Py4EltccJ3Tvd4OjU6hIGYuWyR-Ba85OUSx8XlfTQ2oPhUBR3FvZHzV7l9cKCWn2wpbJLgLjbSNkO30NsAy01WWmI2luTtZiSOQ7-qQyJ3FEnkDp1cF08TS_0_r0wLDxL1GxRo9Rqd6ppzjb8b6rhQDe4DUnqQxHdso9OSFmVjlWe4PxzLI8s5DfmhdtQLav_wRLWylPPc8DpHwGUSCr-u4i3-nSejU5QzGANVab4mIykoYQrS47hzQL3Cp2Da_bptlBF88H7NnJhrFOeB5d9nL5bv4d1jKqNS9nW-qxQRZL9vToqHSYVsaNUuX2fFQI98aykEKJvoWvbUf5PAW_51V4pKFzTbei1j0cv6YpCK1rvQ0IrRj5085rfvru4-_cFRfhYfMM3t8yKxzq11KNwSsrn2PZs6fp5NCoQJmsCxqQPYg7za8FAKTDgJj3z-QDEO1NQYLBBPwF1C-o6yncVqs0H0dMFVn0ZpfpZmO43Ipgy6DBdg8aBVL4tStHQB0GXfRQgnG48ETD6RQN0opIXReULbHWd_d239a037P0MLNbf-2GtTBOLQyZ4WDn8B9-v_1rLDuh8jHJXWIq9-7AHKsNWvpIz1lNJN6olMIEU-23E-vEBG434Z0W4lTdxhzYPywc3jVwh5gK6A3TNM4zw3VgCyWYXMjumkr09qcmSG0a1ZuJJAi2GUc3-6sQjtkLAOAvPk7DDnL7N7qYCOB-3knyDMh-gsrUEI9I5KmTtlSMsnvqX2jyHeH7rTBtMvuytzUdFgT1WLBOk2oYpmqaltDzgQ3wGZvXiTmImloQa3IONdrORBfRvNnoKnZwPBdmWfzU1Uq_t-kECK_zk4GCgBDSmIDwaO-hgKsauyBpbcMhFg_YcUpxCMtq43Y_AhscUkskQVVGvwE1m6bFQDc_5SXfbYJkB5e1X83869LBEgw4SD3GXyXXYDVCPhs_87G6RqdA98Gmw9CwveYsJZ--yjwY8nlron2ii2wl2TTVm_BdG-q1x7ZUaWc9Kh-t2NvDZRh4SYV5t_mI2-GabtZg09yPtzzSbhbmbRcxD7HBBVCbAHhI2QMKJNG2618CJxYt9yIO7ZDnGVU_tiLHFTjzqavB84mi7Xk822NiRfbkLlUIQ50IsK31U4085bGMvVSa3k3wf_rHG89C1PKCQJMJgAPcyxee2arZZ2dCP8htMhw_Zl17mctmtLMB2-OJ_QmFCExsuuilV3r3wRHrrmXuZPuu4wjkqFVhkv7RVXnoOQVnjU2DJMWUBVY3nnz5bBqveS9uqkLguKV2JXQ47Q-vWT-AwKESM-J2E5owfdAByTnZxKZwdTD6bOWO-sPnk9lM_DOzjU9ge4VAn1nGpAValiI-wtzJ_luc8_ICQ4nGwBc0VTnDwPkR-WDdtRNVvjP1pRAAcyScnYncfAxm_p05iO9CBisTM09blpdoZhQSTvBI-_1EDIpTEf_rfUOj1C6xDEo7f0j2CU3HYdZ2n7Ia4I1TGrDfE9PPoUdRNBUExDu9yWU7374X_3HVssFHYFjdXZc4JsA02soJ63gdv-NfD6ULmSarkISDWw4FZNXuuo-Lqv_nhotH695FaBuQRnvhU8KD5bO1Qhc2hfzP7Q5WcVqx8ZW1Fa055I-gBvT4aAiAVGea1icQkOJ7yRPn-CkuVKgnjyVx2TLGW0BRUSyY17TpQE-uu-j00h6KEV4HjTNl1f5tyM1jWcGOwaxMKH5B77bA_-eKFo5rnRh09LFADURY-z8kz2KcydOO3RvtO77Ai9gLj3b-KBmCatFYmQP8qOTJgKAzK278fwQU7rX8RkYOwZz9eQ_NK4iFKmdI0a0thRdRD15RpXk5ug-1xNJjHF_QdaFoGdSkB2i6cFr-9yYLJNo0FAOP_qbf0en2cMHvxfRwiR8wMHVYZn8woMPAjyfzQPT0ydAeA9NhbRMwQtlbGOYiOrzVePjLRphmVny1_O4Y3QZbn0NyjDdDYUG8xwg7hgGKDHxY9jPEBEQB-kHqr_k8_w9_RTqvTR_Os7vk_sickR-GSIVIh91cwV1ToLkZQwTeRDAiPoDPbKfGpUe1sbvylJt5_nXlCmNpXdR_8sgX0XbGIrSn8WDCs0h44KAvEjwl72z4y13llpQBTuT_Q9ipiXO2oJkACpKL5Tai6H0OtxWWDr86e926ujvZRB2i70dPeUuLZAnA94hbbYA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0f984028a5b3fa3c016ae2bbb115e087d0a9d47ce4bc2ca906",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244079,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 322,
+      "prompt_tokens": 2863,
+      "total_tokens": 3185,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 110,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2860,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.010376,
+        "upstream_inference_prompt_cost": 0.007156,
+        "upstream_inference_completions_cost": 0.00322
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "84c5098abfbc3917fff8e717aeb0965294f9337a1dfd2fa10d42ed6ac654bc25",
+  "elapsed_ms": 6750
+}

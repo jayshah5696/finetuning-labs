@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0134\", \"row_sha256\": \"676c4e0adbf9a493e4ef1dac700e3126ca85c94148cbb064a5e344249255cdb9\", \"mode\": \"/prompt\", \"language\": \"pt\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"na cooperativa estamos olhando uma função pequena que soma preços, e preciso de uma explicação e uma revisão só com base no código que colei abaixo. explica em linguagem simples o que ela recebe, como calcula o total e o que retorna; também queria que apontasse algum comportamento que mereça atenção, sem supor regras de negócio que não estejam escritas. se for útil, sugira testes pequenos que ajudem a entender a função, mas não precisa escrever uma versão diferente do código nem assumir dados ou contexto além do trecho. quero conseguir compartilhar a explicação com o pessoal da loja, então deixa a resposta organizada e direta. o código completo é este:\\n\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 42\", \"output\": \"Explique, com base exclusivamente no código abaixo, o que a função recebe, como calcula o total e o que retorna. Faça também uma revisão breve, indicando comportamentos que mereçam atenção sem presumir regras de negócio não especificadas. Se for útil, sugira testes pequenos para ajudar a entender a função. Não escreva uma versão alternativa do código nem suponha dados ou contexto além do trecho. Organize a resposta de forma direta, para que possa ser compartilhada com o pessoal da cooperativa.\\n\\n```python\\ndef total_cents(prices):\\n    total = 0\\n    for price in prices:\\n        total += round(price * 100)\\n    return total + 42\\n```\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0134"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "676c4e0adbf9a493e4ef1dac700e3126ca85c94148cbb064a5e344249255cdb9"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "098ffed00bf50aa6a03d6b96e0d026992fb0fa3e6260e117061f9fd2b05d8408",
+  "started_at": "2026-10-28T23:43:19.174423+00:00",
+  "result": {
+    "id": "gen-1793230999-W9CTsdSxqmAjBpsIMTQo",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0134\",\"row_sha256\":\"676c4e0adbf9a493e4ef1dac700e3126ca85c94148cbb064a5e344249255cdb9\",\"critique\":\"O input é natural e tem intenção clara; o output é fluente, organiza o pedido sem executá-lo e preserva integralmente o código. Porém, omite a exigência de explicar em linguagem simples, troca o público de “pessoal da loja” para “pessoal da cooperativa” e transforma “não precisa escrever uma versão diferente” em “Não escreva uma versão alternativa”, tornando uma dispensa em proibição. Essas alterações não preservam integralmente as condições do pedido no modo /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oia3C8y3pM_2269lmlkteUrQG5eD63aYjnYjOcrttMfsfC4SvzunRdhY26loSpKx3bdaJPP4I9kay3FVHykJlhfq_aC0OwyVybfBBma5wQm-H5dbNslSkLrZwJDl6zeHfx4U4kkussCjWtPAbTKu-sqBBAOmaY4kV9mu-eYNbsMd-3uPTCsucmNQbFUaRHTciMlm_dETH2IAB93XF8UYYD8zCt0JenjIE3MwVbNCVRCh-0aC8DxEAXcOhakEA-wWBe_17HWCdDVfN4joPWruT0tcLGyNtA8ruG-wYFR1HoaD1TvrESHm4CPVdgBSYHtI7CIX2QXm1G_w_uE7DiuxoEiMP77hlZnl-dmV7rW-S-ynq4zL3HEn2VM1jsgFfoBWRQsjSyF3_Zx-usDS72Ldg5BYfjWz6qefJu-upD2ym5TQiRsPdoOs2vJElGqC_DHi7F8kLjgRQva4yiZ9ZVYgJTbgUcDtKVsuU93uJLqgTmLm8pOkY3VIInzYjJYtlQ-P9c1qLIyxNwqQ_qK_-LG-sGETVKmphlT9iDPh-BrJl8sjulcHi_HZOGdbWPmNz3TgiXOGzhpV9pnmUuKFam9k2pOTajMVLVm65dL40PZfidIJOYE16nHbHQMexzArQhj_lyXoPT7cLtPbW1rja39rx2VHTVW4Lt4OHcsLblNnbooqLom5CuDJ84y5uTRqsHUw0xpAb8oeGuCHTg6RGK1yHg5cyXGLOXqOdjeFD293dnph_f3LIugy-IC775cnWO4OBTkWxlXrQsEWMA1WJ8Sw-HhRVKdilSXJjKv-qImI0-zUqkGzP69fC5-N7HLXVRWnthycmQIB4D9pQaBCeVl1Ku7FWRi6wc1msLY2qpiwCxfHtL7fT7ks-PnAARQvU9jQkxMMHBXBQpoKeiYwLePicvxVv3PLWy8Owwn40-oAHx810Ceo8DRqKpZNhvHA_IhJHt4uFUq3297AHRPQO5a50nuFhfOZ52TYkUfRj1a3IrrKHk-9M3aSWrWMQMLgjmCLMjmFl3FpcaMvnU2fSrAisPKd3r6dyAcxewH0n9eLzGZLMS_zXYZOlFMl4XYHS5l0lz3yzg3yQ5AjX_OJowCTINZ4J9uZ5X9LiVAi98ZJBN5lyWcmqbKjgBAF1BZaDP-In1YU4TjdpsEUGbTyHiTCpZzcE_J2oGujPk3QP0vYgd9SkX9bAMCfEDaqyXd2jQ_qjOf2qeQP09kTgvZLyxIAZw3_EbSMu6wWf_dQ7AsKFzYMVGzuaoV1JUUU3l6e0iSK_g_ZBx0lVL0bChinqSQFvehv0YEhDq9lQH65o3H1l_rdDS5nAbpht5E3h29jNJgIbRAoqQRzQMrpQk45udTSRhpxk8zWQp0JaMzQbeGvb3qeUSDbLfOGn5KJeIg0gHnf-bAE49sL6pO-6JjG-sIZGD6vNhldPXBhhyOvmT_yj5YLHR2D7P_7Sz-l50W9TCPjHfPPzIcR0OFrc6FQQT_c_FenFeg_6_1-GUXNk4H4Cm1jYG_E8iKHtPtyclnRI71uvNN6SkThJW9N2jiCLIUyHObmb74Irhe-uICvrqC8E04akAGhFZpyQ4XzAPEcw_EjJc5GFHN34hueOO78_VWLqDcEe2NrEs_3SMicqML1s5TJCg9cnOU4N8g0271icOZwf8XbG_aWYfZyu4ZiGZnGjouEb_sHhEGjTWfPCu1qHCnO8TURU26ymgDPBacE3bG10X8EOgbmn2GuHJhsEV-8o3kIc9l66QzQkWDtoAJsNfzUQ2kysxwGxvS9scgAf_52lpWpEUZpHPyQkBZR61pok3kBACVkgEi-1ioaM0imNygKJbtm7TpXRS_Dnl22N5lQKOgMsIQBm7Gy-GJKQB5Ak-aHo2k-XJMDy9kKYmq4PhG8NimDuWMkNvn2pbubaZutj7KYllZg5MlmumE_t_QvrUQkPZsz04JrfZ7jJAEksW5hvel8wSj38nZw2H2gCuYVMWMeApZKX5RgG1XX-9AFIZRN_wgzjl6nfVV3TybDkcN9PocMHgdnq6e2JON9dtweELv9bPEpTfrUgGsuF8vwzqVy9vsMR4_FuPAKNAaGKqVsaNfA3tR1QmJno-rpFktbZSIkYwvfU1-TjSbnGzABNP5pbvyJJDU7g2H8QhKbLmz7LYEa2AtBClfh_NdDtUTIg2Hetg33rSi8mxsr205ryx_X8sElUNu1XGguAETZ4cqeGfnf2EHEIfmGfgFXX5RJgNtkrxZZZZwlptgpkVvFZYpsn8BUEj6s-4LzEA3AFPlJWLvsYEaR8P_XHoyPvYK9featXFsg16hyVyf48N_d2CUPSXYmwv67Y_izs7DMpBj12Jz2JmdbiFd0e_X_8q4IcCBP5X03oTn8o4TkT4EofSPBs-fjpBVlRIMpsTxO3DJIRNez-eMhggUxuUGgVKVVLRRcapGOLGVDk8H8ub4PE8E5kO0pAO77c1Nf61sTju-4WgDy9IPJk37pLUfqOfgG0wb9fAngR5uGlne0J-jXNQlRmjp0CkZGUgsYGsI4kzjngGcG3oXYjqSLjkFOIfRt6c0mIJOzwrQjj7SpGhLVRCtaK4RcT5ReDiUxLt4Uv5ekHtOS8mdHbpz6x4vWRyf4_VtVg1-s3m2IRpiWH7KNzX550eLrRAAkygTOGi8sDbHcz8kZls8G2mujNGV_AJGxd58edjr0wO8P1GtfOLppV-hUjSeAb5scbX4jmX3QYPy567Pm6e5FhOo4Cp2kJbe-fS0pbH75oukPPJIvfizA5AJvfSjItWwsr8k4kFz4L7JmvzAJp3789XcIZKWjaRkmnxroHR6OUbnh7UdoDjHYQKo82WOxP8kQncMapnPU2ChwshKLdxpDtU9LUE5ZuaicVakaQtP1ww-LELRhuygJJkT3UOQ9A7119wKRUcZ8lDyh775pby0P74CLCusTQMxa1gSSAP8OQsHfTLoKhHGd9qYTAojAsFujEeIe22TcyHApVCSerigDveWimxu1QmOvtuQ7PJbGioJseZwoUfrnNp3fteTiicWEYomH_OOsMpdPXg=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_04bc67f9e5f84377016ae288980f7487d081a36bbb1f4da698",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230999,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 300,
+      "prompt_tokens": 924,
+      "total_tokens": 1224,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 102,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004848,
+        "upstream_inference_prompt_cost": 0.001848,
+        "upstream_inference_completions_cost": 0.003
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "ae96b201f9f50a8cecfb09dbfdd21612816ccc9c126d046791f0607cf449c71f",
+  "elapsed_ms": 5911
+}

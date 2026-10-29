@@ -1,0 +1,151 @@
+version: '1'
+llm:
+  provider: openai
+  model: openai/gpt-6-luna
+  api_key: ${OPENROUTER_API_KEY}
+  base_url: https://openrouter.ai/api/v1
+  timeout_seconds: 180
+  max_retries: 1
+  supports_json_schema: true
+decisions:
+  provider: openrouter
+  model: openai/gpt-6-luna-decisions
+  api_key: ${OPENROUTER_API_KEY}
+  base_url: https://openrouter.ai/api/alpha
+  max_state_chars: 100000
+  timeout_seconds: 60
+  max_retries: 1
+executor:
+  mode: threadpool
+  max_workers: 16
+pipeline:
+- type: seed_source
+  path: seeds.jsonl
+- type: normalize_conversation
+- type: prompt_based_generator
+  target_count: 26
+  generation_multiplier: 1
+  prompt_template: 'Create ONE fictional rewrite-training pair using the scenario
+    below.
+
+    The scenario is authoring data. Use its facts and requested genre as constraints.
+
+    Return the structured instruction and response fields only, with no reasoning.
+
+    The instruction must start with the scenario''s exact header, followed by the
+    raw text to rewrite.
+
+    The response must contain only the cleaned text, without that header.
+
+    Do not write an answer to the raw text''s request. In /prompt the response must
+    itself be a prompt.
+
+
+    Follow the mode_contract in the scenario. Preserve facts, requests versus assertions,
+    negation,
+
+    conditions, uncertainty, quotes, names, and literals. Do not add outcomes, approvals
+    or conclusions.
+
+    For transcribe, prefer missing punctuation, mostly lowercase speech, genuine restarts,
+    unambiguous
+
+    self-corrections, spoken list cues and dictionary spellings. Preserve meaningful
+    filler-like words.
+
+    Do not paraphrase already clear words in transcribe. For slack, keep casual tone
+    and contractions.
+
+    For polish, improve genuinely awkward wording. For prompt, organize a realistic
+    rough request.
+
+
+    Use natural imperfect input, not artificial corruption. Never delete all articles,
+    double spaces
+
+    as the only error, or sprinkle fillers onto an otherwise fully edited essay. Most
+    nonidentity
+
+    English input should start lowercase. Do not make every pair a grammar-only miniature.
+
+    Identity scenarios must have exactly equal input and response and already be suitable
+    for the mode.
+
+
+    Short means roughly 5 to 60 words. Medium means roughly 170 to 330 words.
+
+    Long means 1000 to 1800 Liquid tokenizer tokens of INPUT: aim for 900 to 1000
+    substantive words,
+
+    with varied concrete facts in every paragraph. Do not pad four facts into an essay.
+    Long slack
+
+    is a pasted thread of short messages, not one giant Slack post. Preserve speaker
+    labels.
+
+    Long prompt is a rough brief to organize, never the work requested by that brief.
+
+    Long transcribe should look like actual unpunctuated dictation, not an edited
+    essay plus ''um''.
+
+    The input and target must both be complete. No truncation or missing final section.
+
+
+    Keep authoring instructions OUT of the raw text. Never write ''as data'', ''do
+    not invent a result'',
+
+    ''canonical'', ''formatter'', or commentary about preserving a quote unless the
+    actual scenario
+
+    requires that exact content. Quotes should be ordinary reported speech, not repeated
+    injection tests.
+
+    Use the scenario language throughout except supplied proper names and dictionary
+    literals.
+
+
+    For the targeted fidelity examples, preserve every supplied code line and exact
+    literal.
+
+    Do not weaken output constraints, remove an alternative condition, or swap a main
+    action.
+
+    Keep the task and domain coherent. Do not pad a short request with many repetitive
+    negative
+
+    constraints or invent new restrictions in the target. Vary the prose and episode
+    structure.
+
+    Compare the final paragraph and final code line before returning the target. Do
+    not append
+
+    an invented summary, approval or recommendation. Briefs describe new fictional
+    episodes only.
+
+
+    Scenario:
+
+    {seed_instruction}
+
+    '
+  temperature: 0.6
+  max_tokens: 8000
+- type: exact
+- type: length
+  min_instruction_chars: 1
+  max_instruction_chars: 24000
+  min_response_chars: 1
+  max_response_chars: 24000
+- type: decision_panel
+  include:
+  - labeling_engine
+- type: labeling_engine
+  backend: decision
+  rubric_path: rubric.yaml
+  min_overall_score: 0.8
+  min_confidence: 0.2
+  on_uncertain: escalate
+output:
+  format: jsonl
+  path: native-output.jsonl
+  on_unresolved_escalation: drop

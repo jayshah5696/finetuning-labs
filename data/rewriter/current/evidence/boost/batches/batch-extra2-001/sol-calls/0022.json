@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-extra2-prompt-long-0494\", \"row_sha256\": \"b77f4d85914b0dfa4c3bcd6640e07120068277ce7ddf5390ee5500948cb3d7da\", \"mode\": \"/prompt\", \"language\": \"pt\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"me ajuda a montar isso melhor? queria uma explicação, uma revisão ou uns testes do roteamento, mas olha só o código e as notas daqui. não tenho um formato muito definido. deixo as notas completas abaixo porque ajudam a situar o balcão.\\n\\nNotas de referência:\\nO Ponto de Apoio do Mercado Velho é um balcão voluntário que recebe mensagens de moradores do bairro e as encaminha para uma equipe de plantão. A equipe atende de terça a sábado, das 9h às 17h, num espaço cedido pela biblioteca municipal. As mensagens chegam por um formulário simples no site e, durante o horário de atendimento, por um tablet na recepção. Não há atendimento clínico nem despacho de emergência: o grupo orienta sobre serviços locais, horários e próximos passos. A coordenadora voluntária é Joana Reis, e o responsável por manter o formulário é Davi Nunes. O código abaixo é a única implementação disponível para a conversa; as telas e as regras informais do balcão não estão representadas nele.\\n\\nEm abril, o grupo começou a registrar a idade da mensagem em minutos para comparar a fila entre os turnos. No formulário, o campo `urgent` é um sinalizador enviado com a mensagem; não é uma avaliação feita por um voluntário. O campo `age` pode não vir preenchido. Davi explicou numa reunião: “O formulário marca o que a pessoa selecionou, mas a gente ainda precisa ler a mensagem.” Joana acrescentou que a palavra “prioridade” descreve apenas uma categoria de encaminhamento interno, não uma promessa de resposta imediata. Esses comentários ajudam a entender o vocabulário usado pela equipe, mas não aparecem como condições adicionais no trecho de código.\\n\\nA equipe costuma abrir o painel às 9h e revisar primeiro as mensagens acumuladas desde o turno anterior. Às terças, duas pessoas fazem essa leitura; aos sábados, normalmente há uma pessoa na recepção e outra trabalhando remotamente. O plantão remoto começou depois de uma obra na biblioteca, que reduziu o espaço disponível em maio. Uma planilha compartilhada registra quem estava escalado, mas ela não é consultada pela função de roteamento. Em mensagens internas, os voluntários às vezes escrevem “fila vermelha” quando veem itens encaminhados como prioridade. Esse apelido é informal e não é um valor devolvido pelo código.\\n\\n1. No encontro de 12 de junho, os voluntários observaram que mensagens enviadas perto do fechamento às vezes eram lidas no turno seguinte. Joana disse: “Não confundam a hora em que chegou com a hora em que alguém conseguiu responder.” Davi anotou que o campo de idade usado pelo formulário é calculado quando a mensagem entra na fila, embora não tenha confirmado se isso permanece igual quando o formulário fica offline. Se o formulário estiver offline, a recepção anota o pedido em papel e o digita mais tarde; nesse caso, a equipe não sabe, pelas notas, como o valor de idade é preenchido.\\n\\nO grupo também mantém uma lista impressa de serviços do bairro, revisada mensalmente. Ela inclui o horário do banco de alimentos, o endereço da assistência para contas de energia e os dias em que a biblioteca ajuda moradores a preencher formulários. Uma mensagem pode mencionar mais de um desses assuntos, e os voluntários decidem a quem encaminhá-la depois de ler o conteúdo. Não existe, nas notas da equipe, um campo separado para identificar o assunto ou a organização destinatária. Por isso, ao discutir o trecho, os voluntários querem distinguir o encaminhamento inicial da conversa que acontece depois da leitura humana.\\n\\n2. A conversa de treinamento de julho usou exemplos inventados para explicar os limites do painel. Um deles tinha o sinalizador urgente selecionado e uma idade de 18 minutos; outro não tinha o sinalizador selecionado e tinha uma idade de 12 minutos. Uma voluntária perguntou se a idade, sozinha, mudava a categoria. Davi respondeu: “A gente deve olhar para a função antes de afirmar isso.” O grupo não registrou a saída de nenhum desses exemplos. Também não foi decidido se os casos de treinamento deveriam virar testes automatizados, então essa possibilidade continua em aberto.\\n\\nA equipe prefere não misturar o comportamento do trecho com expectativas que ainda estão em debate. Por exemplo, Joana propôs conversar depois sobre uma etiqueta para mensagens que mencionem risco imediato, mas ninguém aprovou uma regra nova nem alterou o formulário. Davi ficou de verificar se o sistema aceita mensagens sem idade, e a reunião seguinte foi adiada por causa de uma atividade da biblioteca. Até essa conversa acontecer, os voluntários usam “prioridade” e “padrão” como nomes de categorias vistas no painel, sem inferir prazos de atendimento a partir delas.\\n\\nNo fim de agosto, a biblioteca informou que as sessões de preenchimento assistido passariam das quartas para as quintas a partir de setembro. A mudança importa para a escala do balcão, mas não altera por si só o código fornecido. Se a equipe decidir mais tarde que o novo horário deve influenciar o encaminhamento, essa decisão ainda terá de ser discutida; as notas atuais não especificam uma regra horária para a função. Joana pediu que a próxima conversa técnica separe claramente o que o trecho faz do que o grupo apenas considera fazer. O código disponível é:\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 42:\\n        return 'priority'\\n    return 'standard'\", \"output\": \"MODE: /prompt\\nLANGUAGE: pt\\nINPUT:\\nPrepare uma resposta para a equipe voluntária do Ponto de Apoio do Mercado Velho. Com base exclusivamente no trecho de código reproduzido nas notas, faça uma explicação e uma revisão do comportamento de roteamento e, se for útil, proponha testes que possam esclarecer esse comportamento. Separe o que é possível concluir diretamente do código das informações contextuais das notas. Não trate expectativas da equipe como regras implementadas. Mantenha a resposta centrada no código fornecido.\\n\\nNotas de referência:\\nO Ponto de Apoio do Mercado Velho é um balcão voluntário que recebe mensagens de moradores do bairro e as encaminha para uma equipe de plantão. A equipe atende de terça a sábado, das 9h às 17h, num espaço cedido pela biblioteca municipal. As mensagens chegam por um formulário simples no site e, durante o horário de atendimento, por um tablet na recepção. Não há atendimento clínico nem despacho de emergência: o grupo orienta sobre serviços locais, horários e próximos passos. A coordenadora voluntária é Joana Reis, e o responsável por manter o formulário é Davi Nunes. O código abaixo é a única implementação disponível para a conversa; as telas e as regras informais do balcão não estão representadas nele.\\n\\nEm abril, o grupo começou a registrar a idade da mensagem em minutos para comparar a fila entre os turnos. No formulário, o campo `urgent` é um sinalizador enviado com a mensagem; não é uma avaliação feita por um voluntário. O campo `age` pode não vir preenchido. Davi explicou numa reunião: “O formulário marca o que a pessoa selecionou, mas a gente ainda precisa ler a mensagem.” Joana acrescentou que a palavra “prioridade” descreve apenas uma categoria de encaminhamento interno, não uma promessa de resposta imediata. Esses comentários ajudam a entender o vocabulário usado pela equipe, mas não aparecem como condições adicionais no trecho de código.\\n\\nA equipe costuma abrir o painel às 9h e revisar primeiro as mensagens acumuladas desde o turno anterior. Às terças, duas pessoas fazem essa leitura; aos sábados, normalmente há uma pessoa na recepção e outra trabalhando remotamente. O plantão remoto começou depois de uma obra na biblioteca, que reduziu o espaço disponível em maio. Uma planilha compartilhada registra quem estava escalado, mas ela não é consultada pela função de roteamento. Em mensagens internas, os voluntários às vezes escrevem “fila vermelha” quando veem itens encaminhados como prioridade. Esse apelido é informal e não é um valor devolvido pelo código.\\n\\n1. No encontro de 12 de junho, os voluntários observaram que mensagens enviadas perto do fechamento às vezes eram lidas no turno seguinte. Joana disse: “Não confundam a hora em que chegou com a hora em que alguém conseguiu responder.” Davi anotou que o campo de idade usado pelo formulário é calculado quando a mensagem entra na fila, embora não tenha confirmado se isso permanece igual quando o formulário fica offline. Se o formulário estiver offline, a recepção anota o pedido em papel e o digita mais tarde; nesse caso, a equipe não sabe, pelas notas, como o valor de idade é preenchido.\\n\\nO grupo também mantém uma lista impressa de serviços do bairro, revisada mensalmente. Ela inclui o horário do banco de alimentos, o endereço da assistência para contas de energia e os dias em que a biblioteca ajuda moradores a preencher formulários. Uma mensagem pode mencionar mais de um desses assuntos, e os voluntários decidem a quem encaminhá-la depois de ler o conteúdo. Não existe, nas notas da equipe, um campo separado para identificar o assunto ou a organização destinatária. Por isso, ao discutir o trecho, os voluntários querem distinguir o encaminhamento inicial da conversa que acontece depois da leitura humana.\\n\\n2. A conversa de treinamento de julho usou exemplos inventados para explicar os limites do painel. Um deles tinha o sinalizador urgente selecionado e uma idade de 18 minutos; outro não tinha o sinalizador selecionado e tinha uma idade de 12 minutos. Uma voluntária perguntou se a idade, sozinha, mudava a categoria. Davi respondeu: “A gente deve olhar para a função antes de afirmar isso.” O grupo não registrou a saída de nenhum desses exemplos. Também não foi decidido se os casos de treinamento deveriam virar testes automatizados, então essa possibilidade continua em aberto.\\n\\nA equipe prefere não misturar o comportamento do trecho com expectativas que ainda estão em debate. Por exemplo, Joana propôs conversar depois sobre uma etiqueta para mensagens que mencionem risco imediato, mas ninguém aprovou uma regra nova nem alterou o formulário. Davi ficou de verificar se o sistema aceita mensagens sem idade, e a reunião seguinte foi adiada por causa de uma atividade da biblioteca. Até essa conversa acontecer, os voluntários usam “prioridade” e “padrão” como nomes de categorias vistas no painel, sem inferir prazos de atendimento a partir delas.\\n\\nNo fim de agosto, a biblioteca informou que as sessões de preenchimento assistido passariam das quartas para as quintas a partir de setembro. A mudança importa para a escala do balcão, mas não altera por si só o código fornecido. Se a equipe decidir mais tarde que o novo horário deve influenciar o encaminhamento, essa decisão ainda terá de ser discutida; as notas atuais não especificam uma regra horária para a função. Joana pediu que a próxima conversa técnica separe claramente o que o trecho faz do que o grupo apenas considera fazer. O código disponível é:\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 42:\\n        return 'priority'\\n    return 'standard'\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-extra2-prompt-long-0494"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "b77f4d85914b0dfa4c3bcd6640e07120068277ce7ddf5390ee5500948cb3d7da"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "17cdab49583b0ed99e916e28985b50bd3d35394ac54a3de4bdb13737fab744f1",
+  "started_at": "2026-10-29T03:36:07.124046+00:00",
+  "result": {
+    "id": "gen-1793244967-ynohydPUD1A2EtaxxxRY",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-extra2-prompt-long-0494\",\"row_sha256\":\"b77f4d85914b0dfa4c3bcd6640e07120068277ce7ddf5390ee5500948cb3d7da\",\"critique\":\"O input é um pedido recuperável acompanhado de notas de referência plausíveis. O output mantém integralmente as notas, as citações, as incertezas e o código, e organiza um prompt sem executar a tarefa. Porém, altera o escopo: “uma explicação, uma revisão ou uns testes” apresenta alternativas ainda indefinidas, enquanto “faça uma explicação e uma revisão [...] e, se for útil, proponha testes” torna explicação e revisão obrigatórias e apenas os testes opcionais. Isso resolve indevidamente uma escolha que o usuário deixou em aberto.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r8s4pnRRRiVGrYdp4lQaOCfD4zjqtqYmLyEfJhKb0_tTty1NOtvJgHLWLgICuQN8NsD-oVoRipuRVxaD6Nmt_20eWvv4LWlJRKwQIUi4O5ZVKm1kkrMkN2l2cXNOVSq6qPreHYZaOSx19wpAUERgdEbg4jd_1p6gC_o2aahQmOfUTUhHTfkiUNvimewFb0yYoZFvzsbtA5gOVi8qfxKrOT0XAKt2NCav-_-emNw_jfggd6bDOfYmZfjUiyo4FeCzfxx0L3pauN1Rv1EcyoReEmENKhwFTDPrxLgH2DRwQANmOd8GRGdEcCIhRridJc3RIPxqoml40YS2xvfnQ2rx26gPYXxB2waX26-6l4fk4P9BLQk1Tm0gcwVpaM6ozW-4VpvRD9i8M5GZp4Axkm0lxKu3pF728Y9S3-AaTJcO67Tux-IGoW_4Re0WVp090eGc7rIHJmJ7rvKuDaYHV7HebI_HfeOqgsLSCjNYHQNzVduYvxmHmdh0X0xmCOuEXDbKGp2ws_AuCgpzmzMzNH4EumdLdQsNh3KZU_B_Jp9OhCiEkKigU0ErpVKdSSGS9jf5tDDnDHg6Ltgad5U1CGArvl4B_6ZcWeTwocYNo3tkoCC-MLQKWhYfyyKEZknmiWTvljZeNSsVc9N_I0BPzMXOY7P-rSoDd930Tz1VGtRBcUnQx7P9a1y325qFGnCgYJi0_fU80bLjPBLzNm3Y1F67k5WkrSh96sSRw4gQ4lazHfH-L_fVwhS90Dre6-eM_supl6lnF07Ui-rRWLTdIiMXeb3Bt1-l2RPuK0Jv572jEQ9-qMLVw-RlCpLbtVsMN4tQa3_BeWG-vSfopUAqJ36tqN0w6_SA1NHOTdkzW_INdbIA09Hm9EfZCmGu_13W6_VjJPDKZx5MYQnmIzhiUJucEAgU6eyq1LTpU08ePp964hPPqPFrIVAEFDrFl5oyblcQWYSeXk6h4MJxQnsEvizh_QAirZfLD-qFlINUJHGNj-Y_2AAtW3-0fYa4ijxZWk3xERqjRCn2b6AAYS0dVxKq28rGnftzilc-Tq3xbCPX-ugzrvI7KkfFh4Cltotq4llPB3uO0P-skDwvYIEPzYjeheSd-J6hdXk9rdnPACJQCDwEOnpMeL0UBuOe6m0qyuymcLDYb6U0OeN5Ol2OUFmNI-auuGOCTmyfEPm7sSIIM8VxebD2kPAdEm3_Et_vU5J-jmlyuT3ZuPOzI7jzlPBgiscL2imJIt7HW1tGHKX2dCQwYd0jNiYC4ObzBNwc1GhZeakPuMm_Aq5DmMwUbttIpK6lm4xKxNRGy1x567LZw-u6iF1T97NlgyRS3IHk-Q9y-E_z8R1DqfkIOICifo01b_KF-bTfsogvLQz--vQq-mBxGOn4UFyd1PGAz9xhlns136R7LHdLM174Hg4AEgTBa2mcyVMSKKvBF2trJezFGVswbdsG8jlvUJw0mU7Y3ZsvhepTck5B6aU4bp5E_CdO5EPg99AsDuXWbP5GT_sBu01lX9GLQTDqnoRWCBNKwfLGLEhVfznWN0TVZKL81ogdnaCkHEG4_4YSvtJOn2Ie05JE-HLyxCjFmzyscTFiS_1Bo-yXlME23HKYfh-OPZk-VYoQOoqmyKpwHOk0THp0Fq0n3GbgrmCXw7mhAeDr50M5mKujgXXI02UguThHi2CCFpknz2TeVPkc9c-k4jWIQlV603n1d4toXn_M9eHHrJ2t3HFJ0SueeutqXyCfZqQQKGaV0JTty-xFUHlmbe-7r--xEuMxpySrD3cPGalOZsF_MjPyPM1I51u0eitRHoQZ2YjC5pQBYflXaqcqn1vshkE4SkeA5xpfJeOcxTgsQ7BTlXSG6TSokSOe-rEILJYs5PXbky5NzrHJzuW5tNALNl42tpMF5uLZ2t6x6ZaxiFEHjLcMj2oe_RWL8N6Tivvr7IQS072NFsb8Ppt3CMu_c_RziMBshkcRRBewwWRWRzlDqUSgSZ0N9NEHPOzYyAR8iXaIHta82p81NBZN9AsrHJ74Kgsrsh9sO_weGDrIl89PItPA-enwPcQBBfbZdH-MWHls6IE2IPPNXd7srRRZOSlb51T072FUwihMMn0LeYytN9eZUCGDozRh72hVlZVBuqeJcAiOe3ghoOwRXBlgv4yzoJ20Mn5Su6NZDCTwAk3P8rDOtN6jW8tCSYIe1fZ-NANjAyvopFLWqKQ5cBhRF7lChretCPcXKEruBb65zWxWPm6owRRuHp4Mr8dz1_3g3m8oSs-CDCmuFKOwWoZYkxLiqX_FuADWKSuPhr5p3nYlpFJBrkKIdg9SKR1r_bw71sBtdL__7n9qly8TMa3sUlIkzosEHP8aNgIZ-TiibDwIwwNe4NPN0e3KAJeDJjywqYyce8R5ueRk9z4h_N2ZT8sdRAQW6R7Bzx9zzM1pLkIsJQttD6hvOCX4mS869BHf1J-Rz2pjllFduZwu241Q7FylsOmavMuChjZaGcQEzWCmIo_q9dMz9QuABfavFzMVgVnOUIK14jizt_lg7rfaPpUbSRsVekEAXKnPJz23aQtE6bS4__T6KyAxthXSi8ydjzUJ5HDH80KnlFMrHWXOe6A0jZTWt-TX3hFDkFML9oujLGs0Zb8_xegjOdCkvkgxaihzcMyt-IaXzVwZt5o5y6T7sEohoD7ceJgqZZre95zbeSx1hqvJRGgUEGRxuueHF6Un8XkFHOmzuAntLBUTEYpcqcGGLRPhOQuAodl6zO2XUo4V4pMGQfaHccWYG7ZnN12JA8_frC1XaRbTWgBd2UYtV1Fmkcm1zi6Oq00G5_u4DoxcEtesn7Y_Umq1FdcaPwBqtlRayr2FJLWjwl9_QzS9eIC4rwLT1mRCLKxOVcQM5aK5dQGiFS-vq8JmT6-chOrprOoOyKgEsnBpqQTMxR7fK_qnQosu2F61KAkIIb3QvwC2A-pzLnmCytlVrHi9Aobazqw28BUvi5VRk3XC9x32DnMaBJgULLz01BGkpyEZyp2_tEdl2cxx5RCodzikT3KeChtqEzHyuldwasd_9OvtSJAAM9nYDrz51GKRaNTy9OWqMA1FdJfOs1kTnIFot_jHK46Qidj8jBYMTxPDCw2lBkSTcDPyLbUBMKsaQ_IpqHutDE1eMc1qkPeOAnSte6sYgq7rtY6-IykanLnXinXcDePR8vgXFAp11go-MfX9Tr8kkNA8DF1TrkujVUV5E58pEhfU_8lPBNEGOeJVf89PXzQ9ssRLAg6XhP_I19RTI9j9e3wJoMREk4Ij1o7gklKX1Wy0HRke41o86hgxMO_muYSvJWKksSZkurW6NpPseM9jJjbfXLcJ8dgwRTLYBd6FuAQfnVXTrXKt1qiro9n4pm4vMKrxo9K5xnHj2z4_TqnxjPZfarfvMuP5xzrSCkDCjTxH4r-aJzUi7jR_tnsFwREd-V5H5nPepv_l51-i8Vm34RCsta1q15E0wGGcvZFL6BDcuKZoMBodpvZTGQRosg=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0410c70c101964e2016ae2bf284d5887d0a64a92585630f296",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244967,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 342,
+      "prompt_tokens": 2979,
+      "total_tokens": 3321,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 127,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2976,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.010866,
+        "upstream_inference_prompt_cost": 0.007446,
+        "upstream_inference_completions_cost": 0.00342
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "d27c83739f39c86198d878343a253027c9d81c19833866f3153531f36c120c9a",
+  "elapsed_ms": 7178
+}

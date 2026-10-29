@@ -1,0 +1,43 @@
+{
+  "reviewer_model": "gpt-6.1-sol",
+  "scope": "Review only of the final targeted-data expansion delta after the first code review.",
+  "verdict": "pass",
+  "findings": [
+    {
+      "severity": "medium",
+      "file": "src/finetuning_labs/rewriter/boost_data.py",
+      "symbol": "apply_boost",
+      "issue": "The apply command does not require or validate final-overlap-check.json. validate_selection rejects duplicate target strings but does not check new-to-new near overlaps. apply_boost checks against the original corpus, and audit_publication checks heldouts. Therefore --apply can publish additions without running --finish, or can accept a stale overlap report after retained rows change.",
+      "fix": "Require the completed overlap report, bind its row digest and count to the exact retained additions before apply, and verify that evidence against the appended rows during publication audit. Perform the actual final full-set overlap check.",
+      "status": "resolved",
+      "resolution": "apply_boost now requires the completed count/zero-overlap/exact-row-digest report. audit_publication independently recomputes new-to-new overlap for the exact appended rows and verifies their digest against the preserved report. A test changes the rows while retaining the old report and confirms rejection."
+    }
+  ],
+  "confirmed": [
+    "Supplemental plans use a separate source-ID namespace and only generate candidates for deficient quota cells.",
+    "Supplement resume reads the saved plan and cached batch source plan, skips already retained IDs, and applies unchanged mechanical/native/Sol gates to new retained pairs.",
+    "Strong native decisions require a final Arka export and exact Sol pass; other complete, non-vetoed native results require two distinct exact Sol passes.",
+    "Raw provider request/result and row identities remain bound to saved hashes. Native payload, six scores, judge model and final export membership are checked.",
+    "The opaque-ciphertext exemption affects only the heuristic HF-token scan at the recognized provider reasoning.encrypted field. Raw evidence and canonical hashes stay unchanged; exact supplied private needles and the raw OpenRouter-key pattern remain checked.",
+    "The interrupted dataset swap retains recoverable backup handling, and apply freezes original six data/SFT files before staging the append.",
+    "Historical excluded/unused selection counts now have their own namespace, while expansion first-review counts are recomputed.",
+    "The dataset publisher permits only Parquet splits, cards and licenses. Notebook counts and data revision come from the current publication receipt; public data and base downloads use token=False."
+  ],
+  "checks": {
+    "focused_offline_tests": "40 passed across test_boost_data.py, test_reviewed_publication.py, test_lora_notebook.py and test_public_parquet.py"
+  },
+  "limitations": [
+    "The reviewer did not generate or edit data, call model APIs, publish, train, or run a GPU.",
+    "The expansion was active during review. Final 500-row overlap evidence, final public data receipt, rebuilt-notebook execution and actual L4 training remain outside this review."
+  ],
+  "files": {
+    "src/finetuning_labs/rewriter/boost_data.py": "606d7da1bbea1703de952a3c3867ba364d3e4aaf8a1f0845c669d145228a94b3",
+    "src/finetuning_labs/rewriter/reviewed_publication.py": "236936da33f001fec22930483538f2d2ad0bb842169ab53219792e76a8b9fa15",
+    "src/finetuning_labs/rewriter/hf_data.py": "8689b87104b7568999f43921f6024dccf777f4aad8ed6328492aa0e215cc84e9",
+    "scripts/build_lora_notebook.py": "9e7d33c502a5d51bcf0f892173ab254cdb4e9c4f90ecd45b5f2201bb8314690f",
+    "tests/test_boost_data.py": "134cf0c3b79e0f40316a3c0975593af1ded62467dcfcb4b490dc59510305d0e7",
+    "tests/test_reviewed_publication.py": "aaa14fd0a7ca35d78c6e3c6d164e14f6de34ef6beac70d6694bb84606eb22ebc",
+    "tests/test_lora_notebook.py": "8039b441f71b309ef794e4700f4e66a7eb79ba76e2847ac951f3ab54072b1985",
+    "tests/test_public_parquet.py": "cb4fe67c9c88fbb9d1dbfd011136674ff34b5be2410bc1257642bbd1e0b65b16"
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0058\", \"row_sha256\": \"63f2fdeecda3b1b807e0df2b2a6a7e4ec728c317e16a3a264d3d2a83167f4bfd\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"hey, can you help me put together a clear request about this depot delivery query? i need an explanation, a review, or suggested tests for the sql below, using only the snippet itself. the people who will read the eventual response work around depot receiving summaries, so keep the request practical and plain enough for someone who follows deliveries but may not write queries. don't actually explain or review it here, i'm trying to get the request organized first. i want the supplied query treated as the whole basis for the task, not as an invitation to fill in a larger database or reporting setup.\\n\\nat the depot, people talk about checking received quantities across locations and comparing a summary with what appears in a receiving report. one colleague put it this way: “we need one row for each depot, with the received units added up.” that is useful background for why this small query is being looked at, but it should not be treated as proof that the query does exactly what the team intends. i have not supplied a policy document, a sample output, or a definition of how the receiving report is produced. please keep the explanation or review tied to what can be seen in the SQL, and distinguish a visible behavior from an operational assumption.\\n\\nhere is the complete code i want included in the request. keep every line and the final semicolon as written, because the reader needs to look at the actual expression rather than a paraphrase:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\\n\\nif the response is an explanation, ask it to describe the selected depot identifier, the sum expression and its alias, the source named in the query, the conditions in the WHERE clause, and the grouping. it should explain those parts in relation to one another without claiming that a particular depot has a particular total. there are no rows or returned values supplied here. it may be useful to say what the query is set up to include and what it leaves out, but only where that follows from the expressions shown. don't turn the walkthrough into a general SQL lesson or a description of a complete receiving system.\\n\\nif the response is a review instead, ask for a focused reading of the query as written. the review can point out behavior that a reader should notice, such as the status comparison and the strict greater-than condition on units, and can identify questions that would need more information to settle. for example, the snippet alone does not tell us whether a depot with no matching deliveries should appear, whether units can be null, or whether filtering individual rows above 42 is what the business rule intends. those are questions, not established defects. please don't label the query correct or incorrect on the strength of information that isn't included, and don't assume a different threshold or status rule.\\n\\nif the response suggests tests, keep those suggestions grounded in this exact query rather than turning them into executed results. ask for a small set of test ideas that would help a reviewer check the visible behavior: rows with different depot identifiers, rows whose status does or does not match, and values on either side of the units condition. include the boundary value as something worth checking because the condition uses a strict comparison. the response should describe what each proposed case is intended to probe, but there is no test database, sample table, or actual output in the material i have supplied. don't pretend that tests were run or report invented totals.\\n\\nplease organize the eventual response around one of those useful routes, rather than trying to deliver an explanation, a full review, and a test plan all at once. if a short explanation is needed to make a review or test suggestion understandable, it can refer to the relevant parts of the snippet, but the main task should stay clear. use ordinary language and be specific about which expression supports each point. readers may use the result to discuss a depot summary, yet this request is not asking for a new report design, a rewritten query, or an assessment of actual warehouse data.\\n\\n1. Keep the scope on the code shown above and identify which of the requested routes the response takes: explanation, review, or test suggestions.\\n2. Separate statements directly supported by the SQL from questions that cannot be resolved from this snippet.\\n3. Where the threshold matters, preserve the condition as written and make clear that the comparison is greater than 42, not greater than or equal to 42.\\n4. If proposing tests, describe them as ideas only; do not state results or invent records, totals, or database behavior.\\n\\none detail may matter later in the discussion: if someone asks whether the summary matches the receiving team's intended rule, the answer depends on that rule, which i have not provided. if that missing policy becomes relevant, say what cannot be determined from the snippet instead of silently choosing an interpretation. the point is to make a useful, bounded request for work based on the supplied SQL, not to settle the depot's process or claim that the numbers have been checked. keep the tone calm and practical, and retain the whole code block and this final scope note in the organized request.\", \"output\": \"Please prepare a practical response about the depot delivery query below. Choose one main route: explain the query, review it, or suggest tests. The intended readers work with depot receiving summaries and may not write SQL, so use clear, ordinary language. Base the response only on the supplied snippet. Do not execute the query, claim actual results, or assume a larger database or reporting setup.\\n\\nThe context is limited: people at the depot discuss checking received quantities across locations and comparing a summary with a receiving report. A colleague described the goal as, “we need one row for each depot, with the received units added up.” Treat that quote as background, not proof that the query meets the team's intention. No policy document, sample output, or definition of the receiving report has been supplied. Distinguish behavior visible in the SQL from assumptions about operations.\\n\\nUse the complete query below as the basis for the response. Keep every line and the final semicolon exactly as shown:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 42\\nGROUP BY depot_id;\\n\\nIf you choose an explanation, describe the selected depot identifier, the sum expression and its alias, the source named in the query, both conditions in the WHERE clause, and the grouping. Explain how those parts relate without claiming that any depot has a particular total; no rows or returned values have been provided. You may describe what the query is set up to include or leave out only when that follows from the SQL. Do not turn the response into a general SQL lesson or an account of an entire receiving system.\\n\\nIf you choose a review, focus on the query as written. Point out visible behavior a reader should notice, including the status comparison and the strict greater-than condition on units. You may identify questions that require more information, such as whether a depot with no matching deliveries should appear, whether units can be null, or whether filtering individual rows above 42 reflects the intended business rule. Present these as open questions, not established defects. Do not call the query correct or incorrect based on information that is absent, and do not assume a different threshold or status rule.\\n\\nIf you choose test suggestions, propose a small set of cases grounded in this query. Include cases with different depot identifiers, matching and nonmatching status values, and units values on either side of the condition. Include the boundary value as a useful check because the comparison is strict. Briefly say what each case would probe. There is no test database, sample table, or actual output in the supplied material, so describe ideas only: do not claim tests were run or invent records, totals, or database behavior.\\n\\nOrganize the response around one of these routes rather than delivering an explanation, full review, and test plan all at once. A brief explanation of a relevant expression is fine if needed to make a review or test suggestion understandable, but keep the main task clear. Use ordinary language and connect each point to the expression that supports it. The result may help readers discuss a depot summary; it is not a request to design a new report, rewrite the query, or assess actual warehouse data.\\n\\n1. Keep the scope on the supplied SQL and make clear whether the response is an explanation, review, or set of test suggestions.\\n2. Separate statements supported directly by the SQL from questions that cannot be resolved from the snippet.\\n3. Preserve the threshold condition exactly: it is greater than 42, not greater than or equal to 42.\\n4. Describe any proposed tests as ideas only. Do not state results or invent records, totals, or database behavior.\\n\\nIf someone later asks whether the summary matches the receiving team's intended rule, that depends on a rule that has not been supplied. If this missing policy matters, say what cannot be determined from the snippet instead of silently choosing an interpretation. The goal is a useful, bounded request for work based on the SQL, not a decision about the depot's process or a claim that the numbers have been checked. Keep the tone calm and practical, and retain both the complete query and this final scope note in the response.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0058"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "63f2fdeecda3b1b807e0df2b2a6a7e4ec728c317e16a3a264d3d2a83167f4bfd"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "9d1f97f39180bccbfe4d3f04a3507f1c978f9e87d78b3efdcf065ef6d026a7f6",
+  "started_at": "2026-10-29T03:23:02.744862+00:00",
+  "result": {
+    "id": "gen-1793244182-dLIHvxOvzJMw8U9WvEm9",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0058\",\"row_sha256\":\"63f2fdeecda3b1b807e0df2b2a6a7e4ec728c317e16a3a264d3d2a83167f4bfd\",\"critique\":\"The input is a coherent, self-contained drafting request, and the output is readable and appropriately formatted. The SQL, quotation, threshold, missing-policy caveat, and route-specific limitations are preserved. However, the final instruction changes scope: the input asks the organizer to retain the query and final scope note in the organized request, while the output tells the eventual respondent to retain them “in the response,” adding a reproduction requirement for the downstream answer. The review route also changes permission (“the review can point out behavior”) into a requirement (“Point out visible behavior ... including” the two conditions). These are concrete changes to the requested constraints rather than organization alone.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Clarifying task requirements**\n\nI’m noticing that tasks usually output accurately, but they require me to detect small shifts. For the final input, I want to make sure I retain the entire code block along with the final scope note in an organized request. However, the output also adds \"in response,\" which isn’t supported. I think my first step should be clearly asking for an explanation, a review, or suggested tests to ensure I'm being concise and clear.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Clarifying task requirements**\n\nI’m noticing that tasks usually output accurately, but they require me to detect small shifts. For the final input, I want to make sure I retain the entire code block along with the final scope note in an organized request. However, the output also adds \"in response,\" which isn’t supported. I think my first step should be clearly asking for an explanation, a review, or suggested tests to ensure I'm being concise and clear.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rwfwpaVk0mcPdf3H5gpfYJ9K7ihv2QZQtD_HhfQEyz8Yk9OtOibAkJ3loWlK81RHu6ENeuYn9j72N-WWo7yYjGZoERTBg0FlYKkEPGaN_wspaZ-ZmBQU02BwtL835kD0YO3tbuY57jletOKOyxtfuWPPZSn8HOo8lGojg3nGvhSREb1Esv4VQlDEl_mOHRVz6o_iNZsfhOT8_odoOwFJXT4N-c7GAbnGATjndTTLQFW2VQ5wPIGHkUCfI3YabDe1BFXlVFCb2OV98X2pQOINdyM14FhUezL4VPjsuUXpcU_d-4k93pgso0DouhxQFP_uzBHlEw0OCc6WBt2eVnH3lZWWP_mHy9waHpBy89g8ndX_7wyyBibc0Rh1Ned1xwzP3E2ERszMN2yNa_G9jIGIQV_iAJSD7W8g5lx0SKxCGXNWoBrOm7a2hP2-n8WYcYuj51RgALUtVhZ0pXq3xTEgVcLK8Sqqo_AThlyKROOEOnATEBHDmY0z6TUrDzYAIMJB-cBiHcrL3l34OzJQDQbGEloM_sPo_eJzUISZOlpsC_bZx0iUHCf0NOM6CqxFgKZ6cGhd9o_DPAki_DDS07wqrB24t0NKz1l_0crrEcLl-dwJAP0zrHACXmqgfjJ2r7xHtzlLu5dAQkgJeR14VCxLfGcfcc-AKzMkvJPxrn89YKsgol3uGSvbbPj4Nsu4j4OO9ONp5nnZs3Dm-ruadiJa7J0B7tHM2X9m0Us-0nbbwVZzQe7pvPwm_wLfvYYyGnzsju0vvisdQmmeDHhoxIOLsl2QEwYHKp2TKyvLpDBdH14ElcXkXJHoxIkApcvV4Z-xJnntDtBm2VUoIwOQVIF19qPJl7Hgpa8jLvjCrEoeBm76gqWaDXbMgZGlQkKi2De1qNx6GZcTczNBPBJZ0ViKZcGydNCVfJ_bsKRjjp4sdyTBWDlOHDEerVzi11RwQnsn3lFAgEY0bEg0R3e84UwznpW5CQmv8YF6ycra3EMXFgIeR0cw4LKJbZ9OVse19qHeS5UJ2ea4zjWBD7-W-mZ3voB22uLRVAyXoEsvgSGwzNTb45hX6XTO2BBdKYXGpn0JgqVoAPsXhVEyXdpUuE43oRrXVjQL7WPeqXyu9w4jTeRPst21gLnuEw6vK-A80pe2WLM_yu4hsYkmlppYLqtGcTHWoknrmKXwln-4cHrJYENcmCyTcnOpXYpNy_qEwVbIEj5hp2qw3rjyixJjsVMp2r1m--XIewX4sFQpU7vBQc4CNt2EiB8wDrqYBlsQ3OjrgONtxGHpr1URMeFlTiBp0Ob50m8wEgu0zksPMPaRn4rggRFmwBpITMqrnhxUzpkul8w84qatoH7xejZQhs_84uWiFbLGM3A3Av6ST3OEkXkiyp6R8lvToqUhHvCFInTZmd29Z8xQQpWe0yOQOOKjyjcyLSeqmQTsGFsYlprYP9K0TzrBvGLTgB7QjajrZ8pc8AT5mvLPHtuCcA7VMWKA1YfNJAwsDMghsxUYudpOZVxnBeun8iSPndtKGyt0OFFjSIoxQV-JcXc4vZN-6e2CfPe87QPlDZ7MV4W2cSXYD0-gdvsq7Mtr23QCq1oQEJJnwy9k0wT7W-s-zvO8OvmqrzyL8AoBixyeBbSPWc-jfxDDEyHFaEq9VYK78rBrgqOp_5AXRuqEE_zFEJ4u5fJyrMdgjg-MzqcjvmIu1ZK_YyuC7hJt9zrPE_YbID7nGDQr26BpiD8U2LnBPoAJcGNR3LdGBuaY6PAmszhcK8Q8h4Gc-MBatI6Z1pUF1XRlCDUggFeU8SryGjaB1IfPCRnh8oZrCCKDDcWM7XqhfT_6jkzEGI1MVwS55loDcupcYLg1PwbSCyPLmTOEQ1LoAsGnJdM66UZzwNX1FAwhbRNZ9gIKUu6F0Ip7RQFjpGOEpoXu3z1aH3ax87eVK8YPgTioD5E_ZsMTViMhGmmcilxE48U3E2YokQN0ltY1ha75hdExEOrXLleh1-Ltu48ngIAbaNgI8_PZLpx2YHSR3AWQ2mhb_ldbYKeGzGfBnopEI-MDsYAkzRe6R-qSKAFwOpeUppEeK-tW0Y8n95GV2syYCPvuwje6GdZTuFPckAZpYNspF5EtUEUVOPmyXP5jWMYc7QQCQy7LQ1UBhkdJnxUHM6t2Znjd-40kocbCRTda5nPLYQtZJwhLyvzCdnPUZNQPhYrsy0YoFk2efSl6bW9hntYsOOPYv4-ci8at2rpWzuJb55Qhf2ZHeZ15ukikstm1ZKG9M0Epj_gYikMsfWUcYX2AHZGxm1tjvoONwxZJ6LIMG7EGbx8nhYlo-NB1uUws54BgsB510OUtICVglw32-obhZbZyKXrl1t7ersbtueYD9pPE-OKSC4J0uGiNMt6b1nFpOIpAIbbUcl4rs6-7Ts7hRpVSTReZw_nS05Okbb5KIc_s02vRs-H82MQyJGCd6yVbJFStT06-YE1GvcHNgJmNh1ac7T0OrazOIw-tUfptcZle4Mc2u0NiJ9JyC-2YOlvejfEdixmldAeiWp58eqPBz83bfQuYsnLFgAioLquh74ucFZx6HHNyF35tQXNEhN37zNsiRamguTQ6T2leRPyR3gPrqAUDVIkU3Ol8q2b7wYzIsEpsRHucoRUQBcz7DudJ77KFCfigwfsmLe7Nk-Kc6cVwxmIP7l06n_ToouniJGsSb1Z_v5IeOQQ4mqnhBKxJzPt8Sf7Pu1JyeSQgu9IdSvxesGFShs-eoF-cep2cpCQDiryH2ymqrnATglKKezfbFaCavswfaQJZtc6xNZH7Nx68gyOur2yG-PzwXGpbvGMm0m_hxzy6VDaLyuohYjxznAqsfoCq7hzPUt1gv6SW9ATbIC3S6NZEbsBgm42tpfEaBAsiBT61PmhTIa2GnhSzX1NQtsyUlezEHU7GbPjTi9Qr4V942ZtaqK3Rro1OlFKtIpeBjxAhZ7ijcX6mY24hE6PGEQPAkfHZoA5oCh5cOYHNsCYCV5CfDSJY34XrFUuDupxj3sRuu_kQhtAXnbjKkertu-VDir3_BxtMZp-uZ0_NJ4HELonn9qZxZM9g_s2fLEGLxSibNfpr2B_MJ0pUUZGIMQ0sdtqBkmmx7hcx8EI9I3tET2WVgoRWRrcxQHLI3Xxf21SPZk-P-epjPH5dfiYEYnwd6oXu7MI3145AoGZyMMypsz7i5rBjpPuUi2MpNqeGdPs0bUCYxgSCA5yvCs1BQ8_j009PQPwGXm5wheO6tyKvDWxJ-rbB368vjbNIIYjkzsA23Kq4B0bgr0r_Y8J_7-tVZcWuuHvyOuRaTDYvJzXZR4ndiFV19L6tg3LfflXIfXjtBJ3YHmphqG4_ZLOiOTZKI3Zxwz1SZhQvePmlEkoUZcGhCi6jBV3Dbvd15jC5GID3Wl1KWlN2IOE4VDhPgEWSLavqMMuaF44VuQRu6-r1BRzwVFAg_vPdygUsaICJobXQ6As-1G6gh5Vua0yyFCcfzEbH1H953if6I_ViJbocwA9Rw7K4OV9AUmV2nbP0njAz0PwjNfUOOdQJ-r8JJg1dZDpzf0KSxdTq7gm5lYBWCyPGle2OoPwjFpblkrriH402_OAk_tEu8hFM3Bv-7h49MLtX0PN2o-1_UXWVG-NzAesUvFL0ZEm5PuZPmTsHR0eq8cFxgx0MiM1XpmdJWgEYQLAq6N3gGTVmidQQoxjACPUmX85--gI0MSfLW4hYus1lyyima5O-eSgN_K8ZyrkXxjUFx93NKKvYzSPdegUko04PNBNO1zMmH4wEKM6QrSmwqrUCOeB7I9vszlk7wXuN5-qjsoN69potEPBK_b_AO9ByDZa6ES8rYKc_QeHW0rD28sk72E37RrpIy-8tbkzcFwCwz3MSLVgPV3q0-V1WQrfyi-RiY7iuwuwzgmxdJlrl4ZnfsovDl1p_1lCJ6KZe2H7az3JOHXWWNvpYz0dawnnpCmysyqBh0BnV3Mn7UIzexRK45csaVdMMkqLaaFVEo1vgzRbCoVRmM9l3NX58vZmSgsAIufX21M0Dai3OSjja6e6q1h9I0HIAkWO2LXF7hZBXOL4rxIBXZv5beF2VyKoQcL3NxYbxRmI-dy6pmSswNAxVW45q_wKiaL8z78IG50jZOJ0mds1k8shwMiGUEKD639Q6UGdI8UXSPI23ofFGyqUWmL3cSCHnZqvDAAxDGHy6y4NrxLkWNDMf1Bc3o9Iw1zJtOdVOCTNWpSXrcwgVbjEgl0mN5g1K4NfcNAfYfiV4eSgWL1tXBKkJHHRxlXolC9tQq8qI6xr4RB4CiMBq8MzEwyehg4Vl8RSjvnW0tcG5F1Zod7Q9IvWZfgWmUyinWL8f87EiJAngUBoHSnvmNk_bxIsgho7eqXBnIMyx9qhOHAZPaXGoodcuR3gLEUC4DupkcUk_PIbHlk32h2g2dfPXO9ODcvStBducvHbCAJv4fXFZe_NoYPPDOCNO4rdGQn02TB-11VcVkfmqPKW7zLjFV-22YYQAN7uAyhX6UYc-sTyNrZn_ciYNUxnj28NlWyaAsu_pRVfo0f5PE-aTF9KSbfpRjw00I2ixJJkwOCt0nHyIi9hNY6zDjS2N_9N3R6mhvpFISDyugerd8h9OKo-M3c6ZkvYDTCWqdicQqu_K_sOZdN4h9CW08xKMw_q12PNhiuEOii-IlPUc0V0EaqiO7GrY0s5l2henjCrwucHUm8Y-MN7O1fnqXv7j9nrNnuF50vgIyWAiohev6aTeT4QA_dKiFOc6Ew_qX7ZAbuUKwVM8gmmsV1S7eAEhw4YrfW_xhkU42ncChgBap71YdDEDC3UR5UkIO38NxixVVhiu2uY7tgeaqOgCC2_XKIx8oDM52oio5RxVS__fD2JzAAPBolPrwijRg==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_034ad5292e53d424016ae2bc18838c87d084d05026247b80c7",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244182,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 461,
+      "prompt_tokens": 2519,
+      "total_tokens": 2980,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 229,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2516,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.010906,
+        "upstream_inference_prompt_cost": 0.006296,
+        "upstream_inference_completions_cost": 0.00461
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "e3b568fc239810c31506d29d889617b9aebc75b30aa8a2d4932f8f6c9be83e06",
+  "elapsed_ms": 11049
+}

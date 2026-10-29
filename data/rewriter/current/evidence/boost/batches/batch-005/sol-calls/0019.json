@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0066\", \"row_sha256\": \"e76f044c1266745ae3a77c3903fb032a1cf39336a15a9dc62654057f4ad1c291\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm checking that i understand this small volunteer help desk function before relying on its behavior. could you explain it in plain language and review it using only the code below? i don't have other details about the help desk or the shape of its messages, so please don't infer how they are created or what happens elsewhere.\\n\\nplease spell out the conditions under which it returns 'priority' versus 'standard'. in particular, explain how the urgent check and the age lookup and default affect the result, including what happens when age is missing and at the boundary of age 13. then give a brief review of anything in the snippet that may deserve clarification, keeping observations separate from facts the code establishes. if something can't be determined from the snippet, say so rather than guessing. keep the review focused: i need an explanation of this function as written, not a redesigned version or a general discussion of message routing. use the complete code here as your only basis:\\n\\n```python\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 13:\\n        return 'priority'\\n    return 'standard'\\n```\", \"output\": \"Please explain and briefly review the following volunteer help desk function, using only the code provided. Do not infer how messages are created or what happens elsewhere.\\n\\nDescribe the conditions under which the function returns `'priority'` or `'standard'`. Explain how the `urgent` check and the `age` lookup and default affect the result, including the case where `age` is missing and the boundary at age 13. In your review, distinguish observations from facts established by the code. If something cannot be determined from the snippet, say so rather than guessing. Keep the review focused on the function as written; do not redesign it or provide a general discussion of message routing.\\n\\n```python\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 13:\\n        return 'priority'\\n    return 'standard'\\n```\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0066"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "e76f044c1266745ae3a77c3903fb032a1cf39336a15a9dc62654057f4ad1c291"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "833f2db73fca9b1ad7f9f7e489ab1e0e1be6379bc72fb417b99b2151d3344840",
+  "started_at": "2026-10-28T23:43:12.412088+00:00",
+  "result": {
+    "id": "gen-1793230992-TKl5FgMUQx04lZBjDG9i",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0066\",\"row_sha256\":\"e76f044c1266745ae3a77c3903fb032a1cf39336a15a9dc62654057f4ad1c291\",\"critique\":\"The input is a natural, self-contained request with clear constraints. The output is well formatted, preserves the code verbatim, and reorganizes the request without answering it. However, it drops the explicit requirement to explain the function “in plain language.” A general request to explain does not preserve that audience/style constraint, so the /prompt rewrite is incomplete.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oiTNQnhM67_R1kDnLs58vuySjuRWEtC8anZL4oF4cr34bzBqBDYk1cCxIghiqxQCrgxVOK1Ik6jkWzYFdu40l1lud4-kgU3bvs1gcVK9RN4BK2KCOCg8mgFCZYZ53IjBSiAhRj9J8GiDsMMEfm0CgVFRtAxQJzFqrPzY8bMVyXjIrz2ikxtpRXe8xl_jFtWIYWRpf9laIdChIWkAxbBY4JPuZIvNrfEUtig1_bhnvpyPrX7gKzLVmfM5QiKrEbjVCKnY1P6V5xk_f_o8pIlxeGkQ7w4tNhTfwzlrkSJbN1TR2zu5TadKMuUbWUkOH0wIy9JL10R8WHZTLJtg_de0arzuoT5VNuraI5_HrCinUMd8B6Rt9OoOcIKqsZ88PBcfP1O6wog_Iweo2MuPuepEDnU7pjs8tk6D87PFmC6eBW1LkBTU7r2vcyImQVMqlZqg7bJibzTEqstE2w4UjnZiNt-4jDCeDvvLDUFFhXS-jH8T-BPE34MwjFcnyXNjfJmtIRAcd_mZksKFD1rjyfbojH311TDCwAPfZCTjXAhP1EcbVfjWWP1_2D0ghKmUZ9nGvpEfQK0OaKnTOYF2r3_bMt1YOXXaIzj5Slg-ejZgtuFWomJEoQ84jcUn_sWGts718FBPBq59w8Y_kCGX4J5XzS-CONCaQmuis4NsXfGjAOyXWGL7PmeOL_ARPUoEqkcM7TJ3MleoTeNxO-7NH4IOitXdSWvk3_gxdtydnVO7ke5gEvZKBTb0gYa_xewyeMFU_GuH1WuHU8N2C5L25RfqqlytsoS4M6eWJuRaiemdR97TSaSnHtWXw6OVAbPQWexdx_qOxcLy3ZpUl6dY3iHtqYywaELeGkGukoN2kYM9x6gcAvqEfKdqSn6EYV_8z-Yr8fAa1Q2xvPeYLrJcWt4X5aGzgBxFXMetP6G7SU2qw2nbIlixisLsI1jYNAe6mFRuvfD0nvCVmxUdoXNqETcv2hPi9FV-TqegheS_SIYp6gQB7I0aB17QqXGFD9c2mbiD1_y_FBTZODaqLowLjlVvZ_fv_QSY6qTAdZG8PR65vMJWamoDiG4Ry9n2RTtg-xqO1gghBX5kD4oCaDfoy5I1yFybtUcjd530k0Z9eNwsK7s_F9VhsZPoAKP0E3K2JfwEGNli_HEsf-29JmLQx6I2gGylYhxCMQBif2je7_1TJngTX9SG7bIfXjuf903iQmlDgpZnW6dKBy3jTgsh1ODNQU11MWctmOkOYX-S6O0x7J9LlijlM1qySGk0p8fSaE-oLM14szrgpZ7BREFfIivFjsFtU3hmTUDjf3Hb29NCvjDDJA0i4g3f54Sdc8uempMjAPWK0QBe7QmaIR5uL8C6qbUe-cOYgUSy5wHCzBW9Ra4oEH71sbIz_2zEggYkUIQ_0po2zlJG9jUX4bxrOGkOEtVT7ZqsBd16JacWVqO4U_XECRvNzBNfFifFupWtlutOtUiezv94k0FRyYfgRjUl_qEq2SvjNdAEwpv1rVijFRBoKybMoHgLaAYCIv_c4WwPq0Nvkymdbq6YRVcGZLNyjJlNZo4OPLQDYo2JoKORH2zajmPF5Xr3K1IiM7G16X8odCqBNEg24h3QTxMj6lK5DzJqDJUCkn0F3hI7ovy3xgG4SSBJm8yo1YunfJxuG8HKVxit8q-vGHPA42MFjaUOZYDYGEt5TMiRJt2l4tCXhflYFwa21T7R3CGkmL59yliBp7Jj2KQqjTugF0qv6-NhWZ9ERp_xNjm6lBkIiEfqk9vfEAU0LWOn-RevMhBNYlMjqkrtqW0BX2JUFUFyPHKTrjUd4egJ7W5SnoM8U0w9E18r8jCgVaqZOt3eGj0tIxnoMFM6JF6c6ardVN8nJAmw2APSE4Yoi_H-A7KcHVv9KxdVuRiCnmTViPCCsNq-jfUH5P1hG4K1U0G4ssyUTx69gqB4PHbCKHg8zedMTgvDw-j1C_kenXsi019-ZhBxQlGI4OTknALwTlg5U4Wk71n_4pohHRQjnUFROxVEhBzxrHMM4YlSG9zsKuE83kJ92VohHREVzDKarB-jAYjqrcg04ZkDpPygmCxNozSHO2PD0MiiB3Oq1ulL7-z2bK1hrYchP2d5v9AdutYCDufBd6cJxcUwwaRfs5b1txvP9cZLkfilT6eNW3hT75HK44WvjpzpW0FQ_wWtaYkvLLNdgw2pqk4lmMSoeETBjHZbE8BcEf0laQlhQfs_sdVwNab93cM700HwCI0mz2-TWHxk_ai3i_lbj-A3VzkpKJPsSk3txj87avZCwqxsbSgoZNMWqP_SseSo1OnMyxbGm79oponJYNJhuU7bw3kJxaKm2Q_75yP_5bo8CirlgKjYO90YkEXukjNIa1NH7K_po1zqHsJashw34MzkQOZ-Hs7n6XagYa1kRg1Szw4JlQ42ADSy8ppnXbay0Vi9yvRbARGZsW8RNTy4zj3dpGipJSNcEh42X42_H2YodHMbgVSUNmYnKIYg742C2LuzAvOxjeXYrzmfKQygfIQ7n64IqlB4_TGP9Ci9be5rJqbXpp0GIPxeIF6OP3QR7uv3M7TVHY56i8yK0g07JnL5qllSCVQd6i7y_evmuueyjWnCgnZU3_8R50qU5wguTZOH_mr7Qlo2ZpoZAGGhJYAKOX_WRXIgvL3IeDDAb3CMk3pCXaUBWfm-f2DTyTk.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_003b24b2f0c0627c016ae288917c2487d0b81dd690922fab84",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230992,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 242,
+      "prompt_tokens": 1023,
+      "total_tokens": 1265,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 77,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004466,
+        "upstream_inference_prompt_cost": 0.002046,
+        "upstream_inference_completions_cost": 0.00242
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "ac0ba52436825326a9f5d174cf77015fe5e1d4a8dfe01915bc99495e9dc42be6",
+  "elapsed_ms": 4663
+}

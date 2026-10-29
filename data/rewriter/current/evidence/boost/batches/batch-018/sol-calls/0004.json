@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0145\", \"row_sha256\": \"e89f55fd925358729f8c2ab87df38df111c4c3b71fb5bd057ff175aef8033003\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i need a prompt for a focused change in the photo importer, not a general redesign. the fictional app is called Harborlight and it's used at a small museum digitization desk. one import session scans a selected source folder and creates one record per discovered photo; each record has a source path, the discovery order, and whatever metadata the scanner already found. scanning and metadata extraction are outside the change. the thing to work on is how those records get divided up before Harborlight writes its batch manifests and queues work. the image files themselves should not be passed through a batching helper or copied by it.\\n\\nthere is already a simple helper under consideration, keep this exact code in the prompt and ask for an explanation of how it fits into the change, rather than silently replacing it with some unrelated design:\\ndef batch_records(records, width=18):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nfor normal imports the default width is 18 records. an operator can choose a different positive width in the import settings, and that setting applies to this session only, not to later imports. preserve the record order from scanning, and each record must occur in one batch only; don't sort, discard, or duplicate records to make batches look even. the last batch can be smaller than the others. if there are no discovered records, create no empty manifest and show a completed import with zero records. explain how the implementation handles the configured width alongside the helper's default, but don't make up a second setting or a new file format.\\n\\nthere's an important preflight decision before any files are copied. if the selected destination folder exists, is writable, and the existing free-space preflight says there is enough room, then Harborlight should create the manifests and queue the batches for copying. if any one of those checks fails, do not copy any files or create any batch manifests for that session; show the operator which check failed and leave the source records available for a retry. don't treat this as a warning that still permits a partial import. other import sessions shouldn't be stopped just because this session fails its preflight. once a session has passed, a later copying error is handled by the existing per-file error handling, which is not part of this change.\\n\\nbatch boundaries matter because each manifest is reviewed by a staff member before the queued copy begins. manifests should identify the session, batch number, number of records, and the source paths in their original order. number batches starting at 1, and make the count visible in the import summary as well. retain the existing manifest format and destination naming rules; don't invent a new schema, rename the source files, or infer metadata that wasn't found during scanning. the import screen should show progress in batches, for example “Batch 2 of 4 ready,” while keeping the existing per-file progress available in the details view. don't claim a batch is copied merely because its manifest was created.\\n\\none issue from the last desk review was repeated source paths in scanner output. if any batch contains a repeated normalized source path, flag that batch in the review summary and keep every record in its original position; do not silently remove or merge the repeats. if no batch contains a repeated normalized path, don't add a duplicate-path warning. normalization for this check is the path comparison Harborlight already uses on the current operating system, not a new cross-platform path policy. the warning is about review, not a preflight failure, and it does not cancel the queued copy. mention that distinction clearly because the preflight failure branch above must still mean no manifests and no copying.\\n\\nplease organize the request as a small implementation task for the existing Python importer. give a brief description of the intended change, then list the main behavior and boundaries, and end with a test plan. keep the proposed scope to record batching, manifest creation and the importer screen summary. include tests for the default width, an operator-selected width, order and one-time membership, a short final batch, and the empty-record case. test the preflight success path and each failed check separately, confirming the all-or-nothing behavior for manifests and copies. also test repeated normalized paths within a batch and the no-repeat case, plus confirm the warning does not prevent copying after successful preflight. cover the later per-file copying error only insofar as it confirms the existing handler remains in charge; don't redesign that handler.\\n\\nfor the interface wording, keep “Batch 2 of 4 ready” as the example and describe the failed preflight message as naming the failed check. don't prescribe exact error wording that isn't specified here. keep the existing scanning, metadata extraction, manifest format, destination naming, and per-file error handling in place. don't ask for a larger architecture proposal or a new queue. the result should make the conditional behavior and its alternative easy to verify, including the later repeated-path condition, without doing the implementation in the prompt itself.\", \"output\": \"Create a focused implementation task for batching photo records in Harborlight, the existing Python importer used at a small museum digitization desk. Do not propose a general redesign. Scanning a selected source folder, discovering one record per photo, and extracting available metadata are outside the change. Each record already contains its source path, discovery order, and metadata found by the scanner. The change concerns dividing those records before Harborlight writes batch manifests and queues work. The image files themselves should not be passed through a batching helper or copied by it.\\n\\nThe helper under consideration is:\\ndef batch_records(records, width=18):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nExplain how this helper fits into the change. For normal imports, use a default width of 18 records. An operator may select a different positive width in the import settings; that choice applies only to the current session, not later imports. Preserve scanning order, and ensure each record occurs in exactly one batch. Do not sort, discard, or duplicate records to make batches even. The final batch may be smaller than the others. If scanning finds no records, create no empty manifest and show a completed import with zero records. Explain how the configured width works with the helper’s default; do not add another setting or a new file format.\\n\\nApply this preflight decision before copying any files:\\n- If the selected destination folder exists, is writable, and the existing free-space preflight reports enough room, create the manifests and queue the batches for copying.\\n- If any one of those checks fails, do not copy any files or create any batch manifests for that session. Show the operator which check failed and leave the source records available for retry.\\n\\nThe failed-preflight branch is not a warning that permits a partial import. Failure in this session must not stop other import sessions. After a session passes preflight, handle any later copying error through the existing per-file error handling, which is outside this change.\\n\\nEach manifest is reviewed by a staff member before its queued copy begins. Manifests should identify the session and batch number, give the number of records, and list source paths in their original order. Start batch numbering at 1 and include the batch count in the import summary. Retain the existing manifest format and destination naming rules. Do not create a new schema, rename source files, or infer metadata that scanning did not find. Show progress in batches on the import screen, using “Batch 2 of 4 ready” as an example, while keeping existing per-file progress available in the details view. Do not describe a batch as copied merely because its manifest was created.\\n\\nHandle repeated source paths as a review condition, not as a preflight failure. If a batch contains a repeated normalized source path, flag that batch in the review summary and keep every record in its original position; do not silently remove or merge repeats. If no batch contains a repeated normalized path, do not add a duplicate-path warning. Use Harborlight’s existing path comparison for the current operating system, not a new cross-platform path policy. A repeated-path warning does not cancel the queued copy. Make clear that this differs from failed preflight, which means no manifests and no copying.\\n\\nKeep the implementation scope to record batching, manifest creation, and the importer screen summary. End with a test plan covering:\\n1. The default width, an operator-selected width, preserved order, one-time membership, a shorter final batch, and the empty-record case.\\n2. Successful preflight and each failed check separately, verifying that failed preflight creates no manifests and copies no files.\\n3. Repeated normalized paths within a batch and the no-repeat case, including confirmation that a warning does not prevent copying after successful preflight.\\n4. A later per-file copying error only to confirm that the existing handler remains responsible; do not redesign that handler.\\n\\nUse the specified example for interface progress wording. The failed-preflight message should name the failed check, but no exact error wording is prescribed. Keep existing scanning, metadata extraction, manifest format, destination naming, and per-file error handling in place. Do not propose a larger architecture or a new queue. Make both branches of the preflight condition and the later repeated-path condition straightforward to verify, without implementing the change in the prompt itself.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0145"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "e89f55fd925358729f8c2ab87df38df111c4c3b71fb5bd057ff175aef8033003"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "915eef987ab0b0f6cf2a1adaab83fb2b3fe16628e0a89ccb85b11eb2bd5c892b",
+  "started_at": "2026-10-29T03:26:56.337059+00:00",
+  "result": {
+    "id": "gen-1793244416-3lQ3Pz5G1pI2tvkYvOXB",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0145\",\"row_sha256\":\"e89f55fd925358729f8c2ab87df38df111c4c3b71fb5bd057ff175aef8033003\",\"critique\":\"The input is a coherent, natural request, and the output is readable and preserves the helper, batching rules, preflight branches, repeated-path conditions, and substantive test coverage. However, it drops the requested task structure: a brief description followed by a list of main behavior and boundaries. It retains only the instruction to end with a test plan, while placing another paragraph of requirements after its own test-plan section. The rewritten prompt therefore does not fully preserve the supplied formatting request.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating output requirements**\n\nI’m considering whether I need to adhere strictly to the instructions for all requests. If there's a failure in format, how does that affect the end output? I think it’s important to judge the material based on what’s required versus what’s small-scale. I should ensure that my output is usable and organized properly. The structure must clarify the task and not skip important details. In this case, it feels like a legitimate fail in formatting.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating output requirements**\n\nI’m considering whether I need to adhere strictly to the instructions for all requests. If there's a failure in format, how does that affect the end output? I think it’s important to judge the material based on what’s required versus what’s small-scale. I should ensure that my output is usable and organized properly. The structure must clarify the task and not skip important details. In this case, it feels like a legitimate fail in formatting.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r0K3GSvIA7OEbtcmzb-B9p-asISjRxiQAzoYioO59t6YdCHQeb7IAoN-dYeiq_eD-ydXjOFbmllOLPvLIzT-hcbodb7IumSmdkVBc4crBR7c6b2Nhr6_W5hB_xVxyQOPjIN6cAknnj2CG8jRS_K72ZyhiDvzEltI_RXit1FzveQ8VnpMpPllcoNeCyfmd1_TJQ6jm3tNpvgFsI1AsyvQhn6SUIZ-m6L8lCpFmImkggG76dB-SNND0b6pxY50dHyx6bCBlUsPifgTSrB-MjbSW4vCBiymrpc3gZ6B8DJoW4f-HdvsTW2IT8H-ahCw-mHeA09AC4q5QYDW87Uk529m1d6cwvCDgsdKhs86Ye5W-G9pjN5AgaYB3HnH50Fq5loU5GHQrXIgUJ8sFwhnVZrfOAcDov6XL83FmPlGR0Xm-lzFfuGLe338_x8WwL2eYlezuXcMSYVtudW3ODaVBIG6ZlPT08i9MFzE9EbGqld3Bl0fU3854vh4wnnB-oYniDJfvRUwGBtwnKwchNhho6aXS13bmxM_M9vp8UjoLSH4PFc0Uuci-_7sOL7HBq52yM4M6YT4kjUCpI0n87WfoA8yW-_tj_5wPPhj9uohyVJ_t9h2IxwiSxhz_OKg_ggAerngR58G79NuHkKqiap9VyO9ocU5awF52Mrnu-zPQMFyo0AMFb6wb_3Oe5k27nVBjKGwvakjWgP3lnw798WgoiaC9krFChngJ3Ig6W2FbpgHfvm7Yd9ptQaDVpGk_o8rTllQVds_qGIj66Ugaa3xAiDOcdBeK4R4ei-nnvcAb_EHRVIoJcXrLGAN8TskyB-n-BfTuj4L0y7pYjGmHSeHBMuMkqz7jOgKzXyrLf6UWjNGyAJNE5ddXcjPxdAUxdDBeZ07z1r3Xh3OA4bz6gadsWyuZ2rzujdmJA0FpgB8aihf9d3UIQe4XS0KXaa1FWIUsKQivJjF6ZcnD68d3-GhpuEhjKIVGphWEv1NnR9Kw_6TmCKJrsy2Y7qH4ertzmUg25WsFMLi3qgLaqDCY35aHbvaRI9bNUGw1S3qTdr_A9kq77dm4z-W2m0FVNKdH-T7hzFtZzCM9UwEs3yH_kgVdqizAFLM0vzQinrYuAfIIc5fWiZUmv7UwjCgmk55DYlv1nzxVl5muMMnaf0eSmHq2UDpisFpHx6XOP7Q0D2TtZhBOSoshsA-Y94yUU7W3RBgXzpBdulQC5SFjl6Toig_WxmLiPOMHEhUumdsBnm9O4cAjdC1QXsm7U3P3Va_U3svW0TN-coth193-BWDk9m5KteRFWuY8gVBGTHGkY_vZRGNUtNnIfpl4oy0-jPpkTT_vF3JUd_8txl86zoc3YMjQvc3g8nPzHwL4FcWK1avBEdnpNflg-KujMf5yLECmljCT9cqIVH-lw9mRB5rcukmB87QmPLLspzwtw_tnNUiuFE6jMvDIk9qlAAAA5t7RJZY9nDpLPPjfV_Is5Oo_unHNGwRR2SWHfpJllmQiOV8Fw4-AjzptRk9a9iobyxLwIUUW6ppxyHbUBCn6tG4AgvR6j0Kz1VO9rjnY-1be8tOk4gTRamOgssclpLBoBd6PCntwCS1VBOs2NkKEffm2rrBIimBuO48R7Wc8Kk4w7pHsqVonL4Fo8V41smjPITfi2XjW4YdjHSNtg8m1-4JPCoL3CGcMySAPT3ltSBB1sWVlN8ApOhA_MCkPG9e0nlik-BEpjydlnduOphPpaT3kBBo5bOs7SFEj0Sw4GW4MvcdD-tv0uP3_GUn5CtL32gtVUgUoiqn4XX3xNfb8LQbC_q5keI2NlG0KculTRMpQgYmkI8UUX2HUO8t-lLttpbpnwEbdv5KWoaaoM-c94D6-L1gGNtXuCtWknEjsgiyECg4YMTfw9p-08tEbnHmfc20y4gbxjwU0FtRDG3TdVYU8Q2xssV0i6XoFvnaKrZNNxA7h0409G8ImcYFY1BGzP4w5I1WlDlkRBtX0WkU1ccHxI6Jjvk_x9PHgUXFKRBUfM8VAvwWoA6FJAmGYFk-0h3ZQrIm43BXKT0cSPj4Jw0EXa8gmlZBWCTtf6D-ByXnGD-EQATnt6PjjIBHwyqgHhKU2vooq6eX2bG67N2IpBgESR6YPPgfo6FnYGYKWTHTsoCwbfRyFfJ89vvjB4ppsahc6_8XmSjooSwOcn9U5ScZsX-7bYXynRRaBnzFrz97RLWO3iN8pneMKo9kYx3g1jmLRIuxvx2tdXu5hFViIv6rN8P7-GoWENGWHMWkZnSV8WtZyGPyIZpXuWnlShiepSXxsbkT-50-DH5E4clfZDL8EL_1ikHr2bE-GNoDvcZEFMx7C7BEpKvpOTrDrpNh9VsX9z8jZlRGoLm2R_PAMvY3IpUOjHTdp4jOcPFnfIhHcqpK0ar3fgT9v4qTwAbOnrnP_DHRTLgKCorDriFLwxKwFHwZui8ycwIh95vQPPPHXqLoWvLhiB_8NjAjAhXBM-epZQswJaLI0udsQpWvZNruMNFPeQTalP0kf85RmKqYFjHG2q26b_TXVOytU_1-eqaSV70lGeTiootYHt4bXTr2ou7VBymLs8VIpzwh8jyuU8iEKdLKhY_UwLM5EockawqrAnDW_wCXE_CSV-2wm8BNDw1iKGUx_QKH19uufd7WKNxR3NBm9SKykBL5khl7Lw4LhTlJPKOXhPlKjCxsnjo9xGv44Oo5je7gVfhW5MxDJCghSiYjozz_qyOwqRjI1sZPuXsd5DKBD9iF6Cn1L8GE98vhcSOzy9ON6lFCcmq4bmlhSBepphHD2nDhwO-0Nnv6IvBtxpyEEhnWiMAl1IMkT2F8Yp6G4nelgu6MUHeNoSpW-bbbIIF2HdCmjNHJX0GTThGYmvogpmBj8FC3YVak_1VkBimspgxbWgSnuQxa7biW8Fo6XnJwcS2uvfRKD0DgD5fuKNYBn0nHZg0lNdSpfSIga8JltNHPBzpzSQJHX4Yj5oaJKQ1i92w7lSwTBKSKTw9oVKHuNMfqWL4MrJiVO-VDu8sgIWvvNgX8jO6dcgxaQc57Zpf7AHGB9fKdcpzWCjVQpqQqCr9_7LR8EAJOwQCQTxJEVD3EvdvpCJ0E_VbJ1U9Wd6NrCooCGYw8lQGSl4i-Q1NQ7lvtDmQBMv8Yt9QUpjsYT4CPg7nUNeUT6LVeMW07VDIxZbfDv5B5J8zMBY5fkfflcp1lPpT6f2brnJKFHy-nLP1JnJmpcF6d8pfAYSbAYobvU4UBb535Y5-yPohS9SzdWC4oHNsy6FkuJVxU7bEiJsewCw--dfEwQtWsW44XenLu5-1fhMw3qwePHwMdQ-wXLt-GmxUyjqC086Vg-oDBngSesGRhyAEY0tDqq4GAg5EEDhWE1RI91WSXa4A1mxv5mnP2xFzajlHEE6QOFddSThHbJ_4XOqDmkcUx42GuvPqYQBgGXSePEVrF9ECE-YjmntRAeKvkgNrY5ehD8_Cq3GvWxEpAvNlqxpQvsgd4NFsbcgoilpgC0V1FOvbk8ypKeSqcuSAxCZBXvuN2hhuvFAobKHWKNSpOAY73zEB48EdJt0H44MZy7xp-KUnSIRld5BkFPV7LQ5vKhQ-KW2GYP1pY3YFm4ZvcW6durgD9_wvKLcM0EFjNy7c5ACP8QLBM2s2SFlnxlA1AJgcZrnECcaZnYrL_p5KGoFRHtp9tEGeCUu6Smhw4QIROFVAB1aQG1kBtSxZXD58NIlAk1YS24h2Iu4TRM8GxGO51_9FHZ6nfBVnoiPSs2JDznybZ5_QIhigOpbjVQQNDvCR1h5U9gGlNMW8JdvunNVFKvt5bW66ou_DZivYDL61TGv8NbyeF7N3QBGpVM-TsPD5ZLXl9_ZAtDzDOGsGm6Y6BMXfnY_-2KUfizco93Gz6hf4aSaqqXVDsMUY_FQXe9yXioe5RT3S1JWnoYgodTK8sdx5Qr5mHkCpaSbt2kkZh9A1o6QIGlECxu5rj792jKhjMsNvHVg9GJhUZxZFa5JqC401lHZUnInkdPKSCoQPQGn7vYFqAI1kLH2ijJzV-W6SFhd5tVMFM0XYleK2HeO_XagoeSk391TZBFjfLtgut-5Prp3ssC-xxgt5HeOtgdfen4zF8JiWAUE-g7EqJemifTW1aUY9zJMoWvUSri7U_QuFjB3fwD67PIQ_dNa_GkQa18u9-uMjfjqXYP7mWyT4IOb4Hx_mTVrmh3exNXnvHkFIQrGrSp9Sbh89unbifColA_b-zTwc90T-9SiB4helbXMB0Vqw8omRX0z2Q8RC6uHmlD0xgdW8KCRxBiIBBBgmGs2XToACl_Wit4ybaeYTEcUTkyU29RFm3NB_cgIG-ICBvY4imfhFcJ9McxayjeyhkiVAaZGB1EAGdm6oKZolUz_IXZmzNf_DVZ8qAAcSIfbekNPJ5dyFPATwmdYlUPzOL7enXJf-RIRGgaCbhafrj_e7wy0vmd6lhyfa-7eXepewLRPWNWgnruTaOq9a7MwhWLCgXGcKaVDLxInCQPy6mhsOnYoI43myxzUtb0cIWe1-ky_odHaADD-LXFLHQWmEkUk-sa50Mq_rua-MftrDbiteyXju_x2PkD8UhHsTBslnxAFu6dks3rgT0eeRfXKbx-QTClan8sizZu4LjYrUx-NqF8Xa4zC6hk3YZARFVrz2dgUORgu6RUTNsgx87GLpMalc48Prr4gyYejKQDE5zUQyP-0iwUcBNEQtaPiE0hAVTJC6WpPClVGNILHfD82_4oM7YDdOBKh-C1oeQQtiYs4M5qKDlgvP2LTyDh4jIsNw_Jxcqrr2B7n8zr8yBfkHXSropfsocbeGyLFdmP7UcnnvctZXipzu5xKi7xQaXCdcLEuA-ntac63QMmJhfDsmaSXHnMAbgKolSWBK-XF_GUW5lgiN2gJ54MX5JJjDsWrmMzGC8qDIPYmSS-9QjWHd88NVRmz4j6Zld4MA7hKhY3A9Ta4FvMYGjH740MphXDGfR4THLUzJIoxfrCNd2yD0U2s5CMCwQPXdMOuTRgD9avD_gIRTY_FXzQF5uFg0fkuD_xxq7F_w2yiHpwHU0nzZ83tcaeOy4GeSf9--vv26h7qX9LRkl6y1AcvV9luccrcbhUluN-GVx9DM38icQprJGZ3PPc9AAScY7ydQVYiHMJbPFdV0ovi3zSdCyjhETJWgw2FN-8PpJdolqdK2f2dXzNGNz7MtDwwLmow7IffwJHzxFgiQs9kaSLk8ZpHcMxmNS9ST7IxSsEndu-xqEoyaDo-MpHQa8EuglND5KTicJjzSxjOTNiTkKe_FRcaxemTmaDkoQeqZ8RhPXte2MUEfkHOvFi76v7Fm5JJSJsRzZtfiPjsH_6emouNeR4RYUwF1GeebRYuyEh9yemTCaafiI44bhV_4vj9N_9u_le1qvrE6DKSBxAiybZn5iyAYbe-B4UzK6y-KMutPrQ5OkvzwrFOn0xDTN0Coxbv8KzeuSioMzv2uwC4WYEA0fNXaIQqOBOHnXea7t6QBP69pSAwjlUxL0eBqz6piVb6JYS0WoxYyua-BhmvKNY33s20Y3WCQQEyLTGuXXPd4Mq_68M8-p87dm705ESK_NDkBv3hKzU7UEESGUH5wYNie50OMYuRUP6zgJfMtuCsaIS1f_E0vkWU1Zd8Y0JQyir3mFPslR5C48EhCH4WRNJmr9gY7by6UJCHVJdIbRsKZDvQaFUrXgfpdoce4rl-bFzMT6rgGNx-Us0K0Ulw=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01a18726cf773cee016ae2bd019aa087d088600f19bfb12834",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244416,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 467,
+      "prompt_tokens": 2506,
+      "total_tokens": 2973,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 279,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2503,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0109335,
+        "upstream_inference_prompt_cost": 0.0062635,
+        "upstream_inference_completions_cost": 0.00467
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "2be4bd493dfdbadc567caf9221bdca29b6fb766d700d5ba09054262dbf3163cf",
+  "elapsed_ms": 12309
+}

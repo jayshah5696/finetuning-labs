@@ -141,6 +141,37 @@ def test_publication_detects_secret_in_review_metadata(release):
         audit_publication(release)
 
 
+def test_opaque_provider_ciphertext_does_not_trigger_plaintext_hf_token_scan(release):
+    blob = "gAAAAhf_" + "a" * 40
+    record = {
+        "result": {
+            "choices": [
+                {
+                    "message": {
+                        "reasoning_details": [
+                            {
+                                "type": "reasoning.encrypted",
+                                "format": "openai-responses-v1",
+                                "data": blob,
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    save(release, "evidence/provider.json", record)
+    seal(release)
+    assert audit_publication(release)
+    with pytest.raises(ValueError, match="private"):
+        audit_publication(release, private_needles=[blob.encode()])
+    record["result"]["choices"][0]["message"]["reasoning_details"][0]["type"] = "reasoning.text"
+    save(release, "evidence/provider.json", record)
+    seal(release)
+    with pytest.raises(ValueError, match="private"):
+        audit_publication(release)
+
+
 @pytest.mark.parametrize("name", ["notebooks/old.ipynb", "runtime/train_rewriter.py"])
 def test_data_audit_does_not_require_retired_runtime_artifacts(release, name):
     manifest = json.loads((release / "manifest.json").read_text())
@@ -149,3 +180,81 @@ def test_data_audit_does_not_require_retired_runtime_artifacts(release, name):
     verified = audit_publication(release)
     assert name not in verified
     assert json.loads(verified["data/train.jsonl"])["output"] == "Can we meet?"
+
+
+@pytest.mark.parametrize("change", ["review", "native_export"])
+def test_sol_verified_addition_must_bind_to_its_actual_provider_call(release, change):
+    from finetuning_labs.rewriter.boost_data import SOL, review_packet
+    from finetuning_labs.rewriter.evaluation import saved_call
+    from finetuning_labs.rewriter.scale_data import VERIFY_SYSTEM
+
+    meta = json.loads((release / "supporting.json").read_text())
+    item = meta[0]
+    row = json.loads((release / "data/train.jsonl").read_text())
+    item.update(identity=False, native_accepted=True, protected_literals=[], record_id="native-one")
+    for value in item["decisions"].values():
+        value["confidence"] = 0.8
+    saved = item.pop("opus_review")
+    item["data_review"] = saved
+    item["verification_calls"] = ["evidence/sol.json"]
+    item["adjudication_review"] = None
+    item["native_evidence"] = "evidence/native.json"
+    item["native_exports"] = "evidence/native-exports.json"
+    report = json.loads((release / "reviews/one.json").read_text())
+    report["reviewer_model"] = SOL
+    save(release, "reviews/one.json", report)
+    review = {k: v for k, v in saved.items() if k != "report"}
+    request = {
+        "model": SOL,
+        "messages": [
+            {"role": "system", "content": VERIFY_SYSTEM},
+            {"role": "user", "content": json.dumps([review_packet(row, item)])},
+        ],
+    }
+    result = {
+        "model": SOL,
+        "id": "unique-call",
+        "choices": [
+            {"finish_reason": "stop", "message": {"content": json.dumps({"reviews": [review]})}}
+        ],
+    }
+    saved_call(release / "evidence/sol.json", request, lambda: result)
+    native = {
+        item["id"]: {
+            "id": item["record_id"],
+            "payload": {
+                "instruction": Case(id=item["id"], **row).user_message(),
+                "response": row["output"],
+            },
+            "scores": {
+                "decisions": item["decisions"],
+                "judge_model": "openai/gpt-6-luna-decisions",
+            },
+        }
+    }
+    save(release, "evidence/native.json", native)
+    save(
+        release,
+        "evidence/boost/final-overlap-check.json",
+        {"rows": 1, "new_to_new_overlap": 0, "rows_sha256": digest([row])},
+    )
+    save(release, "evidence/native-exports.json", [digest(native[item["id"]]["payload"])])
+    save(release, "supporting.json", meta)
+    seal(release)
+    assert "data/train.jsonl" in audit_publication(release)
+    if change == "native_export":
+        save(release, "evidence/native-exports.json", [])
+        seal(release)
+        with pytest.raises(ValueError, match="native|Native"):
+            audit_publication(release)
+        return
+    result["choices"][0]["message"]["content"] = json.dumps(
+        {"reviews": [review | {"pair_verdict": "fail", "verdict": "fail"}]}
+    )
+    record = json.loads((release / "evidence/sol.json").read_text())
+    record["result"] = result
+    record["result_sha256"] = digest(result)
+    save(release, "evidence/sol.json", record)
+    seal(release)
+    with pytest.raises(ValueError, match="verification|review"):
+        audit_publication(release)

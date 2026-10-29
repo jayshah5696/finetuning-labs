@@ -19,11 +19,14 @@ Both arms used the same A10 runtime and Sol rubric. These are development-valida
 
 | Split | Rows | Use |
 | --- | ---: | --- |
-| train | 1,000 | Fit the LoRA adapter |
+| train | 1,500 | Fit the LoRA adapter |
 | dev | 100 | Select the checkpoint |
 | validation | 84 | Evaluate after training |
 
-Each mode has 250 training and 25 dev pairs. The 84 validation examples are unchanged.
+Training has 300 Slack, 450 transcription, 400 prompt and 350 polish pairs. Each mode still has
+25 dev pairs. The original 1,000 training rows remain unchanged. The 500 Arka additions target
+action preservation, spoken corrections, conditions, supplied code and quotes, and long-document
+completeness. Dev and validation bytes are unchanged. The same public dataset is updated in place.
 The original [68-case calibration benchmark](https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter/viewer/default/validation)
 is also public and remains separate.
 
@@ -42,7 +45,7 @@ data = load_dataset("jayshah5696/finetuning-labs-rewriter-training", "sft")
 
 Open [the notebook in Colab](https://colab.research.google.com/github/jayshah5696/jadoo-labs/blob/main/projects/finetuning-labs/notebooks/rewriter_train_l4.ipynb)
 in a fresh L4 runtime. The [notebook file](notebooks/rewriter_train_l4.ipynb) is in Git.
-Its first cell shows version `public-parquet-lora-2`. This is the only supported notebook in
+Its first cell shows version `public-parquet-lora-current`. This is the only supported notebook in
 the project. Public dataset and base-model downloads use `token=False`.
 Add two Colab Secrets and enable access:
 

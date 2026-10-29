@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-slack-long-0006\", \"row_sha256\": \"cb6238f2097c749e2dab122d56254da5741faec29663d13c7e468d5793a077c6\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"Mara: hey, could someone help me set up one desktop shortcut on the Linux loaner? It should open the current rota file in the default spreadsheet app, not start the whole planning folder. I’m testing on GNOME, and I’d like the icon on the desktop so the evening coordinator can find it without searching through Home.\\n\\nDev: yep. The shared folder is mounted at /srv/team/rota on the office machines, but the loaner uses /mnt/team/rota. I checked the mount name this morning; it’s the same shared drive, just a different path. Please don’t point the shortcut at my Downloads copy, since that one is from last week and already has an old shift swap in it.\\n\\nIvo: for the file itself, use this exact name:\\nspeaker-rota.csv\\nIt’s a comma-separated list, and LibreOffice Calc is the default app on that machine. Opening it in Calc is the whole action I’m after. No need to launch a terminal window or run the rota editor, because the editor is only installed on the office desktops.\\n\\nNina: I can confirm the loaner is running Ubuntu 24.04 with GNOME 46, and the account is `evening-desk`. The desktop folder is `/home/evening-desk/Desktop`. That account can read the mounted share, but it can’t change the file, which is good; the coordinators should edit the rota through the shared web page, not overwrite the CSV from a shortcut.\\n\\nMara: right, I only want a quick way to view the latest list before the handover. There are 3 coordinators on the evening rota, and each one uses the loaner at a different desk during the week. We don’t need 3 copies of the shortcut or separate files; one icon in that account’s desktop folder is enough.\\n\\nDev: small catch: the drive doesn’t mount until someone signs in, and sometimes the VPN takes a minute after login. If `/mnt/team/rota` isn’t mounted when the shortcut is clicked, it should show a clear message that the shared rota isn’t available, rather than opening the older local copy or a blank Calc window. That condition matters because people sometimes click it right away.\\n\\nJo: that sounds sensible. I tried the file manager bookmark yesterday, and it just sat there when the VPN was still connecting. The shortcut can use the normal file-opening behavior once the share is present. Please keep the message short, maybe “Shared rota isn’t available yet; connect to the team drive and try again.”\\n\\nIvo: for the icon, there’s already a simple blue calendar image in `/usr/share/icons/Adwaita/32x32/categories`. It’s not a special team logo, just the closest icon installed on the loaner. If using that path makes the shortcut fussy, a standard spreadsheet icon is fine too; the file action and missing-share check matter more.\\n\\nMara: my rough checklist, so we’re all asking for the same thing:\\n1. Put one shortcut in `/home/evening-desk/Desktop` for the `evening-desk` account.\\n2. When `/mnt/team/rota/speaker-rota.csv` is available, open that file with the default spreadsheet app, LibreOffice Calc.\\n3. If the shared folder isn’t mounted, show the message above and don’t fall back to a local copy.\\nI don’t need a shortcut to the web page or the whole folder.\\n\\nNina: can we make the title “Evening rota” so it’s easy to spot next to the browser and mail icons? The filename should still stay `speaker-rota.csv`; I’m only suggesting a shorter label under the icon. Also, don’t add the date to the title, because it would look stale next week even though the shared file is current.\\n\\nDev: yep, and no password prompt should be part of the shortcut. The share is already mounted through the signed-in account when the VPN is ready. If it isn’t ready yet, the message handles that; if it is ready, Calc should just open the CSV. I’m mentioning this since the old shell script on the office PC asks for a password and isn’t relevant here.\\n\\nJo: one more detail on timing: the loaner is usually left at the welcome desk, and the evening coordinator signs in around 4:30 pm. The shortcut doesn’t need to run at login or wait for the VPN by itself. They can click it after signing in, and the availability check should happen at that moment.\\n\\nIvo: I like the simple icon idea. The blue calendar may be a little hard to see on the dark wallpaper, so a spreadsheet icon is probably clearer, but either option is ok. Please don’t change the shared file’s permissions or copy it into the desktop folder to make the shortcut work; the shared location stays the source.\\n\\nMara: yep, that’s all. The request is just one desktop entry for this Linux account, with the “Evening rota” label, opening the shared CSV in Calc when it’s there. If it’s missing because the drive or VPN isn’t ready, show the short notice instead. The team web page stays the place where anyone actually edits shifts.\\n\\nNina: I’ll leave the loaner signed out of the office editor so we don’t mix that up with this. The desktop entry is for reading the current rota during handover, not for changing assignments. And since the three coordinators rotate through the same account, please keep the label generic rather than putting anyone’s name on it.\\n\\nDev: sounds good. I’ll check the mounted path on the loaner again before making the entry, because `/mnt/team/rota` is the path we saw there and `/srv/team/rota` belongs to the office machines. If the loaner path changes after the next image update, I’ll flag that instead of quietly switching it to a local file.\\n\\nJo: thanks. The welcome desk monitor is 1920 by 1080, so the normal desktop icon size is fine; nobody asked for a large launcher tile. Leave the other desktop icons where they are, too. I only mentioned the monitor in case someone thought the shortcut needed a custom layout.\\n\\nMara: final small point: the handover note should say the shortcut depends on the team drive being available. If the warning appears, they can connect the VPN, wait for the share to mount, and click again. We don’t want it silently opening last week’s download, even if that file happens to have the same name.\", \"output\": \"Mara: Hey, could someone help me set up one desktop shortcut on the Linux loaner? It should open the current rota file in the default spreadsheet app, not start the whole planning folder. I’m testing on GNOME, and I’d like the icon on the desktop so the evening coordinator can find it without searching through Home.\\n\\nDev: Yep. The shared folder is mounted at /srv/team/rota on the office machines, but the loaner uses /mnt/team/rota. I checked the mount name this morning; it’s the same shared drive, just a different path. Please don’t point the shortcut at my Downloads copy, since that one is from last week and already has an old shift swap in it.\\n\\nIvo: For the file itself, use this exact name:\\nspeaker-rota.csv\\nIt’s a comma-separated list, and LibreOffice Calc is the default app on that machine. Opening it in Calc is the whole action I’m after. No need to launch a terminal window or run the rota editor, because the editor is only installed on the office desktops.\\n\\nNina: I can confirm the loaner is running Ubuntu 24.04 with GNOME 46, and the account is `evening-desk`. The desktop folder is `/home/evening-desk/Desktop`. That account can read the mounted share, but it can’t change the file, which is good; the coordinators should edit the rota through the shared web page, not overwrite the CSV from a shortcut.\\n\\nMara: Right, I only want a quick way to view the latest list before the handover. There are 3 coordinators on the evening rota, and each one uses the loaner at a different desk during the week. We don’t need 3 copies of the shortcut or separate files; one icon in that account’s desktop folder is enough.\\n\\nDev: Small catch: the drive doesn’t mount until someone signs in, and sometimes the VPN takes a minute after login. If `/mnt/team/rota` isn’t mounted when the shortcut is clicked, it should show a clear message that the shared rota isn’t available, rather than opening the older local copy or a blank Calc window. That condition matters because people sometimes click it right away.\\n\\nJo: That sounds sensible. I tried the file manager bookmark yesterday, and it just sat there when the VPN was still connecting. The shortcut can use the normal file-opening behavior once the share is present. Please keep the message short, maybe “Shared rota isn’t available yet; connect to the team drive and try again.”\\n\\nIvo: For the icon, there’s already a simple blue calendar image in `/usr/share/icons/Adwaita/32x32/categories`. It’s not a special team logo, just the closest icon installed on the loaner. If using that path makes the shortcut fussy, a standard spreadsheet icon is fine too; the file action and missing-share check matter more.\\n\\nMara: My rough checklist, so we’re all asking for the same thing:\\n1. Put one shortcut in `/home/evening-desk/Desktop` for the `evening-desk` account.\\n2. When `/mnt/team/rota/speaker-rota.csv` is available, open that file with the default spreadsheet app, LibreOffice Calc.\\n3. If the shared folder isn’t mounted, show the message above and don’t fall back to a local copy.\\nI don’t need a shortcut to the web page or the whole folder.\\n\\nNina: Can we make the title “Evening rota” so it’s easy to spot next to the browser and mail icons? The filename should still stay `speaker-rota.csv`; I’m only suggesting a shorter label under the icon. Also, don’t add the date to the title, because it would look stale next week even though the shared file is current.\\n\\nDev: Yep, and no password prompt should be part of the shortcut. The share is already mounted through the signed-in account when the VPN is ready. If it isn’t ready yet, the message handles that; if it is ready, Calc should just open the CSV. I’m mentioning this since the old shell script on the office PC asks for a password and isn’t relevant here.\\n\\nJo: One more detail on timing: the loaner is usually left at the welcome desk, and the evening coordinator signs in around 4:30 pm. The shortcut doesn’t need to run at login or wait for the VPN by itself. They can click it after signing in, and the availability check should happen at that moment.\\n\\nIvo: I like the simple icon idea. The blue calendar may be a little hard to see on the dark wallpaper, so a spreadsheet icon is probably clearer, but either option is OK. Please don’t change the shared file’s permissions or copy it into the desktop folder to make the shortcut work; the shared location stays the source.\\n\\nMara: Yep, that’s all. The request is just one desktop entry for this Linux account, with the “Evening rota” label, opening the shared CSV in Calc when it’s there. If it’s missing because the drive or VPN isn’t ready, show the short notice instead. The team web page stays the place where anyone actually edits shifts.\\n\\nNina: I’ll leave the loaner signed out of the office editor so we don’t mix that up with this. The desktop entry is for reading the current rota during handover, not for changing assignments. And since the three coordinators rotate through the same account, please keep the label generic rather than putting anyone’s name on it.\\n\\nDev: Sounds good. I’ll check the mounted path on the loaner again before making the entry, because `/mnt/team/rota` is the path we saw there and `/srv/team/rota` belongs to the office machines. If the loaner path changes after the next image update, I’ll flag that instead of quietly switching it to a local file.\\n\\nJo: Thanks. The welcome desk monitor is 1920 by 1080, so the normal desktop icon size is fine; nobody asked for a large launcher tile. Leave the other desktop icons where they are, too. I only mentioned the monitor in case someone thought the shortcut needed a custom layout.\\n\\nMara: Final small point: the handover note should say the shortcut depends on the team drive being available. If the warning appears, they can connect the VPN, wait for the share to mount, and click again. We don’t want it silently opening last week’s download, even if that file happens to have the same name.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-slack-long-0006"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "cb6238f2097c749e2dab122d56254da5741faec29663d13c7e468d5793a077c6"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "191f13d8a553974582d1d5665db58361f0f17b7c19874eee4b78eebeb512c24b",
+  "started_at": "2026-10-28T23:30:19.999103+00:00",
+  "result": {
+    "id": "gen-1793230220-T8WfxxHcYnIAOPvJriZS",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-slack-long-0006\",\"row_sha256\":\"cb6238f2097c749e2dab122d56254da5741faec29663d13c7e468d5793a077c6\",\"critique\":\"The input is a plausible pasted Slack thread with recoverable intent and no leaked authoring instructions or artificial noise. The output makes only minimal capitalization edits, such as “hey” to “Hey” and “ok” to “OK,” while retaining the casual tone and thread formatting. All paragraphs are preserved, including exact paths, filenames, account and title, quantities, timing, quoted warning, icon alternatives, VPN and mount conditions, and restrictions against local fallbacks, editing, password prompts, or layout changes. It appropriately cleans up the request without answering it.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oWPSWIfftplHfZspPIREDyzeWBkvcbZBkJWq0TDu8U1yKK2ndhgpuu3lUaTbn5wDp3b5GElJOFhygcZJhrSmz1_u2JmxtWJwTjtOI2YJvuR81Z8P-M2sN8j1cCouOkM7ehqsJmwkKNkVADs_uQb2mCKxujJcOcSGkNMbsoZC6tfiGXghyBW6wRaU2lEHKUFCbMG0V_AtANx1ndNay-ArzP0xmOr89JghkqHqScIi3nxonqxdH6hMnsMW5eKshI-DfJCIg3HcrPS2ezbyJ-KsT4D6sI4VDMPNDFnWsTWsq-PSckGHd4oMQwgs6QB73mwLptB10GHDnIBJmoWT1rmO7To1NkglP2X4pjJ8L6Q9IHO6dbrPqa0pKaok-Ottq7oTAsJcsEEBGS3V12Xcndy3OKOdorbtng70p3oNGstvnLjdVFnBKbXBlxFxdOsOjj_UHwi_onTphXz-Y-Ifx-UHIs5xiuJkjgV2Fu26CRTNKI-nzaiQj0i5LfRSZ9nGU2OXtYJWynxTQbgd8Gm14d44f5sSrncfVDPEx2AwTW6FceYTA1plMkzh8Vd4Z0nDKidzuVNgowLBmEhL4eVaTX8YPERlYWvVB5v2R03q7K6YkeQ0nlEKQywkB7hZ6_-BA0opvSbMsRHRhiITlt_LgH6qrcY_wG_wR1FtpAKj73xMAHy9cfdEfj_BmQ56RuXoewpT4w9HferJ1Yo7-VxgvTnt0z41ofOzOHUTVFgPmmtbO2M6PhoO43YyrHqlcy2XQSzOOA4hqrXNHdElN4lDUBPga4JRg7PUozSXhhs4CQ2mx20fppHKSxMyOKWwnKOaEPRJO4p5u800j3gw2UAZPeuYmMM30vlp1dS-24XfHp9yNWgDx7f_jFVfSvzOA2LzxUvS1zGjBcNWlZplSvs4VO4MHXg2aMCuMqze-dyYfFiSxgTqZESWf5TQJot-sUIlcDykAbT8lPP8UM5O9I2_ZnwmIB90l2eShJFGt2AlgzZ6wdpOXi3F7zZwmw-qO2ZtDGfb0JgBla_8Dj8qr_o88tIb2qikz4HNoULhPX8M6e6dndwt73GEb4cV2ZvXxNEflTbJFcONnbSnAw9nYm7wW90LUn_x66a8igKsnZR7ZKLeWcReRz0s_BSb-UAWqiQ4V65KIxdobUThjJ-a6XZkkhXO_0p0w10y389TG3-rPkgDEjbvC_o5MPfOnUZ1twaVBIPXlLORJWIeB59sYR56BcVv4-bJfSTyounDmo6WNhRE8gBVblRTyghlWyk3s79GFiuWf00-To8PP7Sb0_qv7R5uDD74jezJjVzfNG32KsghTDl2beuSAz3Tt4KqQzbPjyufm5t3ExE3cgC6bk5weY6xx2I5YAM2ejj-9ocCR_PUEebhHJgJjaPGS6hnqzfG0NyPZKibECkLO8_dwnEDGNj0d95KEveQS5MQCwjFKWPUQ2itn7ax7JcalirGeZHXy25HNfZKBUxc4AyIwsiJW2t_ZM_mjDMlDrQUoytGAjWz-mwYzPOvdt6nX4Fj0LM7mkSPfZoG9hQIYEnxFAu5nSXY6YJAv3d6e6ZATdoKCODuAqmRFXMBrHV-OUk7MJHBTJanPcl7P3o90LJOQzNbxhqyaYpeBMaqPt8ai0rDkFK3c5c9tnB9N-RzI7PSy8RuU-sdyq7pdB676Unl1KTU0Aoch6sqgfCup0rhhYh8V-kG8mprnBHRvDokGoXzjTekVTlNCz7Zsa0qruyreQ5FKp7ZPnnx8ekEK6poMQoaBdTOPAMBUWz06Di7Hn-e5T0dMczeNX21vrhf54Dj7t8ny8WQHQFXcSyhV4pjv5li9U2_EBkmnYsBqU32ZlcqThZBP48rq3N3e7s7pOgboeG6DUTovvHl_BuDXu8ZH-hpDs_M1w-CoPErq9YVLC7WXUmGmvtebc3TJuh_W5hp00m7kJ7QqeprpJWsectN_WMRAn8OtfQ31MY7qcYMc9YJYtt5Ma_b7mAgd0qtpJOG7Bu9wdoBFrMijarZ5dwg3_Y-tncVmwyQMrjed6LGAbk09Wk6JKmDOoDP0AerY_HZ75KMm1PC9wxbtfUd4A_Xjnm65KbcYSM31Kln32PIV96PXbXVXwlN2A7j-fns3GSePVdMl9GahKBigJc7ncVrnkGlBDXXU2BxkDhr_wd_6ZnkLwCW7R6PQhfdLvNOarC_nPIhM3ah8SgqdGcKdm3XlUHaxvp7XM8uJ9E4YtEu1YPOvOwz6WxUjEj.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_06a44ae9182b450d016ae2858d15b087d0b7fdfd5092a93c49",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230220,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 249,
+      "prompt_tokens": 3360,
+      "total_tokens": 3609,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 44,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 3357,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0028317,
+        "upstream_inference_prompt_cost": 0.0003417,
+        "upstream_inference_completions_cost": 0.00249
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "95bc8506fac21326fa9a38d5f9dcf1fecc73b359dd56d40f4443120c2b294d40",
+  "elapsed_ms": 5007
+}

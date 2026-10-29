@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-short-0078\", \"row_sha256\": \"a64f725cb241edea24b1a63bf1c1f4c8302c759c3d65cff7dc7cff17d8045b83\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"can you look at this for the volunteer help desk and explain what it does, point out anything that seems off, and suggest a couple of tests? use only this code:\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 31:\\n        return 'priority'\\n    return 'standard'\", \"output\": \"Please explain what this code does, point out anything that seems off, and suggest a couple of tests. Use only the code below:\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 31:\\n        return 'priority'\\n    return 'standard'\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-short-0078"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "a64f725cb241edea24b1a63bf1c1f4c8302c759c3d65cff7dc7cff17d8045b83"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "4cc7bb02721f287e4c2a4f0c35e5027337e203df8cf82a8c83d1ab33eec86392",
+  "started_at": "2026-10-28T23:33:27.653106+00:00",
+  "result": {
+    "id": "gen-1793230407-GlIbSQxPt4bEPpzDRJrQ",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-short-0078\",\"row_sha256\":\"a64f725cb241edea24b1a63bf1c1f4c8302c759c3d65cff7dc7cff17d8045b83\",\"critique\":\"The input is a natural, recoverable request, and the output is clearly formatted without performing the task. However, the rewrite omits the supplied context that the code is \\\"for the volunteer help desk.\\\" This context may inform what seems off and should be preserved in /prompt mode. The code, requested explanation, concerns, tests, and code-only constraint are otherwise retained.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating context omission**\n\nI need to assess the omission of context related to the volunteer help desk. It seems that if the input doesn't include \"for volunteer help desk,\" it doesn't pass the natural assessment criteria. The context must be concrete and concise. I'm wondering if the omission could be seen as not pertinent? But still, the context about age under 31 for volunteers is relevant, so omitting that would lead to failure.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating context omission**\n\nI need to assess the omission of context related to the volunteer help desk. It seems that if the input doesn't include \"for volunteer help desk,\" it doesn't pass the natural assessment criteria. The context must be concrete and concise. I'm wondering if the omission could be seen as not pertinent? But still, the context about age under 31 for volunteers is relevant, so omitting that would lead to failure.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oZLxXaS5MI5w4qYVKOqTaXtTGgnFxkpgErEbP1PwnkoeKsBTKgBXdTWAFe1WdqACh3uYYeGlIkgLhQQD1B1jLVc-WB95-l4TWSvIub9Nzmmt404zh0WIa-gA_SywEhisQT_K7scllandnbptxRrua2cE5fuw_Xz-CaBz4ugOoiXQq3ryU-94wbCntouqpV9_9uvsf4cRZ-LW-MGJOT6DWsAw1v5q60aXOq0Wq0VfSoCMHGvy34pgmV-Jil7HmZgzwaEsAuK4CXDLDLFavpyHr0Ln6hMrlEkvPaxCrs6xjRuf3GMTCeOvQKNh10IGcESDDTrwm6CV_bym3sfLWH3gGOTZ0EdhePSBKSbk6YNRg_NGnEecprp-pijf-sGHEXq3UImaYgt5zV9DsQqDdfN0ihgXwySv5NaKMS4zpTrvCwUNFtgruShABVven8qrN6DXlXAbbApErpjsEe28a1miduTrS4qHltt0i8DIS5u3cTnD62yZolK_fwo68iJIA3vnstb0YwX_RAn1BurPNzxGAJj1mEzebFWhoXUV0YVmN_ydkYHMpiA8bcf6DMM84O3-FcS6MWx-MaPzb3Ew8Z_zB-y49ieU3Z-Kozgeoq0_nJrQ8Uddzc_MJsVd65iDV-iOQhErD9FJp0SbMO58pKPXtfxFAUAKEhp2ytD0XS07u7nJKpxjYrzRN0wgGhoit8JK8u87_7SqyCTUy4J6JZAYmGn27zCjTZ7v_6O7ez7C0KoL04RsdAvgGuv9CM9xnSk_ffTzEhID0sVWz5W-1662pdsEiDZlY1viEnTkUmhexlEgzv25NJOE-HAe7oZW1fwyxrYep-Uf2l6Bt2xC9rk05PqjTNuXapsTry2UQVaVq4sBo2TAeWex9TbQGIpWLcDTKGCqyXf0OpDisIBzs0r0tTzgN2neO-ClpRuobDbvDa11ZSOubnRrcdp-mX52z3uZ_SmYz-DqsEQQzKtjUFcVFKSMCqMlr9bRD_TisgzYktSm7EckSCA7EmrFCS24nawPCgk6NEXzEY08S6fMZJXVykMAcxGfNP0JhZO3wzQTyqYpqzEjjkuLylI0vEVmGvZ0iRqqyM-9xhq93w_kYGtqAxy4gaFWn8oHuS_GKkP5yuSGrTQSRF7BjYilPg1y9WhiRyV2hi8ZtkEiFt8evuQFrz4rsuoMxn6g3rz5LQ6-DuL-HyLNdLNZv0XyNct_BUuao21xSYrzKlUyPLg4KoL8-3mjNTEcB6S1HU5mYoQHzNmZklwJyq__CqVBFYg1m1WnWQfH6EERS6YxaIXuiSYdlOwIiAGL_PSzAH0XL-zXdFt9Q8le9jYQff58hQclUIAR7QxfSuQljNEmG765UCtGqU2k1HDQL6de5YA4ViDXGG4QL3FzYqV579R2cnvCO1CvFoE2D_WaMQAEU7qDqVY48H5FCCOggnjoUw2weqFPBwUm31aQ7ogvb0u1nOCI7YSTkmJs2de8pibpp8EXm0pIScTpsQNjP9PxOtZpLLN7U72QFbo3T7cgbic-_ecmNmsx3mNutsbdV-TMQx71U3BI65yF2UKlZFBopTWzUKI9OE2-nBAN5IgSKEOPueKYoWhavBoikIPiSFCAvJYtVHH-52QypLZSc7uJTmtlT5FkwU4OopAEnH8rpbYcyxO_l_meUzf55poNmQGQt2Mz-pBKMdaLgfEA58Fw_2IBGhvEiFuBEbN3mRtF-K-X8Wg-uxq07iHZl0fl_Xueh2-huQuuYYPrimYphS0TNSPtzk1pSIYuio6NMq5ZdJuGFwXCBaczXzPCvdw_z9Llai6l1DF5QWZ8abpyptkjwiXL07H_FzMs418HkKtOKw3CE7pGiuZPjyI0vM3ECM-wP8imZBcWN8NF71grPIUhj-YzPGU4S8oGEG32vzRY5LGF7QZOHXTB9JKlSdxyxfUCfTDaPmnPqXE_yNbPqj4OPhctDi8JwO36wMTHtVtOss1cFiLfMiIBnNsbL_1fzQs_WL2BRyO2cGqUok4QwJ5QaWvj7SrCvPoHQPpfu3eNKVQHOuuTdsGOQlUMKOvnNPNgGuk3A9rxVGbcOlKA_AyL9LkIqvoFYgWSQg-7ZXhXFIWWAWhTeMEr4xvlP6D67_LUnCcM1CagBwLlRPuL9g1oCR43NowOC6boNXRdfXo9VKQEyj6Geuzs4b0CpU83mXe-c_nToA6BbOsxyCwnW2MdS9eV_WJVdq_-hiOFuOmkHyRBuEdiEYYbRoEXo-2NfdAI2uvRgfpKUZKdZ2-6EEIcM3T1qWwMnjTocIGLoJiaLizkhENhi4VX4d9WpFUgVO1_FqjTF37Kd4Hx9-W-HBYlr6Vy7aIyoWEjjHybYnV1rYXx5UD36sfPVIKSIqs6qomGS2OWg0bJlJqvX9T_vybLMtqS_cVCOCFkkS2cqtJx0ag3twWARhJo_yr.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0c9504cbc741ba6e016ae28648950487d0a8827f63c83090a9",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230407,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 232,
+      "prompt_tokens": 749,
+      "total_tokens": 981,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 60,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003818,
+        "upstream_inference_prompt_cost": 0.001498,
+        "upstream_inference_completions_cost": 0.00232
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "164079cae0d4f51a23e69960abf7894577b93787606700dc50629a7525ac7af6",
+  "elapsed_ms": 4445
+}

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0064\", \"row_sha256\": \"38be02e5618f7fc7a63d6bc4fa5ff51351a8cabe4fc2b9a69582d4a954d7f01c\", \"mode\": \"/prompt\", \"language\": \"de\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\nbitte schau dir die gemeinsame zugangsliste fürs studio am park an und sag, wo eintragungen unklar sind oder nicht zusammenpassen, und was man daran ändern könnte. es geht nur um diese liste, nicht um die allgemeine nutzung des studios. die liste wurde am 12. mai zusammengestellt; die zeiten sind jeweils die eingetragenen zugangszeiten, keine bestätigung, dass jemand tatsächlich dort war.\\n\\nMara: Schlüsselkarte ja, Mo–Fr 08:00–18:00\\nJonas: Schlüsselkarte ja, Mo–Fr 18:00–22:00\\nLeonie: Schlüsselkarte nein, Mo–Fr 09:00–17:00\\nSamir: Schlüsselkarte ja, Sa 10:00–16:00\\nMara: Schlüsselkarte ja, Sa 10:00–14:00\\n\\nbitte nicht raten, was gemeint war, wenn die liste das nicht hergibt. mach die ausgabe als nummerierte checklist, und bei jedem punkt zuerst die stelle aus der liste nennen, auf die du dich beziehst, danach erst einen möglichen änderungsvorschlag. wenn du keinen klaren widerspruch oder unklaren eintrag findest, schreib das ebenfalls als punkt. bitte die namen und zeiten so übernehmen wie hier, nichts an der liste selbst umschreiben; ich möchte eine prüfanfrage, keine neue zugangsliste.\", \"output\": \"Bitte prüfe die gemeinsame Zugangsliste für das Studio am Park auf unklare oder widersprüchliche Einträge und nenne mögliche Änderungen. Beschränke die Prüfung auf diese Liste, nicht auf die allgemeine Nutzung des Studios.\\n\\nDie Liste wurde am 12. Mai zusammengestellt. Die Zeiten sind die eingetragenen Zugangszeiten und keine Bestätigung dafür, dass jemand tatsächlich im Studio war.\\n\\n- Mara: Schlüsselkarte ja, Mo–Fr 08:00–18:00\\n- Jonas: Schlüsselkarte ja, Mo–Fr 18:00–22:00\\n- Leonie: Schlüsselkarte nein, Mo–Fr 09:00–17:00\\n- Samir: Schlüsselkarte ja, Sa 10:00–16:00\\n- Mara: Schlüsselkarte ja, Sa 10:00–14:00\\n\\nGib deine Prüfung als nummerierte Checkliste aus. Nenne bei jedem Punkt zuerst die betreffende Stelle aus der Liste und danach einen möglichen Änderungsvorschlag. Rate nicht, was gemeint war, wenn die Liste es nicht erkennen lässt. Falls du keinen klaren Widerspruch oder unklaren Eintrag findest, nenne auch das als Punkt. Übernimm Namen und Zeiten genau wie angegeben. Schreibe die Liste nicht um; gefragt ist eine Prüfanfrage, keine neue Zugangsliste.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0064"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "38be02e5618f7fc7a63d6bc4fa5ff51351a8cabe4fc2b9a69582d4a954d7f01c"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e36316577f5dfcc9cadc8039cf70432cd0a917cc3a2d0f086322fec03ee7b9ff",
+  "started_at": "2026-10-28T23:33:21.888978+00:00",
+  "result": {
+    "id": "gen-1793230401-yZyRhk1a6rZeI8uMITZY",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0064\",\"row_sha256\":\"38be02e5618f7fc7a63d6bc4fa5ff51351a8cabe4fc2b9a69582d4a954d7f01c\",\"critique\":\"The input is a coherent, natural draft with recoverable intent and no contradictory instructions. The output appropriately organizes the request without performing the review. It preserves all five entries, including Mara’s two separate entries, the exact names and times, the compilation date, and the distinction between listed access times and confirmed attendance. It also retains the list-only scope, prohibition on guessing or rewriting the list, numbered-checklist format, reference-before-suggestion ordering, and instruction to report when no clear contradiction or unclear entry is found. No material defects identified.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oZFJqOt8rQ5WkdLzNQl8upCOOWaGMklyKH29HoPWgx949rUvIhjNNB9SqTh4E3UqWMInma9UX9b1xW8Ojz4mZYhI3by3JW1TLpX_qz8SOzRYJuWbbcBe81u7pzADUAfMvKe_a_fzcAeH1QJVQ9h5j82maG2OywJl4kHeFwFJ-dH9mQV7_tQ_6HwJHwhOog9bGdALF7-jW77UTuHeUSFSUVBi5whJ6-SC_-IAZ7hngwknOgSwAwXp-Q9SknUPgbJ5i_IhfDFjUr41Jafy4d-qr8IRIbisDpwWyshS8azTsSTjfBAnx9O0CVN6-zr2_J1-H9_gOVcYPbiKQdC-HQO961mWJjc3Qajkkp7P25LD6b2CYvWdTJytyufsK8zG5flvStRCqFr-PrxqvNpZ3Enqs9lZlH2LdJRW6ZBSIzn1YZ973nGFFRt3Xumi70oDxvd98KMpgfs8Us4lkuST2RKsbdUGIybzuRXgWOnbiFuumTkCcQYhiR83ssI6Qa4fcftYZcN5YgZJGjHSy5qipzE_-JTme___AvO0DTKxXlihu558Za_eUbErzFz7q436f9VnIGJ0f5PWrWbRMfH9rof95sjQG827HiydI1kTytRIP3rSz3w3i8Rl4pDjtSYnagZwtH7EPNd9ZC7RRypxSv3Vu5UC6afy5mH-H5TSYtK_09AWoDTvMHz_3t0-QfCzclsu0UoepXGfxvz8YLI4Opv6rj1N7bLWzQNDr5tprV1HHZsuz2Z1YTrwhUlgnOj1Vs3idz3UDETNBi5KqCW758mfuyJvRwh1uAJVuKChg1CxAVno028fqkr5kgEgVacTv69cYmTuQqhsBq9Exd1Z5etAdpoxqFrgi40GQvRX9DrPvx99S6rwCTX2ZfZvuslWUFqCTAW4zE4ThpOfKOa4Mcmm9bUgvCaUAkpg1l3fB4BllmTXuGheD_VkDG0VQcAZkAesMoIvr5Jf_tjT-qW2fEyxS3PujdVOeeXZfIQkE7p1_xifP5qXMoPijCmiggjX7OsRtmmQWB6uLAtvjddgg5w4xtf0fZC7EUI2HW_Afo22U7SqxZx3mRAmprruDWDBL9_eg-dj_OApUOWb4QgDBJW7sH1nI0xKL1jY8_OmFM-YU186DJxUG8GL1Q5ylwzgKmO0cninamqYV3R7xHB0nf5AVQ1HUtoJOJIHosw4HkfKiYmCTuowCLBY9ftzBwHyEXnYBns0H5sH5-Nmnqn9k7WSDvxDWk5a7BfC_xLNwyczeVrM6-yKGb2fQ2rdIlMXILbnDWJwUB6V-gBfu7boF6WDSuiUA8Nw5xt5yG16CZ--v9y3Eqlms9elBD_oBf2F9fNWDs14WRo1CxyhXwsHliFHwtTmY6wLoy4G7lCUBUGcRxaRNN_6Jyrk0qxAT-qgokxXQo1QEzZMO0mehriKTtIUSPXzd2j0wahpTPx4SQKcQKCHtUJQxcWfMMtxCSONj9pdTPB8HRKbUeN4syqdDQyKIXtBaOBYkWSGZy_qqUDVw0NKFE6oX8xQA51vJeNWMIZAwy02XAOqc1ce3-V9AmgwrIN__1eoXFsLVlgfiiYgd2ApguDzjjrj53pecq4PgHKCfly6eN6a050t9WmoUCwQqG5wMzXtB9l9dcpxIEATQQesz7ivpnWL9M72YeDe_Kn_mNAxjiKKLGMBrhV4zuBOhDt7SnKhWWpoBy1gkuP0XRsv4G5_o_TT3z1RkqasvJsu4Nvmd0yNXLfbLuYTm_2mnN-MVUbPkIdojn4F_DkCRWGj3Hxzw8QkZfv1EQsOrMG2LK8hwwiSAbS0Sk5UyL6a5QU8VplhCYIZ9v0mdkIY0lGufOUqQSXQVlTdfkpqBxBUGr4BewmpTWP8qMd6Xd-ffx8d2lJQ-rq9lniELpx8R-pYlL464g2U6jBClRZMpE1KXL7_eg81w0znKXz5HwOWOOKx2y2wVt_qhzYEa26OY0ZUNs9SS2lfcdbGFTm4rTLbN8KLoOQLypV6cArUOC67fy7o5L12VY5D-E8x3LVr7aHF3w5XSzUFY0ZQPSof7mv8AR4NSzYrsA0895WgqZr79R5c9NDwqqOR328NygLDwBvzDUwMhKZKbgYXrqx9vLypEd4321RK3OYih8jD7GvPqUA3WQznC1Qa5_Qv-UW75bfQEnj7-QTncbUfLXfetwbrw7S.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0dea2248e307ca85016ae28643249087d0b0a1be65f1e630df",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230401,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 251,
+      "prompt_tokens": 1195,
+      "total_tokens": 1446,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 43,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 1192,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.005496,
+        "upstream_inference_prompt_cost": 0.002986,
+        "upstream_inference_completions_cost": 0.00251
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "aec2b15ddbd24d934f57c0c0e6f09f1b314ea90fe1f3df2015060e8d02d1f36d",
+  "elapsed_ms": 5505
+}

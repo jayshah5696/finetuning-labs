@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0114\", \"row_sha256\": \"ae8a75faefe96ab8d39a937af4174ee2b94e1ac8b0c843539e47708dc42942fb\", \"mode\": \"/prompt\", \"language\": \"pt\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"\\nestou preparando um pedido para revisar uma regra pequena usada no encaminhamento de mensagens do nosso balcão voluntário de ajuda. a equipe trabalha em turnos e recebe mensagens sobre entrega de alimentos, transporte para compromissos, preenchimento de formulários e itens básicos para a casa. não quero que isso vire uma revisão de toda a operação nem que se suponha como os voluntários trabalham além do que descrevo aqui. preciso entender o trecho abaixo, olhar com cuidado para a regra de prioridade e pensar em testes que dependam somente do próprio trecho.\\n\\na mensagem chega como um objeto chamado message, e a regra olha para os campos urgent e age. na nossa conversa de equipe, alguém comentou: “é melhor saber exatamente o que essa condição faz antes de confiar nela para separar a fila”. esse é o motivo do pedido; não estou dizendo que o código esteja certo ou errado. explique o comportamento em linguagem clara, inclusive o que acontece quando a condição de prioridade não se aplica, e revise o trecho sem presumir campos, unidades ou políticas que não aparecem nele. a equipe ainda não definiu se age representa anos, dias ou outra medida, então não escolha uma interpretação. também não suponha que toda mensagem vá necessariamente ter os mesmos campos.\\n\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 42:\\n        return 'priority'\\n    return 'standard'\\n\\npara nós, é importante entender as duas partes da condição juntas, e não tratar urgent como se fosse suficiente por si só. também queremos perceber como o valor de age entra na comparação, e o que o valor padrão indicado no código pode significar quando age não está presente. se urgent estiver ausente, ou se a idade indicada não satisfizer a comparação, queremos que a explicação acompanhe exatamente o caminho que o código toma. não transforme essa descrição em regra operacional adicional para os voluntários.\\n\\npode organizar a resposta ao pedido em três partes numeradas. na primeira, explique passo a passo o que o trecho faz usando apenas os nomes e operações que aparecem nele. na segunda, faça uma revisão delimitada: indique o que pode ser entendido diretamente do código e quais pontos continuam incertos sem informação adicional. por exemplo, não sabemos a unidade de age, nem se os dados recebidos têm algum formato garantido além do que o próprio trecho sugere. não preencha essas lacunas como se fossem fatos. se houver algo que pareça depender de uma decisão da equipe, marque como pergunta em aberto, em vez de resolver por conta própria.\\n\\nna terceira parte, proponha alguns testes pequenos e legíveis, baseados somente nesse código. queremos casos que ajudem a conferir o caminho priority e o caminho standard, incluindo uma situação em que os dois elementos da condição importem. considere também o caso em que age não está no objeto, porque há um valor padrão explícito na chamada get. descreva o que cada caso verificaria sem afirmar que você executou testes, e não crie uma estrutura de dados, uma integração ou uma regra que não esteja indicada no snippet. a solicitação é para explicar, revisar e sugerir testes, não para alterar a implementação.\\n\\nhá uma condição que importa para a forma da revisão: se uma interpretação exigir saber o significado de age fora do trecho, mantenha essa incerteza visível e não use essa interpretação para concluir que a regra atende ou não atende às necessidades da equipe. do mesmo modo, se discutir o valor ausente, separe o que decorre do valor padrão escrito no código de qualquer expectativa sobre mensagens reais. um voluntário disse: “não quero que um exemplo vire uma política sem querer”, e essa cautela também vale para os casos de teste.\\n\\nmantenha a análise restrita ao snippet completo acima. não substitua o código por uma descrição, não o reescreva nem acrescente uma implementação alternativa. no fim, deixe claro, dentro da revisão, quais questões não podem ser resolvidas somente com esse material; não transforme isso numa aprovação ou numa recomendação para colocar a regra em uso. precisamos de um texto que a equipe possa usar para conversar sobre o comportamento da função, sem tratar como conhecidos os detalhes que ainda não foram fornecidos.\", \"output\": \"Organize a resposta ao pedido abaixo em três partes numeradas: explique o funcionamento do trecho, faça uma revisão limitada ao que ele permite concluir e sugira testes pequenos e legíveis. Use somente o código fornecido. Não execute os testes, não altere nem substitua a implementação e não acrescente integrações, dados ou regras operacionais. Não responda com uma aprovação ou recomendação para colocar a regra em uso.\\n\\n## Contexto\\n\\nA equipe de um balcão voluntário de ajuda trabalha em turnos e recebe mensagens sobre entrega de alimentos, transporte para compromissos, preenchimento de formulários e itens básicos para a casa. Está examinando uma regra pequena de encaminhamento, sem pedir uma revisão de toda a operação nem fornecer informações sobre como os voluntários trabalham além do que está descrito aqui. A mensagem chega como um objeto chamado `message`, e o trecho consulta os campos `urgent` e `age`.\\n\\nO motivo do pedido é a observação de uma pessoa da equipe: “é melhor saber exatamente o que essa condição faz antes de confiar nela para separar a fila”. Isso não significa que o código esteja certo ou errado. A equipe ainda não definiu se `age` representa anos, dias ou outra medida; não escolha uma interpretação. Também não suponha que todas as mensagens tenham necessariamente os mesmos campos.\\n\\n## Trecho fornecido\\n\\ndef route_message(message):\\n    if message.get('urgent') and message.get('age', 0) < 42:\\n        return 'priority'\\n    return 'standard'\\n\\n## Pedido\\n\\n1. **Explique o comportamento.** Descreva passo a passo o que o trecho faz, usando apenas os nomes e operações que aparecem nele. Explique as duas partes da condição em conjunto; não trate `urgent` como suficiente por si só. Inclua o papel de `age` na comparação, o valor padrão indicado no código quando `age` não está presente e o que acontece quando a condição de prioridade não se aplica. Se `urgent` estiver ausente ou a idade indicada não satisfizer a comparação, acompanhe o caminho que o código toma sem convertê-lo em regra operacional para os voluntários.\\n\\n2. **Faça uma revisão delimitada.** Separe o que pode ser entendido diretamente do código do que continua incerto sem informações adicionais. Não presuma unidade para `age`, formato garantido para os dados ou outras políticas. Se um ponto depender de uma decisão da equipe, apresente-o como pergunta em aberto. Se uma interpretação depender de saber o significado de `age` fora do trecho, mantenha essa incerteza visível e não a use para concluir se a regra atende às necessidades da equipe. Ao discutir `age` ausente, diferencie o que decorre do valor padrão escrito no código de qualquer expectativa sobre mensagens reais.\\n\\n3. **Sugira testes.** Apresente alguns casos pequenos e legíveis, baseados somente no código. Inclua casos que permitam conferir os caminhos `priority` e `standard`, uma situação em que os dois elementos da condição importem e um caso sem `age`, considerando o valor padrão explícito na chamada `get`. Diga o que cada caso verificaria, mas não afirme que executou os testes. Não invente estruturas de dados, integrações ou regras que o trecho não indique. Um voluntário observou: “não quero que um exemplo vire uma política sem querer”; mantenha essa cautela ao descrever os casos.\\n\\nA solicitação é para explicar, revisar e sugerir testes, não para alterar a implementação. Mantenha a análise restrita ao snippet completo acima, sem reescrevê-lo nem propor uma implementação alternativa. Ao final, identifique as questões que não podem ser resolvidas somente com esse material. Não apresente uma aprovação ou recomendação para colocar a regra em uso. O texto deve ajudar a equipe a conversar sobre o comportamento da função sem tratar como conhecidos os detalhes que ainda não foram fornecidos.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0114"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "ae8a75faefe96ab8d39a937af4174ee2b94e1ac8b0c843539e47708dc42942fb"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "928c071734c5d7924887f2ff2de3ecff114695309c1b68564cc724e92db1c597",
+  "started_at": "2026-10-29T03:19:41.053996+00:00",
+  "result": {
+    "id": "gen-1793243981-TVx4Sb943jAQ4b76d5ZV",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0114\",\"row_sha256\":\"ae8a75faefe96ab8d39a937af4174ee2b94e1ac8b0c843539e47708dc42942fb\",\"critique\":\"O input é um pedido natural, coerente e recuperável. O output está bem organizado, preserva o código e mantém quase todo o escopo e as cautelas, sem realizar a análise solicitada. Contudo, acrescenta a proibição “Não execute os testes”, enquanto o original pede apenas que se descreva o que os casos verificariam “sem afirmar que você executou testes”. Proibir a execução não equivale a proibir uma alegação de execução e introduz uma restrição não fornecida, contrariando o modo /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rtTIAE-HCAA-kt-Yn9ZoVL_ox2QV8BVv7l01RJK2r4ZwKvg06oIkTibvHnGgL12QIvn6ECBK2whWyhDGG1WRUYoVf6VLeTsSiJF064wUHLwpfdPlYFD_pffk6p4tHEzCCQA9j_tUOUSiwZX1Qf7tnUkatwpHtY8hzt3rCsRaeaBpclgWJDpdujjPRWOvDY5zoOlQoRvty14wa3DGhQpq89oB8SmBW3bWiJbKNCtrtrW_s2bkYQbL47vKPUDLj4w8fjfMC6XQJqfhSm5XhbyBe7ZTKqiW-X5zZ4jF_vdJn4Y6XkVAkel7SIUR2Kd6a_DvTiV7uES5Bl8eOJXdsVPQDBjk1suYCITbTNLKqCabkXAQL18QSmyt8pIg8xXU5fKBI1yu7U5OXdfEgFusEOeETuGtCwwtLgM4Ktng6NbafIkOgWLoInyeZviwJweaqWCuGwq5pKsisZtZxV_ak6fw-FPUxuh024W686OnEI0j5XrmJThX0Url501uJ9V9hZKF9V7_7huVIXeVDvN30JEoOybeDkfHgV54IHjGVHN0as7ImQ-Hh89ZvlqAP3qewK0a6RrczMQwtvDlqjC8VLHcADy7DuRpoRU7WW5rY5tFhn8oNRQXUsCftB2Yo2gesxJnjQJ_5PMLkQyUpk8mb_I6fIWOO2lPmSS4pZdfOeZN5jLDa4-t3a_zHxoK_YPlkkAVx3UgAaAZKkXlJyYrJTPOZyeXO-iRF_MzUC3ubk8ReoIx_GmOhz_3URjldlY9V4ZFAw5i_xl3mprA7e2UfNxVFnT3gimiGDov6EdgwE5m4Pwjko7B2hgIydOIerRv1jWh_3KvdqBaBTLYb5TmKczGKcXtCrjjxDcsRrwNyHA4-QXCh68E6XLMbH7U7QWYzdxvBT3TrI6YwJBL3bXrL0TQ6rmPmhQr_4WRbUDAEPvIhsRJ78ncHL3rTAHzz386c46pld23hgj1E2bue_TFK-AEk_2G068KuocabTHlvFTdfvnYnmHUfuBOpEKAG3ph2nm6E3jtDKGL6uPbH7z0nnDay2H9vU4idci6mlXVwQ9xAzqqvSVWCEQM-0oM4xcPWGez-QB_IoaDwGCcFIBijSfHpjti_Svbm2tfJJeG_a2l6lxxpCM7eB_HrIP3QFTesuSnA_rZ8hirRGoRoBJkxqQVPUdmXOxbCfMJJZA6iCpUq-1IFpKaZebPvbYp6EFGCDHuNEmul3ii0ZzmFRxQqutyVgJ0yL8El-Q6YgfpY6hlcmZQba2yp8axDgo6OGUq4iLOxLoUE3_0ZugK_rw2AO7Xwpv5wRQa5Ez9zdP8S0bZ2Ajp2UX6m1aEwfu5o3gJDYIgheQ1nlqPJd9TzyrhOG4Y7NhqFKU-2_GIaTOt-m1fSX9-XmJh8v7EDcqIvCTtugxH4xuSAoHfoq1NX4Rmj4R1URw4j-dOwzb3ja3umLk92P2uXMhrcDA633o1BxMXoBT_vEPnc6kYCjxhNoc01AT441M0sU2z0CvtdW7Whc7NijqdIjEfWH3i5-b5BoGZhgsnoe-4CmjzUK5EfuPKulguydBJalHlQ2UVNFIlZ1PwM4VKGWTEtpsgycc12oePZPlprAAZPrt9u3KJWmxVnNnykR76xmnxDbphRREJNHvbhJTISvifAtJ23qV-YhBrPqeldg0xN-RL92iEbaiN-12NblUt46gKFMynZaMRqNMdKYpqMOGT_xIFfcYk8xoC0oE4TryRwBoMQI6vqTjIICZl7VSe2VreosVR3ZFZwhiKPDvenZ8PV19Pf8s3gy5MW8ZqWZuhwFMznQboVVW6odog-ZAP-XEl8mGaXp38ZNAqaoo_ddNF-Iiy83D_awX71regWpwIkxjxsd6Xy_e6ZSY3nLnKBGBivLujRfCboIQH3QvDGKpYDCuvml_utPe_HoDm6BlfiY7VD4czBqLe-t29vqksO8eSNMs8SyJO_TRmGHvPi6qz-sGy6mm2WMMLOeNWWEjdqAb-6uzJZPnwy-2POBCxZxNi1w24xdSDYso8htmGLJZUQOFJddFfRfihYaGmh2EvFqIkJkxeSjdnogLGa1kWxVuid7E1q5amWY4hj9euzP4Xqzl5ww1HZalQgnAb73MkmPBqn-Sz1zyn_ZpI6HQSyrykbr4hKNaNEab7qHbNMLLSWjCWgj05VUz4J-b0jax9LjoL1FbJjvVlchn_upIuD-bnRUgoRRwFbpBnM1C5zqELA3TO3thNxTQzQW08OJscOspiyZljAfNzdv-oioreUCDM3UW0qcQEZg-7_dEfzD_BiGlc3sVSqSqJJIx-_XMWCaXJ3h_9bwwmg_1ervtyA4oBUqAwI5g5zN_5NUOltDN8FQ9LQFDTDrz98WJNdoehKYL0qf1m0ipXU9MK0VP0BnR64IXAqSi51Zd7jDi5uaa1ScDetL4fyJckHPtcmxG-8LQYU_wy_kr9q5iqzWNJfIY4ndxE5LAzpqTCRvdUv4Q-jm_wjcPbSNttqan-RxEXoqIpJlDKUEjgt9WhleRjPEcRAOXDwIpk8d-NNugRDIXw34QGANctQf3dlrURum4uJjCNcMI5E58CRQB9XpDH4xiQ0a0fmKJvZBl4bK5u2QW1WnoMTroYCgsguzVC_NY44aPgp4RvTzdRk5c53efjYkUlxCivTad3IstnZp_FrSfZv4Q4i4aZKpmGlcOmYqTFxNnvO8cbZqSosPylczEcfCxunCJeNKkRapZwYeIP_EwLy5YH0tb3jCnPqYZl8lu_hB6tCTiBFKESBHSmh6vAZWciGs4fgu26L-BaFYYFjGo94PdxFX94B3FSbYODygabXzsoL8dCabmo80bwllMeb0WCWa2qt5RsRtWCOww-mAtXJl8mnX6HV0dLB35fkRWhwunHiMDd6DGT6_fNtHVo_48u-9n7KCFBYPkNk5py7_VKomfFejBLA80KWFV-dYWzpmmw0RBgUz7_Hpehdkmj9JWmDGMEP30jj-hsZLvEGz88qgzpA263EgZFBW-V2B8goyOueaLgvHvtBUe1DurEhPGviHx2CsWQuF26Y9kYxGSohudUL-CThh16ceubH6g9-utyH8kiE2eEvosRj6zb-L3Lu7ohHZ2R_nfnNlNrB_itjMnAX--TRdmTRTzrQ-L8Bi77rk7lx8j0ykMUdgV9Cmn4kBUwJz-pDvhcqiOaG9jtRXaF1K29aPAg1X-WpVGzFUZ1hmK-_0NbgUH8lZnWN3CtUYRP5UW948jn2O5Fs-N3X_1IrYBuGDJpjMl87hbLGGKhUoRxqNTPA-vpAWoGaScakP9b3TGpiy-W81LVeOb1efl9m-0nRbeVO2IlFnNkIRyHAnfkIwaqkgyO_939yemcip5deZI0NAYaRS5MwMhyt9DzLbDkdh8TFVHXWlWYjVVWfB04sSRnzaagvnbaCHwbWG4q4J8ycdH3lRBWzcbZDGZBGVEBzVDoFCcrnkrZTE9o_3r1zrisjDhfbkpmdymJIrBQeJ0covrd1ETCiBAeX9qxQ7p-Z2_yfaWNeALSJSJJtXLVRiUsHy2WqS_WQN8jp3ecS4zY26jqRVlLvjK1wQmTuC4EuItEmSsFxpcqFL8QfIsfP28EtcbZbDqNX4oPw3YgB8vk6x1daCTjGbfm7fWpHcsMGIO-4O-e5AJy2U3DuNoJwQpvRALebXucy-T00QNrPTf5aFdc9QVW-5K_sce8htGSLG45Z4el_JquiY0UkcR-PitMQHpLVc50LfeFRR2WBan-C7_KSly-2J7TcLFhY0nohZLLPRZkUmMTxQoYwIFM3Lr2jzq2_Ks7g==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_065663661751bc33016ae2bb4e1b7887d0a6994670af46f8a5",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793243981,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 361,
+      "prompt_tokens": 2302,
+      "total_tokens": 2663,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 156,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2299,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0093635,
+        "upstream_inference_prompt_cost": 0.0057535,
+        "upstream_inference_completions_cost": 0.00361
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "d66d6f7cca3b6965fcf03e7deadca767595ac640e57d7067c8914b32e9de7103",
+  "elapsed_ms": 9081
+}

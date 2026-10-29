@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-extra2-prompt-long-0114\", \"row_sha256\": \"12eed63777254b11417b792f2c14392fe02549afc70c00dcbff36cdce07afaa3\", \"mode\": \"/prompt\", \"language\": \"pt\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"pode explicar e revisar esse sql e sugerir testes usando só o trecho? não roda nada. deixei as notas completas embaixo pra situar a solicitação.\\n\\n--- início das notas de referência ---\\n\\nO episódio é sobre a consolidação de entregas recebidas no Depósito do Vale Norte, um centro regional fictício que abastece lojas e oficinas em três municípios. A equipe de recebimento registra cada remessa no sistema quando os volumes passam pela doca; a equipe de planejamento consulta resumos por depósito no começo do turno. Nesta semana, a coordenadora Inês Valadares pediu uma leitura cuidadosa de uma consulta que um colega deixou num rascunho para uma reunião de rotina. Ela não informou que a consulta já tivesse sido executada nem que algum número estivesse confirmado.\\n\\nO pedido surgiu depois de uma conversa entre planejamento e recebimento, não por causa de uma auditoria formal. Na reunião de terça, Caio, responsável pelo quadro de chegadas, disse: “preciso entender o que esta seleção conta antes de mostrar o nome do depósito no painel”. Inês respondeu que a equipe deveria separar o significado aparente do SQL de qualquer afirmação sobre os dados armazenados. O grupo quer uma explicação clara do agrupamento e dos filtros, além de uma revisão limitada ao próprio trecho. Não foi fornecida uma definição institucional completa de “entrega”, e as notas não estabelecem se unidades significam caixas, peças ou outra medida.\\n\\nO código chegou num comentário interno enviado por Raul, que estava organizando material para a conversa de sexta-feira. Ele colou somente este fragmento e pediu que ninguém completasse a consulta com outras tabelas ou regras imaginadas. O trecho inteiro fornecido é:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\\n\\nA equipe usa “Vale Norte” como nome informal do local, mas o identificador que aparece nos registros é depot_id. As notas não incluem uma lista de identificadores, nomes de depósitos, horários de corte ou exemplos de linhas. A tabela deliveries também não veio acompanhada de esquema, tipos de coluna, restrições de integridade ou documentação sobre valores aceitos em status. Assim, uma revisão não deve afirmar se os campos existem de fato, se units pode ser nulo, se há duplicatas, nem se a soma corresponde a uma métrica oficial. Esses pontos podem ser apresentados como perguntas a verificar, sem responder por suposição.\\n\\nNa operação, os registros podem ser inseridos por pessoas diferentes ao longo do dia. A encarregada da doca, Joana Reis, contou: “às vezes a etiqueta chega antes do lançamento, mas eu não sei como isso aparece nesta tabela”. Esse relato explica por que o grupo quer entender o limite do que a consulta mostra; não demonstra que haja linhas atrasadas, incompletas ou incorretas. Outro colega, Mauro, observou que a palavra received também aparece em uma planilha manual, mas ninguém anexou a planilha nem explicou se as duas fontes usam a mesma regra. Não há autorização para tratar esse comentário como definição do campo status.\\n\\nA pergunta da reunião é prática: se alguém usar este fragmento como base para um resumo por depósito, que comportamento do SQL pode ser explicado apenas lendo o texto, e que aspectos ainda precisam de validação? A resposta solicitada deve distinguir a seleção de colunas, a tabela consultada, a condição WHERE, a função de agregação e o agrupamento. Deve também observar com cuidado o filtro numérico units > 13 sem presumir se o limite se aplica a cada linha ou ao total exibido; a revisão deve deixar explícito o que a posição desse filtro permite dizer. A equipe quer evitar que uma descrição informal seja repetida como se fosse uma confirmação de contagens reais.\\n\\n1. Contexto da conversa e limites de revisão\\n\\nA conversa ocorrerá na sala de expedição, junto ao quadro semanal, mas a pessoa que redigir a explicação não precisa criar um cenário de execução, uma amostra de saída ou um resultado. Inês pediu que qualquer proposta de teste seja escrita como ideia de verificação, sem rodar o SQL e sem inventar valores de retorno. A revisão deve permanecer no fragmento fornecido, embora possa dizer que uma validação dependeria do esquema ou de dados de exemplo que não foram incluídos. A equipe precisa saber quais perguntas levar ao responsável pelo sistema, não receber respostas fabricadas para essas perguntas.\\n\\nEntre os pontos que podem ser levantados estão o significado de status, a unidade representada por units, o tratamento de valores nulos e a existência de mais de uma linha para a mesma entrega. São possibilidades de validação, não fatos conhecidos sobre deliveries. Também não se sabe se o depósito é identificado por um código único, se os registros cobrem todos os períodos ou se o resumo será usado para comparação entre turnos. Uma explicação não deve declarar que a consulta inclui todas as entregas recebidas, pois o filtro adicional e a ausência de documentação podem limitar essa leitura.\\n\\nO gerente de turno, Davi, resumiu a preocupação em uma frase: “um total com nome claro ainda pode depender de uma regra que ninguém confirmou”. A frase foi registrada como orientação para a conversa, não como acusação de erro no código. Raul pediu que a análise preserve essa diferença: descrever o que o SQL expressa, apontar dúvidas verificáveis e não concluir que o resultado está certo, errado ou aprovado. O comentário de Davi tampouco determina como o apelido received_units deve ser interpretado fora desta consulta.\\n\\nSe, antes da reunião, a equipe fornecer o esquema da tabela ou uma regra formal para a contagem, esses materiais poderão ser avaliados em outra etapa; neste pedido, porém, a explicação e as sugestões de teste devem usar somente o trecho SQL transcrito acima. Caso uma afirmação não possa ser sustentada apenas por esse trecho, ela deve ser apresentada como algo desconhecido ou como uma pergunta de validação, não como conclusão. A condição é importante porque alguém mencionou que talvez envie documentação mais tarde, mas ela ainda não acompanha este pedido.\\n\\n--- fim das notas de referência ---\", \"output\": \"Organize a resposta como uma explicação e uma revisão do trecho SQL abaixo, seguidas de sugestões de verificações que poderiam ser feitas. Use somente o código fornecido: não execute a consulta, não invente resultados ou dados de exemplo e não complete o SQL com tabelas ou regras externas. Separe o comportamento que é possível descrever pela leitura do trecho das dúvidas que dependeriam de validação. Se uma afirmação não puder ser sustentada apenas pelo SQL, indique-a como desconhecida ou como pergunta de validação, não como conclusão. Considere que documentação adicional poderá ser enviada depois, mas ela não faz parte deste pedido.\\n\\n--- início das notas de referência ---\\n\\nO episódio é sobre a consolidação de entregas recebidas no Depósito do Vale Norte, um centro regional fictício que abastece lojas e oficinas em três municípios. A equipe de recebimento registra cada remessa no sistema quando os volumes passam pela doca; a equipe de planejamento consulta resumos por depósito no começo do turno. Nesta semana, a coordenadora Inês Valadares pediu uma leitura cuidadosa de uma consulta que um colega deixou num rascunho para uma reunião de rotina. Ela não informou que a consulta já tivesse sido executada nem que algum número estivesse confirmado.\\n\\nO pedido surgiu depois de uma conversa entre planejamento e recebimento, não por causa de uma auditoria formal. Na reunião de terça, Caio, responsável pelo quadro de chegadas, disse: “preciso entender o que esta seleção conta antes de mostrar o nome do depósito no painel”. Inês respondeu que a equipe deveria separar o significado aparente do SQL de qualquer afirmação sobre os dados armazenados. O grupo quer uma explicação clara do agrupamento e dos filtros, além de uma revisão limitada ao próprio trecho. Não foi fornecida uma definição institucional completa de “entrega”, e as notas não estabelecem se unidades significam caixas, peças ou outra medida.\\n\\nO código chegou num comentário interno enviado por Raul, que estava organizando material para a conversa de sexta-feira. Ele colou somente este fragmento e pediu que ninguém completasse a consulta com outras tabelas ou regras imaginadas. O trecho inteiro fornecido é:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\\n\\nA equipe usa “Vale Norte” como nome informal do local, mas o identificador que aparece nos registros é depot_id. As notas não incluem uma lista de identificadores, nomes de depósitos, horários de corte ou exemplos de linhas. A tabela deliveries também não veio acompanhada de esquema, tipos de coluna, restrições de integridade ou documentação sobre valores aceitos em status. Assim, uma revisão não deve afirmar se os campos existem de fato, se units pode ser nulo, se há duplicatas, nem se a soma corresponde a uma métrica oficial. Esses pontos podem ser apresentados como perguntas a verificar, sem responder por suposição.\\n\\nNa operação, os registros podem ser inseridos por pessoas diferentes ao longo do dia. A encarregada da doca, Joana Reis, contou: “às vezes a etiqueta chega antes do lançamento, mas eu não sei como isso aparece nesta tabela”. Esse relato explica por que o grupo quer entender o limite do que a consulta mostra; não demonstra que haja linhas atrasadas, incompletas ou incorretas. Outro colega, Mauro, observou que a palavra received também aparece em uma planilha manual, mas ninguém anexou a planilha nem explicou se as duas fontes usam a mesma regra. Não há autorização para tratar esse comentário como definição do campo status.\\n\\nA pergunta da reunião é prática: se alguém usar este fragmento como base para um resumo por depósito, que comportamento do SQL pode ser explicado apenas lendo o texto, e que aspectos ainda precisam de validação? A resposta solicitada deve distinguir a seleção de colunas, a tabela consultada, a condição WHERE, a função de agregação e o agrupamento. Deve também observar com cuidado o filtro numérico units > 13 sem presumir se o limite se aplica a cada linha ou ao total exibido; a revisão deve deixar explícito o que a posição desse filtro permite dizer. A equipe quer evitar que uma descrição informal seja repetida como se fosse uma confirmação de contagens reais.\\n\\n1. Contexto da conversa e limites de revisão\\n\\nA conversa ocorrerá na sala de expedição, junto ao quadro semanal, mas a pessoa que redigir a explicação não precisa criar um cenário de execução, uma amostra de saída ou um resultado. Inês pediu que qualquer proposta de teste seja escrita como ideia de verificação, sem rodar o SQL e sem inventar valores de retorno. A revisão deve permanecer no fragmento fornecido, embora possa dizer que uma validação dependeria do esquema ou de dados de exemplo que não foram incluídos. A equipe precisa saber quais perguntas levar ao responsável pelo sistema, não receber respostas fabricadas para essas perguntas.\\n\\nEntre os pontos que podem ser levantados estão o significado de status, a unidade representada por units, o tratamento de valores nulos e a existência de mais de uma linha para a mesma entrega. São possibilidades de validação, não fatos conhecidos sobre deliveries. Também não se sabe se o depósito é identificado por um código único, se os registros cobrem todos os períodos ou se o resumo será usado para comparação entre turnos. Uma explicação não deve declarar que a consulta inclui todas as entregas recebidas, pois o filtro adicional e a ausência de documentação podem limitar essa leitura.\\n\\nO gerente de turno, Davi, resumiu a preocupação em uma frase: “um total com nome claro ainda pode depender de uma regra que ninguém confirmou”. A frase foi registrada como orientação para a conversa, não como acusação de erro no código. Raul pediu que a análise preserve essa diferença: descrever o que o SQL expressa, apontar dúvidas verificáveis e não concluir que o resultado está certo, errado ou aprovado. O comentário de Davi tampouco determina como o apelido received_units deve ser interpretado fora desta consulta.\\n\\nSe, antes da reunião, a equipe fornecer o esquema da tabela ou uma regra formal para a contagem, esses materiais poderão ser avaliados em outra etapa; neste pedido, porém, a explicação e as sugestões de teste devem usar somente o trecho SQL transcrito acima. Caso uma afirmação não possa ser sustentada apenas por esse trecho, ela deve ser apresentada como algo desconhecido ou como uma pergunta de validação, não como conclusão. A condição é importante porque alguém mencionou que talvez envie documentação mais tarde, mas ela ainda não acompanha este pedido.\\n\\n--- fim das notas de referência ---\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-extra2-prompt-long-0114"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "12eed63777254b11417b792f2c14392fe02549afc70c00dcbff36cdce07afaa3"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "73823cb7297ebc87f2b68f1aba579ae463788548da8969379a37b877597e1944",
+  "started_at": "2026-10-29T03:28:14.059159+00:00",
+  "result": {
+    "id": "gen-1793244494-eujVtvSOh9tLBLN2E4qS",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-extra2-prompt-long-0114\",\"row_sha256\":\"12eed63777254b11417b792f2c14392fe02549afc70c00dcbff36cdce07afaa3\",\"critique\":\"O input apresenta um pedido recuperável e notas de referência coerentes, sem contradições materiais ou instruções de autoria vazadas. O output transforma a abertura em um prompt claro e mantém integralmente as notas, incluindo o SQL, os nomes, as citações e as incertezas. Preserva o limite de analisar somente o trecho, a proibição de executar a consulta ou fabricar resultados e a distinção entre comportamento dedutível e questões de validação. A linguagem é natural e a resposta apenas organiza a solicitação, sem realizar a análise SQL.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r1TTHJw_UliofQ69_DO-fyXAGkDVzUGzaOObMQvO3EBpPwKw8qkwTazm4nXQoJ3L2E3iELyyl3Y-8-XPHpxg1uxmRKQd_1Sd1JTY7QMxHistd2sbGgdte2wMDLeDi9_O2I2VHJDG73bs7blrFmjHcbuxbdEKvDQZAyLGpkxMPcP5K-sotql_sInF9Nqwd3afIG0le1-MKfgnaZ1ym3AXIi0RoainFKoOBsdbP5gAj2-X4VUSDxvldnaj2ArqAtRWzdkQeJiGqzT1QSSLu7lEJD3154DIPweFWUwOFqc_0usTiP3NI0gAj1BerOOR22xbTMasy-_mILddtpK7Vioc1g5ZOShpcBtIruwRdCWA30_kdCJLS0FVO4gjJij33-yQ8qZVBi__IkMqoaIOdquodgSmtJIbmOjeFTp6T-s5DykgcylUT_eb4XUMkihLv_H1OHWoVL76d2xhIlcOB5A6RQrzjNmHXVV_1PEbXrEvcWvEgTxbUqOm1W0Y-qTIEcL735pLUlJ7vrnzFitRo_eGiEfiU7jVBBM_qkuT_h1TPme_GUZJdZN2IQIv4dANLYyc7Ool2c7fSY7ISxCw6PPMss5in3IBEK_HJgPnnF3xSHUpiAA9NLKWNQiJEds784s-haSuBOXarZpUqwIo-tMpjuJuM5S3nk7TU-JdF_G7zYEy1sbU2VG_tO4ZHu120XV_PBzeD7fl_gnane50p-Mcxl3ZT8LnhGEtPL7QMTRUBI_AUMIwk76OCyW6IzGDwtSvWVryF7_JGG-aMn106AwPeCiOUfhXg21lJVSNsxEc9BkB07j_BvGNNyv415veYl8OIi6fm4cmCtuhmTtKrUnFLb0Uvz2hTHHTMHi6kvVkDjDh2574vM29QoQOstnx6GMKgkvlj6naypDfoqZGTKHPg91Bp5LMmA-AfWtifubFGwy_Kuslyv7iOI02adcLvloRsMxOx3ZRK7HTxpy1DcXjm1PhmG8iGjA119DeGY2HebL26Xgx2Fe5wXva3tAht2kRa94TkJ9K4OdCPngs3EBWfetmOa-_GetpqQt-AHBvKMc3OCT7Svt0opDnRoKyqDe4IZXUAskkFqVnN3cB33C1g1qhR4VTsGM6G7xS9foZqO5gkeUrCtW35EFTdNDSQykzDnUJ0GhRMO4-TRSyQWEimLYobF3P0sJAlYrcgPhvTD2RDwO5-AzmlIP5Rfoo2k_Hj8uzvXQkmJEeYi6sHvAc95MHHqGeMV9ZtTElDlW8s-hK2F4Sl5D0Ggp9n99gZ_upXWFRf3-jy0c1megUKpWEI7CIPCwlSwBk5gRT50acB82ZcJCyA9RxQKrm84hLp4DTSWqCArf-jkaDg13qQ5b0AmUyHCEMQvxgVyQ6vcZDzS7nrHkMn9zSY2nOnoKX05zhO498RbwhiKowD0MV9qhZ7u4UJPwc2Qro87X4jt2KfIBm8ULLl6X1F-XAS_S8N5FOeJCCxsjAoJ-khHHH5uWp4aqJUAzipOMWAgIbRL_THfY4p_1Fneuv2rgfNF6JImjPEJ6coMQPEvkTrozoGlivM1Xx5qoPmExgU0Z9idUBRPXAz8Xz4MrEmvsvZKO5Q6NB4w1ZHqHD_kOKI86JbrK97aINmPYhTg-RvMHDiIDq6uYuRKhDdJN_6viQLjiBEC39qNMhy6IEcKjzmVe9p4xRNbBYjq5GW1_WIRfaccEdcYc7_G063xVgpCjBYmqgrSlc9sJHK_vF09-E5IwgmzWMpwX3ywj5kjYztPgw-3wW1qoYsTi2WGpPBJoSoBxVWmZZmjavrgSWH0D5bvWkrf47Ee8WuBGYEc0IYoYStKqyL9Fsx10nhJKlLj32cGWgtNILsEysv8rm9gWCqqJ3tuYZheOCys0c5MCKwuRFuDtcw8AKv41OoWQanQZ0rKuQ6-hHnWnO7FGYyaHeQiCNc0oJ1yzKqVarN8UJa-HPYZGy_cYwkX9TSHni3kqF7dDKOo3039xZvgxOzvXr8dBfN45N_DBqvWwH9Zj8zlTjN_j9qiS_7wTsL1v8rV9wQYyXJVWPVZ61pwMFKhigDtX63jUBatXO5vY8p7tw2Z9XdqL11cNI47ShJFHHCf9uDk_txJ-vmgOOaJa28U7u8ekmbGY4uNRfLk_eSadZDYeKs7xH-1qGxxHcaW4zeEtzrdJFXA0eDpOY0pks64ukfnQqgqhPga1I1XcjM1XpqUT8PxUP0IdDLY8pU8UY4FXfprMX_tjhQDhJ9Vb8MpZnLWRFxfw9T_Db-YYUQ3RFHk28Lko7teoXt5NIlvm0C0aqBC3nFlwQ4urxxaSGfLbzs0lrlgaPfzr2yxNt62pjnoGCycjVsKuSTOxOz8G7r-2hZep2a3fPt0lP7TGou-ZXfwOa9Bb-G1R3sI4pzH0-k1EfuP2XnDOogsNC_cUh5nUbo7OJ_x3aDhQjfKsGZY8FEeH-9n_J6NigX-hnQmH7rstrcYr_QggpdxY_O0ECw0H-EbHbPaX5xwXpXUZvcLAeIZiIIsR6NILjnLHTR0kIJLCQD7X3GwEsvHex3B6_9I10K8T9FxFfrhEKrswxxCdgrjuz6CZURdYm5BlRn0GziIova2EkVSdYBWN-sHn948u0uDkxrDG0KcAkH0EwXyAvAhfbfZgrekACx3UxxVZMVidxyMU-jV_Li-Z6m08sc1B2nstqnEk_bTpHYLmrhQo-JWYKP4u6JSsdU1PfWNj9j38Ffx_wTOCcz6c0oFeOo14U2zkSMH3NyD7CWi_3P-mEXATqS68cQWSdE6xsTVZm6evpO6tiEMOhDRG-xxsWJ0f0ltrwi-kQoNYU-cL0A_26R6c87-YN-TP08oBwDD0AyogJOl1aiTXQsNIk-odgl9PJNU4A_S0UbyaqCg6mJq-w4_meMAD1SATuVt5jW1efaje7I4Ytr_v4i4mWoNZNP24HSCSA8vN7vNxjKPRPCydGoFvXg-ff82N0-rfOrwsQ2yHv8OycntCU1TRMTruwxvTc7nR7RtKulgijEcAUh-jZRbS7qo1TVgKkaauNm23iHVUfHSg_lKSzsInGjBivJHg2GksHYxjfbgi1RirbOXpX_qMaLPnZWR5L_nfbhCklhz2Wyhl_4v7_8U0uH9G6IKNtgGcyCNE6XTOoQVG3s4CVttMSKyjtHq2xvjAJzgD3BDHnPWq67OAbI25WfaAm6LTtxPKq-wAb3BPZsMHWSbQhKWzX7lwZ_CxFfsPBTeFgTa31mDkb-EXw7P2OWZXdTvtLQi18g94VdyUfD1g7-byf9TVnquW151IYiz2FU3Hu6rk-my8WzNEurpQNgPX8kayfPcBfwZq39HNi-EWbrxuKVVM3EQkiHpJLwxvDG41kgRpLyFGPzXv8M5bvmbYuXWQGT4wR9z04EGrJAooLmlmY82IJJ9-zyGEX-d0WzGuraj5Ml6DX23o8Z8Ks6SJuZtjpIaY55lQntwjPeYAh3zXeJDUYMnV1jAzJrbEL7CiYmLbdbkUKy8dPADhygssLd3nl_kQcsj9PPYkQY61g4PHm10vAIKxrw_Q-RiVwg3PDjW2mNO4p5wCW-q1AM2ctHr5off8PFmBWRdgLgTHaOYlHlFOAs7me0wGXR-c-ezVej5h84ZQoIndLHP_JjNB2rdUOF9rkJbzt7mK.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0c214ce872ec99f1016ae2bd4f62c487d0896bd2c151e1d3b4",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244494,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 347,
+      "prompt_tokens": 3277,
+      "total_tokens": 3624,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 141,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 3274,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0038034,
+        "upstream_inference_prompt_cost": 0.0003334,
+        "upstream_inference_completions_cost": 0.00347
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "7462d18114746d9ea4f9b308b6b960eb51ecd2825cd2650240f2c7ee94a56b72",
+  "elapsed_ms": 8236
+}

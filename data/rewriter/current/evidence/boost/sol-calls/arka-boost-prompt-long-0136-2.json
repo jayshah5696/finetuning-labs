@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0136\", \"row_sha256\": \"a56cbc2f57091e616d04864e3c80fcfc20c720c4832e6b625f721a086ef8c42c\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"need a prompt for a clear, useful summary of the june 2025 delivery picture for the Northgate and Canal depots. this is for the regional receiving leads before they plan the July dock rota, not a sales update. Use the monthly delivery export when it is supplied, and the operating notes below for context. Please keep the two depots separate where the source allows it. There are no final totals in these notes, so don't make up figures or imply that anyone has already run the query. Northgate is NG-04 and Canal is CN-02; those are the site IDs used on the rota. Northgate has dock 3 and receives weekdays from 06:00 to 14:00. Canal shares its receiving dock with returns and its usual receiving hours are 07:00 to 15:00, Monday through Friday. Don't assume a shared dock means a delivery should be counted twice.\\n\\nThe export is expected to have one row for each delivery line, rather than one row for each whole truck. The receiving team uses `units` for pieces recorded on that line. A single truck can therefore contribute several lines, and a depot total of units should not be described as a count of trucks or appointments. The `status` field reflects the scan status in the export; it is not a separate confirmation that an invoice was paid or that every item passed inspection. The export owner said the June file is normally refreshed on the second working day of July. The copy discussed in the handoff was a preview dated July 1, so label it as a preview if that is the copy used. Do not quietly treat its date as the final refresh date.\\n\\nFor a simple grouped comparison, the receiving analyst supplied this query and asked that it be reproduced exactly in any prompt or technical appendix where it is included:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 31\\nGROUP BY depot_id;\\n\\nThat filter deliberately leaves out lines with exactly 31 units, as well as rows with another status. The team is interested in that filtered view, but it may not represent every piece received in June. The SQL shown has no date condition. If a June-bounded export or separate date filter is actually available, explain the date basis used for the monthly summary; if it is not available, say that the query is unbounded by date and do not call its result a June total. The notes mention an export date, but that alone does not add a date filter to the query. Keep those two points distinct.\\n\\nFor context, Northgate logged a scanner power interruption on June 18 from 13:10 to 14:05. Staff used paper tallies for four pallets while the scanner was unavailable. The handoff says the scan backlog was entered the next morning, but does not give row IDs or confirm that the paper tally can be matched line by line to the export. Do not say that four pallets equal four delivery lines or claim there is a verified missing amount. The operations note says, “we got the paper count in, but the line match still needs checking.” Include the interruption as a reconciliation caveat if relevant, without changing it into a claim that the deliveries were lost.\\n\\nCanal had a carrier appointment moved on June 12 from the morning window to 14:30, according to the appointment log. The log does not say whether the truck arrived then, whether it was received, or how many units it carried. A dispatcher wrote, “the slot moved, the receipt time is not in this note.” Keep an appointment change separate from a confirmed delivery or a receipt time. Do not estimate the effect on Canal’s units from the appointment entry. Another note says Canal’s shared dock had a returns queue after 11:00 on June 24; it records a queue, not a closure or a canceled delivery.\\n\\nThe rota planner has asked for a short operational readout, not a ranking of staff or carriers. A useful summary could distinguish what the export counts from what the handoff notes merely report, and identify uncertainties that affect interpretation. The planner especially wants to know whether a filtered comparison can support a June rota discussion, while understanding that the supplied query includes only received-status lines above 31 units. Do not infer that a depot with a larger filtered total had better performance, more trucks, or fewer delays. The notes do not provide a service target, complete appointment list, inspection results, or an agreed definition of late delivery. Say when those matters are not established rather than filling them in.\\n\\nPlease organize the requested report as a numbered checklist, and make that numbered checklist apply to the report itself, not to the source notes. Use this sequence: 1) scope and date basis, including whether figures are preview or final; 2) the filtered measure and what it excludes; 3) a separate evidence-led note for Northgate and Canal; 4) caveats or unresolved items that could change interpretation; and 5) a brief statement of what the available material cannot establish. Put evidence before any cautious operational consideration. If you offer a consideration for July planning, label it as a consideration, not a recommendation or an approved rota change. Keep direct quotes exactly as supplied if you use them, and do not invent a quote or attribute a statement to a named person.\\n\\nOne condition matters for the final wording: if the scan reconciliation is still open when the report is drafted, identify the Northgate paper-tally comparison as provisional; if it has been closed, state only the closure status that is actually documented and retain the absence of line-level matching evidence unless that evidence is supplied. If its status is unknown, say so. Apply the same care to the Canal appointment: unless a receipt record is supplied, leave arrival and received units unconfirmed. End the report with the remaining data checks, not a conclusion that the depots are ready, behind, or performing well. Include the full numbered checklist and its final item even if the available information leaves some items unresolved.\", \"output\": \"Create a short operational summary of the June 2025 delivery picture for the regional receiving leads as they plan the July dock rota. Use the monthly delivery export when supplied and the operating notes below for context. Keep Northgate and Canal separate wherever the source allows. The notes contain no final totals: do not invent figures or imply the query has already been run. Do not rank staff or carriers, infer performance, or present an unapproved rota change as decided.\\n\\n### Site and data context\\n\\nNorthgate is NG-04, uses dock 3, and receives weekdays from 06:00 to 14:00. Canal is CN-02, shares its receiving dock with returns, and usually receives Monday through Friday from 07:00 to 15:00. Do not assume that using a shared dock means a delivery is counted twice.\\n\\nThe export is expected to contain one row per delivery line, not one row per truck. `units` means pieces recorded on that line; a truck can contribute several lines. Describe a units total as units, not as a count of trucks or appointments. The `status` field reflects scan status in the export. It does not independently confirm invoice payment or that every item passed inspection. The export owner says the June file is normally refreshed on the second working day of July. The handoff copy was a preview dated July 1. If that is the copy used, identify it as a preview, not as the final refresh.\\n\\n### Supplied query and scope\\n\\nReproduce the following query exactly wherever it is included in the prompt or a technical appendix:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 31\\nGROUP BY depot_id;\\n\\nThe filter excludes lines with exactly 31 units and rows with a different status, so the filtered view may not represent all pieces received in June. The query has no date condition. If a June-bounded export or separate date filter is available, explain the date basis used for the monthly summary. Otherwise, say that the query is unbounded by date and do not describe its result as a June total. An export date does not itself add a date filter; keep these points distinct.\\n\\n### Operating notes\\n\\n- **Northgate:** A scanner power interruption occurred June 18 from 13:10 to 14:05. Staff used paper tallies for four pallets while the scanner was unavailable. The handoff says the scan backlog was entered the next morning, but supplies no row IDs and does not confirm a line-by-line match between the paper tally and the export. Do not equate four pallets with four delivery lines or claim a verified missing amount. The operations note says, “we got the paper count in, but the line match still needs checking.” Treat the interruption as a reconciliation caveat if relevant, not as evidence that deliveries were lost.\\n- **Canal:** The appointment log records a carrier appointment moved on June 12 from the morning window to 14:30. It does not say whether the truck arrived then, was received, or carried any particular number of units. A dispatcher wrote, “the slot moved, the receipt time is not in this note.” Separate an appointment change from a confirmed delivery or receipt time, and do not estimate its effect on units. A separate note records a returns queue at Canal’s shared dock after 11:00 on June 24; it does not record a closure or canceled delivery.\\n\\n### Requested report format\\n\\nOrganize the report itself as this numbered checklist, in order:\\n1. State the scope and date basis, including whether the figures are from a preview or final file.\\n2. Explain the filtered measure and what it excludes.\\n3. Give separate, evidence-led notes for Northgate and Canal.\\n4. Identify caveats or unresolved items that could change interpretation.\\n5. Briefly state what the available material cannot establish.\\n\\nPut evidence before any cautious operational consideration. The planner wants to know whether a filtered comparison can support a June rota discussion while understanding that the query includes only received-status lines above 31 units. The notes supply no service target, complete appointment list, inspection results, or agreed definition of late delivery. State when those matters are not established. If you include a July planning consideration, label it as a consideration, not a recommendation or an approved rota change. Keep any supplied direct quotes exactly as written if you use them; do not invent quotes or attribute statements to named people.\\n\\n### Final checks and conditional wording\\n\\nIf Northgate’s scan reconciliation is still open when the report is drafted, identify the paper-tally comparison as provisional. If it has been closed, state only the closure status that is documented, and retain the caveat that line-level matching evidence is absent unless that evidence is supplied. If the status is unknown, say so. For Canal, leave arrival and received units unconfirmed unless a receipt record is supplied. End the report with remaining data checks rather than a conclusion that either depot is ready, behind, or performing well. Include the complete numbered checklist and its fifth item even if the available information leaves items unresolved.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0136"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "a56cbc2f57091e616d04864e3c80fcfc20c720c4832e6b625f721a086ef8c42c"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "d0da3f88976b13635fe776641072ea42e3cc5c717a37f18d45d4abbac3ed3290",
+  "started_at": "2026-10-29T03:31:48.454856+00:00",
+  "result": {
+    "id": "gen-1793244708-VptO4fsCKeRcBAwuf04G",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0136\",\"row_sha256\":\"a56cbc2f57091e616d04864e3c80fcfc20c720c4832e6b625f721a086ef8c42c\",\"critique\":\"The input is a coherent, self-contained drafting request with detailed operational context and no contradictory or artificial padding. The output appropriately reorganizes it into a prompt without producing the requested report. It preserves the SQL verbatim, site identifiers and receiving hours, preview-versus-final distinction, date-filter limitations, exact quotations, and the distinction between delivery lines, units, trucks, and appointments. Both depot caveats and the conditional reconciliation and receipt-record requirements remain intact. The report’s five-item numbered checklist and requirement to end with remaining data checks are also retained. No material change in facts, uncertainty, or constraints is evident.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4r4qPvP_6ykgKhFv3xbM4XOu3zlUElhbQzZ4p03uZNPY0WFZLjI43KESiib2K6p2FxHQlsKuVUDd83YyAM6uD0-wMj5650QsrcbOB4d2K1SPVQl0qxHi_DbK__FON6kO0aX8xt8dZ4CsVub047I00nzJ7WRrZichNz1E9IMLkBNXobkS4LcCbksQN2B0sv8gw5jmXfufmoqR92lRhH6-62bTNRHCsgfA-aKfq_Bv4OaJTTkkyDnP1IsXyZEqum4V_mfawJkC8HZjtrY97NPkWTNynsF1K6i4CfdD6ZTzF7VeAmH8BN9zhUQwxUcYDaHmQwEzZgPXQrvKR2t4y0_3bD0qsahIGR14d6UqHbpb_xp-75SHfekwbz4Pc7u1x-hIw_VPoHoBq5j8XO9aq9IduHLQINcQzyFBr0PFJFTRKSS1QUfc8ZxjUweopwjqkv9yc_9MFNB8MYEjXAr-xLQ3mLuizcUq3ikZRQkmp31wKXNrEYKEe84RWeR8iJTcA0wmIldbxJFJiTmpqdgg3b0DGTlfLZlzN7xze981z0ueSLodJh-7e1MFLbh6mAXoFGStZ4s2UAkqFmAJVa0D-IvI3Qk0_plEr8UFhdThH9-A8Jv2cuzZium9kgRk3St0buuEb9FdQjDiRirsB7IrGKHFoDtQ_8FouQiln9GCgf9T6LmKi6ie-X_2db9nBCbrZHS5m4PVcm81FA_2N66hUK00qgqRauNSqp0KT_WBA1Rh38NyXyWizvtmhJ6L9aRBhzds_lyNZjt7E05CMgqMYRsVqTbsg9-6wecvl7ZmlPqq-49mseEbeGyw0FdLn8iMrNNN8L5qLGm_VHopm1lbwaJwf93mkdBCxv_-3DAu7suDkmPTrweUwiRslVgWLlbyUdV5ehfcwJGel3AXv_ORlMQ0XlIWmO17M68rkwsihv2vpHCgllE6v-JWVd_qc3bSYZ8PMWw31fX82skIvhMm_ev3pGipY9hLaWSv4-GCr3aNYxkGY5WAk7M8t85rdmd2dcoCUqkiv-b_hGvcc4mlTyVjC3T64M_9kJHdGjBQeLyeuBZyrrn4dglPtzp0kf1XH5IQQUEiJiSEgR2SFKUVuo-NTGw5QmIF1iEAaO6CGd9mDq2pXPlYqH6UAWjt5P8H7chm1lgz4uXaXfio9aoiOSv-l6BQ29pfxfWyTiXJNxPTdI_t9qER96xq4rOvJ7ytUOcoUeDWf8DhPyLMA-024JyOL8MY80-ChTmbhDSJ6ZiT9IdLFxkbhhrsinSSyQt4Cc0YxwDdYgFBQVfVeMFgTau15ABFfpWT5TVcjpK8SYoNABgeQw6FLnsDNLZprPXJJh6aUkSTzesICofLXcv_SU-xxwyUrJoLqpLg-4cMn-u2yJd_0DaQ5Uv3-HRAgDoZhed5DvXm2Ii-ZcrCe589rZTR-ID7IXIbuQ3StsJ9kL1z3lp_PxmNzFdb9uLDkgKbokPO4PlF6NeStCPNO-yuKHUnABT8zTAR69NoS3qobLMF57J4OJ9ad5g5a3pXKleIWK__0T1gkd42xyVmAdscIPaL15IJJsUEDLU65WzBfmZPxkN1DMYjJnM30UYphpY5mi5hN2uee6msnwPEPVb1hmWAbvaQUEUoUtYb-4pUeshaV1-xu8hX-LbgCT1RhFsPAgPxMfixZgpewYW3QDdJOWPaLuzE1TUuI1dkAT2UfyIqFi2zuKXmaWNUC3Lt31p-szsaBnRUN8IiONz_qHeYCuVJe62z_tRUbrtHiciuMdyESWz0dV8zM83-85_c7W2GCSWtWUNws9Gj8Bt5qHvHSSZlMhiktS0DoN4fPmp8C6o8T1NeFsHqeIpHTOwkg7rr6wQvGbf_lb7DGTkJ9eR-bDkHKTWneHaoNsur2qqNSrd4RRXe4EhMCF83xtdtpjzL1v9mTk1GCV_GGCYbcm9KuH9LU-557DCsZwi-pL0LRfeNcY3iScZRn-cNJs-VjOXRGzozmytA_D9cHxQ84-QChnnOUR6ChrVo2RA8da8SkUdyCIYLzWhl2sSwKs9PRFU75M8mjlwdVllzK3DQU3sqcuFm3WXcThYdSgIkDSW6zuya6XDTHu4dgLXudlX0z8Gxt6MJ8iObX0LBuOtg_cpwB8vH-ocQQsXCCpw2_JYAV_5KuBPv4JBfWkMwmR6pxgymbIKVhAFHpfMFscTSw_XIUX20HQvT85o8-wbZGzE-sNRmgp16eQENPI2qoM3lmuKNMj9M0NtLoqA2q0lbDmB-AtANdUdoQrECMdI8c1d7Gj6W4EV3xrHtTdRj9eiW3gmOV9NxtbsDFhAgji5ZHKylE9xh5BZwIOIM7QDHmXusDX7zt8FWwS1j7kIqMQDD_e3RJUEXv39vSglcM6_iS_ezOmYJQ9-RGV_r4WxdclRE7HWM0Bpnf0E03XKDZC0yIOKbxYdKlrNyGQ532rtkveV9r96Wmlzs2dRWWuh-Pb5DOhj1HolhRjoI4qL8A0ydo_7IRI_zkcJmwKn56r-etvhqoEUTbDiyV0Q_IkeKsrVmpqhCHuoWupf0BwQDJVnZOcTrzm4iVmSt77hCbnd5DbCm8biJ3-Je8zwEX_bCQ3xIXHXqrwlYZJBHHYowIT6nW8kuP8fC-vn1s6K96h2xSY90LjsVsnwuoWs4WqkD2U9ANOL42VA-hpNNtPKCMuWbAsScyGp_-nwMfPiCW2dMjN-yhiDiLhzYDiHgz4ZDgIgO20PzWE3wmkD44cdXBiXK9x6rojx92WosNsXP66Ck7ua7unGc1Tb29VCCfe7XKYDlOJk3l7Vl_lucxl9Qd6Lq1T7KWKSN6iRp_Ea8deeV6zlbe7oZ9lLPSLwenGYN2aweWPBJTJqGCw89VTXCHlowOKWYRPvZPEJ-wKYpDNjNOOzJmo2uXM05-ojsK0oeXuCqyVhYx1de2oZCqmsS4n3siJTf8bvhuv7vTzgOPAuAOPd1MSijA7Ni1TP4_v3fdc8HUJ71_249Y_-g7ocsYClBeTivTCbHuWwAg3ICQQCWEEEKUMWtQxyCvYWQT4ltJiwZmOr3799kBROr7HKiKihSQtnq8S14s7EiBOfzGw0yJ4M41nRWXdPE9zkDh1HGU1eN2jr19IJsL78wfWSB8gSSIzIArH8RhN2IQSq07S1y3_qbnYQq4eEJQabqZ5dUdGCgm5QZrsu_zoeDT31gsOd9i8uUQ3P79Q2AaKFnQonOkhHskrTX6k33mcwC50_VXOF4i6JZPSnukwz1Lp3GcYZxu6ZKFgpGy-Fa33TDIoWHBEyZCy0Db_4rrP2LEIZBoMrI1lbcdJuxjmO4ZwH6iKxmwLXfNRC8lpo2xTHdiRWsVA5HjePCfap7CR4MRQrJNDm0UaFmBr5YrxnRWTxKsPaUJq-umrq5Fdqhf1JeIlc1tM3nfKyCRZv81-pcL0ajvkCDr2Ry1JMxi-qk3IalZlA-jqnwk0HR7YswQwsKeWFUmp8Dbz7hyt0MumsRPLcC3DKO40fO3tey9yWlgu814hPxz-yzAN-7CIfuumZoJ1Uf-SvXv9XEYUC5AEXSnjtJll75SHGP0Ii-6LPuWhw8WwdNHA91KADCZn4qZW4oKwdMUj028DBf6mCiPdRgya9OMeTidvmmrUBOogmMJfHtq5M8le_YRHXiCRKehPrWF7HdTFc1wqJLN-lxRP6If_bFvG6Ptx_xd0jfBfjngs13_tl5pw2g8kekDpRRc-aRr3XatlTZFCmyd0u2R8T77tUxyYu3XbV2Nc8JZ7vwQXHq8Cnuy3foZSLM4zJ__lDr1a-C3SIlnT4wykbuYSQjRn-I1ePUkhIV6n4cP3UJl-tN0h64115slarS4LR_lZE2ZVbc_HpcbsvElcAJeA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_096c0a180d6a9a37016ae2be25eea087d0bf85ec659c97f683",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244708,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 380,
+      "prompt_tokens": 2907,
+      "total_tokens": 3287,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 162,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2904,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0040964,
+        "upstream_inference_prompt_cost": 0.0002964,
+        "upstream_inference_completions_cost": 0.0038
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "e5026ee9ad255da648e0fed2c31bb99cbe99dac48dedec65b0face19724ee5f6",
+  "elapsed_ms": 9000
+}

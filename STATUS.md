@@ -1,5 +1,39 @@
 # Status
 
+## Targeted training-data update, 28 October 2026
+
+The current dataset is `data/rewriter/current/`. It retains the original training rows and
+appends 500 new Arka episodes targeting fidelity failures. Counts are 1,500 train, 100 dev and
+84 validation. Dev and validation bytes are frozen. The public dataset repository and split
+names stay the same. Hugging Face contains only Parquet data, cards and licenses.
+
+New data uses Luna generation, six Luna Decisions checks and exact GPT-6.1 Sol input/output/pair
+verification. Native uncertainty requires two separate passing Sol calls; confident native
+rejection stays blocked. These are model judgments. See TRAINING_DATA.md and the current
+quality report for the policy and counts. The code review and release evidence remain in Git.
+
+The single notebook uses the updated data receipt and dynamic split-count checks. Run it in a
+fresh Colab L4 runtime to train a new adapter on all current data and upload it to the existing
+model repository. This data update does not retrain or change the existing adapter. The paired
+4/84 stock and 48/84 LoRA results below refer to the original adapter revision only.
+
+The sections below record previous work and its original data counts and artifact revisions.
+
+The update is public at Hugging Face commit `139bb98b0500fa12ad43dc6c8c5cd4d17645eb86`.
+All eight Viewer split/config combinations return HTTP 200 without authentication, and all
+downloaded rows and file hashes equal the Git sources. The full selection has 1,500 distinct
+targets and 319 long training inputs. New rows include 180 long examples. Exact native scores
+and final-export membership are bound to all 500 additions; 39 use one exact Sol pass and
+461 use two distinct passing Sol calls. Dev and validation Parquet bytes are unchanged.
+
+The final Sol delivery review passed, including all 2,877 manifest file hashes and 961 saved
+new-row verification calls. The rebuilt notebook's CPU check encoded all 1,684 public rows
+without truncation, then completed four optimizer steps with changed adapters, frozen base
+weights and exact adapter reload. W&B was offline and upload was mocked. All 131 tests, lint,
+formatting and package build pass. Receipts are in data/rewriter/releases and the final review
+is data/rewriter/reviews/sol-fidelity-delivery-review.json. Actual new 230M L4 training and the
+subsequent semantic comparison are the next user-run steps.
+
 ## Trained adapter evaluation, 28 October 2026
 
 The uploaded 230M LoRA at 034d54e5b7c291fea1f8fcacba77fc8dad543bc4 completed the matched

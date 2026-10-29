@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0168\", \"row_sha256\": \"e64c58ee629d96bbc43c8af6ab0e6d512179d292e602e69104f9fd085a6d9e5c\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we need a clear requirements brief for a small log-file cleanup utility for the fictional North Quay ferry operations team. this is for a pilot, not a general-purpose product. please organize the notes below into a prompt for someone to write that brief. don't write code or decide unresolved policy questions for us. include how the utility should behave, what it must report, and what decisions still need an owner. the final recommendations need evidence first and then a numbered checklist; that checklist rule applies to recommendations, not to every section of the brief.\\n\\nour setup is three Debian 12 Linux hosts: quay-ops-01 and quay-ops-02 at the terminal, and quay-data-01 in the office. wakeclean would run on the two terminal hosts first. the log root there is /srv/harbor/logs and the archive mount is /mnt/archive/harbor. the three services in scope are ticket-api, berth-sync, and sensor-bridge. the team usually gets one short maintenance window each month, but cleanup is meant to run unattended once configured. the current directory is about 86 GB on each terminal host, on disks that are 120 GB total. recent counts say 54 GB ticket-api, 19 GB sensor-bridge, and about 13 GB berth-sync plus rotated odds and ends; the numbers are rounded and come from last week's du output, so don't treat them as exact inventory. operators say ticket-api grows fastest on busy sailing days, and sensor-bridge can have a burst after a hardware reconnect.\\n\\nlog names are mostly service-name followed by a date, and rotated files often end in .gz. examples seen last week are ticket-api-2025-03-18.log, ticket-api-2025-03-17.log.gz, berth-sync-2025-03-18.log, and sensor-bridge-2025-03-15.log.gz. there are also files with unfamiliar names under the root, including deploy-notes.txt and a folder called handoff. nobody has confirmed whether those belong to an application. the brief should say that the utility needs a defined way to handle unrecognized names, and list this as a decision if the notes don't settle it. don't assume every file under the root is disposable just because it is old.\\n\\nroutine application logs are intended to be retained locally for 30 days. incident logs are intended to be retained for 180 days, but the team hasn't documented how an incident log is marked or who assigns that status. audit logs must never be deleted automatically. the on-call lead currently copies incident material to the archive by hand when there is an incident, and says, \\\"the archive is a second copy, not permission to erase the audit trail.\\\" keep that distinction clear. it's not settled whether wakeclean should move files, copy them, or only remove eligible local files after checking an archived copy. ask the brief writer to identify that decision instead of choosing one.\\n\\nthere are a few operational details from the people who would use this. Mara, the terminal supervisor, said, \\\"we're fine until Monday, and then ticket-api eats the free space.\\\" Ivo from systems replied, \\\"the archive is mounted, but it isn't always reachable during the early shift.\\\" Nia on call said that nobody wants a service restart as part of cleanup, and active log files must not be truncated while a service is writing to them. those are constraints, not just background color. schedule is currently proposed as 02:15 local time daily. the hosts use local time and may change clocks for daylight saving; whether that schedule should mean wall-clock time or elapsed 24 hours is not decided. ask for that issue to be surfaced.\\n\\ncurrent free-space alert is at 75 percent disk use, but that alert is separate from the cleanup policy. one operator wants the brief to explain whether cleanup runs on schedule even when disk use is low, or is triggered by the threshold; nobody has chosen. the candidate policy from the operations meeting was: when more than 2 GB of files would be removed in one run, require a separate operator acknowledgement before deletion. if /mnt/archive/harbor is unavailable at run start, do not delete eligible files in that run and record the reason. retain both conditions in the prompt. the team has not decided what counts as acknowledgement for an unattended daily job, so flag it as an open question rather than inventing a mechanism.\\n\\nwe need a dry-run mode that is the default for the first pilot configuration. it should show which files would be acted on and why, without changing them. the request is to ask for a clear distinction between dry-run output and an actual run, and to cover what happens if a file changes between inspection and action. hard links and symbolic links have not been discussed, and neither have permissions when a file is owned by a service account. have the requirements brief call those out as items needing a policy, not quietly assume a behavior. don't restart services, and don't truncate a file that is active; if a safe way to determine that is needed, leave the method for the writer to specify.\\n\\nfor each run, the team wants a report written under /var/log/wakeclean/reports on the host. requested CSV header is: run_time,host,path,action,reason,size_bytes,result. they want one row per considered file, including skipped files, and a final run summary with counts and bytes considered, removed, and skipped. the example people gave for a row was ticket-api-2025-03-17.log.gz marked as skipped because it is inside the 30-day window; it is just an example, not a conclusion about the age policy's exact boundary. the report should make it possible to distinguish a dry run from a real run and record an error when a file could not be examined. whether the summary belongs in the same CSV or a separate file is not decided. reports may contain paths and filenames, so the brief should mention access and retention as questions rather than prescribe values.\\n\\n1. topics that need to be covered in the requested brief: scope and host rollout; eligible versus protected files; retention rules and the unresolved incident marker; archive checks and deletion behavior; scheduling and disk-space trigger; dry run and operator acknowledgement; active files, links, permissions, and changing files; report fields and error handling; open decisions with an owner to identify.\\n\\nplease make the brief usable by the operations and systems teams without pretending the policy is more complete than it is. separate the facts above from proposals and unanswered questions. don't expand this into a general log-management strategy or write an implementation. put supporting evidence and relevant operator statements before any recommendations, then put recommendations in a numbered checklist. the closing portion should still address the pilot's practical risk: disk pressure is already being noticed, yet the retention, archive, and unattended-approval rules aren't all resolved. include that tension, and ask the brief writer to state what must be decided before unattended deletion begins rather than declaring the pilot approved or ready.\", \"output\": \"Create a requirements brief for wakeclean, a small log-file cleanup utility for the fictional North Quay ferry operations team. This is a pilot, not a general-purpose product. Use the facts, proposals, and open questions below to describe expected behavior, reporting, and decisions that still need an owner. Do not write code or resolve policy questions that are not settled in the notes. Do not expand the work into a general log-management strategy.\\n\\n## Environment and scope\\n\\nThe pilot would start on the two terminal hosts, quay-ops-01 and quay-ops-02. Both run Debian 12 Linux. A third Debian 12 host, quay-data-01, is in the office and is not part of the initial rollout. The log root on the terminal hosts is `/srv/harbor/logs`; the archive mount is `/mnt/archive/harbor`. The services in scope are ticket-api, berth-sync, and sensor-bridge. Wakeclean is intended to run unattended once configured. The team usually has one short maintenance window each month.\\n\\nThe current log directory is about 86 GB on each terminal host, whose disks are 120 GB total. Last week's rounded `du` figures were 54 GB for ticket-api, 19 GB for sensor-bridge, and about 13 GB for berth-sync plus rotated odds and ends. Treat these as estimates, not an exact inventory. Operators report that ticket-api grows fastest on busy sailing days and that sensor-bridge can produce a burst after a hardware reconnect.\\n\\nNames mostly consist of a service name followed by a date; rotated files often end in `.gz`. Examples observed last week include `ticket-api-2025-03-18.log`, `ticket-api-2025-03-17.log.gz`, `berth-sync-2025-03-18.log`, and `sensor-bridge-2025-03-15.log.gz`. Unfamiliar items under the root include `deploy-notes.txt` and a folder named `handoff`. Their relationship to an application has not been confirmed. Describe the need for a defined handling policy for unrecognized names and identify it as an open decision. Do not assume that every old file under the root is disposable.\\n\\n## Retention and archive policy\\n\\nRoutine application logs are intended to remain locally for 30 days. Incident logs are intended to remain for 180 days, but the team has not documented how an incident log is marked or who assigns that status. Audit logs must never be deleted automatically. The on-call lead currently copies incident material to the archive by hand and said, “the archive is a second copy, not permission to erase the audit trail.” Preserve the distinction between an archived copy and permission to delete.\\n\\nIt is unresolved whether wakeclean should move files, copy them, or only remove eligible local files after confirming an archived copy. Identify this as a decision for an owner; do not select an approach. The archive is not always reachable during the early shift. Ivo from systems said, “the archive is mounted, but it isn't always reachable during the early shift.” If `/mnt/archive/harbor` is unavailable at run start, the proposed policy is to delete no eligible files in that run and record the reason. Retain this condition.\\n\\n## Operation and safety\\n\\nThe proposed schedule is 02:15 local time daily. Hosts use local time and may change clocks for daylight saving. Whether the schedule should follow wall-clock time or mean an elapsed 24 hours is unresolved; surface the question. Current free-space alerting begins at 75 percent disk use, but that alert is separate from cleanup policy. One operator wants the brief to clarify whether cleanup runs on schedule even when disk use is low or is triggered by the threshold. No choice has been made.\\n\\nMara, the terminal supervisor, said, “we're fine until Monday, and then ticket-api eats the free space.” Nia on call said that nobody wants a service restart as part of cleanup and that active log files must not be truncated while a service is writing to them. Treat these as constraints. If a safe method is needed to determine whether a file is active, leave the method for the requirements writer to specify. Hard links, symbolic links, and permissions on files owned by a service account have not been discussed. Identify them as policy questions rather than assuming behavior. Also cover what should happen if a file changes between inspection and action.\\n\\nA dry-run mode is required and should be the default for the first pilot configuration. It should show which files would be acted on and why, without changing them. Distinguish dry-run output from an actual run. The candidate policy from the operations meeting is to require a separate operator acknowledgement before deletion when more than 2 GB of files would be removed in one run. The team has not decided what counts as acknowledgement for an unattended daily job. Preserve the threshold and identify the acknowledgement method as an open question; do not invent a mechanism.\\n\\n## Reporting requirements\\n\\nWrite each run's report under `/var/log/wakeclean/reports` on the host. The requested CSV header is:\\n\\n`run_time,host,path,action,reason,size_bytes,result`\\n\\nInclude one row per considered file, including skipped files. The example given was `ticket-api-2025-03-17.log.gz` marked as skipped because it is inside the 30-day window. This is an example, not a decision about the exact boundary of the age policy. Include a final run summary with counts and bytes considered, removed, and skipped. Reports should distinguish dry runs from real runs and record errors when a file could not be examined. It is unresolved whether the summary belongs in the same CSV or a separate file. Reports may expose paths and filenames, so identify report access and retention as questions rather than prescribing values.\\n\\n## Topics to cover\\n\\n1. Scope and host rollout.\\n2. Eligible and protected files, retention rules, and the unresolved incident marker.\\n3. Archive checks and deletion behavior.\\n4. Scheduling and the disk-space trigger.\\n5. Dry-run behavior and operator acknowledgement.\\n6. Active files, links, permissions, and files that change between inspection and action.\\n7. Report fields, run summaries, and error handling.\\n8. Open decisions and an owner to identify for each.\\n\\nSeparate established facts from proposals and unanswered questions. Put supporting evidence and relevant operator statements before any recommendations. Any recommendations must then appear as a numbered checklist; this constraint applies to recommendations, not every section of the brief. Keep the brief usable by the operations and systems teams without presenting unsettled policy as complete. The practical risk should remain clear in the closing portion: disk pressure is already being noticed, while retention, archive, and unattended-approval rules are not all resolved. Ask the brief writer to state what must be decided before unattended deletion begins; do not declare the pilot approved or ready.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0168"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "e64c58ee629d96bbc43c8af6ab0e6d512179d292e602e69104f9fd085a6d9e5c"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e4ffe65ea8a67bb391962004bdbab7cfd62798cc6824031b4e2b7a07191bdbe2",
+  "started_at": "2026-10-29T03:23:06.720115+00:00",
+  "result": {
+    "id": "gen-1793244186-3E9uRJ0tAtVowpUaZc8O",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0168\",\"row_sha256\":\"e64c58ee629d96bbc43c8af6ab0e6d512179d292e602e69104f9fd085a6d9e5c\",\"critique\":\"The input is a coherent, natural request with recoverable intent and substantive pilot notes. The output appropriately reorganizes it into a self-contained prompt without writing the brief or resolving open policies. It preserves the host rollout, paths, estimates, filenames, operator quotations, retention protections, archive-unavailability condition, greater-than-2-GB acknowledgement threshold, reporting header and requirements, and unresolved safety and scheduling questions. It also retains the evidence-before-recommendations ordering, numbered-checklist constraint for recommendations, and closing requirement to identify decisions needed before unattended deletion. No material omissions or changes in certainty were found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing requirements for archiving**\n\nI need to assess the proposed archive against requirements. The input candidate policy states that if the archive is unavailable, certain conditions should be retained. I believe that the proposed output is consistent and acceptable. I'm considering having a brief writer elaborate on the original prompt to ensure clarity. It's important to finalize a concise description that clearly passes the required criteria. That way, everything is straightforward and no details are overlooked.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing requirements for archiving**\n\nI need to assess the proposed archive against requirements. The input candidate policy states that if the archive is unavailable, certain conditions should be retained. I believe that the proposed output is consistent and acceptable. I'm considering having a brief writer elaborate on the original prompt to ensure clarity. It's important to finalize a concise description that clearly passes the required criteria. That way, everything is straightforward and no details are overlooked.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rwejgeuB3dLku19dLvF6IZ7MVHcrbwaKszHEpiBySAxxXNkF9Mk7D9HRJRLdFmyV99n2mS1LdHLwVJVKVid6YVhCnxd_qPDLcT_ArYbzLiNNr6D4AHjFLh99IbtKlLG7psIgWOiMULeXXlNVW0-ji7ZjvCq2tfwoHe10IppR83l1qJ7--bDjS9FiVY5ixwpiNL2w7qAI6ZP_4bkatgTkpAsMTCAsJvkXc_HlbHkgH3N7fQhs8K5n3_ZOb80pLAPgwOFj1poWiTt-K6f3y7h_rHIZgSDYFzxHGurxn1MyONyGuwRX3SB0lwfU3TYmeVpdz-my-24lfrBt092b-qLPJ_jd7VJtOGbK9LE0MTVl4-vnhqIois_lcxEY3pQfsa1NM9epMeDuak1rq5zBcxCCeyu-cR173sE4Kgtx3-qGC9frMmB55V_T-HrwB3qWx3xgL3LFraP-QT624BaMeZG6yotVRqLnJa9RN9Q4JaHBxiGUaYrKQjPs975Wa7P-7nV68BTptp_8vRC04UoJBhKtE59uC5JrFYg8rMZYsOlW13LAdPwaeje9CxP9ll4yTNqEYRdeBsgPmESd53bfeujGHdkbFwZsHD7BvpI7S0XOwgAvBb8uBkEU-uXvhYRA4-uENyRAEgjhA82ozC2SS4QdsZnkMDpS6rfrLFNLUvQxowBZHPNzGG1_L29EelMLetZxVQ_LWVTRrF92JQRIYHym3xlSQ1Cb1lWm7Bxd6AOEFVvmK2OeaMR8cgTkXE5aLvWfJfDi4JSTJ4crdyqR-WsaCSVohZAyn01_oQ4LOotuqKDEZ4xfTs_JStgijRapUlQbmhy0Dv_VKDPAzrWvUsYFg7xw92i_YBF5lTuJZalZtIOsB_B1IlXIWr_ASQWm-iSWaHrC1pypngxhd-jEKBg_72FYKEaoX_fdiRy1ysxO8BoZLIqHbJadmCZUep04IDv2QCUHJDzWEkRBUCR9QVG6GZ-4w3a8GcDc0mYCTqvsnPbU4Tqy5eZSnkspwd6Ex3n7eoigVbLE_HCC1d2bqFdVfHEK9U0rPjk7zvjeZBnzSUdCmqHKYCHv2Yz1DJyfo2TqnmOXvfL2_nDpTNpOUYMI222JXyNayNDLP1q-sCq-6hBDKE72PM6Dtb8DlbB2_7nekqOYggWF6O37b3Jz8nkU9tTyN9Ju9aNwOBGmvbhz4W3vAlEbUxL73y2wImaPPJDhFeUVpg-50ocbWQRQn20MKFS3THbBG1JWdVZTq2CNxUiN5N9rA6_CYCx0NBHeHKAIKq_L5gHU-aRDnRWPFQ7n_o2M346JyytU9gC_fsQIRDE8OWxxtP-K20QorgN4l7cQyJiVY_yOvzioyJgYTs6GLlR981H2jQO4-1cK3eKR8SDruUeMeEjdeyXYqezX4oGFzz90Ab7JW8HpggFHO0vb0pz8CgRQqmKeH8vqeflcv_CqTlzjblkeEB7ckIDXN-CiTdyueRMo6Wi5KxTqsH-a5cyTk1zdYwiNrBeLGZyR_CH6hnWju0RYotcnntD8K2zqcun9JgbSotCwEaAtTgQFqEuHpRlE79rzDatY7rHcIIJYREHB1ul6lp3hzoQCH7bU7Xsj0P0xxL55r0wXT3Xo48OPRxDAmaucXsLgko-iwZHkJLzct_5tIhzZXQjXD0nxfUYIR-Ir7jNhgM6MYL41fihhnLvqDj7d6F5lqQNKZmZfARfEjoIYRFBhmLozsHDvPfheBpLnqM6uGDpoXTEbZAWNUdTHpf8r-s7dcWuN_WAvcjf_b7hrL8bFf6nalTHJhxNlm9y8F5TsZCZjkaDk0tsIsej5GUKol69Bzus8EtSphUXrVj12gucoN9v6oz2euiARO9PZqkvPknym3I7dkLJyAwdmh2L6jlePaBC_40rhy9i7hHLQ8TcOXHy3fgfYI7A1lUliIBSZGNp4vR3N6lIXSXrZgbaLRsdhv4fxqkGhU3_oFgkf1Z5wGpypIi4Kjp2bwHRFngg6pudKV6u4o1Q-h3FSPBcKYKtE49RxOGBimus-I7svG2MwQTOIrjrNdLK4Xu8lYifn0E7pCQ3-4SU6KxSipXpKT0V0PFXe4Yzp-pNkdC2mLL_sAVBYfBpbLFkKZa10l66Wm2lnHKT8Gqf0Bh9HM1zq_f8Gae00qx3OAnmpLcIPmk_fDtktlZ1Acu_c7Bn-HBZoVHqXWyIRlnKP1LMryvnlujLsTUaSQdSiVcBa7sg7bIukeIiiI1biW76mYiDQnthyNdlHVRkukIIUJg2MyhZgJQnX01QFAxrN44nwt2F3UD9QFb0npswpk5F4SD3kxTFK-438Jw1s1LqCBimI3nTUsXsW56TRMqCET2X_xKMWO-D4ZVESaN1iK4Y_dnSqZMQftDvzt4f446MW202k-1nlmO5EZ_OxZ0FN4B41jPjkK64Msxb_xM-mT7xMxGc8U8r870LchGZgZXMe-SnDNAr_fEUnEepgzw-FzR0k-3-1WY0ny66mGUP7vUk.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_07b38572cbf1720d016ae2bc1bad4887d096f54253edb300bb",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244186,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 282,
+      "prompt_tokens": 3465,
+      "total_tokens": 3747,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 65,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 3462,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.011481,
+        "upstream_inference_prompt_cost": 0.008661,
+        "upstream_inference_completions_cost": 0.00282
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "6864a9411a520038fd65b53819931ae0c2f4446b91166a88c4219a4c6c424840",
+  "elapsed_ms": 5422
+}

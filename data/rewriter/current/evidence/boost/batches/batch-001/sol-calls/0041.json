@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0142\", \"row_sha256\": \"16c0fd8fe3437cfc25be0bd75896538864dfa9a62510618125fe65f93a20fe9e\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"hey, can you help me understand and review a query we use while preparing depot delivery summaries? this is for a planning discussion, not a report of a production problem. the logistics team is looking at how the weekly received-units summary is put together before the next depot review. we haven't provided any table definitions, sample rows, database version, or actual output, so please work only from the query pasted below and from the context in this note. don't run it or make up results.\\n\\nthere are several receiving sites in the operation, and depot_id is the identifier used to separate them in this query. staff may casually call a site by its location name, but we haven't supplied any mapping from those names to identifiers. the summary is intended to help people discuss incoming goods by depot, not to provide a shipment-by-shipment list. the operations manager said, \\\"the weekly sheet should show what actually arrived.\\\" a shift lead added, \\\"a box count is not the same thing as a delivery count.\\\" those comments are background, not extra columns or rules to add to the SQL.\\n\\none point that keeps getting confused in conversations is the units threshold. a delivery row with 13 units is not the same case as a row with more than 13 units, and we want the explanation to call out the comparison exactly as written. please distinguish the condition on each row from a hypothetical condition on a depot's eventual total. the query also has a status condition. for this discussion, explain what the two conditions visibly ask the query to include, without assuming that the database has other status values or that the rows are complete and accurate. don't change either condition just to make the explanation sound more familiar.\\n\\nwhat would be useful is a plain-language explanation of the query's steps, followed by a careful review of what can and cannot be concluded from this snippet. we need to understand the selected identifier, the calculation being named received_units, the source named deliveries, the filtering, and the grouping. please explain how those pieces fit together in the written SQL. make clear that the snippet gives us a query definition, not the values it would return for any particular depot. if you mention a likely output shape, describe it conditionally rather than inventing depot names, counts, or a row total.\\n\\nfor the review, stay close to what is actually shown. note any meaningful boundaries of the query, such as which rows are eligible under its stated filters and what the grouping is by. please do not infer a date range, a weekly window, a location-name lookup, a join to another table, or a rule about units being integers. the planning group has been using the phrase “weekly summary,” but there is no date field or date filter in this snippet; if that distinction matters, say so rather than treating “weekly” as encoded in the SQL. likewise, the note about actual arrivals doesn't establish what the source table's status values mean beyond the literal condition present here.\\n\\n1. after the explanation, give a compact review section with observations that follow from this text and a separate note on information that would be needed to verify behavior against the real database. don't declare the query correct or incorrect based on missing schema details. if you raise a possible question about nulls, column types, duplicate rows, or SQL dialect, present it as something the code alone does not settle, not as a discovered defect. don't silently add assumptions to close those gaps.\\n\\n2. include a few useful test ideas for a reviewer to consider, but do not execute tests or supply fabricated expected totals. They can be described as scenarios: for example, a received row at the cutoff, one above it, a row whose status is not received, or rows for two depot identifiers. Keep the exact comparison and status condition in view when describing them. If discussing a depot with no rows that satisfy the filters, distinguish that situation from a displayed zero total; the snippet alone does not establish whether such a depot appears. This distinction matters because someone in the meeting asked whether every depot would show up, and we don't have enough information here to answer that as a fact.\\n\\nplease keep the response useful for operations staff who can read a query but may not know SQL terminology. Define grouping and summing briefly if needed, without turning this into a database tutorial. Avoid a long digression into delivery policy or a proposed redesign. You may point out that the summary's label and the surrounding planning language should not be confused with extra query logic, but don't recommend a business decision. The code to explain and review is the entire supplied material below; retain it exactly when you organize this request:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\\n\\none last thing for the write-up: keep the distinction between what the SQL states and what we'd need to check with the data owner. if the weekly planning group later supplies a date rule or a site-name mapping, that would be a separate input, not something to assume now. end with the practical boundary that this review is limited to the pasted query and the context above, rather than adding a conclusion about deployment or approval.\", \"output\": \"Please explain and review the supplied SQL query for a depot delivery-summary planning discussion. Use only the query and the context below; do not execute it, invent results, or assume table definitions, sample data, a database version, or an output. The goal is to help operations staff understand what the query says, not to report a production problem or redesign the process.\\n\\n## Context\\n\\nThe logistics team is preparing for a depot review. The operation has several receiving sites, and `depot_id` is the identifier used to separate them in this query. Staff may refer to sites by location names, but no mapping between names and identifiers has been provided. The summary is intended to support discussion of incoming goods by depot, rather than list individual shipments.\\n\\nThe operations manager said, “the weekly sheet should show what actually arrived.” A shift lead added, “a box count is not the same thing as a delivery count.” Treat these as background comments, not as extra columns or rules in the SQL. The planning group calls this a “weekly summary,” but the query contains no date field or date filter. Do not imply that a weekly window is encoded in the query. The comment about actual arrivals also does not establish what the source table's status values mean beyond the literal condition shown.\\n\\nThe units comparison is a point of confusion. Explain the threshold exactly as written: a row with 13 units differs from a row with more than 13 units. Make clear that this is a condition on each row, not a condition applied to a depot's eventual total. Explain what the status condition visibly asks the query to include without assuming other status values or that the data is complete and accurate.\\n\\n## Requested response\\n\\n1. Give a plain-language account of the query's steps. Cover the selected identifier, the calculation named `received_units`, the source named `deliveries`, the filters, and the grouping, and explain briefly how they fit together. Define summing and grouping if useful, without turning the response into a database tutorial. If you describe a likely output shape, do so conditionally; do not invent depot names, counts, or a row total. Clarify that the snippet defines a query and does not provide results for any particular depot.\\n\\n2. Provide a compact review of observations supported by the SQL, followed by a separate note on what would be needed to verify behavior against the real database. Stay close to what is shown, including which rows are eligible under the stated filters and what the grouping is by. Do not infer a date range, a location-name lookup, a join, or a rule that units must be integers. Do not declare the query correct or incorrect based on missing schema details. If you mention nulls, column types, duplicate rows, or SQL dialect, identify these only as questions the code alone cannot settle, not as established defects.\\n\\n3. Include a few test ideas for a reviewer to consider, but do not run tests or provide fabricated expected totals. Scenarios may include a received row at the cutoff, one above it, a row whose status is not received, and rows for two depot identifiers. Keep the exact status and units conditions in view. If discussing a depot with no rows that satisfy the filters, distinguish that from a displayed zero total. The snippet alone does not establish whether such a depot appears, so do not state that every depot will be shown. Someone in the meeting asked whether every depot would appear, but the available information is insufficient to answer that as a fact.\\n\\nAvoid a long digression into delivery policy or a proposed redesign, and do not recommend a business decision. Keep separate what the SQL states and what would need to be checked with the data owner. If the planning group later supplies a date rule or site-name mapping, treat it as separate input, not something to assume here. Limit the review to the pasted query and the context above; do not add a conclusion about deployment or approval.\\n\\nRetain and review this complete query exactly as supplied:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0142"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "16c0fd8fe3437cfc25be0bd75896538864dfa9a62510618125fe65f93a20fe9e"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "b0a14638ec1ea1a06a67e09bbb066738d57ea814459e23e624c51c3e11a74843",
+  "started_at": "2026-10-28T23:30:05.090095+00:00",
+  "result": {
+    "id": "gen-1793230205-ABrrWDDE9wKmbEDt4GUI",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0142\",\"row_sha256\":\"16c0fd8fe3437cfc25be0bd75896538864dfa9a62510618125fe65f93a20fe9e\",\"critique\":\"The input is a coherent, detailed planning request, and the output is a natural, well-organized prompt that preserves the SQL verbatim and retains the substantive review constraints. However, it drops an explicit response-order requirement: the input asks to “end with the practical boundary that this review is limited to the pasted query and the context above.” The output instead says only “Limit the review to the pasted query and the context above,” which preserves the scope restriction but no longer requires that boundary to appear at the end of the requested response.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oWBCL5Lr290aIlhcFdXhj-I5XcbnfVEAa8Q6PioCZ9TD8FZzHs_T5Foe44mMo4tHNn9iNwn2fyFJbad_KFP5_PelSxgbdZJHHIN06AmVBfCtr7MtEH_7-rgLhBe19tAKIl8t0dTA_UnaUjwQWkPUM3mOfXm9AsCa7g30rCkKKBnJ_ZCYvsfKNzSZIR9lM_TFCRlu1-Ns7HBQBoQlyGDOug95Hy4CEACMMSePUkufRsJr82Qtn9PVFocJHyiKXXifGtE5rO3Gq8Vrner-Pd_Nn5QeS6MfShQJEVXBT3bVWMhJ9aOChDjwDQiEszNWczAfp3kIU82UqquWBFKd6RRa9nPrfAgJ1sQ5IfDpgjezJKrqBJJloDRHs6YpB1XAsuNDadx4p5WuAhkiKhlItKsJEJwwLpbmcTBIk66kVWggKJ0gfzW4tTGUzWwZx9tW_z26aeyMgIrPnniI6wTSxAazuloWcErZHaMD7khY-boeSlmqg2Q97rCyMfduMVMUZMs9AKaWsnbLtGIBQI_Ok7YD9121z_CYea1F9tNuuyErnGAmbEoKNI4ShnnC1NQoCq7xMrVcu1aB3RwFzvWeklgmkr-2lqtPN889kXqeRvJbq5Ln-MTppoUyNvPh62RtMZ4TiLqEsP-i9Wm2_gyv87Bp0Wu8VBNgIIXKRbaOtqabTvLLt6r4_RaCtnXiCNFpZaAisMmE0K_R-DkW7YUOaEE2b6kwv43unHE2FvohPTUE9e9qiXGRJxvMYYH_CISYTwx2o8gvs-lrA3M46M7dnsS4C7pCCG7eb5JkEJ66J40DPaoYU8ZrQjU40a1xFEjN2c_DKbcPmLpmsDr_YGTjf_pSiizmzmZOuCF1xxl9A5T01YImkWRcc0QSvIPBJzMG_ctO52stsSsNj5QxncRyqFtLMx_gpz4nVYWHH8mULqDs_jxymwkoAH5y1JoefnirVphtlPDDe10JEE-y5nlUNQcRkoqyKu0nRWJvy0CNMjRXkiR_wgQ4gUc9ECgXRSGvr0sWfxGfNnUdfq74uQU0mJrztvw5dzjLGtf1TffLIbz5AtJLk5JtESk1d_Xd8OrvKS7ckmxAe6ZwvE_hKOj4eWzC6tm5Nix1JVBTV3KRZswQWiQCXtHTulsfwo9BY_4fhjKlPxvTbNTAjdALTo1FICGpypItX3FU3CabKP9afc5OROzkQ7LfV7WpvwZWnHxnLPH5VtKqzrTtnTSsT9UZflBUJnpScRkMg0olwOWdOnUT6vyfuzv0QZL3j5MauQH_sEe-DfNYrS3Wnq_2OMmw8Dbfsdc4inotsAufC_72aeBzg1JEdLXExmqY3bX8UdRfatt-z007cR6t2TWk3HNojkRj2HoFCcswBTxOeZpVwkSydRmkd0MvE41CZBvUxcCwzdR_xSBr6BcR3R0fE5SoTT6ERexr0b3NFvqdbJRk73CKUyw2rdCz2yqHEgK-elrPOgo8o_M3tO6aMjm6h4sXl2a7pUYUyiHPCkADKIe8S1IFrDpbJ4ZGRxyU4haLjFXmS81F4qG7xaCy4dzwMmKG97wi8Z4Y8GJLJiW1qSHsYmDdIw7Xv_EEVrLz_ofymPWZhlvXo6ZLudeIJEBRoMgNxw4U0ux_7kvttWmdriNFcbUZqOa1T_Cf6Z2i_gGM2TPRFtroZh_nLK24LeCzkNVVGHn8-v4--bKy3OBnuPiKWkq3NLiOl-lfrzAka5JzExXFChrrRkHs412sbzKnwyTcD7TOrg8OwP4WRBqEpS0x7RhT3VTSRy1V5PjUsf2Pn8FX4O5MS89sGMvgWwqgf1e0RuZJzMHFiGeEh-9_RoCZUKHNPYZYA3Xztxpq2ZBKS6REkFXv77dwV5v5jezjZkc0hJmD5JVx43lqvlrxT4M1ACP_Zb4euAoCSme-oHfd1GAlAG_ZORRQdVkkaZyPhYEHN3OuLvSan1GUunmW2pNfeQplTVtvHggOFtmVV0W1VAqjpXvqw1eTav9nah7Z7rk26bHBIojhyYlLV3XhwI7aLW71ay_2uSnZYtr3q2NwyOICzOiFsyXmX15ziEdtv_5jSPjKqj5pYPpEy0SibLeSbwRQfnh0s2aEgnf5euQA3_Nihs0G41x2CKD9xEW4Csr_6Yh0UV8qBSqQNc4eDbhJv4ewNChiHTRA6b4Hxp_QwUFFjsqJ3YmTqOBwN3GaXWrjWTgCZ-3bK76tBQmqXGYwGYo6ip_ZIdAQk-agdjGv9WXrBCZnyia_8aEmiEz6SfmJKYMX1YCj2rA68mYL8G3OBZpnoePO_VsWyP251I4byC3XdOa-jQmcpO0f-KwDGIHE30-1T1bN7C1mXkFCuYtFFm8NCs0GPIgDxRpnNCCkhYqrJeuUGSa5uPmIu_4iR93tu8f3XTYtPkLwjVl5xmDO7fNEu74nNyzb6rOg3pYyKfevIqamtqFm85zHkdRbabtcmN_qr-goLDCAxtcw--vMMsTV-xbXnXA6em4i3oNvNGcsp-ObDF8PFDHLplvrwfbfwZhmYgm40VHIFdNLm7VfyV_KwlZiHpPrx89DLeMeS2DRV8cN9nnJhI6wPIiIJBBaKmRLcpwEMMszzaiINoB7aBbC1ClZcaiCfrFCsPOvyVB9X5veP9SRgvIoEHwr-PHRIqh7bGlf9huD7rc4fbE42dK0TTyI7OCA_cr-RdxPXYclFhIv4j76F3MHCyQwYAcdi2ZFM6VJ48tj3pWAc9-Lq8E4PNKZEsLH5XZKT9tNakyNjlewqAVJrmHAhvUEOWgyxdPM8sK98vfY0etlvTK-vWFWnGRDdAD7hGg8m5i5WVyuJUovFNUgO4kz710xEQApBHLQvrbA6FLyxrF_U2i66dtlpfKhph_HThJ0FRo4H1pe6cUIJem.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01d10daf0f368e04016ae2857e295087d09a5b24c9faabe8fc",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230205,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 287,
+      "prompt_tokens": 2512,
+      "total_tokens": 2799,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 88,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2509,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0091485,
+        "upstream_inference_prompt_cost": 0.0062785,
+        "upstream_inference_completions_cost": 0.00287
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "c2b15ff93983f2cee865ea488e8ff4280430a2108056ac27e671b327b65b7974",
+  "elapsed_ms": 6764
+}

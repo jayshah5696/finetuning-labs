@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0049\", \"row_sha256\": \"92499079954652bb6afa2c41066274a19f0f1189fea5abd2ae8a09b3b5eea3e4\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i’m trying to get a decent request together for the next Mosaic importer change, and right now my notes are all over the place. Mosaic is the photo importer used by the North Quay archive team. It reads a manifest for an upload session and turns each manifest entry into a metadata record before the importer hands work to the image-processing queue. The records aren’t the image files themselves; they carry things like the manifest position, the source filename, the capture date when one is available, and the archive collection key. This change is about how that list of records is divided up, not about reading image bytes or changing the manifest format.\\n\\nThe archive gets records from a couple of different routes. There is the nightly backfill for older collection folders, and there are staff-started uploads from the intake desk during the day. Those routes use the same importer code, and I don’t want a separate batching rule for each route. One manifest can have a few records or a few hundred, depending on the collection. The importer should keep the existing order from the manifest all the way through batching, since the position is used when staff compare an import report with the original manifest. It should also keep repeated entries if they are present; deciding whether two photos are duplicates is outside this change.\\n\\nWhat I mean by batching is groups of at most 18 records, using the helper below. The default width of 18 is the value this importer should use; the shared helper is already used elsewhere, so please don’t change its implementation as part of this request. The batches should contain the original record objects in their original order, not copies with edited fields. A final group can have fewer than 18 records, and it still needs to be handed to the worker as a normal batch. We had a dry run where somebody read “groups of 18” as “only send complete groups,” and that would lose records from smaller collections, so please make the partial-final-group behavior plain.\\n\\ndef batch_records(records, width=18):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nThe main flow needs a clear empty/nonempty distinction. If the manifest produces at least one record, split the records with the helper and enqueue every resulting batch for the image-processing worker, in batch order. If the manifest produces no records, return an empty batch collection and do not enqueue a worker job. Please keep those as two branches rather than describing the empty case as though it were a batch with zero records. The queue monitor treats a job with no records differently from no job at all, and for an empty manifest we want no job. This conditional should apply to both the nightly backfill and the staff upload path, because both use the same importer flow.\\n\\nSome details that might help whoever makes the change: the importer currently builds the whole metadata-record list before it hands anything to the queue. Keep that arrangement for this work; there isn’t a request here to stream manifest entries or parallelize the manifest reader. Once batching has happened, submit batches one at a time in their returned order. The worker logs the first and last manifest positions for each batch, which is why changing order or filtering entries would make the reports confusing. A missing capture date doesn’t make a record disappear, and this batching step should not add a new validation rule for that field. Existing validation can still report other record problems where it already does.\\n\\nFor the implementation request, can the result stay narrowly focused on the batching path and its tests? I’d like tests that show a nonempty set smaller than 18 becomes one batch, a set of 18 becomes one full batch, and a set larger than 18 is divided without changing order. Include an example where the last batch is short and show that it is still enqueued. Also cover the empty case explicitly: the returned collection is empty and the worker is not called. It would be useful to include the same empty/nonempty branch at the point where the common flow handles records, rather than testing only the helper in isolation. No need to create separate batching logic or separate tests for the two upload routes if the shared flow is what exercises both.\\n\\nThe intake desk has asked for a little clarity in the wording because they look at the import report when something goes wrong. One staff member put it this way: “I need to be able to match the batches back to the rows I sent, even when the last one is small.” That is the practical reason to retain order and not drop the tail. The queue monitor team also said, “An empty manifest should leave the queue quiet.” Those are explanations of the expected behavior, not requests for a new report format or a change to queue monitoring. Keep the existing report and queue behavior outside the empty-case decision intact.\\n\\nPlease make the request clear that batching happens after the manifest has already been turned into records, and before any worker jobs are enqueued. The alternative for no records is specifically to return an empty collection and skip enqueueing, while the nonempty path uses width 18 and submits every batch, including a short final one. The request should ask for the focused implementation and tests described above, mention that the helper is supplied as-is, and leave image processing, manifest parsing, duplicate handling, and unrelated queue behavior untouched. The last thing reviewers need to see is that both upload routes continue through the shared path, with the condition checked before enqueueing; that keeps the change understandable without turning it into a broader importer redesign.\", \"output\": \"## Request: Batch records in the Mosaic photo importer\\n\\nUpdate the batching path used by Mosaic, the North Quay archive team’s photo importer. Mosaic reads an upload-session manifest, creates metadata records from its entries, and then sends work to the image-processing queue. This request concerns dividing the completed record list into batches. It does not concern reading image bytes or changing the manifest format.\\n\\n### Context and scope\\n\\nMosaic handles both nightly backfills of older collection folders and staff-started uploads from the intake desk. Both routes use the same importer flow and should follow the same batching rule. A manifest may produce a few records or several hundred. Each record contains information such as its manifest position, source filename, available capture date, and archive collection key; records are not the image files themselves.\\n\\nPreserve the manifest order through batching. Staff use each record’s position to compare import reports with the original manifest, and the worker logs the first and last manifest positions in each batch. Retain repeated entries: deciding whether photos are duplicates is outside this change. A missing capture date must not cause a record to be removed, and this batching step must not introduce a new validation rule for that field. Existing validation may continue to report other record problems as it currently does.\\n\\nKeep the existing flow in which the importer builds the complete metadata-record list before handing work to the queue. Do not add manifest streaming or parallelize the manifest reader. Batching should happen after records have been created and before worker jobs are enqueued.\\n\\n### Required behavior\\n\\nUse batches of at most 18 records, with the original record objects in their original order. Use the shared helper below with its default width of 18; do not change the helper’s implementation as part of this request. A final batch containing fewer than 18 records is still a normal batch and must be submitted to the worker. Do not discard records just because they do not fill a complete batch.\\n\\n```python\\ndef batch_records(records, width=18):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n```\\n\\nAt the common point where the record list is handled, use these two branches:\\n\\n1. **If the manifest produces at least one record:** split the records with the helper, then enqueue every returned batch one at a time and in batch order. This includes a final batch shorter than 18 records.\\n2. **If the manifest produces no records:** return an empty batch collection and do not enqueue a worker job. Do not represent this case as a worker job containing zero records. The queue monitor treats a job with no records differently from no job, and an empty manifest should leave the queue quiet.\\n\\nApply this condition to both the nightly backfill and staff-upload routes through their shared importer flow. Do not create separate batching rules for the two routes. The condition needs to be checked before enqueueing so that the empty path skips the worker entirely.\\n\\n### Tests\\n\\nKeep implementation and tests focused on this batching path. Include tests showing that:\\n\\n- A nonempty input with fewer than 18 records produces one batch.\\n- Exactly 18 records produce one full batch.\\n- More than 18 records are divided into batches without changing their order.\\n- A short final batch is still enqueued.\\n- An empty input returns an empty batch collection and does not call the worker.\\n\\nExercise the empty/nonempty decision in the common flow, rather than testing only the helper in isolation. Separate batching logic or separate tests for the two upload routes are not needed if the shared flow exercises both.\\n\\nThe intake desk described the practical requirement this way: “I need to be able to match the batches back to the rows I sent, even when the last one is small.” The queue monitor team said, “An empty manifest should leave the queue quiet.” Treat these as explanations of expected behavior, not requests to change the import-report format or queue monitoring. Keep the existing report and other queue behavior intact. Limit this change to the focused implementation and tests; leave image processing, manifest parsing, duplicate handling, and unrelated importer behavior untouched. Both upload routes should continue through the shared path, where the empty/nonempty condition is applied before any job is enqueued.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0049"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "92499079954652bb6afa2c41066274a19f0f1189fea5abd2ae8a09b3b5eea3e4"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "6879a33b8ae1744962704cd37d865773b5472a0505ee949227ccd081b7226f37",
+  "started_at": "2026-10-28T23:36:55.394647+00:00",
+  "result": {
+    "id": "gen-1793230615-jMKELK60Hda8BJQBongm",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0049\",\"row_sha256\":\"92499079954652bb6afa2c41066274a19f0f1189fea5abd2ae8a09b3b5eea3e4\",\"critique\":\"The input is a coherent, natural draft with recoverable intent and consistent constraints. The output appropriately organizes it into a self-contained implementation request without performing the task. It preserves the supplied helper verbatim, width 18, original record objects and order, repeated entries, capture-date handling, short-final-batch enqueueing, and the explicit empty/nonempty branches in the shared flow. It also retains the requested test coverage, both staff quotations, and exclusions concerning parsing, image processing, reporting, and unrelated queue behavior. No material change in scope, certainty, or requirements is evident.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4ocbEnAudo_3fxBOPmoRA1TD3Ifkpfriu-v2eGub8mD64zvshSp1RT4wX3z0cF2hyZNSPOmKaLd2z2xBRIUmphWZMAD3oV6xD2aqmATygYSh4ejxRiy6P7BP4PhLESx-b2PUrtnsfFACG2bqKzFQVhJiPFuY4YWyM7hkdztbnxVmN_BOP_FHwa4dlo-A7RdKWZRXfGXyluITwVBWOMOGhMDCH3eXTVpfPZ0QCOpeHkWdZQdYYNOLNNSTb5n1luB3nXgDXJ0RjJfCF82uHgFfcvquu-oTSydw_Z_lm283DIa1IZ0ebt0uQPhvOdO2EJkD-UAzChb4y_qyWRsQ7GT_UWOEOb5XwRUSb2prDrQRq7IWGlFmQA71YtSoarXlHG4LXQcVzIIKDIUM8wIuHAscsUxl9dgBb2Vw0WTZM--fJwmaloxIGRFsYwJ4k7e6mHuClse1cg-LOtPU8PAIdC-GgNW1WYymmQWYPLMZ_paXRlgaHtfJRDqEM4bcdyDFwa5_DIUKea15bS1CYEFzx7TZSJHmfNxqpvtBK4Ni-qr6PT1NUmFWyyyFWI1OS5K5bMhfVtw-l_UT1NRdVbU6FCiZ83QWsysSOcF45gocSGGeTWLQ2yIXzSPriXaQ7mVqumguVP-Y4sOuC3M0jTbRBeYS637wGCXdl4jWLenVUWXYdECVu9WRalCFM-3OWrLiSoGqYl36_Z8LDcLWsR8mOYwwTaUfiBg9pXaiggqcjpURG2ggG-YDZmdwxG8EqgtGU0ETTJp-OFxh-eDfqh7mn3f-J30NTHc4mRgR_z6Kq0gUuXMa7JSQgdGlQOl_H1lwRmlm6gI_uA5acxvW16rWu8FE141XHjZXK-BQzJNPZiCFydHF6x3Jcu01o-1ByBzffJygW33bDeWcd6stAyWNL-C7Pe9q4TbLt1SUrAxj_BB8Au7r8sT_lGkGunAYdDoKu_kjTst3TOfb7o4Cs93Ok4zuR2tucz7NhLq9XSDwCKDO7P7CId4vZydXwdSyiPymm_5Ag0umYTMmFZjdR2TWKnueSpK9wOE0LEc8c41Ci5yRSazu--A_f56hbtAB7dKXioMENDnnuC-t4poIx085jiJedYpnRtzauITngMq5NuAJC-HLOqs7dpehU_SrChlciTG9d4XXshdTxMYu2zWwIUBpKThChIVsWdgza6uLsTvjHb0808XM2ildKzrRmL5ogLh8T9FsitUzBgX02fE4bqESG56Mk4Nwv1ks0HMzeqACMzFH-CchdyNE8991cIvA08bkVS4GVFeZzLzI9PFjOnFaLDlhUJGJNOjhXHiy0q--khnmJ_AaqOCfgox8VLykUtgKFF9S5P7eqWqbFrYTUzodUpRlEpV8nbGj3G-UZYHbfbP3n0EyYMjtJX0odez4_PWAiTEXFwOSETPWdl3NMHtomlT5-pxrm98O3TorJd9kj9LdFY6_av2IE7flXhHHNRxb-W4MDJ4FcE5SyDT9nxh7gFN4Ix8XJmHZ3-WCZK9egkl6Xzp2h1AjCjmAiTC16oBT59PtwkJO62Nk-3ZgqYorbGodZRTlaqX3ONvKpIGLMu4F3H8nWimxpo43m5ODmG2ixeaJpIi1GV4PAf4cfMD4TlXWq4X4hC2l_jMA697aHqzE66W31NQLtsUcgZBzjw8yN3ItuMtefW74ZaGr6drdGKVM7Pu2B8poyWhq9S71yY70vCWUSLDouZt7qVsCaNeocIqoNMFlY9UG3f8pn-NKcsMqXAUm9MLirMgPHZLPyHOxgTmD17IYXE4pEYeyyKR93IiignvH_5bxM-Be46GbFRPL6wOb1GX1aPld4N_wxcfNChl_oU4pKlo9AO3pZbnueJ_7J2bJy7VQAgtycjMweYaZtoIOgIbMooxMDLbkGlCo9I59YOQjOf9-ixyykgzMg78UChDqKbfT8x2Wt-PGad0tYK9SLksA7D0Y3Whpb1lqrN5Xk9ePSlFbiaTXFvW2zHgTfoZF8dJrny5fioPV35LXCYQ14GFEfh88NsfavG107MZjVEWi1qRJdTmGTZYIw0yr1-mO4-jID5mjIXri2OVCL9bj2ikc1GD082RuakaUXKHPG_uvv390GClXg9XuJtxEqJDfGdyNBTFaqjNkBQ-tF-XFV_AfmnPPd-5cug5bJ23aJ70sz_-lljmSVv2BviKWF0h3F_vSYi1OHzsbv4rFjynS_hs3ix8GLy5_dTAVNScxn-nkWWyD_4j_FzZUjd33MZI2MAboUGRGXTpDsJPPs78o2lIf0gFWbijHlQdf9V9lQbjCkUJwVyQxkHlP_JaX8-M83jEtOJELWVc6UFZ9YGDZQfah4aBhMYH43I6JgZ5-Ff36TMp9Iwzc6jRdEe33_KA3i_ePrUXQQ8QdWUG17VTxLc7Ea-Gc7xbtzYioEVFOcS4xGLC9TAXeOlCPS4-TzVO9O1VfaOF3kMeEYk2wFlKntrEYyCfpnesc0F8oMmI0PjHw8wxTnH1Zs6PQ0H72i5c5uP2hKwpCpSB6LMXsBsVUl37NdrV7A3b79ep0l-9NGlBSxLMat1j218pIvMvN3GdqtlTPfS3DaGDE2vN3NkHOhVJprgwXEoT0b24t3pL8eNSAE_irPlorA0LzD4EC.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_03177d3468ccc876016ae287184f9887d0bc2ff808e412788c",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230615,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 284,
+      "prompt_tokens": 2620,
+      "total_tokens": 2904,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 73,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2617,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0093885,
+        "upstream_inference_prompt_cost": 0.0065485,
+        "upstream_inference_completions_cost": 0.00284
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "15fdd71463508decdc251d500ddafab8e69c39fb1e307687ca6f5057faac1352",
+  "elapsed_ms": 5592
+}

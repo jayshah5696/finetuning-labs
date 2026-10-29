@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0067\", \"row_sha256\": \"3c706ba02491dae5daa56f000ccdd1e04a34792624934cbf7a8315e78785cb93\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i need a clean prompt for an engineer to prepare an implementation plan and test plan for batching records in our photo importer. the importer receives rows from CSV manifests made by field crews, then associates each row with an image on shared storage. a row has an image path, capture timestamp, device name, project code, and location. Rows arrive in manifest order, and that order is meaningful because crews compare importer reports with the printed manifest. don't propose a new product or rewrite the import workflow; focus on how record batching fits into the existing importer and how we can check it.\\n\\nThe current importer can receive a large manifest in one call, which makes progress hard to report and uses too much memory on older laptops. We want to split the records into batches before the existing row-processing step. The supplied function is the starting point for that behavior, not a request to replace it with a different batching rule:\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nPlease have the engineer explain how this function's batches connect to the importer, including what is passed into the function and what happens to each returned slice. The importer should process each batch in order and should not reorder, skip, duplicate, or edit rows as part of batching. The batch width is 56 by default, but the plan should make clear that the function also accepts another width. Don't assume that a changed width changes any CSV field or image path. The existing row-processing step is responsible for interpreting the row values; this request is about the boundaries and handling of batches.\\n\\nSome practical details matter for the plan. Manifests are usually between 30 and 180 rows, though a seasonal archive can contain about 900. A batch may be held briefly while the importer reads image metadata, and the report screen shows progress after each completed batch. Imported images are not copied by the batching function; they remain at their shared-storage paths. The engineer should distinguish batching a list of rows from reading image files, and explain how the implementation plan would avoid treating the final short slice as a full batch. The output should be useful to the engineer who will make changes in the existing importer, not a general introduction to Python lists.\\n\\nA source note from the importer maintainer says: “Rows are already validated before batching; validation stays where it is.” Please keep that boundary in the prompt. A second note from the field team says: “The manifest order is the order we use when we reconcile the card.” Keep that exact observation in view when asking for the plan. Mara said, “The card is still on the reader, so don't call the import finished yet.” Noah said, “We can retry the whole card after lunch, but only if the folder names stay unchanged.” Those are ordinary remarks from the discussion, not confirmed behavior of the importer. Ask the engineer to identify any assumptions that need checking rather than turning either remark into a promise or a system rule.\\n\\nOne concrete sample should anchor the explanation. Source note: The 14 May sample contains 119 rows; rows 1–56 belong to the first slice, rows 57–112 to the second, and rows 113–119 to the third. Use that sample to show how the default width divides the records and how progress can be described without claiming that the images have already been copied. If the input is empty, the supplied function returns no slices. If the record count is greater than 56 but less than 112, the second slice is partial; it should contain the remaining records, not padding. These cases should appear in the testing discussion as well as the explanation of expected behavior.\\n\\nPlease organize the engineer's response into these numbered parts: 1. scope and assumptions, including what the supplied function does and does not do; 2. integration sequence, covering ordered processing and progress after a completed batch; 3. behavior examples, including the 119-row sample, empty input, and a partial final slice; and 4. a test plan. In the test plan, ask for checks of the default width, a caller-supplied width, preserved row order, complete coverage with no duplicate or missing rows, and the empty and partial cases. Also ask for a check that a failure or retry discussion does not silently change folder names or claim a completed import while the card is still attached. Treat those last two points as questions to investigate from the remarks, not as existing guarantees.\\n\\nKeep the requested deliverable at the level of an implementation plan and test plan; don't write the importer code or claim that any change has already been made. The plan should make the batch boundaries concrete enough for someone to review against the supplied function, and it should separate verified facts from questions for the engineer. Preserve the maintainer's validation boundary, the field team's ordering reason, and the exact sample counts. End with the practical point that the final report must reflect batches actually processed, while leaving any unresolved behavior clearly marked for the engineer to check.\", \"output\": \"Prepare an implementation plan and test plan for adding record batching to the existing photo importer. Focus on how batching fits into the current importer and how to verify it; do not propose a new product or rewrite the import workflow.\\n\\nThe importer receives rows from CSV manifests created by field crews and associates each row with an image on shared storage. Each row contains an image path, capture timestamp, device name, project code, and location. Rows arrive in manifest order, which matters because crews compare importer reports with the printed manifest. The importer currently receives a large manifest in one call, making progress difficult to report and using too much memory on older laptops. The goal is to split records into batches before the existing row-processing step.\\n\\nUse this supplied function as the starting point for the batching behavior:\\ndef batch_records(records, width=56):\\n    return [records[start:start + width] for start in range(0, len(records), width)]\\n\\nExplain how its batches connect to the importer, including what is passed to the function and what happens to each returned slice. The importer should process batches in order without reordering, skipping, duplicating, or editing rows as part of batching. The default width is 56, and the function also accepts another width. A changed width does not change any CSV field or image path. The existing row-processing step interprets row values; this request concerns batch boundaries and handling.\\n\\nAddress these practical details: manifests usually contain 30 to 180 rows, while a seasonal archive can contain about 900. A batch may be held briefly while the importer reads image metadata, and the report screen shows progress after each completed batch. The batching function does not copy imported images; they remain at their shared-storage paths. Distinguish batching a list of rows from reading image files, and explain how the plan avoids treating a final short slice as a full batch. Write for an engineer changing the existing importer, not as a general introduction to Python lists.\\n\\nKeep this maintainer note and its boundary in view: “Rows are already validated before batching; validation stays where it is.” Also retain the field team's observation: “The manifest order is the order we use when we reconcile the card.” Mara said, “The card is still on the reader, so don't call the import finished yet.” Noah said, “We can retry the whole card after lunch, but only if the folder names stay unchanged.” These are remarks from the discussion, not confirmed importer behavior. Ask the engineer to identify assumptions that need checking rather than treating either remark as a promise or system rule.\\n\\nUse this sample to anchor the explanation. Source note: The 14 May sample contains 119 rows; rows 1–56 belong to the first slice, rows 57–112 to the second, and rows 113–119 to the third. Explain how the default width divides these records and how progress can be described without claiming that images have already been copied. For empty input, the supplied function returns no slices. If the record count is greater than 56 but less than 112, the second slice is partial and contains the remaining records, without padding. Include these cases in both the expected-behavior explanation and the testing discussion.\\n\\nOrganize the plan into these numbered parts:\\n1. **Scope and assumptions:** Explain what the supplied function does and does not do.\\n2. **Integration sequence:** Cover ordered processing and progress reporting after each completed batch.\\n3. **Behavior examples:** Include the 119-row sample, empty input, and a partial final slice.\\n4. **Test plan:** Check the default width, a caller-supplied width, preserved row order, complete coverage with no missing or duplicate rows, and the empty and partial cases. Also check that a failure or retry discussion does not silently change folder names or claim an import is complete while the card is still attached. Treat these last two points as questions to investigate from the remarks, not as existing guarantees.\\n\\nDeliver an implementation plan and test plan only; do not write importer code or claim that any change has already been made. Make the batch boundaries concrete enough to review against the supplied function, and separate verified facts from questions for the engineer. Preserve the maintainer's validation boundary, the field team's reason for preserving order, and the exact sample counts. The final report must reflect batches actually processed, and any unresolved behavior should remain clearly marked for the engineer to check.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0067"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "3c706ba02491dae5daa56f000ccdd1e04a34792624934cbf7a8315e78785cb93"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "bfbeced0c6d8762029f9f70af74c21190c2183aa831892a20344083311b9065e",
+  "started_at": "2026-10-29T03:23:21.884847+00:00",
+  "result": {
+    "id": "gen-1793244201-SVa1hqIKjZxCqnq1XmXe",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0067\",\"row_sha256\":\"3c706ba02491dae5daa56f000ccdd1e04a34792624934cbf7a8315e78785cb93\",\"critique\":\"The input is a coherent, self-contained request with recoverable intent and no contradictory requirements or artificial padding. The output appropriately reorganizes it into an engineering prompt without performing the task. It preserves the supplied function, default and configurable widths, ordered and unmodified row handling, validation boundary, shared-storage distinction, exact quotations, 119-row sample and slice boundaries, empty and partial cases, and required test coverage. Mara’s and Noah’s remarks remain unverified discussion points rather than system guarantees. The four-part deliverable structure, prohibition on writing importer code or claiming completed changes, and closing requirement that reports reflect batches actually processed are retained. No material defect found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating audit expectations**\n\nI think audits generally follow a standard structure, so I shouldn't be overly pedantic. As long as there aren’t any substantial gaps, I can use the supplied function as a solid starting point. It signifies that we're on the right track. I believe my approach would pass with a detailed critique confirming its effectiveness. It's essential to provide clarity in my assessment and ensure everything is thorough while being straightforward!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating audit expectations**\n\nI think audits generally follow a standard structure, so I shouldn't be overly pedantic. As long as there aren’t any substantial gaps, I can use the supplied function as a solid starting point. It signifies that we're on the right track. I believe my approach would pass with a detailed critique confirming its effectiveness. It's essential to provide clarity in my assessment and ensure everything is thorough while being straightforward!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4rwwBOvUCOWwWIuXZZHPwQnjb4aifqKutWEWUbaYGwx_e9CDxtd6EWSnOXCsHjDr58L2mXUFRRk2ES1EZfBIAyJ0rIIViaQScjEIFbTcgudxG6tD5n6rWbMOUSntVr6VSW02PupqIMiivdbkDdr8TVa5nEJI3t4x4QLGbqqdIKVj0ueG0VKD8mtE4HZClX_CZ0E5p_eAhNhMkbz59dptV463EgibcExxOLCloPSAGPRM2PG4eDVippgYBGYrqWuDXqeTSG-_DXjld8BRTs3quGfd2xS7HcbNkvq16x7CRxxDiH3sCmVANih-12F2PtRj5tMxQLuvz-9jqOJOppWnG0dnGXclkCoLgM1CyNAgKvGKEu4zvVo3xvvV_Y_haA_RRas0L-w9FxcBOVc-dIyeWbJpdF3gQTHjINcc-nrvKoajTggxgfiovllz0GG4yFQ3OsukavZxGN-dguM0S2ca5MJ_YXEo-sxoiu9Hoipti2Q8ApTp07o7aGEuGpM9_hSyvw4rKE6z3eoNq504jUaG6_6F0CrY_3nc2z4TxxEwkBAeA8fZos3ejqDJCGSYV2AsYGlxIxw0gn-X0vZ45vis-vtad0YFnQbi8BrYb1lzvwwZJTkCXGvEuOiaD2ez9zcs-rH4tKQaPV61z6ZToZl-PncsL8Ur-9omAssH1jmNnHh5ckC0wQuVzMXOoLVvSQw22ifRypNzvnNMuoEdljaB3N6ExafT37xuW3SZyfRfj_rqVDdQXXGpEONBaIEtdLu9EtziAsoa-V7Az0P3W1BUCC9hWNMygtDk6wyCTXLIr6xCwMNNeWB4LlsxG41PgYtIaPN7E_4zyPaTmjLTtp88H0nnwq-J6hFG5R6L-BknbelDu95UC6gSxsswaPQLIDvS2FbXMnMPTKMpgpARfKLYnE-PZDIuNgXtRFzNguj0hbzlCvZAv1ce-g7sLcYP6DyJumFZCqxfoqRBx1uZ_6ApZmKZFhyyoa2ycodxuPrt6tKZmUAEwQCbhjQQUuGn0gGlwoYIiNzYs0jdCMjKWsep1PpjcgFDlCgdcwe9EaveAdclz99wbJ3Sp-kw38pzOfjc8PZTLK9DXpDICALNfnqhKR0_G8mmvoVyG143Nz8twALawttE8Ikxsf8gg6Y3tPeNJKcZxAq_VWYxDjkmgmRJ4VDpU6kbcPqNuHlk0I6Pl0SS7WTyXceGH8EnV8C2_O3XAfXSuxc89z9Qc63sMfbpikfiZqp7YPqHubXYX6EbhcajOLzeZQjJ7CqcsDjZgaSOm99JeJZxLsQiEYF1sWiJVQd-zc_JrjBmIyCM3eW4gulVQEPKgITqnCnbvkdf00JvBD_0csA-308gzmsn6r1uEhPuqlgA8LWpvmlcAt9zvAms920nA7iyud4wTjkDcZMpMAvmojL7xeTYUBKQwXRL6AZw4NQ--feJzWBI4I7ihB08RvFflHia3bLtNr5CSRV6X3FwdA-crENZdoNYIVvgI3LL26YhTq4DVsDW6vgUBS3dzkyZZCeDsbLBH17rly_QAEwhRQKQNNao-4rZAw4-DSRi9EsTe08BKUwKyH1PuoHagj9Hkf00-lZpskozZHffSt3Mtks_hT_FFdUuiH78mcAo5NdiHS5dkKsEK4mW6R1KdDcAUSytIoWFIgqgCLbFSjYAcvG-ComYMuAWcnqPJLoKorIHSI5Rb-oPgGed_wvkgak__JKmjQ4nof6D0OwIiKKBcIkbJpS3R8gt4n2RBRi7Mfx3H_I5NdTB5ahMzb8qnbuBGJxTUAkNXw0BjBUSCzPnq6dCVsFlPV-kaorOfFoT2BuDUXBeknxtO3vnnNHpgmoXNaiE4slyy95VOYK1cUdoc-CK4JxUTBjiBUqSsojMWmkuLosGG6MbBMpSrfgJalV_Ffej1MJXym0cuxtTm8dPCNqLAFskmakYVNba69Z4ZEHdOD8F1DwVHdIeHMOuAOJ7vQrVibFxAw_QcYjJ_eQCIsNEBdO-IixUsKve4JM0X8dXB7JRbRtoeqhhIwfVPn5Ez2u39RV5hAqig2W-kUwugzXiju0MIGTYcAySIOme391r_qs0xdjMx8KwSGMCF0Q6INjJTNxxJU5FU8p_CJ7FGcQLxnLBSonBbK5T8C7DnZpRtn1OAupZt68oNdoLqsOmfkC5JTWNcMtijGloYieVO3D2kqusKVSq5jQXRX-dkwRmI_taFcVG4ux9Vf4O3urIvQbMP7zvY4Gqrn4HYCbdVwe0aMG2-SL-mXg4dz4-9bYQWcWtlXwxdXsaFI_m38Gy8sxEBKPdplIOvt18_aXHqqCm7lTX_B1wn1BtJ3wDGVRgAmV1_wPTLvQ4m1hD8z1soKczVYEfxHL3a-1s4-bFOXm80mo6ORs76lm3aLRIQWrWwoMNcXGcSpiGDp_jpFmJdV8oScdsrok9Yja_1DHP47w7LF5zRS3QJyiXhvU4QjBTGm5-cWPXzJ6U2ev-NQos8OHp7BlRRtHi-LdDg0jQN81noGVeLo0B4UCEmCyHwDK7nTElvtQK0W4VWQBTMwFOWwgrAOglxXgvuhNc-H16AiKgAAuLs75oWNTx_cX3DWkd34z7XBBK0xfDjN1DbQ7YmwPzZObgb85DTmFAWCVtZXnL-x8kzlx_JxJ5kIQms303POTQpvXSEv4xYZoSF1hMoWz4OemfuMsULqmUmZvn4CUmuPEpCXPHx2iavsPW4-6LpOEFySQMuyBmxBZJrKKL8ym0K9RL9JpD_midPemVXygGSl1IP4RJXCHFRIkEZZQuhbvtjTn6F8e67Ityuj4i60vYFD3km0kNso75rpLdLpbvBkYe0LSWgq467nKhAzbgFaBibHSa514LvsXK-V4eXPM0_wS1Faa9_0AB75ybPGqHH-NfqnUQO-dppFGyJ2Krw1dvM423YZ4-SeH4jVBMHqigL1kGwsDXpgSTQGe7bX5jG2e1jlRhzpi3DQRdohGpcbwCgUBYns0YN9ia_fdOdLBZ0bMig-JY80RQLd2qKA5nk6hpwrosYXi0hcyw0shEbgXeAADcnAAxryEag4HIXJG3NAMVj0Pi54oyTUMPW_O6yk9nO2nh7NJwSW3Kv3gZm6zjEDL4QFP0nR1FPr6phToO7HKfWC5MwARZF5cwT-mSaxdDE9OtYCaWpVbLWpZURis_2a08DBZiPWlct2udfSmF5U_Rk87tgsci4ffMMe4ObZzHmidHHah2lcXcDPYN6O5Qxd0F7TOG7K_ECDYO3h3ee95wM7OXYjtJiZG8J5oUhsW83QSEaGO9IqtkW6mS7qLDkhd1F_lorj7yeaqtvspvWZsowOWZ7afAM67OFneDuw5CpBvYVLDSAfNqKhQkUaCDZ4PHFqVPQKOf2nRHWJpSavbTnbEnpFQT6SFhogGE5rfwzKZTFi_-Pzn5PuJcgUBB75JPZdPg6WlwilG5gx7ldEDa9jf4d5My34Vu9weE1726jmqrjdO4VUzcVNF3V0B7bZoZNAAW8kJaBSvdgDrDT3fLdR_mot2nYbUXo_cgYja8xYPAdEkYbYaUmNaveyJUj7IpWjtbWeEM9ZDZKQvr5Klg5esgLLz9lWRXDU-fecaPQj8TKp5dWCRsuMseL8ARSsm2v-kNuT3s0x7NYZ9GJjiib8Aiq78zaFpTylaE46ITJQk1IqCz9rWpGBHmrHY4xMJ92Q4eHrkSjMBn-Z327mhicyQugm4LkEXNRivBnPrR5XlA18N5_r_uRyy6LWuJTXWBPMHsjf5oOsJFnUXZfBwytTspoN16fY35oEePZ8kS6kHdWnDUEYMsBRFKniGLiZOVG1ssqwafXeYke8ltEbvDsELjJTpK8h95cp5VWtU4iLGzgUyKdwRy0RFqcSNLJcpEhMyojbEzDZkSMB-Dt-dk2zcSoZJ5wStCzz1BX1FTWSpEN9vyWR-O18VEG5-D-6_G_4frd31HuR7XENY3_ld8anHxWYRy4wKHw_wAyqZ4qNZWNDK4kOu_eYa0i_3ngEIoVCyokDSUV0CqcggaFqtr66Z5baJx0i05zkqI1ttjLMd9sBBJwlQDBX-wMCGRCX9sF-vy5wGfR6oM3jvGnwXJvVVdKBN1TknstS7Ro-nmnrSv8XT4oPUUQe6dyGZN_X53o3awS0QfUEkYLJK7HkQ4LDa78Y7Bs0c8lypF4u0jWVVT8XO-YcZ_1izu4L0_U0u1d0Axoi7Dpx15IG1XBXOpozTkaSXqZeff1tGoemGZvUuoYvP180MvNfq5W0kG3mo62e2-DABUBLYzCmfS9O7wmhG1IX1qT90AKYpbjrkWEePmxmV5uUvHJO2c6IUAT6QdpD2UfZI9CjaVYbvgfTEdweppg6sLK-Qji6eIz14G01yZlCcxVNwvM-y2Apem3YqqYrX1iaIoslh_jtNBgmOXjkWkR67YGBxaKwhl7BV8n9bhyPUebKBbuoajzJLIx1CnioKAa4s6-TABdFDW2KAI7dSd-5IxuPb85ex2LsLCNqKrcSgHGG-XGgeyhkluIQRBYbrhnFFQe_9dceCOVF8Qr8AUr23zJZ0296vGJlCJrAtLG2FRKAa5IOHCfQhC7QpqNp9FGRjzY1HiWhAOYefOQe9iJHvS90ShFpG6WeenOOxScVeKAX4DK2a0kAAGI7gHtDQEzvoTbB--3SAGLxogcmBED-Fa8L4BmGs_9F-fc7odZpwIt_HvUg==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_066d9d1522ac785b016ae2bc2b195c87d08248d2546e003e00",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793244201,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 432,
+      "prompt_tokens": 2537,
+      "total_tokens": 2969,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 209,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2534,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0045794,
+        "upstream_inference_prompt_cost": 0.0002594,
+        "upstream_inference_completions_cost": 0.00432
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "7f756fd5d515e61fd51bb14e5e71502316d13dbef4203f4a51ba7f7d967137cf",
+  "elapsed_ms": 7940
+}

@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0010\", \"row_sha256\": \"60b8c2acb60400c5461a5f5df1a6b23cf839c9d3f82778e43f16866ac6df788b\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm trying to understand this depot deliveries query and need a clear explanation, plus a quick review. can you describe what result it produces, what received_units means here, and what a row in the result represents? i'd like to understand how the status and units conditions work together, and how the grouping and sum shape the output. Please use only what can be read from this SQL; I don't have extra database details to add, so point out anything that can't be determined from the snippet instead of filling it in. If it makes sense, suggest a small set of tests for the behavior expressed in the query, rather than tests for assumptions that aren't shown. keep the explanation focused on this query itself. i'm not asking for a different query; mostly want to know what this one says and whether anything in its logic deserves a closer look. A short explanation is fine, but please make the review clear enough to follow. Here's the complete code:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\", \"output\": \"Please explain and briefly review this depot deliveries query using only what can be read from the SQL. Describe what result it produces, what `received_units` means, and what each row represents. Explain how the status and units conditions work together, and how the grouping and sum shape the output. Point out anything that cannot be determined from the snippet rather than filling in missing database details. If useful, suggest a small set of tests for the behavior expressed in the query, not for assumptions that are not shown. Keep the explanation focused on this query; I’m not asking for a different query. A short explanation is fine, but make the review clear enough to follow.\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0010"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "60b8c2acb60400c5461a5f5df1a6b23cf839c9d3f82778e43f16866ac6df788b"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "970561cc22ed7343052cdb307959f0e0152be44271dceef8da4d6eed96af2bd0",
+  "started_at": "2026-10-28T23:29:43.057205+00:00",
+  "result": {
+    "id": "gen-1793230183-5DE4ffeCL01oVpJBInxQ",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0010\",\"row_sha256\":\"60b8c2acb60400c5461a5f5df1a6b23cf839c9d3f82778e43f16866ac6df788b\",\"critique\":\"The input is a natural, self-contained request with complete SQL and consistent constraints. The output appropriately organizes it as a prompt without answering it. It preserves the SQL verbatim, the requested explanation and brief review, the restriction to evidence in the snippet, the conditional suggestion of a small set of relevant tests, and the instruction not to provide a different query. No material change in scope or certainty is apparent.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating review adequacy**\n\nI need to assess if there's anything logical that deserves a closer look in the output. The brief review implies it covers the explicit request, but I want to double-check. Is this review sufficient? I should ensure that it retains all specifics without rewriting any SQL. I want my critique to confirm that there are no material defects in what’s presented. Clarity and thoroughness are key here!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating review adequacy**\n\nI need to assess if there's anything logical that deserves a closer look in the output. The brief review implies it covers the explicit request, but I want to double-check. Is this review sufficient? I should ensure that it retains all specifics without rewriting any SQL. I want my critique to confirm that there are no material defects in what’s presented. Clarity and thoroughness are key here!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oVqtDMBevHdZjYfoeBdh_cPVmY17l_O5zzM_hXO0JqIiWTncWVyEz-T8LaO5T3jyRDmM9KI7z6VJKEAtV2K5gASnIYBieBToryu2cnF14butLTkxVJOM9SlK6qcUKnzYMPx1WlxXdSKZS9ZgYtcv5uUFFDcRoY7xNmvyU5fK-gl1Am9ogv1ZTezj2P9EMG9c7uTFsGJhpSYRD3s6a6Jka0M8Eq-Z0wAOABqX16NQmSestJxl6m1-9CyxsahxrfftH0mRrrolEvRMcr5Innrj8_n3S8uXJgOXRbA9_8HLOzQMzbTawuaprYzfa_pEc3fa_OSS4SjChtIePlEpCm2dD7Y3YS8SXV4OQom30YgOlMO4t9K66rqIEkiHF-uVZC6UD-r86y00ixwKQZXuJvN-zqYzWA1uliPN_hPstMY_RhJAFQaonlq8gvhCJrkplrH5Jl0UIbkBrOV_0gJ74YPvHf1Rno-TMOCUPc1NgHoN5oL4msyWCrNCOMBxaE0q1U4VyroI_GlQYB72T9sLx8sLUPTV3EzwiJMjNtO19b_ytxrGO47fqJYWdm9FKGlQjXUP8d2sGwCwlLqol6rVOKmR0YiVp3bdtnW0WyL2DRr9AK-bG9TfpCkMLWexUrng2bLyjVXowjb9mvmuUeDI53s1uqTSlEgXygEFILdoDpCmOBFKCAdCflEF2SBZPLqURbv3Gq37McO__12qJwy4_GiTeBTwOb7eBX0_9X7A9BxZrZfhbA7EYQE2sMNftNWc3SV-6cRKLMBRGWXXC2KcUEPEGT9w1kQ-wZ6MjZl32bcT9qxLAEK184ermXKt2hzHUBc2XIS9rr-iW9JByCCSY7wLTaEL5KVlWz5tVYBsx08mwY7o1rByxBw6Kvr669otr_hy-yu-4bCAtKoMoCjRCdl8QKTdFTN75N_oONWfwuy9hHv5_8P9pmlVnDplrmxtFkJUtWZKwk6B7ArtM8XT7WQCiKDE9AGuuXyAQnLaG7SGyiv9-5nat9zP9LrPyXd9dT713K1BO4btFPNj7rqd0MqYtUA-VI162xnjaVYAEF-WU2ICVB-hwylR-vx3xL2k1qxEDh8hsuBzVN3surVrDwXWYjz_YhgT3GAIZZqQJcF1rI4swOmId33tVRxQRS5Mragjgm4NoBpOxeKFlc1eiSKo2TEwwNw3LheyiwpahM0-mUjHzDm-a2IvHGvYSTYbRbMsESYgmfkUYuoCbYf4bS4tsaET_EEP4po5caJ_FY1wzSX8HjKAwB2EtMWlD1AO54l_VNAoMoBURcweaNO8vKXwWs61n4xWWhAL_2B08VWG3powXvCvgg_qy40ax4ZhCRwnecR10gQXHh49gzicjmmQG4LzxGYwzfEjhVoyeJanhbmMkOltYJXpsTq7DgLBuXtBcCqRRYRjPnNlKX66p2Zeif0Kc7c9wZwokkAYcXiH5DrgOYX-2nhMlv9o90vEqyqYL_qkTCPvzXAwq3VKSFIB90IgLKB06aQLdf2CsmghdzzQRXUbr-ieiZvnxl0yRye43Q5vK-C7Dj_GBz8P1vl_Vb7IAQ4C5vzVyKJd-u0fL-g2iWQX5ATVduEUmQf6di1H5ERqiDoO9PszOJLme2Pd5NydPyUdEA2ZuzC_juPvEDDO6YbrxERc9Eo0ZNLjS8s13MY0kDB55uXmMMT97iGW8NT6yqI2gzQlTWvtHozYNq5qZSFlQbRQY7dR1bCSMc4A43Hhg-yEETo_rOOGSRhol9fvPLDhb5RZ2VH-jVATAV7KYkh7ZgMEtNsA-FtAoEfFuxoTeFDGU5wqraEhvPzFqcAJwDij00Ccy8aXYBPXUno-iDVVX9fPB7BXSqF9FN1MJ7VALbikb-C4c5WH_BjuKQwHOa9J_T_bhWdASk8oAVudx9Jm_3mvRqU1w5mXIi14xVpxKPdnJhCoODA1hDP8lMGX35DB5WoQFojIKVKBMu6OZAr2CS-IbsB6M5U2d4k8hEW0HfH67V08EXBGk01LiptyDgirPysvTfskAK5f8wDoqDouHsgNi9CykZ2CAoM9WVtPO-xFDjhDqj_hl6n3LWl_5Skhpctx3yX_oQWuKrD1SfSlZLo-dydCjGD6ZL7xvpBKBcxb6j3b5PbN8cB_oIPcSo8bfwp5dS9hvSP7BPmNg5DEGhyybgn83LAPX2IGzLBQ97RdRUiRaAh3VNY3su0G-jSN9N610dMXNd9v7NKbQivi8fHQh2wZfqCTp_SLuQ10lIb4rUXd-YLI_RgywO925XpLSZDjSyDjBYVPZkI_NpAU8X2RHbQQ3Y5QIrPjgG2uI1trew0ZaXA4ZK7_A4rNmtmpmilzXmq1ERsvzp-dy20HDxPMzyydtLFDCDAY4ENQXmNX-1FuouBgxSifTJjNaqjwvlgwyA5VDlbJtUZRVyjcyFHC58HauFLGJww-zMN5Vd59xT32hin6s5ORJgMa7RhXxh1dqUP3ckzp3mtV_s7EdA1mWqpDQ8VsSJk4-62.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01063fe882bbb4f0016ae2856829d887d0b628b860c902e02e",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230183,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 241,
+      "prompt_tokens": 1001,
+      "total_tokens": 1242,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 61,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004412,
+        "upstream_inference_prompt_cost": 0.002002,
+        "upstream_inference_completions_cost": 0.00241
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "c7d2e3fdf4f856a9afd5ed3584dbba5294558660de5d55245e82634f423c55da",
+  "elapsed_ms": 5286
+}

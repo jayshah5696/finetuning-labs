@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-medium-0058\", \"row_sha256\": \"e5e72cf2adae080466cccb6a0f55282d48af005541eaab5935a4dcb46a9f8bbc\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"i'm looking at this query for summarizing delivery information at a depot and need some help understanding it. could you explain what it selects and what the total is intended to represent, then review the statement or suggest tests for it? please base the explanation, review, or tests only on the query itself. i'd like you to cover how the conditions affect which delivery rows are included and what the grouping does, and mention anything about its behavior that cannot be determined from this snippet alone. keep the response focused on this statement rather than assuming details about the database or an application that uses it. a brief explanation is fine, but make the review or test suggestions clear enough to follow. here is the complete query i'm asking about:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\", \"output\": \"Please explain and review the SQL query below, or suggest tests based only on the query. Describe what it selects, what the total represents, how the conditions affect the delivery rows included, and what the grouping does. Note anything about its behavior that cannot be determined from the snippet alone. Do not assume details about the database or an application that uses it.\\n\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 13\\nGROUP BY depot_id;\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-medium-0058"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "e5e72cf2adae080466cccb6a0f55282d48af005541eaab5935a4dcb46a9f8bbc"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "280dce6ad9df6a64e8dd18e1805d31b403f1d35cac51beb1aeeed7c3f640c564",
+  "started_at": "2026-10-28T23:43:03.087544+00:00",
+  "result": {
+    "id": "gen-1793230983-yp4PcvJSnqc2UySPA5LK",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-medium-0058\",\"row_sha256\":\"e5e72cf2adae080466cccb6a0f55282d48af005541eaab5935a4dcb46a9f8bbc\",\"critique\":\"The input is a natural, self-contained request, and the output is a readable prompt that preserves the SQL verbatim and retains the query-only scope. However, it omits the explicit guidance that a brief explanation is acceptable but the review or test suggestions must be clear enough to follow. This drops supplied response-depth and clarity constraints under /prompt.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oiN7nt6gxzn08i7Z0nsGOQsBMge5y4GWozKmgLal3JKzsyDEZDnD4Fo0a7StGJGuFJnIpzfxJG6JeAsQX0tdOkD1BIO9XkqIdWYopXBk2BFHEaoR4sWsN9euuXWLUxyb9efeVyvc6rPX8d6HRaKqb2w9XT5g4yv1wYtoJjqDxcKdVC-MyUV7k0SsjMhXguGN4hjrwuvotof99yHK-IpqciiirXr0CvXKOoRDddTzZc8OxDON86LGBoPzGqTiO6a3PJfR44EEEwNlK7s4YfCbniw1ExJ7XitXcut0EAZfVCu-yaOo3R5B3VI7tZByVO8t0RzoUsfoo9KfgWQAYrJ6lnuEspOKq88tSJ33xE1dDxFC1FTtSRUTMhFsRJJU7zrYuqs7v5akE4L42YtXRbHYZ-eZHVR-E9Whkte-oByufQtzahhgGkmcs3YXIpoYv0lnVOmqhgPqh737MXcyPu10anslfbvgvTJzaJC1Uudw0CrjXpuJQ_MtB4NEmobZ6bxCAaaKHaSE_hol2CtCLInEO2sPpJ65Z9XaeLV1VNwHUbsp_W8CYDKzLGHLjngNq6coLaQe6ORhaadBe78NVlQCOwQSJI3E-u0_UGYkEsS15cIPN6iY6dwIAZrCgN5RTC5_Cq5j7Kdur_iWsTahDyN1mxT3kSHbPR6ECRkRUtsQpsNmFxAhuINcB3g4mZ2IsgmkjvXVf5ZquVZ7SyzVLsbCooR0QDxpj5tWS1Np0_tCBe-3c5qQlYs19iti1Vsg-HSefkieZ32WcpuHznTfqioVu0Y6RX38NnhvdWTCzFAegSvutJV_pOKFbd1XX45MIE1FWTzmncHvYoCS6uP21tKxrEpIbQ3pElU_wQ4ZoKLdfLF7muaO4cj7ByhOII9KdTu2f8UBwj_Cl2Il-zqLO5btBY18UyWEjJZJvhX3NgplVR-VLNlSMBMEvssoACzRoAraGlkSI0oJ-cC5qyU2rh_mvvWVW2ZsmGX-OpfgQYZsgABYpiF82LZG-ts-E77vlnBGhUxO1Z8BAahKkwBYxx5z2HeVOY1S3T-m6UiOKaX_PKDCniVi2oI32wfNcffawNn-36yHYyWOw0FGBqsC47bQVqqhu0j8aWw4F-ytHPXPX1j78HKSK63blHmghSds-ejZdlUDX0YAZPVIvIq9HlYUyv7qCSeTgE-7S1SFZjQ4gZsmbmE1msGlsqw-MzenM6NeHOfL4OW3bXUcIRdF4OKePzIIolD6AT1T_1MF8UvSRp0h5t6R6FbwTb1c5kjjGLL-WNRq1l7PW3ebI3K22xAnPDXQhiDq5RB4I28ZrHO1SMCnUjOs7U9SazwtpgBF6ZoYVn9WOTWqB7F_zNyQgk1Z7PKTlyErVZUlZAogeeV6pllFR3sYYhbh5s1yOv1HrvWXkkbPRWIujgl752OtLCym7wjQPbcq11JvCON6xSbzVAiam4BPbdWUUmbTUHMPe9KxW5ImyruPurj81j5bkoC7xd3kxy1BOaie9CPyqx0PTVTV9IGeqmuLXLYJo4yN0c44ct88TmT8mZ6marOyV9vvUJSfuQZJ2xQlOoB8bQmfCsvzkteGAh3hfd1_ssnjOit-xiqfgr_fSVzQ1LM8kyQAR9I3JVchVxDhcvQ8vDpJ_GtHsrDLstIKD2Av8rtkFQpjQI-4T4X6wbiZLgFpzalTMm4kS5IbFTb4CfR8sz2xxUZxheVKNxJvLECrMTDyvEO9UO5Oz1MrEQMB2tOD5qIYVyVV_IqsWmLhQwKEd4U8IRFkAAXnoZ7mV2i9P7GCg1Xd26F5_NlOUe99s0dqLfH235cT0B00p0xN4xZ0rL09zY377DpGeV33cjrSE9htMA-VycGZrvymXTIXEdAUP4unAXaowOBIn4ZKBdEJ0wXxS_IZUk75bZqPOgIupg5xhPgP55yN7tavgBExHsoWaMto8W0M_gQN5bsiCKR-eZonH3hOy4X8F3b9Gw8Lrmxb0qcMoMiBPOP50MoKdeJNpraU-5fYgm_L8BIpm5qdV9lbt_cGrDwi3fuu3A4TjJ7r_uVQtoeXDP2vyxapQvKcEIsgzxtIXhvK86FiIvqLKZymd7mQlOnV94SWepFwunpCAklgNvx9tTSqAxLfILP_68nfbqYfdXeDWjlf3Iz2wmah6rnFfbbWosJknnTupDjATxGcmar5C0RUlljADmr8kHOQ7lLF0FkoXjj393bTbVZX4XGxFxT9zZnrjQQPfNTwmEHAMYpF9bKvR9-MHCT1Kz0fXlPO2b30xAhzyPFLSJKAoFM-0SQXMXaRvfCTveNVOEubWA-itWtaUna6oo2AKVFdJwHaePmy5KmaPXyTo7C91LMsIU06ddRafBzXAAs2CtZ-4psaN-XJF41WzBOD7SxQ8ZRt2ZQ7XSup8-sv1huryLmYpZdYF2Lmnj5GhpluweEtarX3zr4Z-NqoA_z9_7vrhrppsfyyWcTiK0TJM90hoj4T1mArT1OOd9vzpAtSHTtmKKBd5yWP8OXMvIcgu4uTVWc6C-KNVirNZGTmiz3zUSrBSh3eM5KDID9-3_4EbyMD1CwTofVVKE1poWj_4l0CGk-QnbspLxeBUROwytTazwKRoa8kBsTBOsVX9Za4VnKIWkZFCemhcErHYzKkZ8w2A_VoAb42siBTb_2ky7MpNRd6tv8xkrrOztHxh3DfvV7TK9DRcWL3IWNmnmgBcrLmvG-gKb3OU4k8JpJbHAVswabQoVDqWJUIRoswHNk-G_XIuh85k0fMQHt74jsk6lnWQbKDqajOp4YMVp1iyO8bB3ANu5vx0VwxTW8VPh9d82WMVpNZ6_8hcO-Y_xt4vLmDgTPmfSMXK_Cv6PoggBeFEUTYUagBAoCa2VHKqJM4M2VG7mFBn3ijBz4jKZFuxu59rPeLhNXzdOo2rEoPhllGFIM_Ws7zjt5n0Xqp2E27oB-3ManjezD1tfLP2Ill2Pq1YP-AqW3rgka9FExgfoHw1uLXhlfmHF7Kdg0UqXrkGDm-Hag86yeh_Lms2fNRXAuogyfeQ50iNUCTZdiDvFObNzfq7umwh4QWumyX0lZH5T2bnLYi3kIsjpydwyLa1ThrCev9jAz7Hd3NOl2KF63lRvfhuC6DX3hnEvFX88SPPX1MKP6JQv4mAiKvly4KMs1GMslodqRJaKMRhmxfm_eQgnUQfZqPzvzcx2J4pjdbiILw6EMG-JeVifUNWDLSwvTZwEvZv6qxdr6Cp2sYwyySjZD17AjaHvBPRRA6_1_L7-nBwcJh4Z0uXfXnzcUO3AN74DfPR--wOO2ilENN14WyEd34MHKHpeKdauidIy8LVUNKq4LDMXTYYAVsJdq8wY6yXZPdA-IqWf2SO7NAxXW4KmKkB1OqyIZtJRwnNLqKFscH-9Sk_F5KGrcG2OEBafe8w2QcrnOv5q3oWsMROQA5cQaSgYfs_Q21orDP47Bnz_9Q4IosVv03qCpoLFZFKm0L5JX_goN0kOZAPOJhk_zQCjg9MTlM0W8O41ah5LVcgvNCf-5ThWTWF4iQYFs73WPjlxd13EE8Jeka9m0NXCPOjlXN2LBH_h3aRhtrLn9iNVEMouF-vDaiPUCjZHmHRzgLtepPm4zv0_FjV08yAwOF3sZZqCLNdAZQOYlU5hsFQW4yZ_q7oc0V71HXyjxyr2bcZ0kJYRBOr7JJb5-hXDPIBEJtliYEt4BosvD-GIVKWZSN1ASSZyZ93EaPQmDL2LjHFk0ydJshBSZISp68wEIsudnMETcxDNhCnogLROZ0r_wXojJ27wlgmfxB4beledj2fybH24nb_DhvDvv-1WZt0vh7h_m7tCrgMTOR3nDQCwBC6e7AWYFhfaTNCsZ0JBoAU80KPrSBPVuDyK7p0UIDECZWUu74V5RYu7MBnAcjkJSysppTpBIpFo-SWHFLTZRXJ6Up-2sjwZBAkafx2YLONt_77ojeI5RPr_O4yFloXIkXJbfPlJHCxuenJzEut2Ezy7ojhUPCyefwskuZ0mF-HhoIasRTU_OJvKKipEsWuetErVhHAc639FF0dehzMsvzvqJw6o0EKeR8xnCC6S_3PsQ-liSEPYi4IICv71AnpzwKr_nXn9SXDGjKIjmUKlLQrPz8FNeF8oQx7ElulTbwn85eDemZViH-NbhBrJKzSJTJp7KhfISvwEWh3BLN8LjZCgIDCwogOc_lMCIU4OjZOfZY8wGUmyTkhTAKN86YFnH7ySgfm4Ruk1dALbFJ0vBHIrzBhg6alt62t6L_mGDdQvN5r9r92TDuJmCtE0Uh5keBS33qb91skeRsz2A58q-B9TjDQ==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0fec56d79fc72316016ae28888600087d0ac0c6fdffbcf889c",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230983,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 346,
+      "prompt_tokens": 887,
+      "total_tokens": 1233,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 182,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.005234,
+        "upstream_inference_prompt_cost": 0.001774,
+        "upstream_inference_completions_cost": 0.00346
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "e0e737ab9402a8e3ce351d29cc8ba175552986284f0dd5f90705c6bc21c2fd1c",
+  "elapsed_ms": 8071
+}

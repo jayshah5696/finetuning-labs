@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"arka-boost-prompt-long-0016\", \"row_sha256\": \"b776b4f42f548e1caab7d4329ad26b9fac3b4498a392401f94d9cbc6252c4a54\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we need a useful delivery summary for the depot operations lead, based on the fictional two-week snapshot below, april 1 through april 14 inclusive. please turn the notes into a prompt for someone preparing the summary, not into the summary itself. focus on received deliveries, units, pending entries, and what the figures can and cannot tell us. the lead will use it at the monday review, and the numbers should stay tied to this snapshot rather than sounding like a live view. the depot names are Northgate, D-04, and Riverbend, D-09. use the ids when referring to totals so the two sites don't get confused.\\n\\nthe source is a workbook called April Intake Review, exported at 6:00 p.m. on april 14. its Daily Log tab has one row per delivery reference, while Depot Notes has a short account from each site. there are 32 scheduled delivery references across both depots in the window. sixteen Northgate references are marked received, two remain pending, and the remaining references are not in this extract because they were scheduled outside the window. Riverbend has thirteen marked received and one pending. the recorded received-unit total for Northgate is 742, and Riverbend is 518. those totals count units on records marked received only, not pending or damaged units. say what period and workbook the summary concerns, and don't claim it covers every delivery the depots have ever handled.\\n\\nfor northgate, most received entries were routine pallet arrivals, but the notes mention a late evening arrival on april 8 and a dock-door change on april 11. the april 8 load was checked in at 8:42 p.m.; the normal receiving shift ends at 8:00 p.m. the shift supervisor says the paperwork was finished the next morning, though the ledger status remained received on april 8. one Northgate reference, NG-141, has a receiving note that says “six cartons were set aside for a count before shelving.” it is still marked received. don't turn that quote into a claim that those cartons were missing, short, or damaged. Northgate staff say the temporary dock-door change was announced after two trucks had already been dispatched, but both references appear in the received records.\\n\\nriverbend's site note mentions a damaged outer wrap on one received load on april 5. it says the inner containers were counted and accepted, and there is no unit adjustment in the workbook. the manager wrote, “we logged the wrap issue, not a shortage.” quote this only if helpful, and keep it clear that it is a site comment, not an independent inspection finding. another Riverbend note says the driver for RB-208 arrived before the booking window and waited 35 minutes. the row is marked received, but the workbook doesn't record the wait as a delivery delay or give a cause. don't infer that the depot caused it.\\n\\nthere are three entries that need careful treatment in the summary. Northgate's two pending references are NG-152, 28 planned units, and NG-153, 36 planned units. Riverbend's pending reference is RB-219, 40 planned units. planned units on pending records are not part of the received totals above. a status check is scheduled for april 18. if any of those pending entries change to received before that check, include them in a revised total only if the report is explicitly updated to a later snapshot; otherwise retain the april 14 figures and identify the entries as pending. don't silently add planned units to received units or present the later check as already completed.\\n\\nsome workbook details could be useful to the person preparing the summary. Daily Log contains status, units, depot_id, arrival date, and a free-text note. it doesn't contain a standardized reason code for late arrival, wrap damage, or dock changes. Depot Notes are written by local managers and don't replace the ledger. the workbook's export time does not mean every note was entered at that time. no customer impact, cost, service-level target, or carrier performance data is supplied, so don't rank carriers or claim customer harm. the summary can point out visible patterns and limits but shouldn't claim that a cause has been established when the source doesn't establish one.\\n\\nuse this query as supplied when referring to the received-record extract; include it unchanged in the resulting prompt and don't modify the filter or the grouping:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 31\\nGROUP BY depot_id;\\n\\nfor the requested deliverable, ask for a numbered checklist for the depot operations lead, not a chart or a long narrative. keep the output constraint attached to the summary itself: each numbered item should put the supporting evidence first and any recommendation afterward. if the evidence does not support a recommendation, say that no recommendation is supported by the supplied material rather than forcing one. have the writer distinguish recorded facts, site comments, and interpretation, and use cautious language for anything uncertain. include both depot IDs, the date window, the received-unit totals, the pending references and their planned units, and the two quoted site comments where relevant. don't create totals for pending units as if received, infer trends beyond this two-week window, or turn a note into a verified cause.\\n\\nmake the final item substantive: it should remind the writer to state the snapshot's limits and the april 18 condition, including that a later status change belongs in a revised later snapshot and not in the april 14 total. retain the full query above in the prompt. the reader should be able to prepare the summary from these notes without guessing which records count, and the prompt should leave unresolved anything the workbook and site comments do not settle.\", \"output\": \"MODE: /prompt\\nLANGUAGE: en\\n\\nPrepare a delivery summary for the depot operations lead for the Monday review. Use only the fictional two-week snapshot described here, covering April 1 through April 14 inclusive. The summary should focus on received deliveries, received units, pending entries, and what the figures can and cannot establish. Tie all figures to this snapshot, not to a live view or to the depots’ full delivery history. Identify the depots by both name and ID: Northgate (D-04) and Riverbend (D-09).\\n\\n## Source and scope\\n\\nThe source workbook is *April Intake Review*, exported at 6:00 p.m. on April 14. Its Daily Log tab has one row per delivery reference; Depot Notes contains short accounts from each site. There are 32 scheduled delivery references across the two depots in the stated window. Northgate has 16 references marked received and two marked pending. The remaining references are not in this extract because they were scheduled outside the window. Riverbend has 13 references marked received and one marked pending. Recorded received-unit totals are 742 for Northgate and 518 for Riverbend. These totals count units on records marked received only; they exclude pending and damaged units. State the workbook and period covered.\\n\\n## Site notes and limits\\n\\n- **Northgate (D-04):** Most received entries were routine pallet arrivals. The notes mention a late-evening arrival on April 8 and a dock-door change on April 11. The April 8 load was checked in at 8:42 p.m., although the normal receiving shift ends at 8:00 p.m. The shift supervisor says the paperwork was finished the next morning; the ledger status nevertheless remained received on April 8. Reference NG-141 is marked received and has this note: “six cartons were set aside for a count before shelving.” Do not describe those cartons as missing, short, or damaged. Northgate staff say the temporary dock-door change was announced after two trucks had already been dispatched; both references appear in the received records.\\n- **Riverbend (D-09):** A site note mentions damaged outer wrap on one received load on April 5. It says the inner containers were counted and accepted, and the workbook records no unit adjustment. The manager wrote, “we logged the wrap issue, not a shortage.” If quoted, identify this as a site comment, not an independent inspection finding. Another note says driver RB-208 arrived before the booking window and waited 35 minutes. Its row is marked received, but the workbook does not record the wait as a delivery delay or state a cause. Do not infer that the depot caused it.\\n\\nThe Daily Log includes status, units, depot_id, arrival date, and a free-text note. It has no standardized reason code for late arrival, wrap damage, or dock changes. Depot Notes are written by local managers and do not replace the ledger. The workbook’s export time does not show when every note was entered. No customer-impact, cost, service-level-target, or carrier-performance data is supplied. Do not rank carriers or claim customer harm. You may identify visible patterns and limits, but do not claim a cause the sources do not establish.\\n\\n## Pending records and later status check\\n\\nThe pending references are Northgate NG-152 (28 planned units), Northgate NG-153 (36 planned units), and Riverbend RB-219 (40 planned units). Planned units on pending records are not included in the received totals. A status check is scheduled for April 18. If any pending entry changes to received before that check, include it in a revised total only if the report is explicitly updated to a later snapshot. Otherwise, retain the April 14 figures and identify the entry as pending. Do not silently add planned units to received units or present the later check as already completed.\\n\\n## Required deliverable\\n\\nReturn a numbered checklist for the depot operations lead, not a chart or a long narrative. This output constraint applies to the summary itself: put supporting evidence first in each numbered item, followed by any recommendation. If the evidence does not support a recommendation, state that no recommendation is supported by the supplied material rather than forcing one. Distinguish recorded facts, site comments, and interpretation; use cautious wording where information is uncertain. Include both depot IDs, the date window, the received-unit totals, the pending references and planned units, and the two quoted site comments where relevant. Do not treat pending units as received, infer trends beyond the two-week window, or present a note as a verified cause.\\n\\nUse this query as supplied when referring to the received-record extract. Retain it unchanged; do not alter its filter or grouping:\\nSELECT depot_id, SUM(units) AS received_units\\nFROM deliveries\\nWHERE status = 'received' AND units > 31\\nGROUP BY depot_id;\\n\\nMake the final checklist item substantive. It should state the snapshot’s limits and the April 18 condition, including that any later status change belongs in a revised, later snapshot, not in the April 14 total. Keep the full query in the prompt. The writer should be able to prepare the summary from these notes without guessing which records count, and should leave unresolved anything the workbook and site comments do not settle.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "arka-boost-prompt-long-0016"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "b776b4f42f548e1caab7d4329ad26b9fac3b4498a392401f94d9cbc6252c4a54"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e2f9e0c7817c13f5e039f6caffb776bcea1870cd32761ca03fed9edf5880b054",
+  "started_at": "2026-10-28T23:43:19.287309+00:00",
+  "result": {
+    "id": "gen-1793230999-OoE8QkIKKNPTtlL7GSay",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"arka-boost-prompt-long-0016\",\"row_sha256\":\"b776b4f42f548e1caab7d4329ad26b9fac3b4498a392401f94d9cbc6252c4a54\",\"critique\":\"The input is a plausible, self-contained request, and the output appropriately reorganizes it into a prompt without preparing the summary. It preserves the SQL unchanged and retains the main snapshot constraints. However, “the driver for RB-208” becomes “driver RB-208,” incorrectly turning a delivery-reference identifier into a driver identifier. This changes a supplied fact and makes the pair fail.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq4oidafzSBdgBkC4Y7AlOuxWM_MFmy5IHOQEPrDyQ9-TqUDN6tp7zVoGSlWN4VAQaZbz9ZpFbfNlMEYj17AoK37IgGcO3ZuwnmKDl4_agiHjsYmZ9a6EVeBjyS95AXPwibDPOaK_hMt3ZJiqOg5gGG8iWNo5PIW8XqzfSvoPd8uQT3lOJEIZS3kpiysV9yrGVERSbquQ863Umr6F6mOvCR3YpY8-Rfb2KRkrW0sJVvcim5GXnnGQO7SDQ6KZUxffZAqkZL1KltKjjdg6t4QwvLLVl5Lkih-oavTwDXhORxIp0A7kwxdz0fqQsdpavFXI1ESheXtpLfNM39k40xjWQLRwUqqQG6UrMx1RiMnjUcPKxhr-xwwo-TOPqyCdferlETQOqX2qGRocOwLw1Xjax41n5oLtEZCJ_FWk1XrjjDBwY8XuoQ-hFNOZoB-SSAFdhnaP1kapBhaKS9TpShAlBIE2hLXHGMYXS0uNsgOSVVLafj83ne6gONFZtMC2kNiFP4Lf_oGUJZzCqaS2InPgLCEzWNGiEEoN-QTest54Sos5db56Yq5S842iaQaxf49TcswwN9YJFQZvWPhr7Fd8iyNDBRX1tKxxOcYwf8AA8umMlolGQ5FVB3yXCaB8vwUykV-176fzgQy0IIikvEAaZJH5_-Kg9r7QJAPtm0SsEFLuQvnbhIW35bKqxjrrSrlPEZWC6-Oh8-IAUkTLUHpNnfcmtUERGwJgyBVlbs4pUkCyq1XGJTirCO9dl4Q-VMJwpHztdAz-Zs6wjXWY7UDbQaBcMb5nGrFf-Wlzd6f1J0wgWSNXhCDBaOZZZ0y07Reyow7uDPvhml7j5BrKA-6wYpvVzUg6lrOrleOSp9gWScDwwG2D1e0rQIfdT98wfnQ_dsvVK59lsjiMvyqEHbdwzYivJ8YtgFLgdSJnF9qwJJHlBoOhTae9td6KWg9dN_RGZ551od3zjhq0xFUJQenDlZKXXGQI0Dv3Mms6vdwoHK6OuKj1akrScQrWsAbvsQUcgP3z_JicgESQnfyBNq0u7qA_iQPzgrOHiHUkiUKGmK6WRYsrU3bUjnvseAM0KfiehsqJywQMHAIiC_M3hJyTkLkEySpIrVuIW5O7s6nwP6Qs8fh-auqHj-CLHLfppFP8bil1VhB4bGir-xYMexwE-D4cEJhyCU883KeRRbGN9yvjKPPDhpxAX1tZWh7_ia0qsE3iDuzpZwJ-LVn9bI84GUr_XE5WRsqE6zEIh8BRplzud8AaKUxi0cnu8NfAYK_x4ep3nZLa-OxwOAjzp3Kk_f2V59lUs_KNdP80-VsjEZGcviISTpEBYUiQUvns0jutNLmhphYjU3tW-ghEtv1JgX_LDMLyAKLBYi1OV-mnr4KYxGxjxOwBQM0D23AVAuSRiNbMU8HOBJ-j1uOfyo9UNF1CdK-a2-GOxynu7q75A0nSOsPbtBdRBI8Hxia5bpSQIH1kPRfQF8y7BmRgTUaDNTiYh6tSTnaYB5qb6zuPtZFAzu28VdksMHGt0yw0VkpMysNHyJFoRZiykua5pDr3fJNl-WxwIXtVS4BXeLGZV4YncSPUtoMpmEQFSZZ7egP_ZnGTOoAagnB0Tj8voDpcVsow9tOeHJvXj5KiX95M_dhJ2C7e6bVT5_gZlO6Vt-RdlmXh9bCDMx4rNR4vJdzX9xPuq_qEXegjFK-becSNp762JnBHUydRhhnv3ssT-7iSQF5mVgslaUs1tDuQXl7X4miGqxb4qSh1FpA2teOU0KZzJ0Ng4VG5Qr2P4l-btaWt2jCiAfkKX8WZ9JSbdXp4nJrk0U71RT5EgCi2t3Ph29miJyCZnxBuJrCs5-4dSrMWoISHwh0idoXH1sPC_y5WUZEM1oEVNo-Vu9wBiJU3qd1JnHIBteic_eURY9Frb404MzCs9uHAf1-Ez1aW9N2WO4F2buRbKAXB6UZxI20vUEaDEqfzWB1WxDM59V0hq9tnBXkkuxnzvXVATV36GJzGZMoIY26PbfUKH_baNTcpolD2QPrVAkeOJwTyHaQxxMxFNvssua7RV2iC7AQeVyNuwQACNPJ2ro6iw-Y5hYDcWKPVAsv2NzJg87M37TvCVgi-hsbJoYKaBLiovCsTjCjDFf6PpAq0-44IL1yd24HB9clX6cea5U8u9JOeMLjk6oS5Tx0VgKeMkZn2cmQtpnVkohskzofXENfS8ts9B-4vco2lt-FIal1XQJ-eQ1nGZ06BaLGNoVoXGN5BPWG2uT7OyJzaxKIRkMKIXGZIyUA3Ks81CWcFbyZifDMSuN_JffKvQkYhp6HNyhqs8jyzmep2chENyncOc7jAXbx1Rn9-rG9mn7oFGBr9GXMamI_GMUocUjxm-OkIz6jJtG2YudKR3Y_Tdjkd3d9mbHX9VG1xrOqICgn3KpBVAHLf1qAUVkoU-OWZUP54hDfB0d-b-xwJZkPETk6cfJDoxTm0sv2R10-0rjPI4typsHmmPSl1ANQ8VQ3ujRwQO1pXD-gzD5Te_mFhcp9IUs4ocOgpVF6zku3KhyqhokFcmSZDLwlphVYpjEqtgEhHzQywK3fW0-qk9sYEIIRWogHOSQGL3AxmTzJN0xGIie0AqwuMKitHr0vDBbTdn49X-TWMlVw9v_ykiaCezkuS_7F7Jbym407Xc0gnrlwDJSEh60bKBD_HZ84MkNNI5bGzc6jlV1SfdxXPyA36Voefee6Get2nrMJu-jn6T7MVGf11S3e8JPgF996f04aJaSc-BXzfZOiROTYS3-1hUers7om0LPrpzqp--FPX0nSxYmFwbiJROQ_JYXo55e7qok6gPkEZwW6YW_f0Lv_ukVwsa8EDXygTkNrVKh1xdTiUxbaLztIuNaaBRKjJfqttoS3MKMu7Q2vjNzEHFSOjMY3E9X14I6sSTqYkTYaS6Gv_wRm1QzPi49FIxeWAbkvtP8U1LMf5tyfIqDEbpOi-p5PhKTGJp9kF12pu2lDk-K-q3Xo8JpAx5DDVM3WaGU4j1PRSoI9y6lXxZV6zoCAb-ue9Lrrs3H2Thj6ELepukjjoFmwPbo10yb0qQPMJjXOON9Ks2o6Y3TnTHQ6KJF66wzJt1576nuQI4KfUmHjzN-D0uogM6fwiLOyHVYbuT2VOG1Jx7rVMaDCX82A27gWpHKKEufNij00tgpfYc2O5Y1C-_IlHvjcNs0NhBLRqcbZJQ9DUnvKQ5hPrtHWJzyJjZmDesgizMGNmJT4Tz_tNM-hoO43pIkInE90Ec-3H236RZqMwXspc2K94yiKsbhmOCdU5xwPk0v-oRwM85kbn2Y2eiV6fvyTU-4aswE6pzQNq7Asy76jDqpK9zr0krxBozXSsHZdL7L9HKaJHbgND6FhB6DaeXFBkXkvAYoktJHMn3LPGuSFWiGcNhudY2bVsTmKL3ygeUmp2fGDUyUpihca5wDe0GftwrY2MRvmZHWtN3rBltSyy-ygxjnpE52CgiChkzrzq2YPoLWIWOr49z9yPIrdXg3bkmENGa6CeNTzSBVwV_HTBqkAl3ai6D5npF3e67S7flWILzVD-y9EBlkiojXBc7WWCZfVRXHQGuuWm7Q7rTekWsi1ytcyD96rToI_zg04NzFrueT38QIAoQuPGmmTlaLx_9UEPThFrnD2M7_SrAHhNlAB3-3l7mzs5Wqb-B-b-QZbccpmitNXD4Tk3UNKyj3E2KrrThwNWmvShKrQ2IBCkuep30lCZkHI2lc6W-nbkbmQQVwHR39IRKwbfdjBN1_gqSAj865p4KgWC8vG4_J07sTmPD0EfldB3YRbjX8hcrC6jUKlBNPH3wxXzIWAcdX01VO3iOkLrXHi67ifuj9rxXyWk6jTekuHWc0Br9rIuqtKsy1G9LLgc0WVZZin8WjfJ-8SXK8gOTb1VXX-vebXDwBYLODwiOpBLiQWHJVxpPfdgJuYCu58SLqSI35fqRLWKcj1c-0gPk2qewNNM6motuvrcSHr469-z_ZBdZmUUxotv5Sf-zvg_uzAfzUXTXSeLZogK9zxVN1UZjH9yq9vjDxDDpF7aDBTWk_7jOkpeRPvxexCI-73aZix9Za80ciZ_OSnn1o5rgt9UDz2MlsoTMQ-cUlT5_hO9U0jXz-SSvDo1h8-GQcyScvYvz18lv61IebCohej9ZKll5Fu2hT9qgiOXphI7dFvhpFrwbBO0SdX_3-w9LzNwCo_KycYJoQF_LztglApLvJ3wzqqw_0wzK407jEcPmvXl_wA8KorCi8raZi_jh-wOLQqg=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0247263710e7ae37016ae288982d8887d0af46accf410b6ae1",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793230999,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 364,
+      "prompt_tokens": 2874,
+      "total_tokens": 3238,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 191,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2871,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0108235,
+        "upstream_inference_prompt_cost": 0.0071835,
+        "upstream_inference_completions_cost": 0.00364
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "245636092beb91ca3446385db216f2e819d9a9f803f25d3f56bbb0b7ab85f497",
+  "elapsed_ms": 7484
+}
