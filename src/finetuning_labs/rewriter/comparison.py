@@ -8,8 +8,16 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from .benchmark import Bundle, judge_packet, load_bundle
-from .evaluation import _load_generations, aggregate, assess, bundle_identity, digest, write_json
+from .benchmark import Bundle, judge_packet
+from .evaluation import (
+    _load_generations,
+    aggregate,
+    assess,
+    bundle_identity,
+    digest,
+    evaluation_bundle,
+    write_json,
+)
 
 
 def _record(path: Path) -> dict:
@@ -229,10 +237,11 @@ def main():
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--bundle", type=Path)
+    parser.add_argument("--english-only", action="store_true")
     parser.add_argument("--left", default="liquid")
     parser.add_argument("--right", default="luna")
     args = parser.parse_args()
-    bundle = load_bundle(args.bundle)
+    bundle = evaluation_bundle(args.bundle, english_only=args.english_only)
     report = paired_report(
         bundle,
         args.run / args.left,

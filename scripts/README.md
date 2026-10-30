@@ -16,6 +16,14 @@ data and source notices. Model repositories receive the trained adapter and toke
 - `backfill_english_quality.py` records the three exclusions found by the final targeted review.
   It uses saved Arka artifacts and a pristine Git baseline, audits a rebuilt release and swaps it
   into place. It makes no new model calls and is not part of Colab training.
+- `modal_eval.py::submit_lora` evaluates a pinned stock model and adapter on Modal. Select
+  `--model-size 230m` or `--model-size 350m`. Use `--english-only` with the current public data.
+  It performs inference only and saves each exact request and response to the evaluation volume.
+- `judge_english_models.py` grades collected English runs with the existing Sol rubric and writes
+  the comparison. It reuses a saved judgment only when its complete packet and judge settings
+  match. It preserves failed and incomplete calls and does not count them as passes.
+  Add `--hosted-run` for the saved Luna run. The combined CSV keeps every model's complete
+  output and assessment beside the same input, reference, checks and context.
 
 Publish the public data with the dataset-only module:
 

@@ -86,6 +86,20 @@ def test_model_choice_switches_base_revision_and_destination_together(size):
     assert cfg["language"] == "en"
 
 
+def test_saved_notebook_pins_the_selected_base_and_public_split_counts():
+    root = Path(__file__).resolve().parents[1]
+    notebook = json.loads((root / "notebooks/rewriter_train_l4.ipynb").read_text())
+    scope = {}
+    source = next("".join(c["source"]) for c in notebook["cells"] if c["id"] == "config")
+    exec(compile(source, "notebook:config", "exec"), scope)  # noqa: S102 -- inspect the actual trusted notebook config
+    cfg = scope["CONFIG"]
+    options = json.loads((root / "configs/training-models.json").read_text())
+    preset = next(v for v in options.values() if v["model_id"] == cfg["model_id"])
+    assert cfg["model_revision"] == preset["model_revision"]
+    assert cfg["hub_model_id"] == preset["hub_model_id"]
+    assert cfg["expected_split_counts"] == {"train": 1864, "dev": 89, "validation": 81}
+
+
 class Tokenizer:
     eos_token_id = 9
 

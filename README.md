@@ -4,7 +4,32 @@ Fine-tune an English rewriter with a LoRA adapter. The same notebook supports Li
 and LiquidAI/LFM2.5-350M. The larger trial defaults to 350M.
 Code and notebooks stay in Git. Hugging Face hosts the public data and trained adapters.
 
-## Latest trained adapter
+[Read the English experiment log](https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-experiment-log)
+for the setup, data iterations, Arka review process and matched Luna comparison.
+
+## Latest English comparison
+
+All five models now use the same 81 English validation cases, prompts, output budget and Sol rubric.
+Stock 230M passes 4/81, its uploaded LoRA 50/81, stock 350M 18/81, the new 350M LoRA 62/81,
+and GPT-6 Luna 73/81. Luna has one judge-flagged critical-error output and no truncations.
+[Read the full five-model report](data/rewriter/evals/english-all-models-20261029/REPORT.md) or
+[compare every output beside its source](data/rewriter/evals/english-all-models-20261029/case-reviews.csv).
+The earlier 64-case Luna comparison remains historical evidence. The current comparison includes
+all 81 cases. Liquid uses greedy decoding; hosted Luna uses provider-default sampling with reasoning off.
+
+The uploaded [350M LoRA](https://huggingface.co/jayshah5696/lfm2.5-350m-rewriter-lora) passes
+62/81 frozen English validation cases, compared with 18/81 for stock 350M. It has 13
+judge-flagged critical-error outputs and no truncations. The available 230M LoRA passes
+50/81, compared with 4/81 for stock 230M. Its upload still records the older 1,500-row data;
+the new 350M upload records 1,864 English rows. This comparison changes data and model size.
+Both models preserve 7/8 identities. Long passes are 4/13 for the 230M LoRA and 7/13 for 350M.
+[Read the four-arm report](data/rewriter/evals/english-comparison-20261029/REPORT.md).
+These are Sol judgments on development validation. Critical errors remain in canceled requests,
+spoken corrections, prohibitions and unfinished thoughts. The earlier 230M score of 51/81
+differs by one conflicting historical judgment, detailed in the new report. Its weights and
+outputs are unchanged.
+
+## Earlier 230M comparison
 
 The [230M LoRA](https://huggingface.co/jayshah5696/lfm2.5-230m-rewriter-lora) was retrained on all
 1,500 examples. The checked revision is `ba71856780e4d2398218fe76756b3390556437ea`.

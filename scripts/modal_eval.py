@@ -2,6 +2,7 @@
 
 import json
 import tomllib
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import modal
@@ -9,6 +10,7 @@ import modal
 from finetuning_labs.rewriter.evaluation import (
     bundle_identity,
     code_provenance,
+    evaluation_bundle,
     generate_cases,
     liquid_backend,
 )
@@ -46,10 +48,13 @@ def execute_lora(run_id: str, config: dict, adapter: dict):
 
     import torch
 
-    from finetuning_labs.rewriter.benchmark import load_bundle
-
-    bundle = load_bundle(Path("/validation-v2"))
-    if len(bundle.cases) != 84 or bundle_identity(bundle) != config["source_bundle_sha256"]:
+    bundle = evaluation_bundle(
+        Path("/validation-v2"), english_only=config.get("english_only", False)
+    )
+    if (
+        len(bundle.cases) != config.get("validation_count", 84)
+        or bundle_identity(bundle) != config["source_bundle_sha256"]
+    ):
         raise ValueError("Remote validation bundle differs from the frozen local bundle")
     result = {}
     for arm, settings in [("stock", config), ("lora", config | adapter)]:
@@ -73,13 +78,15 @@ def submit_lora(
     gpu: str = "L4",
     adapter_revision: str = "ba71856780e4d2398218fe76756b3390556437ea",
     dataset_revision: str = "139bb98b0500fa12ad43dc6c8c5cd4d17645eb86",
+    model_size: str = "230m",
+    english_only: bool = False,
 ):
     import hashlib
 
     import pyarrow.parquet as pq
     from huggingface_hub import hf_hub_download
 
-    from finetuning_labs.rewriter.benchmark import COMMON_SYSTEM, MODES, load_bundle
+    from finetuning_labs.rewriter.benchmark import COMMON_SYSTEM, MODES
 
     if not run_id or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-_" for c in run_id):
         raise ValueError("Use a lowercase run ID with digits, hyphens, or underscores")
@@ -102,7 +109,9 @@ def submit_lora(
             token=False,
         )
     )
-    bundle = load_bundle(PROJECT / "data/rewriter/reviewed-v2/validation-bundle")
+    bundle = evaluation_bundle(
+        PROJECT / "data/rewriter/reviewed-v2/validation-bundle", english_only=english_only
+    )
     expected = [
         {"system": COMMON_SYSTEM + MODES[c.mode], "user": c.user_message(), "assistant": c.output}
         for c in bundle.cases
@@ -110,11 +119,19 @@ def submit_lora(
     if pq.read_table(data).to_pylist() != expected:
         raise ValueError("Frozen validation prompts or references differ from public Hub data")
     settings = tomllib.loads((PROJECT / "configs/rewriter.toml").read_text())
+    presets = json.loads((PROJECT / "configs/training-models.json").read_text())
+    if model_size not in presets:
+        raise ValueError("Use a configured model size: 230m or 350m")
+    preset = presets[model_size]
     config = (
         settings["liquid"]
         | code_provenance()
         | {
             "execution": f"modal-{gpu}",
+            "model": preset["model_id"],
+            "revision": preset["model_revision"],
+            "english_only": english_only,
+            "validation_count": len(bundle.cases),
             "expected_gpu": devices[gpu],
             "source_bundle_sha256": bundle_identity(bundle),
             "dataset_revision": dataset_revision,
@@ -122,7 +139,7 @@ def submit_lora(
         }
     )
     adapter = {
-        "adapter_model": "jayshah5696/lfm2.5-230m-rewriter-lora",
+        "adapter_model": preset["hub_model_id"],
         "adapter_revision": adapter_revision,
     }
     destination.mkdir(parents=True, exist_ok=True)
@@ -182,9 +199,10 @@ def collect(run_id: str = "baseline-20261027"):
     call = modal.FunctionCall.from_id(receipt["function_call_id"])
     result = call.get()
     root = receipt["remote_root"]
-    for entry in volume.iterdir(root, recursive=True):
+
+    def download_entry(entry):
         if entry.type != modal.volume.FileEntryType.FILE:
-            continue
+            return
         relative = Path(entry.path).relative_to(root)
         if relative.is_absolute() or ".." in relative.parts:
             raise ValueError("Unsafe result path")
@@ -196,10 +214,15 @@ def collect(run_id: str = "baseline-20261027"):
         target.parent.mkdir(parents=True, exist_ok=True)
         data = b"".join(volume.read_file(entry.path))
         if target.exists() and target.read_bytes() == data:
-            continue
-        temporary = target.with_suffix(target.suffix + ".collecting")
+            return
+        import os
+
+        temporary = target.with_suffix(target.suffix + f".collecting-{os.getpid()}")
         temporary.write_bytes(data)
         temporary.replace(target)
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(pool.map(download_entry, volume.iterdir(root, recursive=True)))
     receipt.update(status="collected", result=result)
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n")
     print(json.dumps(receipt, indent=2))

@@ -14,7 +14,7 @@ import tomllib
 from collections import Counter
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -100,6 +100,16 @@ def _run_manifest(path: Path, spec: dict) -> None:
 
 def bundle_identity(bundle: Bundle) -> str:
     return digest([asdict(case) for case in bundle.cases])
+
+
+def evaluation_bundle(path: Path | None = None, *, english_only: bool = False) -> Bundle:
+    """Select English without changing case text, rules, context, or source order."""
+    bundle = load_bundle(path)
+    if english_only:
+        bundle = replace(
+            bundle, cases=tuple(case for case in bundle.cases if case.language == "en")
+        )
+    return bundle
 
 
 def _generation(case: Case, record: dict) -> dict:
@@ -568,6 +578,7 @@ def main():
     parser.add_argument("--bundle", type=Path)
     parser.add_argument("--config", type=Path, default=Path("configs/rewriter.toml"))
     parser.add_argument("--api-key-file", type=Path)
+    parser.add_argument("--english-only", action="store_true")
     commands = parser.add_subparsers(dest="command", required=True)
     gen = commands.add_parser("generate")
     gen.add_argument("--model", choices=["liquid", "luna"], required=True)
@@ -581,7 +592,7 @@ def main():
     if args.api_key_file:
         os.environ["OPENROUTER_API_KEY"] = args.api_key_file.read_text().strip()
     settings = tomllib.loads(args.config.read_text())
-    bundle = load_bundle(args.bundle)
+    bundle = evaluation_bundle(args.bundle, english_only=args.english_only)
     if any(c.source_kind == "personal_transcription" for c in bundle.cases):
         raise ValueError("This shared evaluation runner does not send personal transcriptions")
     if args.command == "generate":

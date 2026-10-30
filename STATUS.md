@@ -1,5 +1,50 @@
 # Status
 
+The [English experiment log](https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-experiment-log)
+uses the same private access as the original plan. Its HTML is in
+`docs/english-rewriter-experiment-log.html`. The current comparison includes both stock models,
+both uploaded LoRAs and a fresh GPT-6 Luna run on all 81 frozen English cases. All five use the
+same prompts, references, output budget and Sol settings. The historical 64-case Luna comparison
+remains archived and is not mixed into the current result.
+
+## Full five-model English validation, 29 October 2026
+
+Pass counts are stock 230M 4/81, uploaded 230M LoRA 50/81, stock 350M 18/81, new 350M LoRA
+62/81 and Luna 73/81. Critical-error output counts are 33, 17, 50, 13 and 1 respectively.
+Only the 230M LoRA has a truncated output. Luna passes 16/16 Slack, 27/32 transcribe, 15/16
+prompt and 15/17 polish cases. Its long score is 10/13 and exact unchanged-input preservation
+is 4/8. The 350M LoRA scores 7/13 long and 7/8 unchanged. These are model judgments on reused
+development validation, not human-verified performance on unseen data.
+
+The unified report and 81-row case-by-case CSV are in `data/rewriter/evals/english-all-models-20261029/`.
+Every source row has all five outputs and assessments. Raw Luna calls and judgments are in
+`data/rewriter/evals/english-luna-validation-20261029/`. Both adapter heads remain unchanged;
+the 230M upload still records 1,500 training rows and the 350M upload records 1,864 English rows.
+The same supported notebook was rebuilt from its canonical builder to restore matching model
+presets and split counts. No student model was retrained during this evaluation.
+All 163 tests, Ruff checks, formatting and the package build pass. The repaired notebook also
+passes its actual-public-data tiny CPU integration check: 2,034 rows encoded, four optimizer
+steps, frozen base weights, changed adapter weights and exact save/reload. W&B is offline and
+the model upload is mocked. The check receipt is
+`data/rewriter/releases/english-all-models-notebook-check.json`.
+
+## English stock and LoRA evaluation, 29 October 2026
+
+All four arms ran on Modal A10-family GPUs with the same 81 English cases, prompts, BF16 base
+weights, greedy generation and 2,048-token output budget. Stock 230M passes 4/81 and the available
+230M LoRA passes 50/81. Stock 350M passes 18/81 and the new 350M LoRA passes 62/81. The 350M LoRA
+adds 44 passes without losing any stock-model passes. Critical-error output counts are 33, 17,
+50 and 13 respectively. Only the 230M LoRA truncates one output. Both LoRAs preserve 7/8 exact
+identities. Long passes increase from 4/13 to 7/13 between the available adapters.
+
+The 350M upload records the latest 1,864-row English training data. The 230M Hub revision and
+weights remain the earlier 1,500-row upload. No new 230M adapter is available at the configured
+repository. Differences cannot be attributed to size alone. One conflicting historical Sol
+judgment accounts for the earlier 230M score of 51/81 versus 50/81 now. No output or verdict was
+edited or rerolled. The full report and exact records are in
+`data/rewriter/evals/english-comparison-20261029/` and the two adjacent per-model run directories.
+No model training, dataset publication or notebook changes occurred during this evaluation.
+
 ## English retraining data, 29 October 2026
 
 The source pool now has 2,000 train, 100 dev and 84 validation pairs. All earlier training

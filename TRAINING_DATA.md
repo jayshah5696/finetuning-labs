@@ -57,8 +57,11 @@ The findings are in `data/rewriter/reviews/sol-english-quality-findings-round1.j
 Use the same Colab notebook, with `MODEL_SIZE` set to `350m` or `230m`. The user runs training.
 The 350M adapter uses a different model repository because it requires a different base.
 After upload, compare both models on the same frozen 81 English cases with the same Sol
-rubric. The current 230M baseline passes 51/81, with 17 critical-error outputs among 80
-reviewed outputs and one truncation. Neither lower dev loss nor a larger model proves improvement.
+rubric. The current available 230M LoRA passes 50/81, with 17 critical-error outputs among 80
+reviewed outputs and one truncation. Its earlier 51/81 differs by one conflicting saved judgment.
+The new 350M LoRA passes 62/81 and hosted Luna passes 73/81 on the same full English validation set.
+The 230M upload still records the older 1,500-row training data. Neither lower dev loss nor a
+larger model proves improvement by itself.
 
 The recorded preparation commands below ran against the original 1,500-row source snapshot.
 They produce new stochastic examples, not a byte-identical regeneration. Resume uses saved
