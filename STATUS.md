@@ -13,6 +13,14 @@ All six threads are created. The three data threads started in separate worktree
 training threads acknowledged their parked scope and stopped. The registry records their links,
 branches and launch-state snapshots; it does not claim that new data is ready.
 
+On 30 October the user approved repairs after all three first pilots failed their full gates.
+The first exports contain 40 staged training pairs and one separate long validation pair.
+The same three threads have resumed to repair authoring briefs, constraint preservation and
+long-input length control. Fresh pilots use new source IDs and frozen allocations, with at
+most two independent attempts per slot. Original attempts and verdicts stay unchanged.
+Generation remains bounded; scaling requires the complete fresh pilot and corpus inspection
+to pass. No combined release or training readiness is claimed.
+
 The [English experiment log](https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-experiment-log)
 uses the same private access as the original plan. Its HTML is in
 `docs/english-rewriter-experiment-log.html`. The current comparison includes both stock models,
