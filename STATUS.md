@@ -9,6 +9,9 @@ and preference training are deferred until the data work is ready. Shared owners
 gates are in `docs/data-expansion-workstreams.md`; thread links are in `data/rewriter/workstreams.json`.
 The existing training release, frozen 81-case validation and current notebook stay unchanged
 during generation. New rows and validation designs are staged separately for combined review.
+All six threads are created. The three data threads started in separate worktrees. The three
+training threads acknowledged their parked scope and stopped. The registry records their links,
+branches and launch-state snapshots; it does not claim that new data is ready.
 
 The [English experiment log](https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-experiment-log)
 uses the same private access as the original plan. Its HTML is in
