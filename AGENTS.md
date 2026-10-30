@@ -2,6 +2,11 @@
 
 Use `uv` and the project Makefile. Keep this project independent of the root uv workspace.
 
+The current data-first work is split across the threads in
+`docs/data-expansion-workstreams.md` and `data/rewriter/workstreams.json`. Active workers own
+separate worktrees and staging namespaces. The coordinating thread owns release integration.
+Keep training rewards, rank ablations and preference training deferred until data readiness.
+
 The source dataset is data/rewriter/current. Preserve all earlier training rows and the complete
 100-row dev and 84-row validation files. The active public export selects English only, with
 frozen 89-row dev and 81-row validation views. English additions append only to training.

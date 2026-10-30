@@ -1,5 +1,15 @@
 # Status
 
+## Next English data expansion
+
+The user approved individual workstreams for transformation-rule examples, personal English
+dictation/shortcuts with local redaction, and long-form validation with independent training
+coverage. Training rewards, rank-16/32/64 ablations on 230M and 350M, optional Qwen comparison,
+and preference training are deferred until the data work is ready. Shared ownership and data
+gates are in `docs/data-expansion-workstreams.md`; thread links are in `data/rewriter/workstreams.json`.
+The existing training release, frozen 81-case validation and current notebook stay unchanged
+during generation. New rows and validation designs are staged separately for combined review.
+
 The [English experiment log](https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-experiment-log)
 uses the same private access as the original plan. Its HTML is in
 `docs/english-rewriter-experiment-log.html`. The current comparison includes both stock models,
