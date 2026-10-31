@@ -2,8 +2,74 @@
 
 The user approved repairing the authoring briefs and running fresh bounded pilots. The same
 three workstream threads resumed at 14:26 UTC. Their exact run IDs and request times are in
-`data/rewriter/workstreams.json`. This record describes the requested repairs, not completed
-second-pilot results.
+`data/rewriter/workstreams.json`. The bounded repairs are complete. The coordinator verified
+the result on 31 October. All three complete pilot gates failed, so scaling remains blocked.
+
+## Fresh pilot results
+
+| Stream | Fresh sources | Qualified training pairs | Short | Long | Missing pilot slots |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Transformation rules | 42 | 21 | 19 | 2 | 9 |
+| Personal English patterns | 21 | 5 | 5 | 0 | 7 |
+| Long coverage | 67 | 17 | 16 | 1 | 23 |
+| Total | 130 | 43 | 40 | 3 | 39 |
+
+There were 59 model-passing candidates before inspection. Inspection excluded another 16.
+No fresh validation row qualified. Two accepted long pairs test corrections and dictionary
+normalization; the third is an unchanged-input case. These are model and agent judgments,
+not human gold labels. They do not establish readiness for another training run.
+
+The rule stream now covers both correction directions and all three R07 dictionary/literal
+pilot slots. Long coverage remains the main gap. Failed sources include repetition, editing
+challenges confined to the opening, changed scope or certainty, and copied formatter headers.
+Some long inputs were too short; the larger word budget also produced overlength Slack threads.
+No acceptance range was relaxed and no text was truncated.
+
+Arka's untrusted seed wrapper exposed an authoring boundary problem. The rule and long streams
+amended only unused sources to move operational authoring requirements outside that wrapper.
+This fixed input-header failures in the long stream's second round, but some targets still
+copied context headers. The personal run had already completed its calls; its remaining
+authoring-boundary risk is recorded, not claimed as fixed.
+
+The personal short canary received a suspected false native fact veto. Its exact native state
+and six cached answers bind correctly. There is no established transport mismatch. The veto
+remains binding; no completed verdict was rerolled. Native fact calibration remains unresolved.
+
+## Coordinator verification and exclusion
+
+The coordinator read the actual viewer/SFT exports, verified their schemas and exact assistant
+targets, and checked text overlap across all six first/fresh training exports. There were zero
+matches against the existing release, benchmark fixtures and local personal holdouts, and zero
+matches against earlier staged streams under the existing text heuristic. The original new
+validation row also had zero matches against staged training. Semantic source-family and
+privacy clearance remain pending. A text heuristic is not an independent semantic review.
+
+The six exports contain 83 staged training rows before coordinator inspection. One older
+long-pilot prompt target begins with MODE, LANGUAGE and INPUT headers. The coordinator excluded
+that exact row using `data/rewriter/expansions/coordinator/quarantine.json`. Preserve the row and
+its passing reviews as evidence. It is absent from current train, dev and validation data.
+The remaining 82 staged candidates are not an approved combined release. All 43 fresh rows
+are outside this one-row quarantine.
+
+The coordinator verified 326 first-pilot manifest entries and 474 fresh-pilot entries without
+hash mismatches. The rule exporter was replayed without hosted calls, followed by all 178
+tests, lint, format checks, the benchmark audit and package builds. Personal and long branches
+record 177 and 184 passing project tests and passing exports/builds. The rule runtime hit a
+usage limit after committing; its artifacts were recovered and verified directly.
+The main checkout also passed `make check` and `make build` on 31 October, with 191 tests.
+That checkout includes concurrent uncommitted expansion work; these checks do not establish
+that the three data branches have been combined or that their release gates pass.
+
+Each source branch is pushed. The data commits are `5f97dd6`, `2e84cf6` and `89bf3f4`.
+The rule branch also includes documentation-only dependency commit `967136f`. Exact revisions,
+thread links, handoffs and row counts are in `data/rewriter/workstreams.json`. Scope checks found
+no changes to the active release, frozen holdouts or supported notebook. Credential-pattern
+checks found no matches outside a typed opaque encrypted reasoning payload. That encrypted
+payload was preserved unchanged and was not treated as an exposed credential.
+
+No training or Hugging Face publication used these repair exports. The separate data-prep
+thread `3ee0f519-0231-4ea5-945a-352578283295` has no final verified handoff in its latest parent
+message. Its provisional root-checkout files are outside this result and remain untouched.
 
 ## Evidence from the first pilots
 

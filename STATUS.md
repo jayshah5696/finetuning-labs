@@ -15,11 +15,15 @@ branches and launch-state snapshots; it does not claim that new data is ready.
 
 On 30 October the user approved repairs after all three first pilots failed their full gates.
 The first exports contain 40 staged training pairs and one separate long validation pair.
-The same three threads have resumed to repair authoring briefs, constraint preservation and
-long-input length control. Fresh pilots use new source IDs and frozen allocations, with at
-most two independent attempts per slot. Original attempts and verdicts stay unchanged.
-Generation remains bounded; scaling requires the complete fresh pilot and corpus inspection
-to pass. No combined release or training readiness is claimed.
+The bounded repair runs are complete. They generated 130 fresh candidates and staged 43
+inspection-qualified training pairs: 40 short and three long. The rule stream contributes
+21, personal patterns five, and long coverage 17. No fresh validation row qualified. All
+three complete pilot gates still fail, so scaling and release integration remain blocked.
+Source branches, code and evidence are pushed. The report is `docs/data-pilot-repair-20261030.md`.
+One older staged prompt row contains formatter headers and is quarantined by exact hash in
+`data/rewriter/expansions/coordinator/quarantine.json`. It is absent from the active release.
+Original attempts and model verdicts remain unchanged. A separate data-prep thread is recorded
+as a pending verified handoff; its concurrent root-checkout work is not part of these counts.
 
 The [English experiment log](https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-experiment-log)
 uses the same private access as the original plan. Its HTML is in

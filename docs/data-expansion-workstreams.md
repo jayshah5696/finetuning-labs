@@ -159,6 +159,8 @@ answers as preference-training examples. No DPO/GRPO run or reward-model build n
 Merge reviewed workstreams sequentially. Run cross-stream duplicate/source-family checks,
 private-holdout overlap checks, token audits, reference/review binding checks and privacy checks
 from the main checkout before release. Verify old training prefixes and all frozen holdouts.
+Apply the exact-row exclusions in `data/rewriter/expansions/coordinator/quarantine.json` before
+selecting staged rows. Preserve the original rows and passing model verdicts as evidence.
 Update the same public dataset only after the combined release passes. Keep direct personal
 records private. Update the shared notebook's expected counts only when the released data is ready.
 Then activate the deferred training work. Do not claim that data is complete merely because
