@@ -112,6 +112,15 @@ def evaluation_bundle(path: Path | None = None, *, english_only: bool = False) -
     return bundle
 
 
+def verify_published_validation(bundle: Bundle, rows: list[dict]) -> None:
+    expected = [
+        {"system": COMMON_SYSTEM + MODES[c.mode], "user": c.user_message(), "assistant": c.output}
+        for c in bundle.cases
+    ]
+    if rows != expected:
+        raise ValueError("Frozen validation prompts or references differ from public Hub data")
+
+
 def _generation(case: Case, record: dict) -> dict:
     if record["status"] != "completed":
         return {

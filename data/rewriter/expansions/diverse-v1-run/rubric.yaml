@@ -1,0 +1,79 @@
+version: 2.1-diverse
+description: Input, output and pair quality for a text formatter
+dimensions:
+- name: candidate_input
+  description: Assess only the text after INPUT in instruction. Is it a realistic
+    recoverable user draft, dictation, or pasted thread? Imperfect punctuation and
+    grammar are intentional. Reject fake word deletion, padding, meta authoring rules
+    or ambiguity with no recoverable final intent.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: output_quality
+  description: Assess only response as a rewritten text in the supplied MODE. Is it
+    readable and natural for that mode? Preserve intentional unfinished thoughts.
+    Slack stays casual; long slack may be a thread, never force a formal essay. Do
+    not evaluate whether it fulfills an underlying prompt.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: pair_facts
+  description: Does response preserve all substantive facts, sections, conditions,
+    negation and uncertainty in the INPUT portion of instruction? No invented facts,
+    missing final sections, approvals or summary. Identical input and response preserve
+    meaning by definition. Explicit speech repairs (scratch that, no wait, cancel
+    that, never mind) must remove superseded obsolete details and repair cues entirely
+    from the response. Conversational adverbs like 'actually' before verbs must be
+    preserved.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: pair_intent
+  description: Does a question remain a question, a request remain a request, and
+    a proposal remain unapproved? Explicit self-corrections should follow final intent.
+    In /prompt the response is itself the reorganized request, NOT an answer or completed
+    task.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: pair_literals
+  description: Are names, quoted wording, quantities with their roles, URLs, code
+    and filenames preserved, allowing explicitly supplied dictionary normalization
+    and explicit spoken corrections? Obsolete corrected details should not be forced
+    into the target. Developer filenames dictated as 'name dot ext' must be converted
+    to proper filenames (e.g. 'main.py', 'client.ts'). When workspace file tag cues
+    ('tag', 'at', 'file reference') are spoken, they must resolve to @file workspace
+    tags.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+- name: pair_mode
+  description: Follow the mode in instruction. /slack minimal casual cleanup. /transcribe
+    clean actual disfluencies and punctuation without lexical paraphrasing. /prompt
+    organize request only. /polish improve awkward prose without changing scope or
+    certainty. No added wrapper or formatter commentary. Already correct text may
+    remain unchanged. Never include conversational chatbot meta-preambles or wrappers
+    such as 'Here is the rewritten text' or 'Sure! Here is'.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Contains a concrete defect for this criterion
+    1: Meets this criterion without a concrete defect
+overall_weights:
+  candidate_input: 0.16666666666666666
+  output_quality: 0.16666666666666666
+  pair_facts: 0.16666666666666666
+  pair_intent: 0.16666666666666666
+  pair_literals: 0.16666666666666666
+  pair_mode: 0.16666666666666666
+few_shot: []

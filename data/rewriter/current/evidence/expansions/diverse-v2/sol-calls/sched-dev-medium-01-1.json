@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-dev-medium-01\", \"row_sha256\": \"ea277358162565af5d856bd7f3ece3fe82996d80a245ac34e11bee706d814d94\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"files\": [\"src/channel.rs\", \"src/worker.rs\", \"Cargo.toml\"], \"level\": \"high\", \"profile\": \"technical note\"}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"In our asynchronous event pipeline, we are observing unbounded memory growth under sudden traffic bursts. The bounded crossbeam channel in channel dot rs requires proper backpressure mechanisms before message queues overflow and worker nodes crash.\\n\\nWe must update the producer thread loop in worker dot rs to acquire permits asynchronously using camel case try send or async send. If the internal channel occupancy exceeds eighty percent of total capacity, the system should log a structured warning containing snake case queue depth, dropped messages, and processing latency. Ensure that slow consumers yield thread execution to prioritize active subscriber drains.\\n\\nAdditionally, please inspect cargo dot toml to verify that tokio runtime features are compiled with the sync and time flags enabled. Run dash dash test across all channel integration suites before requesting peer review, and verify that unit tests cover bounded buffer saturations without memory leaks.\", \"output\": \"In our asynchronous event pipeline, we are observing unbounded memory growth under sudden traffic bursts. The bounded crossbeam channel in channel.rs requires proper backpressure mechanisms before message queues overflow and worker nodes crash.\\n\\nWe must update the producer thread loop in worker.rs to acquire permits asynchronously using trySend or asyncSend. If internal channel occupancy exceeds 80% of total capacity, the system should log a structured warning containing queue_depth, dropped_messages, and processing_latency. Ensure that slow consumers yield thread execution to prioritize active subscriber drains.\\n\\nAdditionally, please inspect Cargo.toml to verify that Tokio runtime features are compiled with the sync and time flags enabled. Run --test across all channel integration suites before requesting peer review, and verify that unit tests cover bounded buffer saturations without memory leaks.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-dev-medium-01"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "ea277358162565af5d856bd7f3ece3fe82996d80a245ac34e11bee706d814d94"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "37dc8b2d57cc6241f8d8a3786759ef2dfea5565bfd607c38eff2542ce59d4456",
+  "started_at": "2026-10-31T21:13:58.710096+00:00",
+  "result": {
+    "id": "gen-1793481238-PhiWwam4QwvVl5anRmgT",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-dev-medium-01\",\"row_sha256\":\"ea277358162565af5d856bd7f3ece3fe82996d80a245ac34e11bee706d814d94\",\"critique\":\"The input is a plausible dictated technical note with recoverable intent and no authoring leakage or padding. The output appropriately renders dictated filenames, camelCase method names, snake_case logging fields, the 80% threshold, and the --test flag. It preserves all three paragraphs’ requirements, including asynchronous permit acquisition, consumer yielding, sync and time features, integration testing before peer review, and saturation tests without memory leaks. Formatting and language suit the technical-note profile, with no material omissions or changes in certainty.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating technical inputs**\n\nI’m considering the ambiguities around camel case and asynchronous sends in my inputs. Natural language can lead to technical inconsistencies, but I need to ensure my outputs are recoverable in context. It's crucial that I check for any defects in how I'm processing inputs like \"try send\" versus \"async send\" since both imply the use of camel case. I'll run tests to verify all conversions and preservation aspects are functioning correctly.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating technical inputs**\n\nI’m considering the ambiguities around camel case and asynchronous sends in my inputs. Natural language can lead to technical inconsistencies, but I need to ensure my outputs are recoverable in context. It's crucial that I check for any defects in how I'm processing inputs like \"try send\" versus \"async send\" since both imply the use of camel case. I'll run tests to verify all conversions and preservation aspects are functioning correctly.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5loaAQNORhfsg5FToCnyRxkYeW_ptbrNXGSPkRT3HYmriJpPlFPkPMi3slNwNIrvtQUcRxk9VgZY6O8k-96N19X30b3nNpopbLRWkARaFyglgVwFWGsicFw8OZ3D15EXjXqYwJXPSma4l3Rl86JxZBVPUprzfzKx-WVUpq9vsLZAIoi95SxKKrH0Z0Hgk1Y-9wCnYDLlJWKP-0wUhyTItLb4uyR9pZs3qGEJLkKi8E9LPlZLtePs2ruZOlmG8ltFGQNsr-f4FsrbOZNBaKgBPrLdLnVv0LKPHlRy3z1YoZbmxw6b-rbE5LFqoX861uUyen0aRKtN2CbEwJ1YqpiBz0mKKHWVRlYJUHRIq4b3byV-Q0mMvxg7F12C3rzgiFBQ4yILHEwmNRfHUE1ovEiSJ_ZYLmDeCRWpLDwwKDotgyPldpCuEOobhigG35j5lCOZ8jiUaDcrQlQpfZ937fnJTZkwfsgLt50E_Djg29lRTEX2ThSqLq-EnH_rvZ3419J9Sfv_WWRM0Tfab4_UvS6pXxCFKj-UrN0B_SQPkHKhs8sC0NkEIge4eoo3lThNJzW4FlZamPIuEPH9QbW4_KWtjON_8KUqA8PSf5nxgVnZTKhxIRFn4-LG2NeZdD3eQtCMY6pbvHi8WEJvebmskccVNxIh-nW0dCkB8nKsZ0MRGbyQzoxC-pEav5uBYXCxJ3SzBidx4UmZNtP61NdJ091-z8eoMj0gAHjm4Jvj0YIK7nyS7et1L50EPQ5ib5VIFn9EsXlnzH6P1Oxl4-4-mD5pNV7IxGXg_OEq7ZmTGxN1PzKvbtLe3iQzMi2kLim_QOvKKU6HRSEFMYTaS7kZAYYtNCYA0KqCHChRfIi9Zryn8UhfUoVkqz0XdZhO_6U-fROe_WikqMDHTcEQyx0rQWSUhIpTpzeDjgwVEId8APPWLo2ImpapvH-AShavOzSdVqnZXsnsqeHZ35UELGaQ0K1-8RMGrgQE5kT_TVM3DhQjcNxEme2UC05Y-SWE6UMWW9tt2YAS1QWDmyOzVFYxEDmFKI9ge6lsq5tK1t_VQ9hFcuyBo8WW7YV6pcuxMCgvO46kGtb1gMRYvBgk3EysGvI3R3glCu4wofMFny79jiLBM2y4E9JT7uPbG46BmllPIsC154W4ckasdrHbNKbCPFgVr2je8oY-fgbzWtHHasZbNTC7gP9RfEP7ew_cV59bY9FTCjKR18f8CX3gueFjXF0X_FN6sl3oTo1KwDIdvjhCMJNE8QQj-Y1n9CC04uJ9sJoXOjLcXHVJugJdXiyZX6EmJitrMLnRQgi7Av6d7mVHEn1InkczKppC2zs6gsLUMjsroJRUmP_aobBel5D5mHpcD5LJnLXiVyu1dt8esCEnRRDr2q-O3GQTPbE35xwIDKIa9jrjs_5Sfhx79nrsipiERdqbume2rEPzAFYnO9VZFihfsZxp5Ku-o_l05r58QsK1syVgChJxbizC-dRxSPe_XyckX6xQZom-SDDS8P6ItQg0Skkt4u6ZVTihcBI_Gv4FLmW6Wt-ddN2Gs4qzKZJ92odN2tvwAcWag4d8xgRrUfyk1i2DSYRAa6ytz0JJMD9G3-ivCxY15PGoUe2xnzSWUwFPddj3SLKZYqWk-FVpwdv6oL37FN0L0Ldjospac476i4D0WzMQBngj3RvLybeolmquwwcYzv-0jMvmnQD0BqVM0QhxruoAoZDT2UD1DcfqEDIDA2R3wcZd-vjoZVaN5VRzyy0rZ09_xLBa738RH0jMQk7Lc_UlMIeLd2wnYL0r0xg1OaLN8YmxMrnxW1J2YJNzP-NFsOdbtl30SVEaKBoYq2jb_lipNzfDxi4XeEc7NLlYjtVHGrJBxthfL4mw0C_U5FEIGyQo_N3I9vfPYq8UhNG_lhLbLKJzorWNR53YheUV9wFCDsQedCnijVGUWmHhCGA_0nB5yt3-gWfV9ZJ7R3MhEJHjkNxo20PX7MSOx8q--YwN_EVtsuy04fKAY7eRLMwRX0Wc07WYfuOoYuBtVvZOk3fXHkHoz9mG_GIL5dk25Xa2dsDhKFOzh51gN_1fskBQF1BcUWOAOziF1GQXXU7zCk41FYRFBBLGsEZo4rIrBMlG2ORo_iW8aBFd3F33iUjCYDximdCsku9WY_QC2_9g-Pid3uIzMj_1gk8z4tY574r__5qASD5mEjd9ehHDuQyE7kKEGh4jN_VyI-vlfTkXLCjLqlhro9h43WjIwEsAtllHARZLOuw8waXTCUvHmPf2TZ0koC3PIewCRY3NilUxHGk90xQn3EQLRMaKcx8fYrAPSiIWkvskjqQqVgWvlW8ARNPntNn3YB8LDy3k4463HK8iye-jbF4H5nX6-BppBM-ZoB4kURBXtm72QG5IJB9VAjRvcuXRyCENLEMnIV2mCc9dgRR5py6ELQtNWdw8-SgQ_JzVXv4nbZFEh_9dvG31qlU-yraicWrbXB_qj69IU5zh7oEd7guUHiOw6XWVCJduf4uPLw0f_lDrI_BrkwXefsXprWH9JE9naZXAbaZJ2MU0jxiD3synpz7GbRXGS0C70O9bf5_srwrT81g9erLkx7c74WPbY8WmchMUkDn5l1YvJtWTa9vATPA0v0s4NVy1TyQsJXobAhfjTz5Pcf0wgNeQXD-iyFyV8dlTwfapNqSK-FGQK7gy9tyAh_Pe.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0167109a2463c6f3016ae65a18200087d0b333e9ad1902454b",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481238,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 263,
+      "prompt_tokens": 957,
+      "total_tokens": 1220,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 76,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004544,
+        "upstream_inference_prompt_cost": 0.001914,
+        "upstream_inference_completions_cost": 0.00263
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "7cd13f9a976a5c1f48963875e80579ed7648a56f77b77ea95c666f2bce0bf548",
+  "elapsed_ms": 5450
+}

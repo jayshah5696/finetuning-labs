@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"exp-file-01-at-type-ts\", \"row_sha256\": \"6e819c9afe64167e5705b9d4399625eb9550832841b5acc251b9dbb90b24b822\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"files\": [\"src/types/type.ts\", \"src/main.py\", \"src/services/auth.service.ts\"], \"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"look at type dot ts and add the missing timestamp field\", \"output\": \"Look at @src/types/type.ts and add the missing timestamp field.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "exp-file-01-at-type-ts"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "6e819c9afe64167e5705b9d4399625eb9550832841b5acc251b9dbb90b24b822"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "1c8991f33c5c267ce3a31ae0fb56522af2751ba01b0ce39f71827cec8e260ccf",
+  "started_at": "2026-10-31T21:23:12.087208+00:00",
+  "result": {
+    "id": "gen-1793481792-ubbyXJcuAyYpVxF0frr6",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"exp-file-01-at-type-ts\",\"row_sha256\":\"6e819c9afe64167e5705b9d4399625eb9550832841b5acc251b9dbb90b24b822\",\"critique\":\"The input is a natural, recoverable request. The output resolves “type dot ts” to the matching supplied file, src/types/type.ts, and preserves the request to add the missing timestamp field without inventing its name or type. Capitalization, punctuation, and the file-reference notation are appropriate for /prompt; the task is not performed.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lxDwmTllLnmuGN6daf5bxmajp_XHs6uX0nbBjJa_3Vo2eG3ge4P3HTGC5TA3zcUSiHpL8kRfe4dHzhv8A7b-outgmO79XdlirFuMM5eKvZ78EVuFSbQlbJW0URXchtH0k7pLB9iT2hT6uT5rX0ct5XFj5d3xomWZQw08rn1alvbQWGCEqOv0RYKM0Z8E7IGdmg4ryU_lx7-V4G_UGLhpbRmbyF4ENWmsa9CMaLvXIlyYfkjZxKrJcKhbO2Ko1cg5t_prsUpB46e00vgznCJnJLzF01OhV18e2PZ21ESsWkTi88AcyoOjG2kpuCFxBo5ymZ9hYoYXaMGA4xyXKXKWjZ8pmLBHugigALXHumPdOz4qqZK2hCjP1XiseXv9tB_RpJSWf9okZITYwsHAujTJ_eZZ9m-kWj5nQpT0mxU7kXeGI4mpx1jxOlfd3kQ27AU3wKcYicVuc9LYMbjZbKJbuc6yKhNLraaCHXxVY-p7FnNJe1oeY5-xl98kVcjfAXFPvblYasFOC9pH1HEYX5brbrOpTeJbj0iDezVbl7ufWYSgxrupK2WbqpOvXMsrkpe-qSTIJah_rZ2olvRDNaR_3loDCtVNxb-G3kv8Q4dWrd2tABdwHC5G-4FYqQUN-Ye2Y8jv8wyEap5ZFHkuShcKruswKlpko6VZ1CyRii2leonDDxJLRsxNzrEGkeCWR5hy1j1dj-dSShhDHZH-akmehxFOrdMmFrRj4Wm7cLRbolOEJFmoJPFjAL9_KQknlMZJC5wz1YSRKsBo7ktl12Nfj6DtzOu7QFGzWVjlDq3cRFVcXGXEpRYFeqxKPlLnQQorbfbIb-WvNtHrBftwG2xSjvWyWTN8qmrHgK7ML4_ZqeH7ioQyiaBdS5AgQeRrx5x7rd4IruMocOAjhjW1T9aJgqYDiHElFuPc8wfhTDzfKKfLMXO2nVNvuGcLLdxa22j-K2pZHSXwznhbwxtvFSSw49zLMAjpptI65UpL7bODifRNcuItG57ApyLEpes1Y63I_bwF0ooKrJ6SOwVBGjhE8VqVSJkDlF_IrjIca1tw6N9kflJE79ddfpDow8aWDXmN4UL5jqfrUdF-_HgFp4IBW-_xn9yMU0ssdXgVRsV0ymfUrygHg09o1WPQXWZuHQgGei774cfI1WcV_kd2-52MMp_XJLbdL1PfECJP_7iiJZz34OBi0Dm7N5wr2ArWL5UDD39HetG5yFynUXHoCaa4z5y_jXKSqQweF6ZhD6F_sw4ijhPMA-Owl_jxfduR1UM8hLKNoYnBH6WsaAPq8IL6jzplMy0zNsKVuBr38vh08sDF3mGjczTrfZ3DOiJ2DKbz5XA0tv3B9enPl512mD5YpZziYwWFgtzErIukf839aa8gjX42WL2BKGF6mTw9zXaq0UZjG6WdFvW89cSZn65dMbRV3hSP4mFUyU0VEgowrOGkSgDN6ih0gqYMp8CE_E5TuUa8B9_fUg1v-YPWbgu3Sg_Ehe_YhxJoVaKPuDuybwUuBhVUetLCmHKlNEYTMwS1IVK_Oo_CfM7j9WbdLDzesE3deMsf9JzLFj-ZRN2aeeOrg3Tlz6Db8j8zrkx2zewimVQttYjUwxexF_tjNbcqR4Kb7G4R_swpe5lZw4_xDdBRp3jYJgxQ9Sv54uT_s_tRCK5lcTuCbkHT0VvGChiLW5w8euC3w_rl-ArF-OBPcK7nRbgIP3Pjkws6iWhFMcudDwBCQr5ywsITVsYr7UquYwqPovMMpy8CHPtENRU0tdJ09y3qXkVUS5GJoXOKY5_7mIHOf0njMKMIHbuRRtaI8ix8GO6QbeYgqOe62Plgc0mVAyHtP2s9VAeKw094ga3ASW-GickqhfV7z3s4w9fvIKi-s1E1Y2EaUS53j2NEE_LyXn6SDArEDLLXzELrDAtsphFCttmw5TSbi0FZh_FrxVx77S737BrtBjJI3mN9UjwI_9A5ad1jRPuCPNhC9-RU9oKOTmbRlojc5uxbhlH0GayWM5Sg_j_b2aht9lazI8jt_oUIVqQDGo5yB8a7O5EXzIu9cgJ2yrrihx8HwLtUVoGMSb5ocCQx_CahJIAdfRnNBNGiiuancUh2AeIJrNrS3h0.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_087538759c6acf2c016ae65c4143d487d0921f39a6ca13fc4e",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481792,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 199,
+      "prompt_tokens": 648,
+      "total_tokens": 847,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 39,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003286,
+        "upstream_inference_prompt_cost": 0.001296,
+        "upstream_inference_completions_cost": 0.00199
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "fce25960a52624efef2c71e5a0d9ffb283482a0a2c1fc282b96e7f7e414ac3e5",
+  "elapsed_ms": 3756
+}

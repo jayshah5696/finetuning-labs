@@ -338,29 +338,43 @@ class LeakageIndex:
     assigned together before generation. Eight-word shingles avoid matching generic short phrases.
     """
 
-    def __init__(self, texts):
-        self.texts = list({normalized(text) for text in texts if normalized(text)})
-        self.shingles = [self._shingles(text) for text in self.texts]
+    def __init__(self, texts=()):
+        self.texts = []
+        self.shingles = []
+        self._seen = set()
+        for text in texts:
+            self.add(text)
 
     @staticmethod
     def _shingles(text):
         words = text.split()
         return {tuple(words[i : i + 8]) for i in range(len(words) - 7)}
 
-    def matches(self, text: str) -> bool:
+    def add(self, text: str) -> None:
+        norm = normalized(text)
+        if norm and norm not in self._seen:
+            self._seen.add(norm)
+            self.texts.append(norm)
+            self.shingles.append(self._shingles(norm))
+
+    def matching_texts(self, text: str) -> list[str]:
         candidate = normalized(text)
         shingles = self._shingles(candidate)
+        matches = []
         for blocked, other in zip(self.texts, self.shingles, strict=True):
             if candidate == blocked:
-                return True
+                matches.append(blocked)
+                continue
             if min(len(candidate), len(blocked)) >= 60 and (
                 candidate in blocked or blocked in candidate
             ):
-                return True
+                matches.append(blocked)
+                continue
             if min(len(shingles), len(other)) >= 5 and (
                 len(shingles & other) / min(len(shingles), len(other)) >= 0.60
             ):
-                return True
+                matches.append(blocked)
+                continue
             if 40 <= min(len(candidate), len(blocked)) and max(len(candidate), len(blocked)) < 600:
                 matcher = SequenceMatcher(None, candidate, blocked, autojunk=False)
                 # Both quick ratios are upper bounds, so they cannot discard a real match.
@@ -369,8 +383,12 @@ class LeakageIndex:
                     and matcher.quick_ratio() >= 0.92
                     and matcher.ratio() >= 0.92
                 ):
-                    return True
-        return False
+                    matches.append(blocked)
+                    continue
+        return matches
+
+    def matches(self, text: str) -> bool:
+        return bool(self.matching_texts(text))
 
 
 def validation_index() -> LeakageIndex:

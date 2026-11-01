@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-ws-medium-02\", \"row_sha256\": \"736640c92e272339bc5c4df4bd9b83d1b485f98fe5f743c77af49f312c85b625\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"files\": [\"infra/terraform.tfvars\", \"infra/main.tf\", \"infra/variables.tf\"], \"level\": \"medium\", \"instructions\": \"Tag referenced workspace files with @\"}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"Hey infra team, we need to adjust our cloud provisioning setup for the staging environment before deploying the new containerized workloads.\\n\\nPlease inspect at terraform dot tfvars to check the default VPC subnet allocations and cidr block configuration across private worker nodes. You should also verify main dot tf in the root module to ensure autoscaling groups have minimum capacity set to three instances and maximum burst capacity set to twelve instances.\\n\\nConfirm that backend state locks in S3 and DynamoDB are enabled before executing terraform plan in the terminal. In addition, review variables dot tf to ensure sensitive database credentials are parameterized properly rather than committed as plain text strings. Let me know once the plan completes clean.\", \"output\": \"Hey infra team, we need to adjust our cloud provisioning setup for the staging environment before deploying the new containerized workloads.\\n\\nPlease inspect @infra/terraform.tfvars to check the default VPC subnet allocations and CIDR block configuration across private worker nodes. You should also verify main.tf in the root module to ensure autoscaling groups have minimum capacity set to 3 instances and maximum burst capacity set to 12 instances.\\n\\nConfirm that backend state locks in S3 and DynamoDB are enabled before executing terraform plan in the terminal. In addition, review variables.tf to ensure sensitive database credentials are parameterized properly rather than committed as plain text strings. Let me know once the plan completes clean.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-ws-medium-02"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "736640c92e272339bc5c4df4bd9b83d1b485f98fe5f743c77af49f312c85b625"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "5b164c74ecc82c5fe6adb69d226e060c7734f9c6a02bae20106d06254f8c40ed",
+  "started_at": "2026-10-31T21:14:02.013669+00:00",
+  "result": {
+    "id": "gen-1793481242-LSjHeZ7fzu72B8BStHvl",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-ws-medium-02\",\"row_sha256\":\"736640c92e272339bc5c4df4bd9b83d1b485f98fe5f743c77af49f312c85b625\",\"critique\":\"The input is a plausible team message with clear intent, and the output retains its requests, conditions, and capacity values with minimal cleanup. However, the context requires tagging referenced workspace files with @. Only @infra/terraform.tfvars is tagged; main.tf and variables.tf are left untagged instead of referencing @infra/main.tf and @infra/variables.tf. This is a concrete context-instruction violation.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5loe7NioOPEZB-caZtCXIe1pP5B7xb2GbYBISo1fHDXvZUAZBdS7Mbg59cuYVNQSWJRGu-8jOWa_yO96QJBjiMNXl2t9v91pKIONzylroRqsNDw3mNPk1v0rPB6UPjmW1AJCIMJX5eO1ZCFDDXFkU5wpcN4UrdFkTFOgo_VnzdVvD-5w2-g0P9E2MeREGAkVIYXswrysY5ZIvpCN-DXKJyimgvyjZbY1rNfHfvMiG7_Y0AgdsAsxD0XNs6m0AmxL8wJJ6nVe56kHzkfAzZdLCkIY0u1YIADISUsp_kmjpl6oUu8FE4C1E-_XlT0Kt9BEgsO-Yjjj2thGbXKpUiZq-dw4DpYyKCckAREggG8rxqeqHeA2xuV8OZVjy0RjwQ6R53EpQ9RyRzHrRStjis2abrT-2OTE-wtdz-TjhXmSJmr1GxzV7McGgT9SKq9_C-Z-1lHTc32-VUTGjzQGBanS9YFXsTbcp-JM9GttVidVxleOIfX59UZq8s0d_IDqPS6ur1HgPb6mtu6CPUQr_85-GGVRGMsZ2tc_8sol2vTecPWbY_nCsqRVJzNnEXvuXlDUXYUDgxfVITHN17efn_seYKEp5QFPOB8ObnJ4zBse9yVTlJ1RInSoi17Cb4t7EqYHlYcR1-ibP7oMCU_xzvsfRXTNtNEf3vvU__Poku4lLqlZ08T9wrDJ2qkjqh-6BxfRD3VXycTK6bjrbS0ycqK1q2bsrCf7bxM23hCRrN8JIvUEynaVCMOkjjBLLc0vgpLByxFLLDodexO1xTQ_0rBhBFGzQjAF9SS7u520NJ2Bn0wZ9yWC9_JEt6gjHQl0NCagxInokLnB7_EqTnY47xndivoL3Gi0vlVcB-oJDiBDGWJuZMfTn7qwV0zYsguk3Kuapfinw4PQ-x8bNRDfY0wXu2P8N98to60kDcCRfexmbWxyBCyglwmGy35eFW6b4P3WSeSNzj96tOBu2y-QhQ9ulkQlP1ktUHarVymbo9MbjrPYiI8WAehiNM_kbDzTqj_Tk1nYK0r2WUdBxUoGz2318_wKnN7YfunDUFZUQHtEO1rmmIaCniZfUoSco2TjUBSmo0d7sh4M4Wq6RnJvemYy7NsfxqHKkdTRYqEFOm6dwhag3B6fK2XzaefPGNsz3xSvq7SSH2uIaOzNB4SErWciIshFkBqH7doTNhiqfTQ2N695ID82PmNvgQkshs0ZaaEkVVAkgCCGX9HDL6qcYZSCKSNyRASNRU1FCkDqeOZ_8HyTe8jcIGqeuqINvU_cS7kgFf9w69olTUe4RlkKCMTttZC2Vcc5if5X-9VbiU5RInKh2k49cneKBOkc5kgKRjlpqv8rwKjKavG3aF72PekE2bIYxpaTCY3Z-GJ98OtFMNihfG9yfnfc1qN0PSHZD78sGvjgKgIUWymBqpMLv4C2wasLE7FcO91ZhcICkD0Hrlj3oI6FB4OYlXm99aSWcWOEZo4h_c7-ISed3PgiKS8VzEN0GYRlvIFnyXPpWqKFA6FlRNVlXofsOu-nYolpuOfE3sqBrAsrZBAfBBUsJlinEAbPeJWjEZW_yqqa1SoAaUgL-yd5jHnY75JMJDY6tvLgQN45EUmsY_unJfCohSEWnMZlLqEuqyYV7OwDsni4Z0Wsa3A0QwV5ymsr6g3MyKf3GTPq-1YwRuwGy25Ibb_v62nTAwVR6LVC471TKU_S9ueq7xmXEAyLRM2i0Q5_2Ao76JTpO_5-XaaKbeUSap6xN4AT9MTjH5SD9ocOmJMgH8Jao7jz5zi70FR8j41seipRtjDUJWTphcsc0KOwA9DBmcETRumVGk1z8f7n5XwMAROU7iQD1qTz4EeevY55LeM5k0-8x3XxW6ljOt0dTntFJfQ8K9tPucdqNmjDwUqVgv0AzPhLIBGisuBFxQOWB8sejJa0n5Jqoff_Q4qBTNrKH1cLniur3MaAjLfdV1IdBliY5IXO0qglxL27rw0-Fp3WbQUwayflrV6qgks5SR2ZGXg84U-x_rSbWn2g-go1aUSysukGq741OOFIuZmoTDpQPng6357vweot-iDkTSZzSbDHxhYYi3dLOweDwMimPj6jfB_XES9ap85yhzxpDN26SJY2lPLXzzKpH6kcdYMQarU2adNWKVt_zN2SKdOVXeIf-IzkHdUMMFDdLOegTyVXwiQGXxk5osM35GJOqskK7IzFMaj04muU2jpfJ78-6CZ85bF1KjdvNeUl3Gq4JJN5jl5Hll2I7Qrfb6gKglMbBvu40ZBmeGWnPMCCzlR64HF5qYAe3exId-96qjAUkhrt0sEVguE1erGcxnO6wDM_v3VKwTyErG4jrgBB-5GM-onkDi1DdxO1k5SsLFBmwRcbLxRZUpNeLhlB5TSqjfm5OVADY7gy_FZtxAeMp94XhvssyPScPelNU-ju4SNXxlhjfdRIOEL5WOK_myF-ztUJHMkir3euC_cvDNzUoed9B3IGoQDKduQ_T78cGLpOrw7gD6V8HdFVR2ecdJcrGTUNdgVl9I1LOxldqKY5NtA_LPfH2IQAxkW6AuWya9QhHSL6fG84fRzpYIwRvglR3gjTWrFAFEliT-cjpo-9cot2ALuht1wK4iXncEkfyYinCeRXvLsX2KBtfaRj_mwTncSOPtGqD8hemQwaSJXv4rNzAQseA16-CG1oslCNS96ZO2qNgmoGYeL6SI-pt6z0zNq_ueIsYBxkA0paMhKvfk63zQpGzyAHYbRl9wO20LzfymhybjDpquyt1IQMl7ebe8MbnzSxSMEuIBdY6jJe7OiZFwtFXLMy0IZ5IHNRAKAga4JwuMgbGykt_DhqczmR3ffUcoaT1b-f9EvaChqpaPppEzzWpj0R2kSKQNsb9e8yqFmNoUM8GxnVfN-gDBTtoFVU2mpjzFkgFaVHlHPslB34d6ZaDYDBA_l7FO7rs-NtbjGYcfyR4MryH83jTHVvjjfJn4A7-mz2sHylhRHWyyWB4ijPc8K5coViZBLfLlmnH6t2rSLOhcf51UD3Xp0hs7GtOOoAU1wCfUpRMdf65zPJ5albWWexjUJkH-cMd3QcHOezIeGmPvBDD_QWxT24Ee9PO8rctsASS8ex-lycFgp0X79W-7zTnK_scv_0nELy5FkFtFElilrvhDGzzPliAUpueHyLydwY7vu7c-9s7LtRLfPcTcdI7Ucn1e2PAnSSOqZAZD_W0UEIjUF_n10mHJ2l4Vr-9EuhqLnNcyl4xZs-Ri_RsmIHI1QWrm4UkbFI_z-EOyilq25oEwRK1iUbx1UjkfVvmBhOzhou3vpx1jC4NGn7eor4WKfJSpwz66X6HAfuos5CskBXjtGpfAFH8TBjn9HF6VpLuG-VvP-wMrYrpF2F7WhqWLl-dGJAVLazFO6nvHWQVLEj2IfRBnFmZhWrDGf8T7f4pWph0KJ32vsxt0VpC_E=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0fa93c46b3fc48d3016ae65a1b271487d09e9906d3af35797c",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481242,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 298,
+      "prompt_tokens": 912,
+      "total_tokens": 1210,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 124,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004804,
+        "upstream_inference_prompt_cost": 0.001824,
+        "upstream_inference_completions_cost": 0.00298
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "50adc81dfe4fb088201a1999195a16dfd691363c22e3c44e82eb15646d44f19d",
+  "elapsed_ms": 5962
+}

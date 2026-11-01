@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-08-prompt-custom\", \"row_sha256\": \"fd0068161f8e3475aaa7bfed0f768a46f16048411513f8db611125e76a58fbbd\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"level\": \"custom\", \"profile\": \"developer\", \"files\": [\"telemetry/sampler.ts\", \"collector/trace_pipeline.yaml\"], \"instructions\": \"Create a technical remediation task and observability pipeline specification with file tags and sampling rates\"}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"our distributed tracing infrastructure is overwhelming open telemetry collector nodes during high throughput service load. please inspect sampler dot ts in the telemetry directory and check trace pipeline dot yaml in the collector configuration folder. our microservices emit w3c trace context headers across hundreds of rpc service boundaries. under sustained traffic loads trace ingestion volume causes memory exhaustion in collector pods dropping valid diagnostic traces. we must configure the head-based trace sampling rate to one percent no wait five percent and implement tail-based adaptive sampling filters. furthermore ensure that sampler dot ts always samples requests that return http five-hundred series errors regardless of baseline sample probabilities. update trace pipeline dot yaml to configure batch processor settings setting send batch size to eight thousand spans and timeout to two hundred milliseconds. also configure memory limiter processor settings to trigger hard trace drops when collector memory usage exceeds eighty-five percent of pod allocation. site reliability engineers must verify that span storage retention in clickhouse preserves sampled traces for thirty days with snappy block compression. to reduce network egress costs collectors must compress exported span payloads using zstandard compression level three before streaming to remote storage. high-frequency health check endpoints in health check dot ts must be completely excluded from trace generation to eliminate redundant trace noise. the observability lead mandates enforcing semantic conventions for database query attributes redacting all sql parameter values from database client spans. if an upstream collector agent crashes the local opentelemetry sdk buffer in tracer buffer dot ts must buffer up to five thousand spans in memory before dropping telemetry data. in addition trace processing workers must compute p95 and p99 trace duration metrics across one-minute sliding windows exporting latency percentiles to prometheus. to maintain trace context propagation across asynchronous message brokers kafka producers in event producer dot py must inject traceparent headers into all record metadata headers. when distributed services execute database transactions the postgres client driver must extract trace identifiers and tag query comments with span context for cross-tier query attribution. system administrators must configure open telemetry collector pods with four gigabytes of memory limits and two virtual cpus ensuring collector buffers do not experience cpu throttling. the network operations center monitors dropped span ratios on the secondary grafana dashboard raising critical alerts when span loss exceeds zero point two percent of total emitted telemetry. additionally all exported telemetry streams must route through internal private network endpoints avoiding public internet transit across multi-region cloud deployments. observability engineers must also configure prometheus alert rules in alerts dot yaml to trigger on-call pages when collector queue utilization exceeds eighty percent across two consecutive polling intervals. finally the platform team mandates that all microservices pass automated telemetry integration tests verifying that trace spans contain valid service name and environment labels before promotion to production.\", \"output\": \"Remediate distributed tracing infrastructure overwhelming OpenTelemetry collector nodes according to the following requirements:\\n\\n1. Remediate distributed tracing infrastructure overwhelming OpenTelemetry collector nodes during high throughput service load.\\n2. Inspect @telemetry/sampler.ts in the telemetry directory and check @collector/trace_pipeline.yaml in the collector configuration folder.\\n3. Support microservices emitting W3C trace context headers across hundreds of RPC service boundaries.\\n4. Resolve trace ingestion volume causing memory exhaustion in collector pods and dropping valid diagnostic traces under sustained traffic loads.\\n5. Configure the head-based trace sampling rate to 5% and implement tail-based adaptive sampling filters.\\n6. Ensure that sampler.ts always samples requests that return HTTP 500-series errors regardless of baseline sample probabilities.\\n7. Update trace_pipeline.yaml to configure batch processor settings setting send batch size to 8000 spans and timeout to 200 milliseconds.\\n8. Configure memory limiter processor settings to trigger hard trace drops when collector memory usage exceeds 85% of pod allocation.\\n9. Site reliability engineers must verify that span storage retention in ClickHouse preserves sampled traces for 30 days with Snappy block compression.\\n10. Compress exported span payloads using Zstandard compression level 3 before streaming to remote storage to reduce network egress costs.\\n11. Completely exclude high-frequency health check endpoints in health_check.ts from trace generation to eliminate redundant trace noise.\\n12. Enforce semantic conventions for database query attributes, redacting all SQL parameter values from database client spans per observability lead mandates.\\n13. Ensure the local OpenTelemetry SDK buffer in tracer_buffer.ts buffers up to 5000 spans in memory before dropping telemetry data if an upstream collector agent crashes.\\n14. Require trace processing workers to compute p95 and p99 trace duration metrics across 1-minute sliding windows exporting latency percentiles to Prometheus.\\n15. Inject traceparent headers into all record metadata headers via Kafka producers in event_producer.py to maintain trace context propagation across asynchronous message brokers.\\n16. Extract trace identifiers and tag query comments with span context in the Postgres client driver when distributed services execute database transactions.\\n17. System administrators must configure OpenTelemetry collector pods with 4 GB of memory limits and 2 virtual CPUs, ensuring collector buffers do not experience CPU throttling.\\n18. The network operations center monitors dropped span ratios on the secondary Grafana dashboard, raising critical alerts when span loss exceeds 0.2% of total emitted telemetry.\\n19. Route all exported telemetry streams through internal private network endpoints avoiding public internet transit across multi-region cloud deployments.\\n20. Observability engineers must configure Prometheus alert rules in alerts.yaml to trigger on-call pages when collector queue utilization exceeds 80% across two consecutive polling intervals.\\n21. The platform team mandates that all microservices pass automated telemetry integration tests verifying that trace spans contain valid service name and environment labels before promotion to production.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-08-prompt-custom"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "fd0068161f8e3475aaa7bfed0f768a46f16048411513f8db611125e76a58fbbd"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "0154705ee1dc8727359c4f4841225860567954ca81d746b044766c5dc861b28e",
+  "started_at": "2026-10-31T21:14:15.795588+00:00",
+  "result": {
+    "id": "gen-1793481255-6nYl4DIPSYyOdwihON6T",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-08-prompt-custom\",\"row_sha256\":\"fd0068161f8e3475aaa7bfed0f768a46f16048411513f8db611125e76a58fbbd\",\"critique\":\"The input is a coherent dictated technical request with a recoverable correction from 1% to 5%. The output organizes it into a self-contained remediation prompt without performing the task. It preserves the supplied file references, sampling requirements, thresholds, retention and compression settings, conditional buffering behavior, propagation requirements, monitoring responsibilities, and production-testing gate. The repeated opening requirement is mildly redundant but not a material defect.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Considering clarity in output**\n\nI think I can pass the review with only minor duplication. It's important to give concise and clear critiques while addressing any corrections. There shouldn't be any awkward phrases like \"per observability lead mandates,\" since they might sound unnatural. I want to make sure everything is exact with no material defects. Also, output filenames are missing context, which could be inferred from underscores in the file names, but I’ll make sure the dictation is standard.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Considering clarity in output**\n\nI think I can pass the review with only minor duplication. It's important to give concise and clear critiques while addressing any corrections. There shouldn't be any awkward phrases like \"per observability lead mandates,\" since they might sound unnatural. I want to make sure everything is exact with no material defects. Also, output filenames are missing context, which could be inferred from underscores in the file names, but I’ll make sure the dictation is standard.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lov0HO10F7gN1gSnKjq2ZOujo4U85RQUWkwcq_w-jGBRGLanSKGjzJoOQDjqm6EtzP8cs4e3iIQTAK1pa6gma6_TAlQHsn776I7UvQg7K5GU245FMwAMk1KXDMYbsh7xXEsRFSz5kuDLYnQDr7KWc5royhjOunDhiAAA9AXnUMiskj5s6mxBebg0zbIR-V3eB-hW7hl5dZwaM1i7CKZTa2IdFNzOC2yvBz1HHSn7MTbTuveDgrduTwe7z4CgvEWH9EXlcRph-TVb4-f7VCxfMLeSL2ZFftkrHPx65_U9F3u2p-j9vJ1_eJ7q7Egfpv3Xm-MUWKuja7X5kg4xQ0tL2NLI3jdIb8JFU_0pCHBFcvZdEEOe3gq3ic9e5lOFzfoMG2N19GVAaXHCWf_7OXj5C_kzD37FL6DzcDAqgOR-Ue-t9a96vM3mn0mCguYIMWFw3iU7U3y3LVsmF4er3XuyCLjMLCpAq2rUJnUe--WERrz7yGro7mD6u7a0mZ59O5hhg1ZD-c8th36Y01Z7VehZTn_PaS-IEsqTLEcJ4duaNlgNJacqgOTNJGe2i-Y3XPdjmiqxL2V7b0AsKdge48rwmeXO6U5Fq12Mb4hORD8meyOEmC6sqVUPEiQJ3zbz0F99V-Ed6z5yR8oIwgRXtul6waToqy_0IWUbFu2JQPFvwntirnZI92zfwpHaMNoQSEYYLvfMuhTDCuep2_US6wXYC-EUHYhW7cntzlPb3ctTz-LcuDTN9hHJTGylA5PVfDyArfl2HB0JSC3796ovGosqx6wOiyEX_gvZGBmYxQLuVr2p7mb2d3pD89evMF7DaHfPc6u3QYKn_59zDiCbx4geADHkFcfHh4mILbLij9Lp-5RubHPbxLdfl5Qa3SXJIG_1Os7deTqdHupRHLDdpe0OlRlif5LbN4wOMFobVvBznc3o66xQ3S4oInzneb56b_flbli2SBzk4MnnX1yEixg9C9Fl9vVJbM4iby3B7jcjZPdIS9GedMnIFNyc8gTBIzNO3XjLhG9xYa7Gca2s9Gws0VfZpt6FTVEaCKFQwycp8X6lI9lU472w2TSLCpHUp4RH1OyNGtTsAfh-eZNhGabQx8UY1tMtyyVhpem1IAkU0eOku_qg9PCvesC_soEJejqxOyU927AUudovwOD3mAvukbwwypfiaUDAgJQrGvpCLHQNHK27JB9G09Op0NmOYFuNTJn-EsD4TNtRgPnbt7e6NP41hKesGhm1aLL0xzBlxejsb3DOsiDdqkWt1wWnx_M8m4GXhS-Fktzoad7QKrZJW_p4t2Vv2TTZobsLzjCx9yatIYhRXBn89N_ur-ZzbJrVhn5rVnnVEA-jPxtGxJBbRCsCezCnNyK9SbBXxzQqL9hC3EVEmKXBir9UCUlNTYMhuPdxFU76SBuLKYaG9w7vR8luNLs13zvl1At_hRlm0Oww0kTlo4pAxmm_W0hjwh1dkDyz9SdqivUB8ABxbdKKBTjrQQYhwYkxS_ISxjdTt7mMeX0Nj4XtQxKwCMaLdUeKvBG5Ftoyyo5QJLS5RLTSo6I9dWuIwR3uy7MGePJs2tnL5upddUQDkhEKPlUkrmgX0JUm50iU7PnriWGpxPgIWvCBXMCIA2LQntxU51d8r4MUM0kXxIH9x-HuCkOIUvsV7HswqPNPfJrbD0tC-g282Wq2EZbqDa5qNYCSAKTK3NW4i-S7hoJI1G-_T-zZ_dopD8QzkQ1YWemg4R97XyzHuZhcCbsNX905zlalQZKkwJv1y5OXJ_RgnRmGfKsbbaNofu7Fu5ayIxZ0i37CsnrMN6COvBMZ0sOId5uu1LiPP0AmW34TiWZxrMEVK4_KkFj-7DbDs_l2sNMOp_XKrisvDmiLbYtbN1hLwkcvjWKVAdmp8BtkQ0_ah6OFljBuS3fNt2UqKHKqUxQyJhKSQsaW_UiZREtjLINFPKaU6JpakxY82ztU00px8Db9T8kW9GYH45KKxILJlQjg9FiFnIa63q5NY7udv-3nko227P4EYnbuDLMJJ4lhOAFF_oR1lT_9SdldHMAX97M6xVbTCa7dMdfj1OHH7M621mXMkJB3gA53PiI5OR58kkdnq6sfmPXh5rsHse2b8r_AL3XUbOsHuSkjGoA8CNKtHMs6dEFHgY5ce28ihVKxPRAbqvYxiY5Qvssai8n-9wqNRSm8OhLh049mnNOYb-XrmKlA4b7zYPfgIBeKdwNUCc4i1lr9ehweJNI6UaZR1EtQVv8d7hez9lJUv1pjzLSJDQ9VZZqGImI-T7l2o6NwWucbrQpp_YjwxU774jOLocb2EZ7hVnXg4zuAomLLt3TRDoaZXX5LPNcHzvDGmIWDp1SxT1ZGCJXn7Wqq_P6fTOIg3oTw8TwNF7hKmZigb08uFsHSYqiqKHVyCTU5MStJTd2ecccgwSeS0sOlqSEeiCN34Tamv76OXKs-FFsF5_a8gi0fFC5XSa6Sx_2_io3-pCmVztJ9ih85FDkBgIVdMvD0XwWQNacx8qsbLfrLpMo0vHO8IUoNdUIQDLVGcEbJeLRlOTjimVhMFjrlhBWqIhcutbOnmNThSB6gBpnaxS07pclqbI32NkKfAdBbSqByULG2o2MKmRSycOB5Y9em50AHJsi92MuNwnLfO9Hfok-QydfAwRfLsKggOfPlYxOb3sTEdGN5wBD6vdHmE2QolqhAMsyTKEQDdvMyFk8iQS7yvQEYfjj4n9s7Fa2sB2cbNca5hW7Zi7eYgaxQi1JknPmc8PIpxs2HxztTRlyA-u4hgkRSLN-1V_rcGAdexNFYufWRoHIQI-8LkaJVtJ8t0jFnKLY9e2sKyEW3Rlh7Cqtd18LoIFB_Hp_JTBoIeTZIj-AAVt59BwneM9LUgRUX6Ji--u33H0e_pJhMP9w1VlcW9zcUHXosabG_GD_73j19K7CYYvhtjftBCjR7KvQlRiqurR6id8jHQQld3mFsUIbmxDdW71JwguKaD0PX9Akd1WbH5ZjTLJkQ_Vx3Hn4XQY3sEjNZ-SlqyuRVc5A3mr4-ZTX3o73LroP4gL65J-vQ6jm0XWg8S3d6fhVZKvKBOuZm1Puv0cfFNzJEvPMpMadbMWkEshr6NFgaY5AoyKFgVPfxFELFrZjhD24xmWhULFUyBybJEOfXAXlrTfUM1-KPrVLyqSA_Fo4ipAg5_vKqN4SF9s3TmynnAuZE66r3S-TiCBUmRJcEzC7TPJdfaJajw-njQiazGrViDGLGLuK5XK6AaG5J3jbsuT9CYlI-KXgi1w5xWPFGhlOWbv80Vn11ES4ClcWGraIxCnswavWz18KkU-4bLZuLp-PzZxowzA-bANDcvkupaZXeGAWG3p8esCgTa06LEKw1KNWYqYZze9QnnlIl6KGdr-N_zMKcpF9rLcvzILvlhRSq-GTMAepgZYFSiePHduplzGYN-_P3wEaqL0MnMXmaXa1rMihozVWNMlDfZV8OueMONjDt_4IFVAIdTWayiZ_F5hAMJpFLDoVJ7iuutfzDjoETPYek8TsgPvZiE4G6_4hsH_QBYKTrzIqzejp1AYCSd1Dr9rWe5Gv4EGxQzZuV7omftE8ZTL-aBhmva-gYZyvBVzE_XYtJ_Eb_-hVfvJNNYD2bCfC-pnEVS5HhuN8SG0XWLpBKIACoZAvITR1MNTaPt7EHKUVl0MsIlibGizkqKYhJbqJh52x-O7TEeUZlDT5fbNrzDAa4A9HCp3PFrXpj13NYdB7sL4qrSC35oLKT3C5iVsu5Ma_0xUch5rZd3hDNcBDCLAbbUv-w45tYRAa3bnEvxkCDCt7qwuSVfd34hWHkhaSyK77N0201OwVWerT5lgjB1CpYVu1fUkqehwQ6CCy5hdHPOzV5yw81TR-nJs-cB8KKQ_a7W2NAN-EZmRfuDKk1jMdNJe1cbujczHKHrQ6u1_DqQhOLAFDtVePMLjdehE3sOt6u8EuPcuBNLMcmRg-RUExIsP4EMWA0G7kDLFESIJBj3yYJlAqRwTMZz_dyeRJaCMofcHRhu5s3oJMp7Fqt5qcqLcNXACtfYIufyy8kPQmBX8wn3ihhyQOZjmvL_kGgQfKwQ_SwUczqhNjY4bOq4ZkgD-vFf8pNeq9mEibe-0i7YuJ0ATwGko9_LSEIy9K7TrfxRpMRW3vGC8aGkwskstj0xT18D4gzJt0_0ejg73YF7IE8jcBl-HWIYgEnnzS6Mr579TsVmUKXH3oWsbpFv0GQlNbgrATOTo2k_klS99_3rp_cUFxSYVe6I7kVSQZeMmf8ITY8EUEJvprU3WQcSo2dAWOpgFRNeXG3VpARB-g9qUBymFFrpXbIWxGcSeme6pH4nxZ_75jyCtb_g9gYIdwFOjgBXGub7-GsKaFcsbVARI3Grui96q9h0dzSExIZaaqkCVQhJWMgc2xR-i7j_bvF3P6r9PLRIFt5s1fwYmKkk2t4hNH0Si_xjPr77zzAvlJoq_4K6idSzD1XTenGwdaeeWGdjFlV9cw-ybZuc6UWpvN9dVc-pni5UjN3W4G9EIkzPjNCeUdvTtPfnqrXO4tYSevh38hf1FLM6Lyp0bDQunTxX-XtnkZBx2NWKmrcJmPaCSRC34woL-t_cRhzIawEm799QUMb3Zgu9PMSBbB47_14T7CShvBWWYvouZ56xPF12JjvHr6fmB3G76Ja4s-0QZV-5i0iuetaFN4-CZ4G8XHRPREr6sqUPsq_Q8HpWdOBqtB1gF5894AZX3sb0CgOZon3usyYTDt2-I2_Oi5_Th_pyIfJE9uEvIqiyl8KHEfzeixZS61FswC2G3UMHGalgs6e5jkIiMkdzSJV6axyyIAMXJKm_VHDUdYA4JC7frARyAcFNEuo3OZdpoyWGcSOSPv9SVJ07ltGTz96FtEKeqQNi0OQLHBcjLySfKLQadGeOFpUHt0C0FmtibXsVmHw4z2O0aeE0VusYrc_ppGQVZoIwJJsAUEZgbDratazfAUtw0h4C10WIPjQq3pZtqPz3X20toNn2QbOdOIiNhLJBI5sFl4vMDvv66nUhJgzmyKtT6_f6Of1nX_L3-3RCCNJqD3HlBlS80DJbly04pjnfD-rbyr0VuI12GEpYAi1rNW5-XQDSDxd7IgRb025Ue0brAcgOXDZ_Ay0NJbt1j-VkhFx9dZ5d4OvV5jQtlcGSoHAtqtgXb_MlRh10bK2_i97gbUvQzd08DcMgzUu-qSTn-l9FjgemnhU2f7R8TwznYfnC2SQRYvJcAV3P9vkgUiIGxE00zABjDRZ1apLDDN4DojFO7S4leuOsNJz2C5EWzk9R57cKzs_30T.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0db0e73d63a2469a016ae65a28ad7487d0b98ec6e18efcd2e9",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481255,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 431,
+      "prompt_tokens": 1760,
+      "total_tokens": 2191,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 258,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 1757,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0044917,
+        "upstream_inference_prompt_cost": 0.0001817,
+        "upstream_inference_completions_cost": 0.00431
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "0fe709307109ea1887a82415a9a80741da56585a6f84038d96212081b446a584",
+  "elapsed_ms": 8320
+}

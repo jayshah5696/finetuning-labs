@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-09-slack-medium\", \"row_sha256\": \"2f5f52612ac3be6765bae034e7543c3ae9a5ae7e7b78b7e564ecf89068919da5\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"level\": \"medium\", \"files\": [\"consensus_node.cpp\", \"lease_manager.cpp\"]}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"we need to finalize the operational architecture and failover specification for our distributed consensus engine. the raft cluster operates across five consensus nodes deployed across distinct availability zones to guarantee high availability and partition tolerance. each consensus node in consensus node dot cpp maintains an append-only replicated log on high-performance nvme storage volumes formatted with xfs. the leader election mechanism in election coordinator dot cpp configures randomized election timeouts between one hundred fifty milliseconds and three hundred milliseconds. heartbeat intervals emitted by the active leader in heartbeat sender dot cpp are set to fifty milliseconds to prevent false election triggers during transient network latency. when candidate nodes initiate elections they request votes from peer nodes by broadcasting request vote rpc payloads containing candidate term and last log index. a candidate transitions to leader only upon receiving affirmative vote grants from a strict majority quorum of at least three consensus nodes. for read operations the consensus engine implements linearizable lease reads in lease manager dot cpp allowing the leader to serve reads without quorum rpc round trips. leader leases are granted for a duration of one hundred milliseconds guarded by monotonic clock timestamps to prevent split-brain reads during network partitions. log replication in log replicator dot cpp batches client mutation proposals into sliding windows of sixty-four requests before transmitting append entries rpcs. peer nodes append entries to local log storage and reply with match index acknowledging durable persistence before the leader advances commit index. when active log storage exceeds two gigabytes or twenty thousand entries snapshot coordinator dot cpp generates point-in-time state machine snapshots using zstandard level three compression. once snapshot creation finishes the consensus node truncates superseded log entries up to the snapshot index reclaiming disk space on local storage volumes. if a lagging follower falls behind by more than fifty thousand log entries the leader streams installation snapshots via install snapshot rpc in chunks of one megabyte. network connection pooling in rpc client dot cpp maintains ten persistent tcp connections per peer node with socket send and receive buffers configured to four megabytes each. site reliability engineers must monitor consensus health on the primary grafana dashboard tracking leader election counts commit latency and raft log replication lag. the p99 commit latency threshold must remain below fifteen milliseconds during sustained workloads of fifty thousand client proposals per second. if log replication lag on any follower exceeds five hundred milliseconds the cluster monitoring agent must raise a priority two alert to on-call infrastructure engineers. furthermore split-brain mitigation scripts in partition guard dot sh must simulate sudden network isolation between availability zones verifying zero data loss. the security architecture lead mandates enforcing mutual tls version one point three with rsa-four-thousand-ninety-six certificates on all peer-to-peer consensus channels. client request authentication in auth interceptor dot cpp must validate jwt tokens and verify that administrative commands carry valid authorization signatures. dynamic membership change protocols in membership manager dot cpp must implement single-server joint consensus ensuring safe cluster expansion without service disruption. the disaster recovery runbook mandates automated nightly snapshot exports to geo-distributed s-three cold storage with pgp cryptographic signatures. the principal distributed systems architect requires running continuous jepsen fault injection tests simulating message delays packet loss and node crashes for twenty-four hours before production release. in addition wal pre-allocation routines in disk allocator dot cpp must pre-allocate contiguous disk blocks in increments of sixty-four megabytes to eliminate filesystem fragmentation under high append volumes. the state machine applier in state applier dot cpp must process committed log entries asynchronously using dedicated worker threads while enforcing deterministic serial execution order. hardware watchdog timers in watchdog supervisor dot cpp must trigger automated kernel panics if the main event loop stalls for longer than two seconds. cluster telemetry exporters in prometheus exporter dot cpp must expose detailed metric counters for raft term transitions uncommitted entries and disk write queue depth. the infrastructure operations director requires verifying complete disaster recovery failover restoring full consensus cluster state from s-three snapshot archives within thirty minutes. storage durability policies in fsync controller dot cpp must enforce group commit fsync operations flushing dirty write buffers to nvme storage every five milliseconds. the consensus engine must maintain an active thread pool of thirty-two worker threads dedicated to disk i-o operations preventing disk stalls from blocking network event loops. memory management in raft memory pool dot cpp must pre-allocate a fixed pool of four gigabytes to eliminate runtime heap allocation latencies during packet processing. when cluster nodes undergo scheduled rolling upgrades the cluster operator in rolling upgrade dot py must transfer leader authority gracefully using raft leader transfer protocol. site reliability engineers must configure automated prometheus alert rules in alerts dot yaml notifying on-call engineers when consensus disk utilization exceeds eighty-five percent. the chief technology officer requires that all automated backup systems archive encrypted cluster state snapshots to secondary cloud regions every twelve hours. the engineering team mandates continuous performance profiling with perf and valgrind on all pull requests verifying zero memory leaks and bounded stack depth.\", \"output\": \"We need to finalize the operational architecture and failover specification for our distributed consensus engine. The Raft cluster operates across 5 consensus nodes deployed across distinct availability zones to guarantee high availability and partition tolerance. Each consensus node in `consensus_node.cpp` maintains an append-only replicated log on high-performance NVMe storage volumes formatted with XFS. The leader election mechanism in `election_coordinator.cpp` configures randomized election timeouts between 150 milliseconds and 300 milliseconds. Heartbeat intervals emitted by the active leader in `heartbeat_sender.cpp` are set to 50 milliseconds to prevent false election triggers during transient network latency. When candidate nodes initiate elections, they request votes from peer nodes by broadcasting RequestVote RPC payloads containing candidate term and last log index.\\n\\nA candidate transitions to leader only upon receiving affirmative vote grants from a strict majority quorum of at least 3 consensus nodes. For read operations the consensus engine implements linearizable lease reads in `lease_manager.cpp` allowing the leader to serve reads without quorum RPC round trips. Leader leases are granted for a duration of 100 milliseconds guarded by monotonic clock timestamps to prevent split-brain reads during network partitions. Log replication in `log_replicator.cpp` batches client mutation proposals into sliding windows of 64 requests before transmitting AppendEntries RPCs. Peer nodes append entries to local log storage and reply with match index acknowledging durable persistence before the leader advances commit index. When active log storage exceeds 2 GB or 20,000 entries `snapshot_coordinator.cpp` generates point-in-time state machine snapshots using Zstandard level 3 compression.\\n\\nOnce snapshot creation finishes the consensus node truncates superseded log entries up to the snapshot index reclaiming disk space on local storage volumes. If a lagging follower falls behind by more than 50,000 log entries the leader streams installation snapshots via InstallSnapshot RPC in chunks of 1 MB. Network connection pooling in `rpc_client.cpp` maintains 10 persistent TCP connections per peer node with socket send and receive buffers configured to 4 MB each. Site reliability engineers must monitor consensus health on the primary Grafana dashboard tracking leader election counts, commit latency, and Raft log replication lag. The p99 commit latency threshold must remain below 15 milliseconds during sustained workloads of 50,000 client proposals per second. If log replication lag on any follower exceeds 500 milliseconds, the cluster monitoring agent must raise a priority 2 alert to on-call infrastructure engineers.\\n\\nFurthermore, split-brain mitigation scripts in `partition_guard.sh` must simulate sudden network isolation between availability zones verifying zero data loss. The security architecture lead mandates enforcing mutual TLS version 1.3 with RSA-4096 certificates on all peer-to-peer consensus channels. Client request authentication in `auth_interceptor.cpp` must validate JWT tokens and verify that administrative commands carry valid authorization signatures. Dynamic membership change protocols in `membership_manager.cpp` must implement single-server joint consensus ensuring safe cluster expansion without service disruption. The disaster recovery runbook mandates automated nightly snapshot exports to geo-distributed S3 cold storage with PGP cryptographic signatures. The principal distributed systems architect requires running continuous Jepsen fault injection tests simulating message delays, packet loss, and node crashes for 24 hours before production release.\\n\\nIn addition, WAL pre-allocation routines in `disk_allocator.cpp` must pre-allocate contiguous disk blocks in increments of 64 MB to eliminate filesystem fragmentation under high append volumes. The state machine applier in `state_applier.cpp` must process committed log entries asynchronously using dedicated worker threads while enforcing deterministic serial execution order. Hardware watchdog timers in `watchdog_supervisor.cpp` must trigger automated kernel panics if the main event loop stalls for longer than 2 seconds. Cluster telemetry exporters in `prometheus_exporter.cpp` must expose detailed metric counters for Raft term transitions, uncommitted entries, and disk write queue depth. The infrastructure operations director requires verifying complete disaster recovery failover restoring full consensus cluster state from S3 snapshot archives within 30 minutes. Storage durability policies in `fsync_controller.cpp` must enforce group commit fsync operations flushing dirty write buffers to NVMe storage every 5 milliseconds.\\n\\nThe consensus engine must maintain an active thread pool of 32 worker threads dedicated to disk I/O operations preventing disk stalls from blocking network event loops. Memory management in `raft_memory_pool.cpp` must pre-allocate a fixed pool of 4 GB to eliminate runtime heap allocation latencies during packet processing. When cluster nodes undergo scheduled rolling upgrades the cluster operator in `rolling_upgrade.py` must transfer leader authority gracefully using Raft leader transfer protocol. Site reliability engineers must configure automated Prometheus alert rules in `alerts.yaml` notifying on-call engineers when consensus disk utilization exceeds 85%. The Chief Technology Officer requires that all automated backup systems archive encrypted cluster state snapshots to secondary cloud regions every 12 hours. The engineering team mandates continuous performance profiling with perf and Valgrind on all pull requests verifying zero memory leaks and bounded stack depth.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-09-slack-medium"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "2f5f52612ac3be6765bae034e7543c3ae9a5ae7e7b78b7e564ecf89068919da5"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "e158029a0e19ba9f5562901cb424a2e205f9954f1af737d7cdea3984662daeec",
+  "started_at": "2026-10-31T21:14:27.132473+00:00",
+  "result": {
+    "id": "gen-1793481267-LcFMv5IMZaCPiihFJ9GK",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-09-slack-medium\",\"row_sha256\":\"2f5f52612ac3be6765bae034e7543c3ae9a5ae7e7b78b7e564ecf89068919da5\",\"critique\":\"The input is a recoverable, detailed technical draft with dictation-style filenames and numbers, without leaked editing instructions or clear filler. The output preserves all requirements across the six paragraphs, including thresholds, timing, actors, conditions, and mandatory language. Changes are limited to capitalization, punctuation, paragraph breaks, numeric notation, and conventional technical spelling and filename formatting. These are appropriate minimal cleanup for /slack; no material facts or requests were added, omitted, or altered.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating input clarity**\n\nI'm thinking about how to evaluate if there's unnecessary padding in the input. It seems like the architecture is dense but plausible, and it might just be long. I need to check if all facts align correctly. Minimal cleanup is needed for file names; I'll use snake case based on the context provided. The phrase about applying the dictionary doesn’t prevent normal filename normalization, which is clear. The output has some missing punctuation, but it doesn't impact material meaning. I'll decide that the input seems more artificial than fake; I’ll pass for now.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating input clarity**\n\nI'm thinking about how to evaluate if there's unnecessary padding in the input. It seems like the architecture is dense but plausible, and it might just be long. I need to check if all facts align correctly. Minimal cleanup is needed for file names; I'll use snake case based on the context provided. The phrase about applying the dictionary doesn’t prevent normal filename normalization, which is clear. The output has some missing punctuation, but it doesn't impact material meaning. I'll decide that the input seems more artificial than fake; I’ll pass for now.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lo4GJwAnCmA8rsRLGTNqrmhew74Whdf7J4q-LOy3Uh1XyLtV_zUrqFY5HmHUx4FY8r5xyBn7BvZjcLaeSNV4HZQ-E2ir9Xv-ll4SRO1ro28_su-7ZayXY_bnf73rC5aMnG8Yt0pxTWfYs5szf6cp1ZaX2o4ADwGa19bJrcNpfnA4KphYqEhhe2VZWzXJL0ZvsoTSx9PNcwkE_Hn9kXLC6HTbjr63oGu8DNnoCjskGcR2agymy0wwy78v391HPw9nWQcbYuUEUENQvkyhqz14qmQfnAWrgc2AA1-B-96IPsaAa9qjYDYjVUigp5c_6oe0s--qcZ5YwUhPWPCE8derzglKo-CziBcWiGhGZ-nE4F33quh9AAt70YFVMcPiBZ7dXWxrFiGWA0TZdROZysOR4gW55VxqjcoyZpndUMtPELEiADsE2mzDGTH-znFY7omCMxgnse7BupkKNeqv9Jv5pta0RZ46udBd932ehQMroDlfiIoX1TZwbG1IrOFYG22du0XX6YboBKO_u4EyJfWWUoAv0w8u_HpLgh3jo66zXsLt_DAYT9yXo4ezOvaTORdncn1-OXkJu9UasIqUaJzw_J9uWozrAO-9EuuADUsAAmFTJjBJh0i-WBiAE1XL0BkeAO7i8qXd2zNMfHkQcklkHmb62CxI4br4NKm6a30SlPhgyOHnmf9lTihM_XT337VEduFto9oCI-ZvwtxhHJ3rrUxWTQx4iQpoEQsccelx6wi1_OP5O94vSqnMZnwEJXKDcSvSdAnYlNgPEtOAbRtAkpRgkSSSa-2zYMi25avp8yp1oV5fS7FZP0bhyGrsEP3igZ7CUTfvYf3NvJCJniPj1o-s6mByQFb9ltVqXS4WFFkwhswKo9dxrfXDTsMK4tYtnionOIhfwCAPaRL53qwEegYh3gVThxrnEJS4t2Iov5KnKCm_aZuxKJrcEjwELjhFix5uWRLRkrwbEmxxrOScCWPYMtHuOLHfQjwpWMQnQX1BVUz1F3Dh48_kPcRy2ZI-Kte0cMsIqmgkbqEVeMUKjnYZpDx64nipsv6bIgM7Uksxt3aAP-8cmIhpUh35et9YngV-y8KM17A8ZkEeuYV4jOcglNKRa2nJESENyargP70n3SsbE0fnVqEYATujG4tGi9DFLmrwvcFDi_FZNaEMGZnhEkcPRG9dAo_t62NdcnUJ2A0Y3A7o4t1yQMn4r7pPgCSRcdjnq5jqmAndC4ryKpPP01c13focmP13FTDm7-7vV0JVyUB56tjMdc-p2NGZrcuQht8avmqcbflNhrQyNXhanIEz0sNlNb3W987I2K5Crl5lOiF7Hl_lnKMW0EpfY8qWGtG2jOJ4GdpvafRPLJaesW7kd1qcAI7uualc3cdSkm-t2XlPKbBZsS4MWXqWi-jvWGpw40EHmHNXNcvDhIh8ohGv_gn4efX_aI2Lf1xbOFvGMWmNdaLI_K8hcX2gtaL6IxDu2rqopW5T9y_l1WtGbRprmt9OLGou3FD6II4BJPYcZNii5LoKbR6Zmi2BB_vBfdTBM9cE_3FkpZnPqxNqodECDzqq0uHS5wvkOow1i2B2faagx10rfq93mXkB54FJweMbTD5Yx0SWpGvFG6gq-SrxRFYjFbmA35if3ngcouogp0f8wxGdd8vS7qq9CQ-N54xHGaHfztlPjvBB-TQi3TSTiLtalCH6-K5v3d6yMqtuvKfW1c-UEtc88yLBKBm9VM9_BovGe3nPOi8B2wCp2CHA6amld_aXGkcXvkJMdnGEyjZszvyiSJobKa7JTBr29SVPVl1LZmtHOiBoBGSDtyD3nub3sWIRDrWSyRuiR8xEN_AykGpJRUKRvBzfxkyx306vMBY9LdOGFiPrdqtxI8jiuPZeSB3M2hcuX3tbH_SUfhdi5ihTOPjTzNcukbvGsfoqhnEp-V-SPiWS0RJMJEwk_GfwycZPKBYBBNwQpiCRIi-I1b42Ys9a4w7mHZMzRYbj_UPYLSfglNSqJVzAV8-uNSC5mRi5NV7nicm97KjcBxJ_5qeW4s-KhkHaITm8OEiHW2_7EWPDaTYUi3dQDwws10ON3zcJhWwnlqN8ErqiF4yKQ0TzV-6WGpJA47zRaIOZkHct7qdNG17SQ-RYPd5MM768b1dQ_qxxmI4GiBKPZBtUpV6EmZvhXVCVr5Hr_m6k7arYrrdOSZGqfSPh514NlbLchmWJPXsyuUVUbcOG6RLmVPWKYuOM1geJisYd5LbNuYN2GDs0fjC7gs8IC3oqUBbeI_zT7GujLf8DuD7HEFUTUv5yiUnYRPTUaJkCysvh8X9H3CfGYaWfenw1pVMDlHctk7Ejv1aYcmD3fJ0TwVgjOGWMi9laGoZYonPz9SKL8EXvpgaMYN-qCHDMjG070VMlgacCsOJf7cmo30dS5d2Oku1i-2uHjYI4wJn7gbhMZbJHw0V0xwlQFBHmWEEjj7zgxnfav7Xljupgq7IIJ-IRMz1AA8oU2N3lUa1DzoLEZmMGP9XYNM6YrSjPMonh85SyT1hiBvkYOerS6UQhcK-W5qnCXfevGuQ5pXKW47kj7dvnL74DkQyI5rWex0ksiG1xqIq9-i5nKWKjXOYxdVke5ybLVdbOQL4qPzvHI3BapJNoIVKI6cJWu2nWPq0q-50Lqk-Pqhlut8Fg_s5owt_1oSjydNAycswEUIqJ1VOHklHb_szM6Z4qK4Ww2W1K1BIh7nIYT8O_udpHJDJzie5enNbjNvhe2Xg8dzRl4mnoP1GCOtUyp9PxVG5Pfst_WAlMx1NSSoi6tURAenkgAEhJSTTvl17HC1hbVWawVcSd7XTSvpvI3Q_o2Y819Er7Y2IHSQmLw56-fRSjrJ5HHOy0TxNTlp38Mwo-cZSwn_ug2z8DesxRjG2GzUwasu8hSHQhw5W0Uus21I4dlV-r5twvs5lKensNrN058-uRH80ZIF-l5ZsfIgNu2t-rE2P7ENgXYYERivIS-SXyA9sOFObYiIGQ1IG0Ia8Dv9VprlLHgbFKdGa37VC7RPvRw5S8lmHzwQagjpR3SFbJ2v7thG1k7qyXCmksEhuX_O-Nq2NnoZZYVOXU30QzRs3lnkkxOV4oHwUMJp0wq91TNjIjHOmNdj4sFLkZWn2U0lSZ0Qz2oLtiLkvkwKPUU7JYDW4svP_3QbTwE7nTuwOTEH3vAh7KAholcqs-jshUmhLQaatFcln4EVpjYUPGYSJII5vUZFo-1G4Nu3ZUkruldksicnsfCklBYXzNyvqfUE8L9qPboZeTuRAOe-c7DgollJULo3i8c4kpaldPidTmu8y2TyTJfsy2X5SV3vjG0D06U-DMZVb4SuevZXEaO1cSTaKBsQj2qiUEkeLQBUJZ1wecPQ_ykdUBgPSW44J7KjrbzhfmH4lTJKbwBKe63396CQhsBllZ0CwK6OJAMvMTQfyqSvrhE_l0QiS85PwpCr3KU6v89yPbtQREj_CJjoF4Ldd-Q5H5CgMQKpbmnLy7trErRi1VbvL0HLN8ZOA1ozHL9B-7foo-jPQ7YiduB2VkgEfT7fw3di5tf1iT2xrPMU=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0d73949ad0c92c3e016ae65a3415c487d0994c3da922ae96b8",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481267,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 326,
+      "prompt_tokens": 2577,
+      "total_tokens": 2903,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 136,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2574,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0035234,
+        "upstream_inference_prompt_cost": 0.0002634,
+        "upstream_inference_completions_cost": 0.00326
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "d0b99da3427fe513b98c629a87c6c6ae07b95c18f6cd2627f260905e1dd65b7e",
+  "elapsed_ms": 6496
+}

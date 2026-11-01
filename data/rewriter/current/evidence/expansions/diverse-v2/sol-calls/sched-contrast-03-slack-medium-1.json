@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-03-slack-medium\", \"row_sha256\": \"8cbc5c4b56dec8c748643f8b13169e1026b9f46d26ec737f16903c1739d81165\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"level\": \"medium\", \"files\": [\"k8s/deployment.yaml\", \"services/worker.py\"]}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"we had a deployment failure in our kubernetes cluster earlier today during the staging release. please inspect deployment dot yaml in the k8s folder and check pod logs in worker dot py across our worker nodes. the backend api pods entered CrashLoopBackOff because the database migration job had not completed schema updates before new pods started accepting traffic. we should add an init container to check migration status before application containers launch, and configure liveness probe initial delay to thirty seconds scratch that forty-five seconds so pods do not restart prematurely. also verify that resource limits in the pod specification prevent memory starvation during startup, and ensure on-call notifications route to the devops channel. the platform engineering lead requested that we document all container restart events in the incident retrospective before promoting images to production.\", \"output\": \"We had a deployment failure in our Kubernetes cluster earlier today during the staging release. Please inspect deployment.yaml in the k8s folder and check pod logs in worker.py across our worker nodes. The backend API pods entered CrashLoopBackOff because the database migration job had not completed schema updates before new pods started accepting traffic. We should add an init container to check migration status before application containers launch, and configure liveness probe initial delay to 45 seconds so pods do not restart prematurely. Also verify that resource limits in the pod specification prevent memory starvation during startup, and ensure on-call notifications route to the DevOps channel. The platform engineering lead requested that we document all container restart events in the incident retrospective before promoting images to production.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-03-slack-medium"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "8cbc5c4b56dec8c748643f8b13169e1026b9f46d26ec737f16903c1739d81165"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "4c3fe1146f852923eadbae09147ab52d69a98064dcd7b62010591ee0a21dc0b0",
+  "started_at": "2026-10-31T21:14:07.330155+00:00",
+  "result": {
+    "id": "gen-1793481247-jGZLJQ3ADGZVJrUdWEDz",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-03-slack-medium\",\"row_sha256\":\"8cbc5c4b56dec8c748643f8b13169e1026b9f46d26ec737f16903c1739d81165\",\"critique\":\"The input is a plausible dictated Slack draft with recoverable intent and an explicit timing correction. The output appropriately fixes capitalization and spoken filenames, consistent with the supplied file context, and resolves “thirty seconds scratch that forty-five seconds” to “45 seconds.” It preserves the deployment details, causal explanation, requested checks, notification routing, and documentation requirement before production promotion. No material omissions or changes exceed minimal cleanup.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing input logs**\n\nI need to assess whether to pass these unnatural pod logs in Python. However, they seem to be recoverable since the supplied context doesn't penalize technical semantics. I’m thinking about capitalizing, or possibly altering the DevOps channel name? A straightforward cleanup should do the trick, and an explicit correction might resolve 45. Overall, I want to ensure everything passes concisely and clearly. Let's keep it concrete!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing input logs**\n\nI need to assess whether to pass these unnatural pod logs in Python. However, they seem to be recoverable since the supplied context doesn't penalize technical semantics. I’m thinking about capitalizing, or possibly altering the DevOps channel name? A straightforward cleanup should do the trick, and an explicit correction might resolve 45. Overall, I want to ensure everything passes concisely and clearly. Let's keep it concrete!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5loi7Odi-1yDcxbCSY0P-yVQ7v38JQF95n32zUrQYvUDnvkTVM0U1s26UrlNgc2nLb87Rkr8fDtVC-XRjvSA1-a-KnNoTGDkfDtsaZ8mW--jKAKV23uxLDv1waBxqXvx0-fUvZPL59eVOEpCr1aMwfR6ovN_pAO3CaNA3BkJsPUM7vOKAC910pqb507qgJ0k3bVPuGdf_Ud0i2_g4eddpkou7DkIBtNsLO2998Q2S31zDMAzrPlOCBadaU2P00FGpL0PdUXOv4PNHw8dyp6huQrBbumLF4BSAUF5R6P6267WL-mD5cGJ-GxanCX2MszxE8hEbIlSdwoNZobipGpKRVm5wA202ITj8LTkqiTsI9hk0LTA6MFkX_1Wgd-pa6LD5oqpoUTJYLjzJT_qNGT0DJmYKCyDq3PHa4bh8DhfieO9FXu7Qi_F-S_LqNTFLH5HEcpcXV4a1GKq-daB8-F38QndDorQR8wg9yRNgPsWCN7xB2ZRuWzkJcvOJibhkKckmzGXG8Etz56NElrahUFrHIaXmR6_Bxc9eMLx1O-1aucSh1WoyG7SiH_HSoj8i31jKihK2B5FTCEJhqDoGfCUJ5G8owADksfrf_YFuyrhV5l72CYZx_O6wzsx-DVpRC6cIJTbCIrA2tHYQunfQcnT9H4aAimdfYNo6OQpk_IXC64LeNDwtwqKaQ1X1YMkOP2QEBe1567GqvaNSsN4y-DHzSH9A7ev4kJPoUHUCQuVkichefATFNluziAqBEZ0KzR1dLEuvCGjQrfoeBuWEctYBcDMnZATk7takbXS9dzy-vTKgSyQ6UK1zY3oZUZSIfjDY35JrU7L-1JuilNnccOs-EejpJFAG34exo2WWGbH3w1lIzHIDReEEZsBt9WSprXfgzlmBrUr5DK9pI4FZ9nhqataUT2FPRazdlNIwrNdytGH-zcPzBPwoLtmKv71GrikmrN_XsbG0nMt9p2M7ZSSy5H3dNkOX_nXowTlh7Z99BU_-kz54ssDME8oXCM3KBtGSYKS0NJT30tOTL15xHTX_-Omvu8bewsByN5cLDdNTRVEagE0d3nDTZo0LsOHCNAI0yOIPemF3CiEfWfFWgaNMJAhhD6iuLX-MEM2zaBYR2eZRBVPTEasc6DsmaQZECftz35A5-dskyy7_RU34zGm1e7kGC1_ybWnOovMRhatn2G0AvuRABcWOIsxn318pVCIui9uothy6dHX6aQ_O9Bnd6zf4vOwkInLr_ux2dgOj7UhpuFk9UiM94FpUHopPkViOSIQyLmWcJqReg9oIuvtyPysMSPV4yjiMqVPXU3cQliamW8eRjpHG9JvN1FvJttYtaSPa5Wz8O_lifhuxgh73fpsv1T2Uhfow2R_0scr5JvUax382O-P7di0brQE2_JGypJy9UkiGETlLp9-YBrh5rVty2xgYwvxylh7u-xh-VgEsMD-0swCW_HifJWNA8DgrvecgSbL9Gr-ek9EhMquauNiIvaIY0p9jaeCntc0dZHsadpHBEFB0QROBFRoVT3I_rLJFVgQKsKsJPfM3Ix0pFKd2JCv-51qkwtcKYa8Dng9Kn2uJZE0BPkPlQSGfI4pWVhaAYNoF8qQL74haValMtfcwAB_s1I2vdLm24b4PIaZxIVF6hleaga4CEBHHD3eNZmnwpfiP1ELnyaD4xDud6L26SPHO52WG3f969Gp3j3XzeQgGe6sfPYQp6pFFXxt6obAalnrIxWPJs-N7oyfzWEYUhD5yXOGUR2NdFhH7v-65Gls4rJtlsEo3v248ImWGvBF2EFhV9TWdZReBj-FX-m76u1Gq76ZFF6rOZhEYDMAdUqmFNL_tdn9qfhwgQR6m42o0hCMhLGsjgxr6CaKC4jGcswnKzxKU675qqASQK1W5IJdKhFZwjgu_W4n7wSYrB4et_y34vmW9rTUXFHVbnr9UccbFZ8qHz8pj_pbCJDSzTObeD9GPFNx2jlTiqoIGQaFqChWO2aEQe66vjGJB6nxcerYN-C1sv9btOLMFIo58qdR3jtiEUVsF6CoPZ0VhgrSxVBKzQxpEQrrvewy77x2Vhn-ffYYZbCJ-6iXia4_EHZOETIzto8BuFPAzbNrruS-T0uHcEiz101XjamOPYMMAURNehfAdukmS1WDOJ7o9CqUiRBe9qTB8tCbIyuuTEStfQPh3D5ZcP08di-0glAtIPxEC3_JmGFBtMpmFF5xZS2PA5ceQv89GMii_3Mg1Nz0mx3UJEf-tdadzhOD_yu-0UskXS3yGOrToGdFXmJzNkw7nB-A1IiG9cPu6WQ7KwV0.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0114b7e434092636016ae65a20783487d09cfdd1bd6f1edb9f",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481247,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 226,
+      "prompt_tokens": 923,
+      "total_tokens": 1149,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 50,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004106,
+        "upstream_inference_prompt_cost": 0.001846,
+        "upstream_inference_completions_cost": 0.00226
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "435058b33ed9f7ae72f53b70913b8717b665a16a9b2c3476c6722848b06b9814",
+  "elapsed_ms": 4173
+}

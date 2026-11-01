@@ -65,10 +65,16 @@ class Case:
 
     def user_message(self) -> str:
         lines = [f"MODE: {self.mode}", f"LANGUAGE: {self.language}"]
+        if self.context.get("level"):
+            lines.append(f"LEVEL: {self.context['level']}")
         if self.context.get("profile"):
             lines.append(f"PROFILE: {self.context['profile']}")
         if self.context.get("dictionary"):
             lines.append("DICTIONARY: " + ", ".join(self.context["dictionary"]))
+        if self.context.get("files"):
+            lines.append("FILES: " + ", ".join(self.context["files"]))
+        if self.context.get("instructions"):
+            lines.append(f"INSTRUCTIONS: {self.context['instructions']}")
         return "\n".join([*lines, "INPUT:", self.input])
 
 
@@ -141,7 +147,8 @@ def load_bundle(path: Path | None = None) -> Bundle:
         if any(not group for group in rules.required_any) or type(rules.identity) is not bool:
             raise ValueError(f"{case_id}: invalid literal or identity rule")
         context = support["context"]
-        if set(context) - {"profile", "dictionary"}:
+        allowed_context_keys = {"profile", "dictionary", "level", "files", "instructions"}
+        if set(context) - allowed_context_keys:
             raise ValueError(f"{case_id}: unsupported model context")
         if "profile" in context and not isinstance(context["profile"], str):
             raise ValueError(f"{case_id}: profile must be text")
@@ -150,6 +157,18 @@ def load_bundle(path: Path | None = None) -> Bundle:
             or any(not isinstance(item, str) or not item for item in context["dictionary"])
         ):
             raise ValueError(f"{case_id}: dictionary must contain text")
+        if "level" in context and (
+            not isinstance(context["level"], str)
+            or context["level"] not in {"low", "medium", "high", "custom"}
+        ):
+            raise ValueError(f"{case_id}: level must be one of low, medium, high, custom")
+        if "files" in context and (
+            not isinstance(context["files"], (list, tuple))
+            or any(not isinstance(item, str) or not item for item in context["files"])
+        ):
+            raise ValueError(f"{case_id}: files must contain text")
+        if "instructions" in context and not isinstance(context["instructions"], str):
+            raise ValueError(f"{case_id}: instructions must be text")
         cases.append(
             Case(
                 id=case_id,
@@ -286,7 +305,7 @@ def audit(bundle: Bundle) -> dict[str, Any]:
         counts[case.mode][fixture["expected_verdict"]] += 1
         semantic_attacks += fixture["expected_verdict"] == "fail" and actual == "pass"
     return {
-        "status": "draft",
+        "status": bundle.manifest.get("status", "draft"),
         "case_count": len(bundle.cases),
         "modes": dict(Counter(case.mode for case in bundle.cases)),
         "source_counts": dict(Counter(case.source_kind for case in bundle.cases)),
@@ -294,8 +313,8 @@ def audit(bundle: Bundle) -> dict[str, Any]:
         "fixtures_by_mode": {mode: dict(values) for mode, values in counts.items()},
         "mechanical_failures": failures,
         "semantic_only_attack_count": semantic_attacks,
-        "semantic_judge_run": False,
-        "human_review": "pending",
+        "semantic_judge_run": bundle.manifest.get("semantic_judge_run", False),
+        "human_review": bundle.manifest.get("human_review", "pending"),
         "personal_transcriptions": bundle.manifest.get("personal_transcriptions", "not included"),
     }
 
@@ -404,10 +423,16 @@ def render_review(bundle: Bundle) -> str:
             context = ""
             if case.context:
                 parts = []
+                if case.context.get("level"):
+                    parts.append("Level: " + case.context["level"])
                 if case.context.get("profile"):
                     parts.append("Profile: " + case.context["profile"])
                 if case.context.get("dictionary"):
                     parts.append("Dictionary: " + ", ".join(case.context["dictionary"]))
+                if case.context.get("files"):
+                    parts.append("Files: " + ", ".join(case.context["files"]))
+                if case.context.get("instructions"):
+                    parts.append("Instructions: " + case.context["instructions"])
                 context = '<p class="small">' + escape(" · ".join(parts)) + "</p>"
             examples = []
             for fixture in by_case.get(case.id, []):

@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-dev-med-05\", \"row_sha256\": \"c9ef1039bcb9af22c95f9e154c04325bd0c1b6431725c9b74ebac74a1ecc555d\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"level\": \"custom\", \"files\": [\"api/billing_service.proto\", \"internal/grpc/server_interceptor.go\"]}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we need to create a complete architectural specification and migration issue for our grpc streaming billing service. please inspect billing service dot proto in the api directory and check server interceptor dot go in the internal grpc package. our streaming rpc endpoints currently lack dead-line propagation and tracing metadata injection. we must update billing service dot proto to define bidirectional streaming rpc stream ledger updates with strongly typed protobuf messages. protoc compiler flags in makefile must specify go grpc out with require un-implemented servers set to false and grpc gateway out for rest reverse proxying. in server interceptor dot go implement a unary and stream interceptor that extracts w3c trace context headers and enforces ten-second context timeouts. furthermore ensure that grpc keepalive enforcement policy allows clients to ping every five minutes with permit without stream set to false. configure rate limiting interceptors in rate limiter dot go to restrict client streaming bursts to one thousand messages per second. the security operations team mandates that mutual tls authentication verifies client certificate subject alternative names against our internal ca. site reliability engineers must monitor grpc server handling seconds on grafana maintaining p99 streaming rpc latency below fifty milliseconds. if an active stream disconnects unexpectedly the client reconnections handler in client manager dot go must execute randomized exponential jitter up to thirty seconds. server socket buffers in connection listener dot go must allocate two megabytes of dedicated memory per client stream to prevent packet drops. the accounting compliance team requires streaming audit logs to append structured json events to ledger audit dot log with sha-two-fifty-six checksums. grpc reflection in server dot go must be disabled in production deployments to prevent unauthorized schema discovery. flow control parameters must configure initial stream window size to one megabyte and initial connection window size to four megabytes in transport config dot go. channel pool manager in channel pool dot go must maintain persistent connections to upstream payment ledger nodes across fifteen geographic regions. server health check probes in grpc health dot go must expose standard grpc health checking protocol v-one endpoints for envoy load balancers. the authorization interceptor in rbac interceptor dot go must evaluate jwt role claims enforcing strict scope validation for billing ledger mutations. the distributed tracing harness in otel trace dot go must record span status codes and error details on all failed rpc transactions. site reliability engineers must ensure that automated failover routes traffic to secondary clusters when server error ratios exceed zero point five percent. the platform engineering lead requires automated end-to-end load tests validating ten thousand concurrent streams without goroutine leaks before deployment.\", \"output\": \"Create a comprehensive technical migration issue and architectural specification for our gRPC streaming billing service with the following requirements:\\n\\n1. Address the complete architectural specification and migration issue for our gRPC streaming billing service.\\n2. Inspect @api/billing_service.proto in the api directory and check @internal/grpc/server_interceptor.go in the internal grpc package.\\n3. Note that our streaming RPC endpoints currently lack deadline propagation and tracing metadata injection.\\n4. Update billing_service.proto to define bidirectional streaming RPC StreamLedgerUpdates with strongly typed protobuf messages.\\n5. In Makefile, specify protoc compiler flags with --go-grpc_out setting require_unimplemented_servers=false and --grpc-gateway_out for REST reverse proxying.\\n6. In server_interceptor.go, implement unary and stream interceptors that extract W3C trace context headers and enforce 10-second context timeouts.\\n7. Ensure gRPC keepalive enforcement policy allows clients to ping every 5 minutes with permit_without_stream set to false.\\n8. Configure rate limiting interceptors in rate_limiter.go to restrict client streaming bursts to 1000 messages per second.\\n9. Enforce security operations team mandates that mutual TLS authentication verifies client certificate Subject Alternative Names against our internal CA.\\n10. Direct site reliability engineers to monitor grpc_server_handling_seconds on Grafana, maintaining p99 streaming RPC latency below 50 milliseconds.\\n11. If an active stream disconnects unexpectedly, the client reconnections handler in client_manager.go must execute randomized exponential jitter up to 30 seconds.\\n12. Server socket buffers in connection_listener.go must allocate 2 MB of dedicated memory per client stream to prevent packet drops.\\n13. Meet accounting compliance team requirements by streaming audit logs to append structured JSON events to ledger_audit.log with SHA-256 checksums.\\n14. Disable gRPC reflection in server.go in production deployments to prevent unauthorized schema discovery.\\n15. Configure flow control parameters in transport_config.go with initial stream window size of 1 MB and initial connection window size of 4 MB.\\n16. Direct the channel pool manager in channel_pool.go to maintain persistent connections to upstream payment ledger nodes across 15 geographic regions.\\n17. Server health check probes in grpc_health.go must expose standard gRPC health checking protocol v1 endpoints for Envoy load balancers.\\n18. The authorization interceptor in rbac_interceptor.go must evaluate JWT role claims, enforcing strict scope validation for billing ledger mutations.\\n19. The distributed tracing harness in otel_trace.go must record span status codes and error details on all failed RPC transactions.\\n20. Site reliability engineers must ensure that automated failover routes traffic to secondary clusters when server error ratios exceed 0.5%.\\n21. Require automated end-to-end load tests validating 10,000 concurrent streams without goroutine leaks before deployment, per the platform engineering lead.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-dev-med-05"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "c9ef1039bcb9af22c95f9e154c04325bd0c1b6431725c9b74ebac74a1ecc555d"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "be0775b6deeb0bb1f72a645a71208309cfe29c1ed76d30f95dbd15e9abe471b2",
+  "started_at": "2026-10-31T21:14:18.944968+00:00",
+  "result": {
+    "id": "gen-1793481259-HTLSOOS92qrrvqV3FH12",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-dev-med-05\",\"row_sha256\":\"c9ef1039bcb9af22c95f9e154c04325bd0c1b6431725c9b74ebac74a1ecc555d\",\"critique\":\"The input is a plausible dictated technical request with recoverable filenames, identifiers, and requirements. The output organizes it into a readable prompt without performing the task. It preserves the architectural and migration scope, inspection requests, current deficiencies, all implementation and operational constraints, numerical thresholds, conditional reconnection behavior, production-only reflection restriction, and predeployment testing requirement. Normalizing spoken filenames, compiler flags, and technical identifiers is appropriate for /prompt. No material omission or invented requirement is evident.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating MB Conversion and Output**\n\nI’m trying to judge the minor conversion of two megabytes and ensure my output is consistent. I need to check if the path formatting is appropriate and whether referencing \"streaming audit logs to append\" is grammatically awkward, but not a major language failure. The input should be a natural list that feels plausible and not fabricated. I want to ensure all critiques are concrete while summarizing and retaining constraints without adding any unnecessary uncertainty.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating MB Conversion and Output**\n\nI’m trying to judge the minor conversion of two megabytes and ensure my output is consistent. I need to check if the path formatting is appropriate and whether referencing \"streaming audit logs to append\" is grammatically awkward, but not a major language failure. The input should be a natural list that feels plausible and not fabricated. I want to ensure all critiques are concrete while summarizing and retaining constraints without adding any unnecessary uncertainty.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lovTAodIwPAwBYdvYfTmVvZ1t5CFg_tWm0_RAJUk8H2S-kY888UQV7mSxGKv2F6PTchXhQlqCGHNBHnRIJ0nIWym7vZ_T6WQBVNJpwaFhTjEFN5mqrX7LkC2V9c9hR5y0qWjdxuUW-2A0ulcv3u_NpIo9rY63nZYPLHDh9amIjFMnmWUezn-YAoIkhbig5tXzMYzqo_8cG0qLPiJ38SYsePel5wTgRB5SjaMSiw2PJUxX5dRNkixLLasU90ctl2QRiPw_DQgcC1wMDfQZd-agtR9G7II5Rmueeu0setQevRR67HTWDb9FOlifoafplMGZOQZ893aE5WawAloOcfsbtqOrxPN63YnYNXHLeiMeGC3IgwT-mfazqwHvqlnGvfJ5qfEpaymdEACvcESR59Cs0RchqUAFWnwJZgOivkuEbjxynwnS0vxFtMi_O8FCVCNjfINZ_2R4oXq1eK_q9kh5hZ8daQtD0NPeaWqXbxBAB0PUVfBRpHaiud3ajcTE9D5ZZGru7wTCQnLv8SbCzrRUyU9w7scxET8H8Bre4I4CX-wY7HwvhlwFkF4J_qCzWBqVItmXVIoExOevmvfGmF-VpTOwC_0zSCoBvgmsZ70yKfGxycflrIlgLw28snoQNoWUY2mcbc2gF3z7OARX0S5Pd4DTz62KF6DZBW2sNWcuKoUIadh5pCIsVzXym-5JfEW3CLXa3u_IJy3bf-1MPnFeofzOyByFjHWiIQ4vYl2CEmpLRbeXoHCkM4PWBjuyq4_VPRYxRZsTQGw3pleaKbH2PkH9Z6yKFVGnNw3W41bW6rd7xPxBfDxLvtfttWtPNegVo1l9yfuGadqcSf-28i8xTRcNd_NXVHyfiY6tfBp-v_29DXDAKR_82fhhLPgHUTA7LW_T6lvC6a53u_at5ZMvVz1G5QXw_domBZp8EdNmvds-LhcleRiTa2SI_ON8W25_t8ZpBywcGPsBZsMLmPigAxMTPBu0nKObgThC3NP7SNtb51-5BoOc5T29yIbfTkJ2fTFhuaclDfCdtgEpTSvWsusN3zqghihMLSXEHoCbFfAUr9HnbzDeJ1xVKAbf-d2-_n7k30tTl6c00YWM9rb-1r6PaR88coB6gesWE9DGxoV-dvyEIJjrreEk_uzy5lKoF6aLnwPSk-bnYrPyCW_7XaLyrjL4-yvJXANEbiuhEzVo_WMQzK4It7xw8VC-NB3stNwA4eXuTIb8WysmsU5fZKFJxpWmlg5Xu1PkrisDA6Cv3RCB9xLjDmSPwF_eB7x4YEKqM314RvleIrujgg4R88Pb-wC3819NYUnD4zaNvUuGac755IDtA-uyYieepWXzMzQQVYiq3N-ihOwMpmGF0yR98jcOn4RVW7UJwj0C-0z4H2RJm1NPGLMqNVx54pPm24eUHrM6hSkw23RuvLyCRPuFxVaiXjcHHKQL8sXlXRPdOYXg5RFlggMN0ILmyG4chgPtd9CqR37rZqMVp1jQEfApokBV73P6y0J0s2JsU4liCaLCBiyG2wEGNchzyDoT9CGAzd1anA9b0kaQcCV0I1vWzsdDxTWoIqCoVbQvRoVhIT3ZjvsNY38TUmIp4UJVWam-CC2JTIXPOv3DXN99SnWiDxTHLFi8Lsj7zlV2V7SxozSLeguoxlE9Mktt0D8MaInKhTp0whrzMnfa-D9VuneUjVE1Hc2HT20RtEgfCQwGgD7aMpGmqV4Y8Qmu2MRp2pNERNFQIy8TP_CKDBWkZg4HEI--57DxjPKU09hQG2rRRnd6bW_UxUmSWAbMUYJVkPZ_aNdylbhcysRcDE2gE3C4biaNEf4u7Z72wzS4Gzc2qCB5ksvi3338IXVp9d7I6HW4UyKVMZne-bIsplCmUuhXlJUBDSDHa6bVuc_LP8CUxi0InwDcXpZVPv_W_0RKw3-gw6bTjSPCgqdCmnX5v0srnt6Vv25Qj_ja2VcpDq_TPLH4iohhp_rLUqJ1k_Cs0gvfc7i9w9-7ZbVoxu8twFTNcUlJfziUGyChms57pXi03R5WpWwzFR5SRcVWR391vPRuRgDWdAVRVm-PUvKbvsHqOdEUiwW0X1MpH__e0x_Y7JdNwntDwQHEfTJvkCpG8bBNgg5zyRV9r3bWL_I_1yv-1pVQVlXPS3GV0A2mq3dZqvutPjtISBt1FQasNZ3ksuiZwUU3vysjk5rIdPRMRtAf2Al-emsqGFSRWXimw8R_6-YugUV_eQI2F4Op1-BTN51TdT5WIiDq_iSG16QZquo18ULvxqqe2Zp5R_p6DImGk5Z2vlDzhJY0rRLttSIwSZ811Y1TugvTDJ297livye-1LgN385GY6FJIZHrBcFNurixJKNIonYDW3VqfDpqNI2xdL2zNXXavi8V3J0jGXgo122zuR5uT5OjbJrRNzOwcnYqthciezxsGKPQ4Yp1uPkC-3yLcX4pFVEYQxuH5thIoUrV--6TpYGQbV2uvT5x9wotgCZ-ZO5U1YwmX7IHVOYorE9YIoqIXFqpFduMmxCIPiNg-AqG5dQRLEL8Ygi79cxJiKXGn4ABmHYtx4UFqiD58caSkE8Nr1PeXI5gv3nx1bYJji4K6IqmnH_cA2r9WoX_MNm8jSx3Ws6nLfVtTxmUEguwItMvaNFieKVqQxk3khmNVp-36ikZQ3yIRIfO0yF05WyaUD2hFLExKG9AiLtPRUdU63xmQcZ9TRU6_Y_WA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0ac3e4d5b68f3b4d016ae65a2c21c887d09b6b32e332377d03",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481259,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 266,
+      "prompt_tokens": 1696,
+      "total_tokens": 1962,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 77,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 1693,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0028353,
+        "upstream_inference_prompt_cost": 0.0001753,
+        "upstream_inference_completions_cost": 0.00266
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "ac49b6bd5a2e49856f2655cd1ea44846e081d8fcce6e30307888c45d3a968219",
+  "elapsed_ms": 5740
+}

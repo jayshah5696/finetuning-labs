@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"exp-list-05-negative-narrative\", \"row_sha256\": \"faf647cbdd3c2fd02123db831fa472cd96a29156719b2ebbe9e776cb1f4df2dc\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"first I checked the server logs and second I restarted the backend process\", \"output\": \"First, I checked the server logs, and second, I restarted the backend process.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "exp-list-05-negative-narrative"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "faf647cbdd3c2fd02123db831fa472cd96a29156719b2ebbe9e776cb1f4df2dc"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "361a92c71e86cabd15ccc932f631bc08f2d5a95c01b74dfdebd1a8838472b991",
+  "started_at": "2026-10-31T21:23:15.664837+00:00",
+  "result": {
+    "id": "gen-1793481795-7xkmhEngxNLYNd9Plvm4",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"exp-list-05-negative-narrative\",\"row_sha256\":\"faf647cbdd3c2fd02123db831fa472cd96a29156719b2ebbe9e776cb1f4df2dc\",\"critique\":\"The input is plausible dictation with clear intent. The output only adds capitalization and punctuation, preserving every word, the first/second sequence, and both completed actions. This is natural formatting and complies with /transcribe.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lxGa5YpwVJSvg7BwB5ADTHIIjJXH56S-61YJtw72Fi_eKSohSDmpDkTDa7MjGvWFxXy3QyTzSBX3ipjWidepiw4F2RnV1W3fIWY1GVTqkhPQqz7Ne84c3kHfS30Wqx5yGKjFOCMbEzSb1aW8xl8kGUJYQ2ZWnbQ6KQh6ZyHtA4UOfiPHzLl1G_lTqRluvB18huab1Nr0FKh2KKmDAdB1eO535ZBkntyCbckUDYiPMjk-6CAlfQZgFwdNSra0uq23OQKhGUUKx2458EjO156VWDO3Z-M20-TZ9_IZi3H55hPHSYYUb44K_obg63M7_BeNwNeN3sMth4n5cUvlwmQSXVyyzBI6GQBc9neEaEwrOCUx_5vesP6wUnV7HStYh2NXl9TCo6X02LEUDpkWUoCo0nfJfzBxGShNk7-sUWhOl1mTW2IIbj310S0lrT_KtJustfvwz3NLXBDd_FPKSPP_fe6vgEi0ocC3fg2NYJ6vFnIW_vbh5438foTp1OtgzlyYuhNuo7FvWgnMERm-C3jxRwBhwgPVUnSK3qQIKQfZ6Yb7HJ_ELLeIr72alUkLCBTatW0b8SidJ0sjjclLsV2dE1puo0wWCdNftVCV1vGyRzCQQssT2qymBrFQfxOBW1z5SLsP2Go0hXS25Nr58m7hwWoKJ_nZnDuRxMoOb7AwcXlJIG7e-3OjNXvm-8LTmCokgiCz6WfHgnDYEXgtovQY4kMqIf67BuaC7MAiRXGEIf9rQ1UsFz0CpBI3__svLBTFaaa-SefukRWCASqk68DJrHJ57qbqDqtipo5NeIxoMIbxa6gtz57xe7EaUFnWJsqcVr_Fu8aDnymYCmlfMIJpms9epgn4KILSBD7IOTwDDazmtHhl7h-ZBbUmEx_k5Gp-eldGso3eQ6stinprFAXDjIC70Yn4lfwxmNhs1e5v-VnqqxmUTLb9X9BLWJAyxQMdpn4Kagq8tDGuAbCapqGtELHlixDE0rWCQhIGY63DCi_eticjIwy0hCc_Y95Fal_wLkh-BSlWH8BRGNYjIGYERaaIffYU0EQu-E5cdMzWq7XNsgmq3gvSQ7lGQ8ya99BX0_O27c3_p6zWI4Cv9qSIzaj6uqOpx_y1Y4MUVROel02RUljoRYNGV7ktoZG_pQZbWvWPNA3ucPNTExXev1LvPku88jyWnBNOqzWXTBYaOb4ATxWgR33EVfRRQZhHCOvgX_PDxGixEfy0nkABoWRBhwAJpBpYuacgMVWVHfFVDSGUNtYFSu7HV1Cv9MC1kxquhXuNEq0Nm2yIePR5CsZPbN_GrZ832ZeJiOuGgm9SQTy6fZfExC_ozGD_Rov9E6tV7Y2goybePH1Tys5xuGMIJ_FyEZ_UGILiqVuDAVXMIEsjpQT5JmAr3a84TBfP-WmdVcobzIM6hP4aGnBG4Y-s0OpCUU-_2FSbDAHd3o8Ps_y6IL0yVC92ZHwoOHG80VFAR5dcTpGris7dVTo-j1d1ovAmB2ifI4DoxutMBAP69JgBdwAswghuL6M7xLhV0Zl1Kb0YvnVH2zICyw9fQCSSojMMCxkV11STIqbZ-Ssy4R3OCSqeEbp3yPY0Sm05c6fhZmdQQ-Z28NFVpR0JzBkxzrm2sk4PlbHLI3b7_Rxkn6aCng_aveuDaPGafofItlmV5Witst4YOCNBGOsRT7WrBDibCOpCUa-agz6FVAMAWJfN962MJsGN4ti1qaWeooiFb-hv9_cx_-kr9tdv9OpnAfUnxaVqtowiP8ORNNNFfuONFIxpIiMQ9zor7UtuKeI0x_-Af1uekpbeQbFN6AZHBARCjB7wTnol0ZlAb5ICgpSYYSfH8xNF1cHq0tvf83kOW4YthXstPwpoGmn3pSdXJB6OiIBJhsyM3ys-tb0GBeC1vw=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_00c888a845b1d354016ae65c44c6dc87d0887b12387f6f8279",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481795,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 157,
+      "prompt_tokens": 640,
+      "total_tokens": 797,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 22,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.00285,
+        "upstream_inference_prompt_cost": 0.00128,
+        "upstream_inference_completions_cost": 0.00157
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "546a908cd91f05296a16d7209c4a36259977f550967cd9f0a45dd318159322a5",
+  "elapsed_ms": 3075
+}

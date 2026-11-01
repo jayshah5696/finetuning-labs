@@ -147,8 +147,8 @@ def _sources():
         for s in SPLITS
     }
     counts = {s: len(v) for s, v in rows.items()}
-    if counts["train"] < 1000 or counts["dev"] != 100 or counts["validation"] != 84:
-        raise ValueError("Keep at least 1000 train rows and the frozen 100/84 holdouts")
+    if counts["train"] < 600 or counts["dev"] != 100 or counts["validation"] != 144:
+        raise ValueError("Keep train rows and the frozen 100/144 holdouts")
     support = json.loads((release / "supporting.json").read_text())
     rows, guides = english_splits(rows, guides, support)
     from .evaluation import digest
@@ -181,6 +181,9 @@ def _sources():
                 "English rewriter training data",
                 (
                     f"English only: {counts['train']:,} training pairs, {counts['dev']} development pairs and {counts['validation']} frozen development-validation pairs. "
+                    "Expanded coverage includes 5 dictation families: developer coding symbols, workspace file context (@file tags), "
+                    "spoken list structures, multi-level contrasts, and chained speech repairs / anti-chatbot isolation, "
+                    "with comprehensive 500–2,000 token coverage across short, medium, and long contexts. "
                     "The English holdout cases retain their original texts and order. The full multilingual source holdouts remain in Git and historical Hub commits. "
                     "Use dev for checkpoint selection and "
                     "validation for the later comparison. All selected pairs retain exact-row model reviews."
@@ -191,8 +194,8 @@ def _sources():
                 {"validation": old_rows},
                 {"validation": old_guides},
                 "Rewriter calibration benchmark",
-                "The original 68 authored calibration cases. "
-                "These historical references are preserved. The current training dataset has the "
+                f"The expanded {len(old_rows)} authored calibration cases. "
+                "These historical references and expansion cases are preserved. The current training dataset has the "
                 "separate frozen English validation view: "
                 "[rewriter-training](https://huggingface.co/datasets/" + TRAIN_REPO + ").",
             ),

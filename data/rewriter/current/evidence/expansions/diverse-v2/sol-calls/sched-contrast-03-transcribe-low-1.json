@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-03-transcribe-low\", \"row_sha256\": \"2cc17feda8268e32b3a07a6c76209f0c5585376895075b708c30719004199f37\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\", \"files\": [\"k8s/deployment.yaml\", \"services/worker.py\"]}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"we had a deployment failure in our kubernetes cluster earlier today during the staging release. please inspect deployment dot yaml in the k8s folder and check pod logs in worker dot py across our worker nodes. the backend api pods entered CrashLoopBackOff because the database migration job had not completed schema updates before new pods started accepting traffic. we should add an init container to check migration status before application containers launch, and configure liveness probe initial delay to thirty seconds scratch that forty-five seconds so pods do not restart prematurely. also verify that resource limits in the pod specification prevent memory starvation during startup, and ensure on-call notifications route to the devops channel. the platform engineering lead requested that we document all container restart events in the incident retrospective before promoting images to production.\", \"output\": \"We had a deployment failure in our Kubernetes cluster earlier today during the staging release. Please inspect deployment.yaml in the k8s folder and check pod logs in worker.py across our worker nodes. The backend API pods entered CrashLoopBackOff because the database migration job had not completed schema updates before new pods started accepting traffic. We should add an init container to check migration status before application containers launch, and configure liveness probe initial delay to 45 seconds so pods do not restart prematurely. Also verify that resource limits in the pod specification prevent memory starvation during startup, and ensure on-call notifications route to the devops channel. The platform engineering lead requested that we document all container restart events in the incident retrospective before promoting images to production.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-03-transcribe-low"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "2cc17feda8268e32b3a07a6c76209f0c5585376895075b708c30719004199f37"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "cfce1516ba39c19e4ba04a7eed6160fc99f6d86e10b4eeff64f01ed8d370dca1",
+  "started_at": "2026-10-31T21:14:06.730986+00:00",
+  "result": {
+    "id": "gen-1793481246-w1n6QjLLiUBS1kupZUN9",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-03-transcribe-low\",\"row_sha256\":\"2cc17feda8268e32b3a07a6c76209f0c5585376895075b708c30719004199f37\",\"critique\":\"The input is a plausible dictated incident follow-up with recoverable intent and an explicit correction. The output appropriately renders spoken filenames, capitalization, and punctuation, and applies “thirty seconds scratch that forty-five seconds” as “45 seconds.” It preserves the stated failure cause, requested checks, proposed changes, notification destination, and documentation requirement before production promotion without lexical paraphrasing or material omissions.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Reviewing pod logs**\n\nI need to provide a concise review of the pod logs. The input in worker.py seems semantically odd, yet it feels plausible despite any inaccuracies in the tech request. I’ll ensure everything is retained. The numeral 45 is allowed for normalization, and I’ll transcribe punctuation and correct any spelling issues regarding filenames in context. It's important to critique and mention explicit corrections while preserving the words used in the original request.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Reviewing pod logs**\n\nI need to provide a concise review of the pod logs. The input in worker.py seems semantically odd, yet it feels plausible despite any inaccuracies in the tech request. I’ll ensure everything is retained. The numeral 45 is allowed for normalization, and I’ll transcribe punctuation and correct any spelling issues regarding filenames in context. It's important to critique and mention explicit corrections while preserving the words used in the original request.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lohECingRf9cppxBRjm_Dkrd4CGWEFZf1fDVCS6hITfo8aCemrkSUtIYcmvSw-bxnL0gsjLslnMW9_-JNWVmN7kdQqI3e-RNvtdnxwfzX2e9gWE1GeIM2fu5s-x0Rez_QLG9W7HuvYebVVBm9cjsV7poawIrOC0YEJajTYsKLgkYYIXzT3wVJDfxgOm83ggpilgjtXFUK7tdXHbBG7O6_V08541nalDTDwx3nhmPYeLkz5gj137EKST_PBkiEJESdENfVCTP_HNTRtILe4eNmNb5RpqQAR-5bKHBBq8xNfpa1ntPeE5vPGKaCFcpaXxUoHBVs_zo0zcx9cjvmURzX5Nu0P3fw6Anh-AXomWopVz-Ve_7RmWkov5d_SE0pTxCszVD5L9nQU1JEb5CZn26DxgeKUgxC3u_y1nR4Cv9kPWY-aUn6xTY-mRah-MIyg8at4SiWKctuZRbiRpYAKair6YeQrxArL1eoUwF2E_j_TmufJAAVCiXkM9GVi2XVH4gCUx--hLEjGao8D3jgjEtkecSQHQBhfOdshmYqGtaILd0NzU0zel0ON_G4sZlEldnbxPmlZO1pztWDgnG0PzG8Dci0b8id4cAKZwW8ini9pem5NGDTE9We4rnpYgb4avSE7WmjCIde_TgH3W8x7ZYA0PNau4s0STcuFcLHY8e1wvH2kKdGnEo1cLHBLw1r2VeGnC-gXLlY1xQPViU2jFRJXQahhxBWPcjiZpa0VQf2pHSk21fyj_ljvO86SZxXkhcyZqiY0kXB3d-fgKL6lNnKoWXZSM-yqlkgUB8Yw_P5NU0z5i7oorOt5Ew9CHNUt4KColPLrmFCdFValHW3EmUB2rJijshk-kiiWGkvt8Ymt7GOISELIryBO2fpZnV4p7V1WArlRZ40REog_Z_Hn5BBK33znVkRBDJBgXkOaQu59EbrIhQLwCbhgF4_scAHRn3KbA9QtvrBb24K-xpkoXipuRnVg5PgsB-gcDlzjfgUJ8Sx-bmziLCNDYUXPGvpARPzoRBQZlGB2gPmh4mtLz3dI6e6QGJbae2FTOQnjDPmNqQ_NY2dnM9Ad5ojg0FuHxHFuAHoxfOnGb6Ysm9c7H7pWpF4n23YOIX2qP5PWJ9MUUnTmkfwpZk2Bv39Wgp-f0krvmm1fiLS_4rtNlOO3ALJn0vjE8Jag6eqS8sPa_C5jNzJWYIwEx_2s8CmcfgMIJ7lpR51G3hpPTV1PPw6TZsnv1O7KN-tfgQKc0oQP06PstHKr-TU5bSyEKqS3HZVjijoK3vE60tAYeHHrbXrXRhtHZMdcIfsXI-K3lVXpv_P5ObPtQXPf5VJctafIfGhN4ze6S5tzX4ASt8hnCiCpDLqYk5ghhLVVm4Rc6SjVoTS_obYCYyV-xW4IV6W0vBNNbIPx7D5f-zwgsI53vsdDSXWpPM3ETqyTnC-sxviG4k8laR22W3JzJwGJVaLWWjqMLZhGoJuTjWmTqzneB77Ow1pdIpeGqM9mHXXd-_o4GYNGD0HOP_BeJbmaH7pJgsasjn8jKEa4IuI6ybZZeLojzP5YVjvgCE3uUYM7ir8XDZ4giblj-9ERQeul_XGxFweCk3w8A2AXf9s5AmPmSNNJARFST0LEd2W1K0v81wHuds_txd9os5JsXWB1TRTvh4J9KT27m46vcUtm439oMUfjR8W0uhV6P_4jNOs5-cA1EAKrUh_WeKOvKUVzOEhAYL-cxQ5L5LGu0bQKYscVwgT4uCZEnJHSjbW971Bf28zopS8b6nzcaUk4t2OY63ykxCbLA7sEIISF3f1Q_OA4iEXWBWQMkLqJXpS0RIJ5g5JKQmpOC42xeSmQr1Hg3eQI01ge7tyCWarJMi0c-H-dAHmo6hFLXzJn322KE4uOTq8Hve3wzzMOSEPco5xZ1wyLyBP9LUV6kgNC_zimKX2Rd_xFRUW_aVVnvC8kYF89QGJ4-8kVmp3GajFhY5eYhPsRwCuUTJBbYNX0akPQKHNKOpiHBjeNjqUQHetkwda7Vg9nozLGverCcJu6Rnp_Jy8EnsC7qLJ2ePGHEiw0aNOun142KbqlUGpGUx_JSyNxEVLeMN-3pBGdVT3wn1b5Yl_ZlrLv2saF6rLddmicziEYspmaK9xCs9zuLPSmeOnJ1acB9gdji0yTK7kj9yCp1vDa-fVBRCUDy_rWUg6Xm3hYUV-wcrxhl9MwlH2T4hMdLc1vKZKsGGKIjblTDPe0gcyy7mSVZJNnHMnzFSApkdFa7GAXNHkm_y0w_ve_GZrRPwu2982bVrHaMNwykaFnn1j-txK0sKF3VB0uRHIBDc3zqGQeYO6sUwFhdg8QX5qOUumSAFFf5Fh09E7wE_kiP2FKq6DJchR3lqs_JJqcw_udowUILGUKwFIucm4YueLaF71rzpXNm2kbsQcEJTrhkp70a7srqj0e_ruaUUWfEKvSnMKj3F-qHwEgiIKA7yUAnLgrKPDpTxMjPTe5rJHvaNuKtMpQ56fy1.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0de1f05f181380e7016ae65a1f9e8487d0aec562305fc139a0",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481246,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 230,
+      "prompt_tokens": 929,
+      "total_tokens": 1159,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 60,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004158,
+        "upstream_inference_prompt_cost": 0.001858,
+        "upstream_inference_completions_cost": 0.0023
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "4a461ee4815bfddc173498c79bbdf13520b8d88423313dd5cfaaa2516ef95770",
+  "elapsed_ms": 3982
+}

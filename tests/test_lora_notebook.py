@@ -97,7 +97,7 @@ def test_saved_notebook_pins_the_selected_base_and_public_split_counts():
     preset = next(v for v in options.values() if v["model_id"] == cfg["model_id"])
     assert cfg["model_revision"] == preset["model_revision"]
     assert cfg["hub_model_id"] == preset["hub_model_id"]
-    assert cfg["expected_split_counts"] == {"train": 1864, "dev": 89, "validation": 81}
+    assert cfg["expected_split_counts"] == {"train": 1979, "dev": 89, "validation": 141}
 
 
 class Tokenizer:

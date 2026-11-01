@@ -1,0 +1,65 @@
+"""Run the existing evaluator with the authorized OpenRouter key held in memory only."""
+import argparse
+import json
+import os
+import re
+import shlex
+import shutil
+import tomllib
+from pathlib import Path
+
+from finetuning_labs.rewriter.evaluation import (
+    bundle_identity, code_provenance, evaluation_bundle, generate_cases,
+    hosted_backend, judge_cases, write_json,
+)
+
+PROJECT = Path('/home/jshah/Documents/GitHub/jadoo-labs/projects/finetuning-labs')
+ROOT = PROJECT / 'data/rewriter/evals/english-five-models-20261101'
+
+def credentials():
+    if not os.environ.get('OPENROUTER_API_KEY'):
+        match = re.search(r'(?m)^\s*(?:export\s+)?OPENROUTER_API_KEY\s*=\s*(.+)$', Path.home().joinpath('.zshrc').read_text())
+        if not match:
+            raise RuntimeError('Established OpenRouter credential assignment unavailable')
+        os.environ['OPENROUTER_API_KEY'] = shlex.split(match.group(1))[0]
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('stage', choices=['prepare', 'luna', 'judge'])
+    parser.add_argument('--generation', type=Path)
+    parser.add_argument('--output', type=Path)
+    parser.add_argument('--workers', type=int, default=6)
+    args = parser.parse_args()
+    if args.stage == 'prepare':
+        ROOT.mkdir(parents=True, exist_ok=False)
+        shutil.copytree(PROJECT / 'data/rewriter/current/validation-bundle', ROOT / 'bundle')
+        runtime = ROOT / 'runtime'
+        runtime.mkdir()
+        for name in ['evaluation.py', 'comparison.py', 'benchmark.py']:
+            shutil.copyfile(PROJECT / 'src/finetuning_labs/rewriter' / name, runtime / name)
+        shutil.copyfile(PROJECT / 'scripts/modal_eval.py', runtime / 'modal_eval.py')
+        shutil.copyfile(PROJECT / 'configs/rewriter.toml', runtime / 'rewriter.toml')
+        shutil.copyfile(__file__, runtime / 'run_hosted.py')
+        shutil.copyfile(PROJECT / 'data/rewriter/releases/public-parquet.json', ROOT / 'dataset-publication.json')
+        b = evaluation_bundle(ROOT / 'bundle', english_only=True)
+        assert len(b.cases) == 141
+        write_json(ROOT / 'setup.json', {'case_count':141, 'historical_cases':81, 'expansion_cases':60, 'bundle_sha256':bundle_identity(b), 'scope':'English development validation; not an unseen final test', 'models':['LiquidAI/LFM2.5-230M','LiquidAI/LFM2.5-350M','openai/gpt-6-luna'], 'adapter_revisions':{'230m':'664f541045c0148e7bec66b267b35238716d4688','350m':'b660a2046092b07e46061ee25b738da3f4ef0688'}, 'dataset_revision':'36a75c009d008415fad557d49005ba4e5c73f4d7'})
+        print({'prepared':str(ROOT), 'bundle_sha256':bundle_identity(b)}, flush=True)
+        return
+    credentials()
+    settings = tomllib.loads((ROOT / 'runtime/rewriter.toml').read_text())
+    bundle = evaluation_bundle(ROOT / 'bundle', english_only=True)
+    rubric = (ROOT / 'bundle/supporting/judge-system.txt').read_text()
+    judge_config = settings['judge'] | {'rubric':rubric}
+    if args.stage == 'luna':
+        config = settings['luna'] | code_provenance()
+        generate_cases(bundle, ROOT / 'luna', config, hosted_backend(config), workers=args.workers)
+        generation, output = ROOT / 'luna', ROOT / 'luna-judge'
+    else:
+        if args.generation is None or args.output is None:
+            parser.error('judge requires --generation and --output')
+        generation, output = args.generation, args.output
+    judge_cases(bundle, generation, output, judge_config, hosted_backend(judge_config, judge=True), workers=args.workers)
+
+if __name__ == '__main__':
+    main()

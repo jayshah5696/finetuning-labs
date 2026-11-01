@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-ws-medium-01\", \"row_sha256\": \"2b57c68177213bfc6c79a0575b1e30b31ef93048b8c07606cbe9d6e5ba0cfc5b\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"files\": [\"services/payment/webhook.ts\", \"workers/notification/handler.py\", \"config/stripe.json\"], \"level\": \"medium\"}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"Hey team, we need to harden our payment processing services against duplicate webhook delivery retries from payment providers. Please tag webhook dot ts in the payment service directory and review handler dot py in our async worker service before deploying to staging.\\n\\nEvery incoming event from Stripe must persist the idempotency key in Redis with a twenty-four hour expiration window before invoking payment fulfillment. If the incoming event key already exists in the cache, the handler must return an HTTP status two hundred immediately so the remote gateway stops retry attempts without dispatching duplicate merchant orders. Make sure the Redis transaction uses atomic setnx operations.\\n\\nCheck config slash stripe dot json to confirm the webhook signing secret is loaded from secure environment variables rather than hardcoded configuration files. Also make sure database transactions rollback safely if fulfillment fails, and notify the payments on-call channel if retry volume exceeds fifty requests per minute.\", \"output\": \"Hey team, we need to harden our payment processing services against duplicate webhook delivery retries from payment providers. Please tag @services/payment/webhook.ts in the payment service directory and review handler.py in our async worker service before deploying to staging.\\n\\nEvery incoming event from Stripe must persist the idempotency key in Redis with a 24-hour expiration window before invoking payment fulfillment. If the incoming event key already exists in the cache, the handler must return an HTTP status 200 immediately so the remote gateway stops retry attempts without dispatching duplicate merchant orders. Make sure the Redis transaction uses atomic setnx operations.\\n\\nCheck config/stripe.json to confirm the webhook signing secret is loaded from secure environment variables rather than hardcoded configuration files. Also make sure database transactions rollback safely if fulfillment fails, and notify the payments on-call channel if retry volume exceeds 50 requests per minute.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-ws-medium-01"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "2b57c68177213bfc6c79a0575b1e30b31ef93048b8c07606cbe9d6e5ba0cfc5b"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "ac8f1e53d8c062bdc1f63ad76903c52657bbb7772f767bcc511bd22dc039a5e4",
+  "started_at": "2026-10-31T21:14:01.046832+00:00",
+  "result": {
+    "id": "gen-1793481241-zeCWyOqIJE0DHTV53KF8",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-ws-medium-01\",\"row_sha256\":\"2b57c68177213bfc6c79a0575b1e30b31ef93048b8c07606cbe9d6e5ba0cfc5b\",\"critique\":\"The input is a plausible technical Slack draft with dictated filenames and numbers, clear intent, and no authoring leakage or contradictions. The output makes minimal, appropriate formatting edits: the tagged webhook path is supported by the supplied file context, dictated filenames become file literals, and quantities become 24-hour, 200, and 50 without changing their values. All three paragraphs retain the original requests, sequencing, conditions, negation, and technical requirements, including atomic setnx, secure environment variables, rollback on fulfillment failure, and the retry alert threshold.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Clarifying tagging request**\n\nI need to determine if I can appropriately use a subtle tag for the path context. The input seems to be a long technical dictation, so I’m weighing if I should roll back or leave things unchanged. For the @services file tagging, the phrase “Please tag webhook dot ts” should relate to @services/payment/webhook.ts. I should be careful to ensure all paragraphs get mentioned for clarity. Let's make sure everything fits together!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Clarifying tagging request**\n\nI need to determine if I can appropriately use a subtle tag for the path context. The input seems to be a long technical dictation, so I’m weighing if I should roll back or leave things unchanged. For the @services file tagging, the phrase “Please tag webhook dot ts” should relate to @services/payment/webhook.ts. I should be careful to ensure all paragraphs get mentioned for clarity. Let's make sure everything fits together!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5loceqLDD8WP7l1Hi06tH7f8A9MEk_eorFupIYCKf-Cik2Fsd12MQbaitNsl3M0IMYtPswm17YFPXzYOSvMT4aNSMzxjz1N4wYLKno_rOZedH8_zIVX3zM29M0uzWohYaaU8PsjvqYt5TcrYTKfL1NnKDucFLAyTeoX2lt7-3L01cdBeM2-WHBwFkgAN-wVOFzkecgvIcEyJFzSOaVQJy6fRtZc9zFoY4plnJcJ-x4lKfB0PU2PRtc3svddFYuz3Hgc4GLmGjCSbb5oU5OL4lGAJYL9fR9y_0WOaJsdFXKmcKXuS7JiXZQW04lDx1NpP4VDNkPwad2amJ26k3wbzPTVoNcc8oiI3jVQRBbFw8SuiioixyPWufFpz7PpbXPraDze9J998tXEJteWwsz078HhsaSPTSyFK0i345JF65W8cIgI4t_LfMTrDn8S_xGLRQ6MY02-lgTjjN-E2ECUXqGacU8d_aDgG6ws4RwXaGW4RiY6A9Y6ffObVYZ6cBc1Y1Wg8TEb6tGQ-9nbWNOf5sbEkR1AnRqzQql9Ds9VbK2dzgm9IhsE5e6t1bNSDR-hquKNsEsil6uKBIsrG_so6WInNxMKoetDxME-QjR4qtl-7OPN5Y9OR8vWko8JM3QlSBXR6BAK0jNYg1QaOmUIG_BqoeU5-Myr1gfoNb31OBlytprjl7MJ_mWH6k06Hok1ABf70SLUpKd4As5zVCTuKJD5Us-zYu5ZTaaSkI-9lhfmDbPnJKpjAGg77rANSy9BCQFqCLEksFjBpE7bav09eF5ZUdFnBUyEDt2vBJDx9yN_XbNtE6a8MiyRQswL0jripz3lMbCEazGBj13q-ygvV5jMwU8gKoEN7lCFzftPKUguwd3t-wn3v3gEEUAVi25c3KDNLjLYGmUZ0f5hz8HFPlv9fxeGvRPUIhtlEPpxv114oyH-t4NzGz1u3Pr7KLPiV-zZdOdEdsCHwT_NCqrgiVzJpO-feMcohADJ0XL09j0Lk-1OvoZrGimGBnrUSJWne-jLdlqmkpjrRTlZAytgot_y60vc6MwqDQ5yNhY0h-vq7gOi4bgkOZ09Pl53tcntL9sl2dwue4Q_XuhlMzsOlrkJB38RVmOkZvlACqoX9c2HZhf4wqW7K48mekWgV0mpoW0EfnQ_mumQitcO9YxW9s1yE2OA1xFatYND2femNZWHxNDpziuAXXInRTsgJ0ivsCJjAVZCx9t7UIkKp1Ni70iI34NskVAPObGWJDjS7KQ4ESu4B0OFv6o3EXcRrZ3sQrdOYgZ2uU3XPk9VEKvdx8r2id7IZNx2GNr4egtaUBVAwpU_0dJfStB3fdyp6vBym59OFlh__WOEWkmHPLvgzH802BphKhEosJYJVIo-ImrbwvXkXTwuhGk8tnlh5nXmeHCtA6LZ5u0WMNKVAI669Nm-9zwBnzm5CCuIhC0W0Fh4ihf33HVvUo95NxKc67_WZaJk-ulSTTa_GRy9JjVapFW1F0zRKIoPzvnEE41TrjTWcksGTODHPnQudn0TLsQmrB334ILCLIvpXowf0QPt4khADQBiEp9tkIQpE9-H_PGGvcX0ErCmWOHB7ARyqu_LDhOPyOBn-ZiycWoguVGmunDCKzPjqBq4Mmc5faMknVTm3O-k7dq7tp-wFRQAqzJg4Et-ZklsIL6r_BnFjyfF_7dHxHr_tFegzU5OLfQaZXTHHWHuiOEf-WzMW1IjDmpboUhxPSaK9twbd_vpPH4zuu3XyjtAiZROGn-xzvMGCx3tnIodCU4sqPDIHvgawim1BlRFsEgoPIoMWIB4o2pIrca5T4DvP9GfDMSV-HNmVX9a1GEKXzp_7iZH9QKZxqIe93acXeg6TUHAsna62xO4TlOUOgb7zogVKAcoU_GtFrAVWz4F_tQUvgnVQidPF7_sDB_EI60xTliax2IcXng6T3qcIohUhJqx-HOyussuyO_WcfzoRhjT2vM_ql1V5-Fy3ExIPTvwS6sdp9rAplHdGMfKMO7JdGfcJX0nNIB-ilQ4HaS7YRNkAStV54vGDZTjhHtfVYz8nG-gBzZrMTQ68wYSkwAfVmUBh47k0Jj8IbhnIeHgohqLGXxdV_LpPI4moITPD-0oNkZ4JcRVz17UnEyYWYA-bb-1cG-eqE44LpHLbtSu3-aPFDtzHtYmjNxr6FFSOKgdZIInkNSxGNqg-EJpxwxGd7Dfu278W-q4CD4k7d5hXL4ktTxHm0kJZNKR-YNOXkK6cr0NSApFNw6U2zdDfY8p_opm6_LhKKVAJl7GhGGbGL5twIxcDPZD0-Ne9wDLMpFeKo3UXUus_Z2DGNmVn_TCoSzT5JPZxShMK8I1ol3okYcekh9BBCpVtF1MDSU6-YxVSzgQc_icSj9bOp0iOn5NNwUDw89typPIKXiEKU2vyjL5DNg0sQLUCcLfG9Nm2HKGfGEHeyImUvKpimykIwwBlRvg_htzlUryK_-dquJnEvh4KIuylfw0DE_WUdw8wrCAAu1_ffFF6zfgAg-2rMsn0btRPMCene5TDXg1YIEc=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0abfb5ed6323240c016ae65a1a0a5087d0ac824b81ebcce9c5",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481241,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 274,
+      "prompt_tokens": 985,
+      "total_tokens": 1259,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 68,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.00471,
+        "upstream_inference_prompt_cost": 0.00197,
+        "upstream_inference_completions_cost": 0.00274
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "f30c48a4a672c9453bc391e78e0994f4bc0bd2804b013b1aba5b76ba4b2a8f71",
+  "elapsed_ms": 5644
+}

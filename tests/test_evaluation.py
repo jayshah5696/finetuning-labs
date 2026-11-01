@@ -232,7 +232,7 @@ def test_hub_package_is_an_allowlist_and_retains_simple_rows_and_license(tmp_pat
     assert not any(p.name == ".env" or "personal" in p.parts for p in files)
     assert not any(b"do-not-upload" in p.read_bytes() for p in files)
     rows = [json.loads(x) for x in (output / "data/calibration.jsonl").read_text().splitlines()]
-    assert len(rows) == 68
+    assert len(rows) == 128
     assert all(set(row) == {"input", "output", "mode", "checks"} for row in rows)
     assert (output / "bundle/supporting/TYPEWHISPER-LICENSE.txt").read_bytes() == (
         source / "supporting/TYPEWHISPER-LICENSE.txt"

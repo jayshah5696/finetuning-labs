@@ -1,0 +1,158 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 6000,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-ws-short-06\", \"row_sha256\": \"c44127cd545809802576a5114757761dcf6978eb3ae6a6eed53522bfc972b527\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"tag handler dot py in your code review comment for the pull request\", \"output\": \"Tag @handler.py in your code review comment for the pull request.\"}, {\"id\": \"sched-ws-medium-01\", \"row_sha256\": \"2b57c68177213bfc6c79a0575b1e30b31ef93048b8c07606cbe9d6e5ba0cfc5b\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"files\": [\"services/payment/webhook.ts\", \"workers/notification/handler.py\", \"config/stripe.json\"], \"level\": \"medium\"}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"Hey team, we need to harden our payment processing services against duplicate webhook delivery retries from payment providers. Please tag webhook dot ts in the payment service directory and review handler dot py in our async worker service before deploying to staging.\\n\\nEvery incoming event from Stripe must persist the idempotency key in Redis with a twenty-four hour expiration window before invoking payment fulfillment. If the incoming event key already exists in the cache, the handler must return an HTTP status two hundred immediately so the remote gateway stops retry attempts without dispatching duplicate merchant orders. Make sure the Redis transaction uses atomic setnx operations.\\n\\nCheck config slash stripe dot json to confirm the webhook signing secret is loaded from secure environment variables rather than hardcoded configuration files. Also make sure database transactions rollback safely if fulfillment fails, and notify the payments on-call channel if retry volume exceeds fifty requests per minute.\", \"output\": \"Hey team, we need to harden our payment processing services against duplicate webhook delivery retries from payment providers. Please tag @services/payment/webhook.ts in the payment service directory and review handler.py in our async worker service before deploying to staging.\\n\\nEvery incoming event from Stripe must persist the idempotency key in Redis with a 24-hour expiration window before invoking payment fulfillment. If the incoming event key already exists in the cache, the handler must return an HTTP status 200 immediately so the remote gateway stops retry attempts without dispatching duplicate merchant orders. Make sure the Redis transaction uses atomic setnx operations.\\n\\nCheck config/stripe.json to confirm the webhook signing secret is loaded from secure environment variables rather than hardcoded configuration files. Also make sure database transactions rollback safely if fulfillment fails, and notify the payments on-call channel if retry volume exceeds 50 requests per minute.\"}, {\"id\": \"sched-ws-medium-02\", \"row_sha256\": \"736640c92e272339bc5c4df4bd9b83d1b485f98fe5f743c77af49f312c85b625\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"files\": [\"infra/terraform.tfvars\", \"infra/main.tf\", \"infra/variables.tf\"], \"level\": \"medium\"}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"Hey infra team, we need to adjust our cloud provisioning setup for the staging environment before deploying the new containerized workloads.\\n\\nPlease inspect at terraform dot tfvars to check the default VPC subnet allocations and cidr block configuration across private worker nodes. You should also verify main dot tf in the root module to ensure autoscaling groups have minimum capacity set to three instances and maximum burst capacity set to twelve instances.\\n\\nConfirm that backend state locks in S3 and DynamoDB are enabled before executing terraform plan in the terminal. In addition, review variables dot tf to ensure sensitive database credentials are parameterized properly rather than committed as plain text strings. Let me know once the plan completes clean.\", \"output\": \"Hey infra team, we need to adjust our cloud provisioning setup for the staging environment before deploying the new containerized workloads.\\n\\nPlease inspect @infra/terraform.tfvars to check the default VPC subnet allocations and CIDR block configuration across private worker nodes. You should also verify main.tf in the root module to ensure autoscaling groups have minimum capacity set to 3 instances and maximum burst capacity set to 12 instances.\\n\\nConfirm that backend state locks in S3 and DynamoDB are enabled before executing terraform plan in the terminal. In addition, review variables.tf to ensure sensitive database credentials are parameterized properly rather than committed as plain text strings. Let me know once the plan completes clean.\"}, {\"id\": \"sched-ws-medium-03\", \"row_sha256\": \"15cf0b9277c50387427099924d1f480f378a03bc01ad480bd9c53753fc530f6e\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"files\": [\"billing/processor.py\", \"billing/exporter.py\"], \"level\": \"high\", \"profile\": \"technical note\"}, \"identity\": true, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"Our comprehensive architectural audit of the backend billing service identified several files requiring scheduled maintenance and performance profiling.\\n\\nThe core logic in processor.py handles customer invoice calculations and tax aggregations while exporter.py generates monthly reconciliation summaries for accounting audits. Neither of these legacy components requires immediate structural refactoring, but both pipelines should be benchmarked under simulated high-concurrency billing runs before our holiday traffic surge.\\n\\nEnsure that unit test suites in tests/test_billing.py run cleanly and achieve full statement coverage before merging any documentation changes to the main branch. Let the platform reliability team know if memory footprint during report exports exceeds one gigabyte. The billing operations lead will review customer sample exports on staging before signing off on deployment.\", \"output\": \"Our comprehensive architectural audit of the backend billing service identified several files requiring scheduled maintenance and performance profiling.\\n\\nThe core logic in processor.py handles customer invoice calculations and tax aggregations while exporter.py generates monthly reconciliation summaries for accounting audits. Neither of these legacy components requires immediate structural refactoring, but both pipelines should be benchmarked under simulated high-concurrency billing runs before our holiday traffic surge.\\n\\nEnsure that unit test suites in tests/test_billing.py run cleanly and achieve full statement coverage before merging any documentation changes to the main branch. Let the platform reliability team know if memory footprint during report exports exceeds one gigabyte. The billing operations lead will review customer sample exports on staging before signing off on deployment.\"}, {\"id\": \"sched-list-short-01\", \"row_sha256\": \"e0e5582f48e7e7a58a9dfca639e7d5230e46d28e8d5cd8fafdd8f16e7a51a4c4\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"level\": \"high\", \"profile\": \"notes\"}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"first pause background worker queues second trigger sentinel failover on primary cache cluster third verify replication status on secondary replica nodes before resuming\", \"output\": \"1. Pause background worker queues\\n2. Trigger Sentinel failover on primary cache cluster\\n3. Verify replication status on secondary replica nodes before resuming\"}, {\"id\": \"sched-list-short-02\", \"row_sha256\": \"c6af6003e65d98e3b38518d7ecee6a7048033079d085d82510e9b6fbc6288afc\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"level\": \"medium\"}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"bullet pull the latest container image from registry next bullet run database migration scripts next bullet restart background worker pods\", \"output\": \"- Pull the latest container image from registry\\n- Run database migration scripts\\n- Restart background worker pods\"}, {\"id\": \"sched-list-short-03\", \"row_sha256\": \"4ec9428322e66ebba0e3f4ddb1c9a30a3b1db601335ef3e0e16c662ce08e465e\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"one export database backup to cold storage two verify backup checksum three update backup verification log\", \"output\": \"1. Export database backup to cold storage\\n2. Verify backup checksum\\n3. Update backup verification log\"}, {\"id\": \"sched-list-short-04\", \"row_sha256\": \"97dabd85d4b466aac0131af7c8eb9b6ec57091b743b2328a3570d447e583977e\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"first restart api gateway scratch that first restart auth cache second restart api gateway\", \"output\": \"1. Restart auth cache\\n2. Restart API gateway\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "row_sha256": {
+                    "type": "string"
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "905811e8efd2989e7007a79cbc54932a714ddab36ebd2844b389d93721b4d530",
+  "started_at": "2026-10-31T08:55:21.110622+00:00",
+  "result": {
+    "id": "gen-1793436921-H3RPDPzBq4rcSfJkvigy",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-ws-short-06\",\"row_sha256\":\"c44127cd545809802576a5114757761dcf6978eb3ae6a6eed53522bfc972b527\",\"critique\":\"The input is recoverable dictation and the output is readable. However, the output adds an unspoken '@' to handler.py. Converting 'dot' to punctuation is appropriate, but /transcribe does not authorize adding a file-mention marker based solely on the verb 'tag'.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"},{\"id\":\"sched-ws-medium-01\",\"row_sha256\":\"2b57c68177213bfc6c79a0575b1e30b31ef93048b8c07606cbe9d6e5ba0cfc5b\",\"critique\":\"All three paragraphs preserve the operational requirements, including the 24-hour expiration, immediate HTTP 200 response, atomic setnx operations, signing-secret source, rollback requirement, and retry threshold. The supplied file context supports resolving webhook.ts to services/payment/webhook.ts, and the mention notation fits the explicit tagging request. Other edits are minimal formatting cleanup.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-ws-medium-02\",\"row_sha256\":\"736640c92e272339bc5c4df4bd9b83d1b485f98fe5f743c77af49f312c85b625\",\"critique\":\"The input is a plausible technical draft. The output resolves the spoken 'at terraform dot tfvars' using the supplied file path and preserves every paragraph's requirements, including capacities of 3 and 12, state locking before terraform plan, credential parameterization, and the completion notification. The remaining edits are minimal normalization.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-ws-medium-03\",\"row_sha256\":\"15cf0b9277c50387427099924d1f480f378a03bc01ad480bd9c53753fc530f6e\",\"critique\":\"The technical note is coherent and appropriate as supplied. The output is byte-identical to the input, satisfying the identity requirement and preserving all maintenance, benchmarking, testing, memory-threshold, and deployment-signoff details across all three paragraphs.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-list-short-01\",\"row_sha256\":\"e0e5582f48e7e7a58a9dfca639e7d5230e46d28e8d5cd8fafdd8f16e7a51a4c4\",\"critique\":\"The output appropriately turns the explicit sequence into numbered notes. It preserves all three actions, their order, the primary and secondary cluster distinctions, and the requirement to verify replication before resuming.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-list-short-02\",\"row_sha256\":\"c6af6003e65d98e3b38518d7ecee6a7048033079d085d82510e9b6fbc6288afc\",\"critique\":\"The explicit bullet cues are naturally rendered as a three-item list. The output preserves the image pull, database migrations, and worker-pod restart without adding or dropping instructions, consistent with minimal Slack cleanup.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-list-short-03\",\"row_sha256\":\"4ec9428322e66ebba0e3f4ddb1c9a30a3b1db601335ef3e0e16c662ce08e465e\",\"critique\":\"The output faithfully renders the spoken numbering as a list, retaining the backup destination, checksum verification, and verification-log update. No lexical paraphrasing or substantive changes are introduced.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-list-short-04\",\"row_sha256\":\"97dabd85d4b466aac0131af7c8eb9b6ec57091b743b2328a3570d447e583977e\",\"critique\":\"The output correctly applies 'scratch that' to discard the initial gateway restart and preserves the final sequence: restart the auth cache first, then the API gateway. Numbering and acronym capitalization are appropriate transcription cleanup.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5a0EQrh0LeZEM-UkGoXsAkRayAnViOpI0jH_zWomHXeQRrTvv8kr3w9IckDBbbEGZHd3hjxFDRuVep7kfbhb_5RhEbJZvVwn07iprX6OsnQHsmm_Xo92Xng8hVwLsQ4VJgXQZ8AOcO3OwXobpM0HWAyH2e_liDthfj4NnVEK2pa2sgEQxDbHU8IOK0xDR-ztdVxc3ZilZ5idDTUAGab_jx7J7s_3zmiS2wj5io3TY5Do1_wdXkfA5qX8V6AKm_ex7lJtwRaVCnKL8uInv5mT8KyQCNZ9vg8iRMmW_sY6KNSZvmhYQfZpi3_SHoVA_FYkGylJpWonV7scHCvM2nOpkPKGy_Y-JaG9vgF-4b7sdkplUMPA5QxWdX8bgZpAQaKp5gUtSG3E3FCHMG0B5HFeCIkhvNl0O0epmIEsiPIP9W28wlPi2O41ch0vQBaEC6wBkJDakB0nrENIW07nc9DB5a5-52icaKIG5qtyKXYlBgyExtk3TtdmdXseRSYS2Toa68O0iGmYhgJdzkt-qcoQLxxLmD6O1-9jaiYzc_5celcWB7gsZbp6XRHL8MDyZPTk4dG1v_YxqVBBAufGVYp6WDvpcaDiI6iXUDOONSSb6gu7ECl-2qtQ1DWL7SDGXtM0cnWnNN9loSUjm4dWg06qq-YGG4Eei6ZTJZQJa2pApkr9bbQ_5HSl7Gi0aaJXndgocy9nGOc4PgWGvR1YTKZqGJth3rynBWlJMtc6StOPvY9Jg1jG1a0A9g65AmIGONtXlEe8fZ5BML_6kd4W8_fDftURYweAEYgcfZ-XOAGS1h0d6cfjvm4VJcAxEvhK-FfBLGtOvqfZ1U5vFvlJPzEomTdkacAUjYAW-nbxCkzxhgmIiPjn7tTx-d1Lgg3okiUUehRNGwVvqRrGMy_AjX-1gb4fXnMqUGBgtMV04N4DZhKVmufBsYBQ3ZiRwxHaWYh4C3HsRP5hUrkL0GhwT-zIRPgOqrlD-_iYRIfqwPoQgfS94mvfLl_HZQ2bv4GRXGvf5DX-sjyjwRS0dvzRp6tlds8x4Cl2MrjbtuQn_4o9gaGvlkxmJDkLTECDx8Mq_a9ZpLIGHOk11srTNILAXgj1Q5gGkgjVUzLo3B4n1E28oL1dGSkWShWCtznua5wBwDLrza-pjfZnJLWK1_iPVwAJws4g64-ljSpQ8bDQyaaENhFVx88cPT4oYQeieRQoOjwy-xofjIxTsf1YOGF8mvAse0PC7REb29nkuQw7WxgfcEkanEqdEbhW-dpr8P6Ryflp60BdSBKcKxf9v1m8NgTfsiACqA6W-Yuvo7f8mpPusxgm8_i0DLisKaA8Jcv49DVe9K0gelyOFAL8cGqJl-6rZ1WGhAEux8Jv6k1er1SXkcqGGS7TYE1tbZKMCjKQoV3KrX0xJh8JNopUGL0MgK2TsRMI-azdBc8jI2tJt_f4bg5fhYj0Eu1_LnRjEfITsfo-iupS0-ILgWc1XRyWBsmSS7a258DHauSoNJDAOnV3M327d5QuGt_0PqAGSSgmN8s34y-MgfnqbU6s_aOjpoM3xZn3AbOkpUrAd44-SY_j-YhNSeHAbZtt3NSpNmKKEMsPa8deGxUjKoawxZwXp6uSvOktrNgt0YjGQny_pnen6yNVn3XxnUOCeK9m0aBl1S8euanspPNJN__qh7gvOE29pIRocm_pWZ43svcEuRN2njAfcfQ3pbzztNEVVN-VEtsEMmOC-eVBFpvrEhk6gGrpzjtM2KKMimtLawvBAVqwObF2ImydsOxOERfzB5qr1qEReZwgzKaOu05YwVcMLCDC-21sueA5zgqZMWutytm-jGX4Qpg56r1hIFmtq-l7VB6nz9hg0Ltw66pmNgvYivGW8kYteD_bCLgMhde9sAfaMcOgg62TFCrL3thJHN1kmsmaf_WK_CAiKDpMGG37Qwdph_1PgCXFpnfLfovDFigfK4KqWyhSHsT80FTD-YubQFYFSy97HLm0N0AR4badrV4Jv6oIoEtKECfOTAsd7ycLNOHtrUF05E52EEYJYrrm1rVW63lJbU_KPZ8PaJkCwtR6PL84IneuLQlNv1tm_eAymSrHMAYoCmqahWAlf6RZKEiB4v7Avvnd6tS-1F_zG-kgKoTj8a3S6EksYwOSTGw32klT6DKmD3QhB4WcQTA1CeVWz-_mx3qhn90Cbzvg3MVm6mPPfXGifuGraKT8sWtSkV_hyYsZaezqDGBt-_j_dNtyG1afgabWt_8oxFarLuNSFmv-bshAq9LtGMp_7K2TCXD8s76tuV5No4gCr2Ec64a7m3Z8DKKrPr0IL3eQtOgnSqdOE7jkI_UVt3-obX88uLQJS1M46BD7Lj14udvXhkH2tIbPecz2K0iEGbQ2KwRbd9zQyID4PrNyjEoq1THnVRrtgdnt00bMO6C2Vts3q8TqnqEyXapjO_7Wx3xMl4T4ZSCKg1tAKUJJlFIadZYNYDlGOKW0iNrgHiGlAgkt5U7Mf3_rFvhebMsvdiBidAcVbMudCqysZ2XTsV0seRCGuIKSrrHr2i2xKvDRmOIuwuqog18k4Art0DABJkD-bj6Pndvg4n3YGO5HLFpNgxpaO_X4W5BPNJ8TmVVCsvDqUliK0AygQcXW0VBtJ2phttDx3LE2rmL0fXBjG22WqZIBVNPWWFn-pAHvFIswYsfKi6fmx-aAa4qbs0P6DBBIRdklM0QWuE1nGLIitUBvtTqS_66zsJZD-SdGeTRAytO3vXpqMOU-2GnKlB_SMJkH_hbwzcP0Ek4OEf0_qKpyD6KOn0TFdzOwj07ZM6ZnowxzcwtYOFhbz-ggngWQCw8Bt2gOvGGMBOXaCx3gWDbXmcgZJg_iL20Av6GyFRhqlho4dmkPMEPMear9Xuybn8Po25IbU9oc17DQUgmLRwRYn29qK8MBNQopc2KUvrZg9PcA8Dn-xjeyRkqGoG2TZEtH6DJrR7a8K0TaaNmmw450br1XK3v6zpfK7sJm4CA2akLxOP7RngfoHwz4lmbUvW8mTJLJOWJNqhOe-pKNs8mURlb-M9ebN-V4YF9qpx02vkNKMMNmDi9wvHvtUDy8jsIuJ22abbFDfJ7xtxoaZJrUHLShQXELJzGX9SodumS-sDEZ0IIXxj2t72GOknGqrE2cIsN3oGHJCtPNcH1E6qF3ywOsRGr7tWlCn7X-fZqo8okg21fNR8jb1to_C0jedwH_27O7sHsDDjmFWW-fD5B3UDlm5RMwBwbV20zx7YCWLw9vxOYgCvJXjyG2jF3wsdKi0bwyqpkvxNr-NnVZdltFBrw4GZmR_rI_G0LBfMgwQoPX5CwmdS1MQ6Ccj0-e7ZWc5PdbNH7glYXTkOhc_jvzuhLkmHbGYkAUURQmjRzvOYyTE02mx93pYvIhrMJYDYk_XN1UrODuGQmBw-HNeA9a08MTXAy7t1_DkB2B5Aa9OonxvRrXA_6XTc1P1atKlonHF-9Ft17UKdBdS-AQLQijoogRZ7734q3SiTU3QFeF8HdVB8qi6c2PhWr7lewkOn_CVC6ZzBcngES5fQBsiwN3Vbx_d-Q3FMG5yhMjH0XXRqlaQHWzXgbGdLKxTaTSBT9Ge4fYOF42R0jpZNGacMn8gQJ-r15VfvU8ygEKVrzYZKkQrhxRwUEc-nGICaSd21BXpxr6f004eVq_xG6WpL6acGkciRvkzcSz7L_FhSKzlTUNxjJqJo-mxAZGrYdQDPIur0OBzB88DnV9U-x2RvSDKziyWYO_xemcryNJaio1U0ztxqV7oC5HifBzP5PjQit88tOYqwTJnI8FJlBO1uoMQScGXCAJqisYfb-ye4M27clTOyvfW-P-4OHpfY6ynzIY6fRZ9FuuiJtb83CKRwo3MjIQnF6yjQanhwYXWF-unsZbbLYsxIbDJ__GxeHgnadEm48Sug9t-NG8JgzFoNyIykkHXmuOitR0b_L6IgZOZwtWwJYux6gqy-z7erTnZoekZ8Ui_wepDZ4QG6fp2dp05OC359P0cV3VDX67AWpZZ4l2WyAjx2ulaaO8VrYHQfMGoQIaPddyh-p2q21MgpcgZLuI89MUMjJOA2JNipsZGUWXAaRrIcRX1X_g7j3TJk-klcvGBCpEq92142EE4tbWpZLZlW0zEX-a9XAvf7kBGL43ALunO7c12I2GS18Y0EYg5UziHNW1SAkBT10duolLNp6qqlWhG3bBocwXx9iJ6Y1JjbS7kJPeWEJ-4q5A79iOd2iJu3XJLouv3_tzt4cia1o5AxfnYUNhEYCGy9ZarcIBxyZG3riZZhK-mG0tbTPhdto5NdqP7lmyAPjjj9tGAiPtHSyLUBMPEOhi37YynWpse3QuPGey7021fDbZsa1-YBpqpPpSxM2R4T421LHNIIhLc3N47xmMYJE6ah48mhwL3t2AghScfnLivATEljsiO0wRYt5vos9vLIAltxU7u3TdgDqgnjoe9vmMiSCinp-lUzyF43e3QA1ZCRCBFVh1Cv5fTr55jgLqmGjnDgYCF_LuiemD49Mze3VTnfAYLzrJyQLWxzn5NZQ_uUPPijYNBmg7lgtFuybdvMXHMKB_xdjMSLRbbKSgf2YmFlzTiRXKVwyKquUQjzWTC-qmhU0VCLlWqdqXrKuNcS2VFo01HciHBfuKUPdVqfjsqkr3PkhnKnGAnDxibGwA1PHc1RB_a1hkBhn9WKhBxumnZHmYBEqZZsJzBHrNAxS2MmvCeCNMM4eI654W_pViY3LmqVCBcYcaQuUvPY76UCphFyrvd928mSzzFMUkhpaSfclxQLyBtrcStASIMg7d67Q8qgTnAozWxKomlBp_61T1Wkqm0PnejwdasX8QmhJG4hIPAdv7i2xLqHjKaRD6vHLvf96NSfJALNK4z0vRlJI_JPlL391mcxo5BAjc4FAsV6ee3ZvTfrW3qF_xDV2BSq165n1sQmagfyrzpfLJMrJprje6-jRLtO_LcNklmSjs2UYQ_-7YNpc4Y6TbgfizGyuRCyYQuDMaqi0UQNqjaXgTBQQSozGLrzQuByDznLzcDoGV5JCvaqo5mBriRg6lFEi0WNyxFA4pWDIhBbNuFJFkZtmEHDje7tfIAUsSwiIM6oa_l4IpoxarIQtgVqSnPbuaif6WHDJmlMdzYzqrFpe6brAPDfthOEZL1pdz9TH6u9N_ci-KXjgC6jo2rE5F0TU30QwgKzKHbu_zVt-v3BODu1BHmWfE8OMUHb6-4TZVI3sC3Ol4sgZoCQv_cFzL8p7LlRkNix70uK6Gm2xqL64qKI2W5wVCMhYbRNu-9GtSAFQc6vnYSaAzNNQzujO1J-lTFiNW9wAVTLfbomFZN6eYjDWEzp2bDY1ChaPbkUWKLIyFQlBzqhg7gLrNOmz2uSPYs6O1ekypiTdl6n85FDfbKB48FK3ddpuqCo0YHYd9zKHm1rKJcCpUmfCPDGTZy2w-WmDDaVoqeIa59Oy2rRBIm2h45Cj7-YS-vg8A1QUvHqViEuKuaaQRd3GOTbvxxfTcXvLplWjVNB6k9y4QoqGxk6AnahriglB4fRwLDlBBIhbu8e3QDZHGnl2CabpXKscWdA2P6pqHI56wmo94x2cOHvIdcYnX5tFu28XgKjxxsDZbZOjTvhep0xqYP1vz8MXX8HT8ynSm20UhvI3DeOrreXzmzJ3anNmfVmPk9RAG8mghlp2v3mc7JOkWFOyG1FuWxv29sI__Qx-uFAR3DPGZTP6JorJzTr2EQg6iL94u-jcGZB7kdZo9eRbHeKdamuDIqzwLrOgvwApoiNVpYavFPaykpxuEGQ549ZB-INbYJkRSseuyqh1RSmfrLpeLqKZ4cJreroBOGF5ZBiYU6eqaustKYpEK-QqDDh7mk385hLdcLi6oJGKZyzERESfCouk9YOmgUBDOlAOAR-G7C2hcP3JxrpKqGvxM7DMqNzNXe_a5bOrSzqLFdlJ9y97jL8FpH_PTrKmDpfjSoV3xDpcezovtOKrkhrQDLwrUn0MhTUAU5vr3RRzWl4S0t9OLbnsO8JgexXugrpjk4L6cszsBWhLDDxsI5D57jrpdj2gJeNtiRe48c2jMINSl2jVW9PSYCyD-PCGI-ZYWorbDYYWEpWx6HMjbcakieFGDN_2ntSKMDR3Kho9Sgrbeh1xZpewbgIuRRvxi0pVTQM_fPx5JBGQEC2ehkGv7KwL8NdkGwDShAP1cPo_fpiCdT4jHp4zknGnek_qy5Y5uNJZm_15TVn-VtFIjcIaBL0tDzGGqWzQ04dBBpWpgnPeISVfsEy7nsKkmwD20eycANQBu52bPwFD7GPSHRYvSbz27iFWBkp8QGQFLIUz9ZqN3uLzl8GqczDBFPrfdWXXeivU03KbDaGG8QayULm0qj0ala-7yuEiiXklWuQegWREPCQUVDRXrYlJ-Ztbovb_Ea2-fH-20q3UfrHZOhh0geTH7EwpNPBXBO1qKDU72Abt4VOhXreW3Yjs1FQJNbAcWGLQMyRS97s8EKBCZKrY-6DCbr0qkj46CMp6vxN56vE-a9t2J7F8yTAEnxdfUFIjtDwQBhxe8bIABHuvOdPdZY8WWC617cwpICcErVBMys5MSjzNaca7m5q-Cv_IgJeb__ortnLjddB36KTx65Q6KHkx3FtXYg-SD_uDQRbmIjpPcXCi_VqkHmc3YqBJhUcEs7Q8PEj7BPuGKdfiLeL77Um9HqmB9vV97mttdeiO7_tmPzVC8TYOBLvvi7NxGxrgZ3_kcUgS4O2A333f2AFjUSmE=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0626b932e2e775ed016ae5acfa54d487d0aa8115870b14f2a1",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793436921,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 1410,
+      "prompt_tokens": 2678,
+      "total_tokens": 4088,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 383,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2675,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0143735,
+        "upstream_inference_prompt_cost": 0.0002735,
+        "upstream_inference_completions_cost": 0.0141
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "356eb0edcde0780707d7e6b5417f765a7d6d1723f24261b584580c60db1efb65",
+  "elapsed_ms": 19905
+}

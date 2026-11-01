@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-repair-long-06\", \"row_sha256\": \"cea69faac65054219500f092372d902d3d7427ce4d0941843426bf65e6a86242\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"this incident debrief examines the leader election flap and distributed consensus stall in our raft replication cluster. interviewer question what was the configured cluster node count during the network partition event. response the cluster consisted of three nodes scratch that five nodes distributed across three availability zones. the leader heartbeat interval was configured to one hundred milliseconds no wait fifty milliseconds. interviewer question how was the randomized election timeout window configured across follower nodes. response we set the election timeout range between one hundred fifty and three hundred milliseconds sorry I mean between two hundred and four hundred milliseconds. when network jitter exceeded eighty milliseconds multiple followers initiated split votes concurrently. interviewer question what log compaction threshold was active on the raft storage engine. response the raft log compaction snapshot trigger was set to fifty thousand entries actually make that one hundred thousand entries. the snapshot transfer rate to lagging follower nodes was throttled to twenty megabytes scratch that fifty megabytes per second. interviewer question what disk write synchronization policy was configured on the raft write-ahead log. response the write-ahead log writer invoked fdatasync every ten writes no wait on every individual log entry to guarantee durable linearizability. under no circumstances should operators configure asynchronous wal flushes in raft leader nodes as power loss will violate state machine safety invariants. interviewer question what membership reconfiguration procedure was executed to replace the partitioned node. response we executed single-node joint consensus reconfiguration adding node four sorry I mean node five before removing the unresponsive node. the total cluster membership transition took forty-five seconds actually make that twenty-five seconds to achieve stable quorum. site reliability engineers must monitor raft term change frequencies on prometheus alerting on-call personnel when term elections exceed two per minute. the distributed storage platform director mandates running automated jepsen partition tests verifying linearizable read and write semantics across ten thousand network fault permutations before deploying the consensus engine update. interviewer question what pre-vote phase parameters were tuned to prevent disruptive elections from partitioned nodes. response we enabled the raft pre-vote extension setting the pre-vote timeout window to one hundred milliseconds scratch that two hundred milliseconds. candidate nodes must verify that a quorum of peers would grant election votes before incrementing their term counter. interviewer question how was the snapshot installation pipeline optimized across slow inter-region network links. response we divided snapshot files into two-megabyte chunks no wait four-megabyte chunks streamed via g-rpc with lz-four compression. the maximum concurrent snapshot transfer count was capped at three streams sorry I mean two streams per follower node. interviewer question what disk write throughput limits were placed on the wal log writer to prevent write starvation. response we set the write throttle ceiling to one hundred megabytes actually make that one hundred fifty megabytes per second. the io-uring engine was enabled with a queue depth of one hundred twenty-eight entries scratch that two hundred fifty-six entries. interviewer question walk us through the lease read optimization implemented for linearizable reads. response we implemented leader lease reads with lease duration set to ninety milliseconds no wait forty-five milliseconds to serve reads without round-trip quorum checks. under no circumstances should operators increase leader lease durations beyond the minimum election timeout as clock drift can cause stale reads. interviewer question what log compaction retention policy guarantees that slow followers can catch up via wal replay. response we configured the log tail retention to twenty-five thousand entries sorry I mean fifty thousand entries beyond the latest snapshot index. the principal consensus engineer requires verified automated fuzz testing simulating five thousand network partition cycles before releasing the storage engine update. interviewer question what garbage collection heuristics were implemented for obsolete wal segments. response we retain wal files for a minimum of twelve hours scratch that twenty-four hours after snapshot compaction. the total wal disk footprint is capped at one hundred gigabytes sorry I mean two hundred gigabytes. interviewer question how does the state machine handle uncommitted entries across cluster restarts. response uncommitted log entries beyond the last applied index are truncated upon restart scratch that replayed up to the commit index. all committed state transitions are deterministically applied to the memory state machine. interviewer question what keep-alive probe settings were configured on inter-node tcp sockets. response we configured tcp keep-alive idle time to five seconds no wait ten seconds with three probes spaced two seconds apart. under no circumstances should cluster operators modify consensus election timeouts dynamically during network partition events without leader confirmation. interviewer question what backpressure mechanisms prevent memory exhaustion during heavy leader write spikes. response we configure a max inflight proposals ceiling of one thousand entries scratch that two thousand entries. when the proposal queue reaches capacity incoming client proposals are rejected with status resource exhausted. interviewer question how are quorum failures reported to external monitoring agents. response quorum heartbeat timeouts trigger immediate warning alerts on prometheus metrics streams. under no circumstances should operators disable raft backpressure under production load conditions.\", \"output\": \"This incident debrief examines the leader election flap and distributed consensus stall in our Raft replication cluster. Interviewer question: What was the configured cluster node count during the network partition event? Response: The cluster consisted of 5 nodes distributed across three availability zones. The leader heartbeat interval was configured to 50 milliseconds. Interviewer question: How was the randomized election timeout window configured across follower nodes? Response: We set the election timeout range between 200 and 400 milliseconds. When network jitter exceeded 80 milliseconds multiple followers initiated split votes concurrently. Interviewer question: What log compaction threshold was active on the Raft storage engine? Response: The Raft log compaction snapshot trigger was set to 100,000 entries. The snapshot transfer rate to lagging follower nodes was throttled to 50 megabytes per second. Interviewer question: What disk write synchronization policy was configured on the Raft write-ahead log? Response: The write-ahead log writer invoked fdatasync on every individual log entry to guarantee durable linearizability. Under no circumstances should operators configure asynchronous WAL flushes in Raft leader nodes as power loss will violate state machine safety invariants. Interviewer question: What membership reconfiguration procedure was executed to replace the partitioned node? Response: We executed single-node joint consensus reconfiguration adding node 5 before removing the unresponsive node. The total cluster membership transition took 25 seconds to achieve stable quorum. Site reliability engineers must monitor Raft term change frequencies on Prometheus alerting on-call personnel when term elections exceed 2 per minute. The distributed storage platform director mandates running automated Jepsen partition tests verifying linearizable read and write semantics across 10,000 network fault permutations before deploying the consensus engine update. Interviewer question: What pre-vote phase parameters were tuned to prevent disruptive elections from partitioned nodes? Response: We enabled the Raft pre-vote extension setting the pre-vote timeout window to 200 milliseconds. Candidate nodes must verify that a quorum of peers would grant election votes before incrementing their term counter. Interviewer question: How was the snapshot installation pipeline optimized across slow inter-region network links? Response: We divided snapshot files into 4-megabyte chunks streamed via gRPC with LZ4 compression. The maximum concurrent snapshot transfer count was capped at 2 streams per follower node. Interviewer question: What disk write throughput limits were placed on the WAL log writer to prevent write starvation? Response: We set the write throttle ceiling to 150 megabytes per second. The io_uring engine was enabled with a queue depth of 256 entries. Interviewer question: Walk us through the lease read optimization implemented for linearizable reads? Response: We implemented leader lease reads with lease duration set to 45 milliseconds to serve reads without round-trip quorum checks. Under no circumstances should operators increase leader lease durations beyond the minimum election timeout as clock drift can cause stale reads. Interviewer question: What log compaction retention policy guarantees that slow followers can catch up via WAL replay? Response: We configured the log tail retention to 50,000 entries beyond the latest snapshot index. The principal consensus engineer requires verified automated fuzz testing simulating 5000 network partition cycles before releasing the storage engine update. Interviewer question: What garbage collection heuristics were implemented for obsolete WAL segments? Response: We retain WAL files for a minimum of 24 hours after snapshot compaction. The total WAL disk footprint is capped at 200 gigabytes. Interviewer question: How does the state machine handle uncommitted entries across cluster restarts? Response: Uncommitted log entries beyond the last applied index are replayed up to the commit index. All committed state transitions are deterministically applied to the memory state machine. Interviewer question: What keep-alive probe settings were configured on inter-node TCP sockets? Response: We configured TCP keep-alive idle time to 10 seconds with 3 probes spaced 2 seconds apart. Under no circumstances should cluster operators modify consensus election timeouts dynamically during network partition events without leader confirmation. Interviewer question: What backpressure mechanisms prevent memory exhaustion during heavy leader write spikes? Response: We configure a max inflight proposals ceiling of 2000 entries. When the proposal queue reaches capacity incoming client proposals are rejected with status resource exhausted. Interviewer question: How are quorum failures reported to external monitoring agents? Response: Quorum heartbeat timeouts trigger immediate warning alerts on Prometheus metrics streams. Under no circumstances should operators disable Raft backpressure under production load conditions.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-repair-long-06"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "cea69faac65054219500f092372d902d3d7427ce4d0941843426bf65e6a86242"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "73229780bec75e7fe76fb558146354b0dd7225d67c7b89ced0af1625e546b6bf",
+  "started_at": "2026-10-31T21:14:42.657149+00:00",
+  "result": {
+    "id": "gen-1793481282-UR2JhR3KBKJxMUhGbPdK",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-repair-long-06\",\"row_sha256\":\"cea69faac65054219500f092372d902d3d7427ce4d0941843426bf65e6a86242\",\"critique\":\"The input is recoverable interview-style dictation with explicit spoken corrections and no leaked authoring instructions. The output appropriately applies those corrections, including five nodes, 50-millisecond heartbeats, the 200–400-millisecond election window, and replaying entries up to the commit index rather than truncating them. Across the full debrief, it preserves the technical details, quantities, testing requirements, conditions, and operator prohibitions. Changes otherwise consist of punctuation, capitalization, numeral formatting, and conventional technical spellings, consistent with /transcribe.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating input plausibility**\n\nI need to review the input for plausibility and check for any long repetitive corrections that might seem fake or noisy. It's important not to make assumptions and to read everything reflected accurately. All corrections need to be exact, especially since the input technology seems dubious. I'm wondering if I should flag any contrived corrections throughout the questions. Following the guidelines for plausible dictation corrections is crucial, so I’ll ensure to preserve values and requirements without introducing material issues.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating input plausibility**\n\nI need to review the input for plausibility and check for any long repetitive corrections that might seem fake or noisy. It's important not to make assumptions and to read everything reflected accurately. All corrections need to be exact, especially since the input technology seems dubious. I'm wondering if I should flag any contrived corrections throughout the questions. Following the guidelines for plausible dictation corrections is crucial, so I’ll ensure to preserve values and requirements without introducing material issues.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lpHCL9RlEjZHuJEjnZbPZNE6sQLBUquLFeFVF86250rynSRc0LVrYILvifUpWjqtKH5z0uWPAz7fDF7ZZDbcst100nKfaGeVmsyM8fOY9lKyWGeHFSZrqgzLkciaeAQlWim1IR5_fpMJayTwqCpHqM_EbIEh4zC79PFuOcDW8jUrpgxy_zsWgyfB_tiT66gjNAS_QSBqB2O8F86NuhcCgxedAYtRrkQlDh5_LjKdpwbXOONfwnNJ6WnrAIdPMPS_O6W24GR1MnSsYU_PngyyFM20Rde_HpwPM5gfoPmxGIxPBCczldW5png65LQQO0h87YCp2RNu_kwrp94Wq4aNgM2uWkMrMo9JOmU1nlyThk6gQAeb9YWTw-yLBJcVdDFINq9e2x3sd0Ty60Ki2Xbkag_rxi7IhnwGsSm0-DowAHJxVL2HTrB7vYsuuwSyXbxfYEy7Cs2BRrad_jadHIQU2Jg2XXR8xaRd340ypi62Sph0k3MbhMKxG-MnzOxw6UbV3JLbaGWxkVqsJTaz7LpT1cunaj6qspjxInSnEEQoaxRUfGlm6hxDKFpbHmvv2SBYZjyjLNV98jfHEyb_NZ3o37uoatQM9OMxSiZclyMTo4lRfhh7zErTi0C4G2_4K8iTVlodxfCX7AVEq5UpJlA_prYCWwQI9ayWwAmlmNrGxBYe6r2UDYGYc3yh-cwiQGQ-lhXB4SaUOC-XMLXjBf8AD-sTNGfxibS-eS_JDdnEgCztVRaWxh1mZWB71VsGQLWEVJvhtfBY30KsKgGXQ5t3iADPNgoFJ0KM2nzI8MkXcsyq5_AOJvxYscqWWev8qLE1rwyEfQDqnEP7GCgpIOooLyh19NdzCcGfXZ_Nd8vexDeiSupXzc3CfGDWE_6j7zAKk1PcYGr9BKlXLXD3HOOc62pKhcMrrhoB2pjStFwqUU9bMjLFk83M7LzAZpvR45tjEnlZjmfh-_i6XujwfcZLm9YDkyF-sZGEOBegjno0ZR7sFvMBA1PYv_KuUZyPi0zdFrHCX1QsaVvuWUttSoSDrXVwxEay_Go7hPyTPZoBe7CFLGba9akh150oRJVqnr0pyeHPgdnZyZ3kTL3KfLIj8FyX21piYuAdv2UV0-oNx7q7EYVFGOIpUJ-I80aQnulSJE9B7zMnXUxO7GZtE4ymN2-YsB-xLqlDXarvLt1hRuxVI57IGM16Aa9NEdBJ4Ls2k6R2tc8ctPUYblluela_QOTv7dHlyKKCr3Cbb3oy2G0ErVeClUuy-o57NnBinTSz3XYTkbiP7-mdY-U-Z51iPckJRGn8_eYNHUwkVjlV65EsZ2nw41ZgRuCPHs96R_-QRgS8acOGWMghd5HcZvoEwVGFgp7oRLHjrEdVdwsAS6LpdPiTcx960CkQ8BI6qdoVtx7hm_5-Qe0wxZavPt1GQ8A-jA3nlL-YxJHzZwLfsuL9f-afEqktbixvcHp2g3t4injt4GwD_CnRMC_7H0tZfnWtjesMpLO3TQLbc5mq8C5GYm2tK09CSrBeBjf5By6eX3kj0ThFYV1xHzJOhyXpQgCtOIy1aBoHOrcTv9PYUgUh9MeWJINNuomMDmzUVOB9JsnYt7B6mBtl1qVyR435Kb8g9PAlcl_CGagHsMdCSqjK0a3Bww3WA45MQJlceMr2vnrESrhLt2ZcxUQ-KpucxJPKrtZjY6LFzmTeUVnCf-0DqH1_PGLcQBCk6x4EvadWrAKWw2b9wVPYJCX_We8bg9-rdy55-CltzKSYfBD01eG-kxU5oXOYQOaGewDubSs8EmHLovLrb27fJF83KR1hy2mjPT_vgI3D-zubJdKowhVVnwrtdOS44XLtON7g_oGSj5QidALPJWIxOAu3oUIRpr0svFt1MB9nxunWeEFC3JveD0D7IAL1qC-Xedbp7cSncRa6vBqtIE00XoFPmlddNmCuKt7IJ-B5tlEfchFjfcwwdau8Et1X-NUYvPoq_xXoe9L8Z9Xz97UX4A_BAEoivyJGsd6349ymaxvpkxZyaTOxgDqK5GEIlqWv168fhLivL5EPLfO0DmXQZ0r7z0vlpjpTKeFmgwVESUTnUOucA8Ie4Ac6b-QlB64Z3rMjlfeR5OjFxTZ_HXqdnFGI7ADCdVms1Z3FKtRJVvWMHzTJuDtkQF_BM_sQWDW0PVmuXu50TVTSwrYqI3TmxgK9Z6bEfoIjrBsp7WgFdDPVWVBJV4LDMvUO87qHaktLGNaWDWbg2yhtvkGDUo6M6lVMS2r4H2tqJ06BmZgFbI73s4BVkzIVFtR5pIklYrKs75YcpeGy4fTlt0yPb8qhQPQlQie7wqc6CgkUPA_bN0svwoCR7p4tER2h6IA-ZTQgtWZ_WJNg3GciQ1R73YbPZe9sKk1d8Rl4gVn2qKBv471KfMnUIDoxpZRRcwzckRImsSB03tZ-kS_KuFO8QuSCcBPjHCSStqHJ_y-rSq_ULRwhtCiiKe9kd-kwxghTb9uyTzW-BHFThqH_tIqyOGB2_Lu8KT9D-9D57oNjWYkZG4WCvcyojVzJodO7R6MgX_VSVPeMcd4J_R6p596qumIobCy5OmyDx4WGVx4Uzc9Z6gTDFMzPt0UbCDcR0cWk24BM1IfQMwe8tTzgG987FRE_UGOwvoGFQU7-GhDyLuudlG9VnHFdX0EMNwpc28zVJVb7TcQ3MnX4mC9GxLMOh-Jn-BbUBlj-yBxrXvGkZ1kB028nfzVPiz8MD9x9m3PZRDVVbVRQPLO7ga_uCbfVxA7Sn62Rm8jIh-XdGLvTHLUsC9FVP0zpsEbbVrw1-Crao57-_7u5fBPwFhw7BLNYSZtHzBVYoBBfkZlvsOmNmPIzeNQZ0_xkNZQ-MBnuKGvMhXQ_PIShrzrvUfF8ed8ASCn4YypmIvM2L1gHZpTrtflH_Cd-mrPh1e26no3UQkK3dBtLn9oYEKI5SXq0MI03nuvsfz-HFhD6_C9fy5oWu0G1x9aNkliFUED9WWa7WHCl60_b6zfp58Kj9SbsU6mnE26AFfB7YrVOvsP5OykSy-UfAm8eVcaFq-083HgpAnjwcMawHMYHXIvZQu3BAgRu_0CBjDBUUo-HdcEkjUUxy7Uri7Kn7hLKf3n4gB0R3tOu_2MqTDl8JN1WaeCe_zRNOsAaghQvK-_eylMA8mhNWCQ53b2SC6aSCoIrcroT-skZikvEWIOuvNCFM6MGmuhs94vD3XeIlBWvHQeewDQJPIwZ98kDbH7jKOVkHogx2p3Q265OunlFKfjujqd.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_00160666c6965f9d016ae65a43c86087d09c215922c26fc1b6",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481282,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 311,
+      "prompt_tokens": 2469,
+      "total_tokens": 2780,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 114,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2466,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0033626,
+        "upstream_inference_prompt_cost": 0.0002526,
+        "upstream_inference_completions_cost": 0.00311
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "3274cff0104619c9c6f12ca4cc23ec4b903225c5df4e4a291a762ca2a37f0a8f",
+  "elapsed_ms": 5880
+}

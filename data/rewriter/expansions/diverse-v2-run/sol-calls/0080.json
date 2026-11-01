@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-ws-med-04\", \"row_sha256\": \"5214c64bbed68b1ec9bded1b72e606f1b654271da9e2eab596468a9e58f79a3e\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"level\": \"high\", \"files\": [\"gateway/envoy.yaml\", \"certs/tls_policy.json\"], \"instructions\": \"Tag referenced workspace files with @\"}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"we need to audit our ingress envoy proxy configuration for mutual tls compliance across internal microservices. please inspect file reference gateway slash envoy dot yaml and review certs slash tls policy dot json. our edge routing clusters terminate client connections using upstream clusters configured with strict transport layer security version one point three. when client applications initiate mtls handshakes envoy validates client certificates against our intermediate root certificate authority. in envoy dot yaml configure common tls context to set require client certificate to true and enable alpn protocols h-two and http one point one. furthermore ensure that tls policy dot json specifies allowed subject alternative names restricting access to authenticated backend services. certificate revocation lists in crl manager dot py must refresh dynamic certificate bundles every six hours without terminating active client connections. site reliability engineers must monitor tls handshake latency on the primary grafana dashboard keeping p99 handshake duration below ten milliseconds. if an untrusted client certificate presents invalid signature chains envoy must immediately reject the connection with tls alert unknown ca. the security operations lead mandates logging all failed tls handshake events to audit access dot log with client ip and cipher suite details. network buffer allocations in socket config dot yaml must allocate one megabyte per tls connection to eliminate packet drops during key exchange. the platform security architect mandates verifying that weak ciphers including rsa key exchange and cbc mode are completely disabled. the infrastructure team requires automated integration tests simulating certificate expiration and rotation cycles before approving production deployment. tls session resumption in session cache dot cpp must configure session ticket encryption keys rotating key secrets every twenty-four hours across all gateway nodes. the load balancing tier in cluster manager dot yaml must configure active health checking sending http get probes every five seconds to origin clusters. connection draining timers in ingress draining dot yaml must allow ninety seconds for active inflight connections to complete before terminating proxy worker pods. the network security team mandates enforcing ocsp stapling in certificate resolver dot py to verify real-time certificate revocation status without client latency penalties. the infrastructure operations director requires benchmark load tests demonstrating forty thousand active mtls client connections before approving production rollout. client certificate validation hooks in cert validator dot py must verify that certificate extended key usage extensions contain client authentication flags. upstream endpoint health status in endpoint health dot yaml must record connection success ratios across ten consecutive probe attempts before marking endpoints healthy. the network operations center requires twenty-four-seven monitoring of envoy proxy buffer utilization. the security incident response team requires real-time alerting on ingress tls negotiation failures exceeding one hundred events per minute.\", \"output\": \"We need to audit our ingress Envoy proxy configuration for mutual TLS compliance across internal microservices. Inspect file reference @gateway/envoy.yaml and review @certs/tls_policy.json. Our edge routing clusters terminate client connections using upstream clusters configured with strict TLS 1.3. When client applications initiate mTLS handshakes, Envoy validates client certificates against our intermediate root certificate authority. In @gateway/envoy.yaml, configure common TLS context to set require_client_certificate to true and enable ALPN protocols h2 and http/1.1. Ensure that @certs/tls_policy.json specifies allowed Subject Alternative Names, strictly restricting access to authenticated backend services. Certificate revocation lists in @crl_manager.py must refresh dynamic certificate bundles every 6 hours without terminating active client connections. Site reliability engineers must monitor TLS handshake latency on the primary Grafana dashboard, keeping p99 handshake duration below 10 milliseconds. If an untrusted client certificate presents invalid signature chains, Envoy must immediately reject the connection with TLS alert unknown CA. The security operations lead mandates logging all failed TLS handshake events to @audit_access.log with client IP address and cipher suite details. Network buffer allocations in @socket_config.yaml must allocate 1 MB per TLS connection to eliminate packet drops during key exchange. The platform security architect mandates verifying that weak ciphers, including RSA key exchange and CBC mode, are completely disabled. TLS session resumption in @session_cache.cpp must configure session ticket encryption keys, rotating key secrets every 24 hours across all gateway nodes. The load balancing tier in @cluster_manager.yaml must configure active health checking, sending HTTP GET probes every 5 seconds to origin clusters. Connection draining timers in @ingress_draining.yaml must allow 90 seconds for active inflight connections to complete before terminating proxy worker pods. The network security team mandates enforcing OCSP stapling in @certificate_resolver.py to verify real-time certificate revocation status without client latency penalties. Client certificate validation hooks in @cert_validator.py must verify that certificate extended key usage extensions contain client authentication flags. Upstream endpoint health status in @endpoint_health.yaml must record connection success ratios across 10 consecutive probe attempts before marking endpoints healthy. The infrastructure team requires automated integration tests simulating certificate expiration and rotation cycles before approving production deployment. The network operations center requires 24/7 monitoring of Envoy proxy buffer utilization. The infrastructure operations director requires benchmark load tests demonstrating 40,000 active mTLS client connections before approving production rollout. The security incident response team requires real-time alerting on ingress TLS negotiation failures exceeding 100 events per minute.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-ws-med-04"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "5214c64bbed68b1ec9bded1b72e606f1b654271da9e2eab596468a9e58f79a3e"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "5807902a50e129970be4bb6f2380efa00e25f810436331feba3efafe3a74d610",
+  "started_at": "2026-10-31T21:14:20.519196+00:00",
+  "result": {
+    "id": "gen-1793481260-SiZdyto78LEZvUo83iRV",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-ws-med-04\",\"row_sha256\":\"5214c64bbed68b1ec9bded1b72e606f1b654271da9e2eab596468a9e58f79a3e\",\"critique\":\"The input is a coherent dictated technical checklist with recoverable intent. The output appropriately normalizes capitalization, technical notation, filenames, and quantities, and adds the requested @ file tags. All requirements remain present, including the integration tests and 40,000-connection benchmark, despite their repositioning. Timing, thresholds, rejection conditions, responsible teams, and deployment approval conditions are preserved. No material omission or change in certainty is evident.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lozABYjMTKn-oGgbclX9BKxU6hf9lOetmBtk5yteXiVDSh7nqGWiJUvR8R3W2nuICZ8rksEQOlDaMo8Z6rmw0IJsJ5kvXm_XRqa8K3HSuCCNHk4jn_vsa_1rPDxhcBs007HMGnXBUhGiRHSdu8-3RQ9_qe7Y8S_o5CHt6ti9rvMsvN_MvEWoHBBq1y1r6mVhwV-1GDA4PnQVVcLY1YmYt_nrsmhopLgn0Zln6eYqwOgPdDKSV_96Kh81bJaHf24NhyRvOgu0Bc15CgtdIZ2H9ysM4BsXkoG95bedo4qwwe7JwQLapambrBm8f0tplKiTc9Kxb4ekEOG-hnunyHdZVXlkrvI_2u99WxkDegqZZ96KsPzwwfH6R6IzFMlvW4Lh00oPOhGzmidLfMQg24Hwp7cZros4MRVBZFfykRPBOJcNfsu9HtJUhwrHu6QxRtvTNNtgwgUKbZBzAsTeuEv5Gq8Rze0sFpTmz0PBuFmd9iplE29Mz3IG0FE0WtAn6oshS2fZH8zdo3SuRTAj_AKqrxAF3Au39J3RNxmHXFVPwr4DjSPWOkK-HJMeRm724rwaUcioic7bgsdNz9frNdFaEBny8TRCmDY2YujSfC-DnO8zIUMjCNrCBzsSgMZma9aX7bWFJoNV6KHu0Ky7iW21xt8U0hkY5-gxw8qqUTrVMISk90cChN2_88X8rMKjH3vkeii4oUMDWdzXQcw-NkB2c3l_3BHgFM0NDJqWqi-wzJa2ykDlXNOdvWXHdxYtvh6fZNBmJjaNsevsuMesnMpUJl12LQ9D-qEYCys4uTFZI0CnOSZbPRF7DGMkryHrRL-F5eVDpudF-CEulThCGkgEFQjSeCKVHGhei-tYZQn8Wj2aoTPwfMc7uAOfbBJLV5fQ5rzoQDmW9M1OM058DUcGkLyKie4O8SPI3ml90yRkvH4jgPaXbLx4dJHmzfs2D8QNGtvjS2dm42UQ3TdC7gTlAr4_Zg78kLc0ed74ugYngUdBSJTDAew0qrfPdQ3Qt7Ob8kpXO25mQ1YEr5b62kpI5aT5qheScTeiqxNXTXrbDHrablIO8KcEkMmzpPneDgSdxpOvdNzHKQew3xr_Wezn-f0mfynuY5HvpMiwLzzIJ0YaAepUQnT2L7Or8my4bROD_5iEPPNQPlm2bUvpZIkbGkL_pg36sZfBKEwd34NK0j2EEz0H4TAEZtCGRU0f6VADZpQril5onW1x35JG-kDhZdj_nzOxU3arSr57T_uvIsKGOl_WZCUZgtoU4IdZPFNKXlD5OktDjEib3Yt18io5YJQtMMR_3_LBMwUSQtSmlo_dPXoYR-ct0KpWIqqgzSeX39j0bZrjoLM8nwPwyphR8KKCpxKJOUQahK332lvopXEl6NZd6dHI-Jn97gwoe4G9t4tRb5LOF07E8T2UlsQDeaFT6wEMWvcISFefmY1rZQjqZEeRHzfdDNUzDure5DRTlDD2oPfMqZQlmOd3MFMx0tveqfo4IOUS8I-fU8GtwVheqC8b9LOf30_ZFxRHtgWJ36s4KV6MxcRA-LPovZP7xyoIOHc9WLZBWlbowawnSF_rQ0ItKWdaUiVaUGVJ0kADBukEHzhluIXAxZx5evs_ftxlFG_zn9QfAY_6EqibYgluuWlHiVWe0QmIQGn-_GQzapeNTnb1BuBvj7dyc_CuFLx6BYjHc7NEIl8CK4wPBCald3NYws5jdlwfE9-DphJJDQaHhJ0sPpktWYgXeaxwa06DvXfvJD0Or0s1Sjj52CCBf_KRwRlPm2HdUaLoCUkyNzDNAa3JzYeX3NQbxFAwWlhuunuehmUK-EHvCHaAITVw5aQao40rwD5ANYdW2M8y1PkzzBefxEgXKg6cVstpDqqSTVeKebmWZjn5lBpMJdJ5YNRHfA-6FWGyE17bQj-HyoKEAMTMJqB_FjA32lshhhLhxCz62iL3Aac5DcmeegwoG0oV6-952WF-Lq5kb-xdNhnzGjOzZnwer3nq0N2PzXXefx3hyFqrxMU196a-kvFsB8smDekZJMx9DF8nc1LQIbzAfVqwiDWFjVyBiK4Z9l0VYSQsSeE6f97sScneQx2iufkXJPHfCzPHjNA3IkZVH5bvFCuXWYJnC-9JP1MR3H4WBQsoW9yaTi2Vb7IF0n1TVF-T6H2q_lUvmWLX7xM2Bgl0SCTYo2mRVzMbnXZYaHV6WljRSzCBHJkymw4G7qNrsiXsWxwR61i4vPeWRvAc-UI0YqRO4vdt1K42T27VyTCUOakEXUCuW5756o5AJw17x9mjy2TFAwXIoPL7pukEb3BqMwapx5aO2GZ2JsrFjLNPADWXuO-4lhE1kUpNP1yRTR0f9LM4yQBliiN0bNpEzgEKqm0elqDNpr-5YJRGsTwNUWwTLacIVl2TCGdq5g3YMe56y-8NAFP4ak4c5Q1D0UL-KTjFZR_MuDwm8csefVhmwchBNnRfnl1pzedTqNmuz32O3BG33Hd7nl2SDcUaFRYdX7lsNLHwdoO3kV6Ra-8pOEA-MYqKPNEuZwBhJpKlGD79-08bnVU4DGBasyTSiwk52h3Ob9a4mkCaNEWjvOMSNmyfMnp_TOtpZWrwF8w80Tn56gdll-j_CBNjpqe4t-QrFUKx19CQNDXW-o2c_qjX76ggEZ_QLJbxvEaX3K8Bd5rELwliv2p1AGgnAGqEu4-So0OuGE_Mi1vf98cLtw6dieXHt0eFv5MD3TwsZ8xTCklx73wl2huPJJw21Vt-Xrk9AAqIzrYDuNEjOgh92Fcd6ftNHEC23mlGE-i-ahKChqc2bQ9jnqCdkt2bj1dV0kEJ6dbXpWvwgow8XrzAFMAGsFW16FW_BPuDj5yJnL4m88CDjZyZko1E7t_CQcE9j-4ualVdA2ku9lpFL_Gsl6vD0ekADFZZAiWveZdIOiCO1KMHK9dtJXhYx98apon30z94H_-wp6RKf74-1Xeko5uM38cFj95wLD7AlVVdbwsQsh2J76I7Hxq-uj5Z1Ii1HksUf1eJBofj1PBnjZfF8J2BqJg9q4py_Pr2-Rf67zQq5GFZm_ncLVymjcMzQWeEtUD5eHCGU2UBcIMz1rq31603Wp0fWnJKq8TE80mJ8zgdy6aV8YeWoKEb2yePO6ydV3HxAMvTzP5HJ0gxwI-RlTeTdnTx56B049WKWJ8WR82faIolF4z0tbh2BgQ783GVK4uqCgS2Gee-AYxiX11Agk-rG1Rz4dCXmmYSOCUom-oDTpLnwm45YNzO5pwWFqXxJwWJAAQUlBbQ2Ln5w7te04H5zYhEXGiMolktz2yJ6mRL1oHtVwDJFCxccZOI5T5BncMjsyZBjTGVpuLveU5qXG4dZHjKT5uBr8TAYmtZwBhsa8zcpz73uCSoCeVi2uCAtY_N6QG5fK6-F5xdIedqSU57Cg5pajUWRa2KFLVQpPC9FvRbE9EgMYpKJc2ZkuKF5naCBCe1UFQyyvHRRyJplcc8yh_Ti9PLN0neiEV3F5VITenZLWMuFl8cfa4hn5nW8robvbE51sc8SRsnw_Tnb1rNOWiipg9pVf3j1h7TpMVFf-M6nxrlHWSdgMvsYnhXUVvp4ZoIcB-vLKQ2DxQbd1whJYQookxhBRpp39szPNNyxSNmLzajtsbIcUC1cwD0_KYopFY8zPICzQd6nROsLoTL4FIyzZGa4cHK46Ss3jNQIBe8TpwGdyZD84QoCj-CfOtMb_30ZUlZH2jggro5T3ffqdMNj9tI-288e_FOo20eobfXc-2jTaMBrM_9XYevsTg20g4SLPz5757snJwMQW7Zojihob_L8I5M9lvHqpd6ehfZH873VWXzZclzT79212tBRMo6ue8gl9oIhxmceU4LrRUFIvomvYBExV1UNnfWnEHSN4z5kUIqTdrbaIPMRPmA2KkYG2In0nzi5BvnY087WaiigBvleHMRoH98gI9-cTSLKUHI56BfSZ8gzA-th1-CoB0-78duTLwMMz09n1dFn9jy0hQlJKsnKqdPJ3E_zDtfubOgjXrXlFCF9qNEm0lVm7oNug0RzrRYCg-I8wYB_PXz-Ig0YNFzg3YLM4roKBH2eiXw5IQ9hLymJMlWaQ83HkschBVJmn8yj0U6T51eoaujNLbpcYFwR_Sf12p1G1ILUYp7e1DLVcNma5mG4vR8cnZhwn5GEgD3mfmGvE5kxvjBO8ggZwNqYhgcXaGhlaTUZ_gRiEyF-i_ejib3WT0O0VoWnLjtci9fs3tYQV7HiGNUCaLZF30eLJ3-ddAMLb0o4W0bjoWsmOS6jKoLxIh0xtNqK_MeThtBVHSwpcHaI3-9ehmBp4d1eydcOdL8K4FuCxujjCxg0I-Hj9skfaT095NB2_gKRlLtwgZ2UNujZJO9WrwEZL8UNf4-bmUfpuoYFewYAC5DP_3tLqcFJrRa_zJpuYfc1J5pRBlSZfYOCUoGkqAvOj15phwOOzrAfIJ8rZ4zsrsgMcJTVGZjmZ2tLVF9FDrwmdrjBKbpRkJ6RImBUdZumi3kncxFwcVx4VhS24MdIhPbWSqVrYY8NXo.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_019c69120e5e075f016ae65a2d656887d0b131fe4b2739d958",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481260,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 381,
+      "prompt_tokens": 1664,
+      "total_tokens": 2045,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 200,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 1661,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0039821,
+        "upstream_inference_prompt_cost": 0.0001721,
+        "upstream_inference_completions_cost": 0.00381
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "e2b1e26ad0d73f63048f752d91aa061a251bea59f62400bffc17b98e1d3e0ca7",
+  "elapsed_ms": 8451
+}

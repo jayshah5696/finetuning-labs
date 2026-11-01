@@ -13,6 +13,7 @@ from finetuning_labs.rewriter.evaluation import (
     evaluation_bundle,
     generate_cases,
     liquid_backend,
+    verify_published_validation,
 )
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -26,6 +27,7 @@ image = (
     .add_local_python_source("finetuning_labs")
     .add_local_dir(PROJECT / "data/rewriter/benchmark-draft", "/bundle")
     .add_local_dir(PROJECT / "data/rewriter/reviewed-v2/validation-bundle", "/validation-v2")
+    .add_local_dir(PROJECT / "data/rewriter/current/validation-bundle", "/validation-current")
 )
 
 
@@ -48,9 +50,9 @@ def execute_lora(run_id: str, config: dict, adapter: dict):
 
     import torch
 
-    bundle = evaluation_bundle(
-        Path("/validation-v2"), english_only=config.get("english_only", False)
-    )
+    source = config.get("validation_source", "reviewed-v2")
+    paths = {"reviewed-v2": Path("/validation-v2"), "current": Path("/validation-current")}
+    bundle = evaluation_bundle(paths[source], english_only=config.get("english_only", False))
     if (
         len(bundle.cases) != config.get("validation_count", 84)
         or bundle_identity(bundle) != config["source_bundle_sha256"]
@@ -80,13 +82,12 @@ def submit_lora(
     dataset_revision: str = "139bb98b0500fa12ad43dc6c8c5cd4d17645eb86",
     model_size: str = "230m",
     english_only: bool = False,
+    validation_source: str = "reviewed-v2",
 ):
     import hashlib
 
     import pyarrow.parquet as pq
     from huggingface_hub import hf_hub_download
-
-    from finetuning_labs.rewriter.benchmark import COMMON_SYSTEM, MODES
 
     if not run_id or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-_" for c in run_id):
         raise ValueError("Use a lowercase run ID with digits, hyphens, or underscores")
@@ -109,15 +110,12 @@ def submit_lora(
             token=False,
         )
     )
+    if validation_source not in {"reviewed-v2", "current"}:
+        raise ValueError("Use reviewed-v2 or current validation")
     bundle = evaluation_bundle(
-        PROJECT / "data/rewriter/reviewed-v2/validation-bundle", english_only=english_only
+        PROJECT / f"data/rewriter/{validation_source}/validation-bundle", english_only=english_only
     )
-    expected = [
-        {"system": COMMON_SYSTEM + MODES[c.mode], "user": c.user_message(), "assistant": c.output}
-        for c in bundle.cases
-    ]
-    if pq.read_table(data).to_pylist() != expected:
-        raise ValueError("Frozen validation prompts or references differ from public Hub data")
+    verify_published_validation(bundle, pq.read_table(data).to_pylist())
     settings = tomllib.loads((PROJECT / "configs/rewriter.toml").read_text())
     presets = json.loads((PROJECT / "configs/training-models.json").read_text())
     if model_size not in presets:
@@ -132,6 +130,7 @@ def submit_lora(
             "revision": preset["model_revision"],
             "english_only": english_only,
             "validation_count": len(bundle.cases),
+            "validation_source": validation_source,
             "expected_gpu": devices[gpu],
             "source_bundle_sha256": bundle_identity(bundle),
             "dataset_revision": dataset_revision,

@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-repair-medium-02\", \"row_sha256\": \"dcdd19858dbf01ebd3b769c7954bebe2b34174791fecb2815939934e5c00078b\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"level\": \"high\", \"profile\": \"technical note\"}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"When handling failed payment refund requests across our distributed billing workers, the service must execute retries with extreme operational caution.\\n\\nRetry the refund request three times scratch that five times using exponential backoff starting at two seconds. If the remote payment gateway returns an invalid card token error or merchant account mismatch, do not retry the operation under any circumstances and flag the transaction record for manual compliance review.\\n\\nCancel that retry counter if the customer account is marked suspended no wait if the customer account is closed, and notify the payments on-call channel immediately. In addition, record structured audit metrics capturing transaction identifier, refund amount, and failure codes in the primary accounting database before terminating the worker execution. Daily summary reports should be emailed to the compliance auditor.\", \"output\": \"When handling failed payment refund requests across our distributed billing workers, the service must execute retries with extreme operational caution.\\n\\nRetry the refund request 5 times using exponential backoff starting at 2 seconds. If the remote payment gateway returns an invalid card token error or merchant account mismatch, do not retry the operation under any circumstances and flag the transaction record for manual compliance review.\\n\\nCancel that retry counter if the customer account is closed, and notify the payments on-call channel immediately. In addition, record structured audit metrics capturing transaction identifier, refund amount, and failure codes in the primary accounting database before terminating the worker execution. Daily summary reports should be emailed to the compliance auditor.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-repair-medium-02"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "dcdd19858dbf01ebd3b769c7954bebe2b34174791fecb2815939934e5c00078b"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "f824210461cf9ed597897fbc8a5a03115a78354def7c7ae9ebae67038785e596",
+  "started_at": "2026-10-31T21:14:12.956196+00:00",
+  "result": {
+    "id": "gen-1793481252-kSHh6tR4e8UHlXkaenHI",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-repair-medium-02\",\"row_sha256\":\"dcdd19858dbf01ebd3b769c7954bebe2b34174791fecb2815939934e5c00078b\",\"critique\":\"The input is a plausible dictated technical note with explicit self-corrections and recoverable intent. The output correctly resolves “three times scratch that five times” to “5 times” and “suspended no wait ... closed” to “closed.” It preserves the two-second initial backoff, both non-retry error conditions, manual compliance review, immediate on-call notification, all audit fields and their database destination, the required ordering before worker termination, and daily reports to the compliance auditor. The technical-note formatting and language are appropriate, with no material omissions, additions, or changes in certainty.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Reviewing input corrections**\n\nI need to review five straightforward corrections in my closed inputs. Even though the dictation might have some technical challenges, the output maintains a bit of awkwardness, like hesitant phrasing, but still seems acceptable overall. I definitely want to ensure I'm providing concrete examples for everything to clarify. It’s important to keep improving my handling of these inputs to offer the best output possible. Let’s make sure everything is clear and well-structured!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Reviewing input corrections**\n\nI need to review five straightforward corrections in my closed inputs. Even though the dictation might have some technical challenges, the output maintains a bit of awkwardness, like hesitant phrasing, but still seems acceptable overall. I definitely want to ensure I'm providing concrete examples for everything to clarify. It’s important to keep improving my handling of these inputs to offer the best output possible. Let’s make sure everything is clear and well-structured!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lon5-dz4TsUnPqFWmLUHISZ5_UycURZRsmSp7VywjE06Mb332ja1CtiL10oh2kCYg-YwQ5Nz2NNDZPHh8tPC58TaQd-2f0CAAcVeLIu4Ab2Cyn-AKVh8Oh9J9cec8jiJfKPvjkEDWoWmrXhrYHxUkKtR-mCmH9vAlyuwq2FkeXT-E0ujHIew1d5V-It9CxQ0CyDZXoNy6qwZ0yLSmJqpOB6nMkzqiM1JKudRiyQmnOXLTBDN4f231GffFN6gVJdLloTgp8LU44Wl8nGRxurY0vHiWbAMr1UIKC263DNbH3xPcYKT3c_ndLXM6KHjuDXyzcJFEZPmyStcF_ybfm-VOIycCkavB_9m2Mhd-P86c4L37qlNRS1-KKA4X_NEXqzzS7E_ANU-DADFZDPVllEaXYP_YxU6wssb_-QiPdR2HNRVgCZXmD7oiSEjrcPaCEg2avZCrsTh-fNSQt65Hraokc8MwbJ18kel5IBQrAIbQwkvq3wjbNWWyBzFplBaHbO7N5iv_taV7krDwrj1zB6gzbwDRYvTZBV8uMx6g7-dGMshb6ZxFkcQjkZVV3Q7afsKbE4trw7J3KFxcdI-FfRzhiiGQ9qmTIbK6JnJNf_4mfzSedGmioINJkC0NJrufn2tt4d9M3fasdhVmjsf4UjyDuTMGqeiG5ceAcMq2B0qVg_WU24pwFDdLeY0mRzzivSLHsqMk1WmsEwFVBdYzvYL3kPYbIw3-WzhvllfO9V0LCDAXzM6vqPKZbgRj1yYRIYB9VlBUAd74bs58B3QPV6OwCaS1XxOGtOHs5L3ZJZ_tftkgFlNFIoAsrDbHRTsqNx-0DUT9NSa8seDYS71GcyQFr-JthKY4F4VnLuFF1qFTDh3iMgqJchHBiax2Cdaege_sM1ixloskUer_E37meJd787rBwlH8CwGK9-cSaLWJq01HdhM8_clFdEceVEJHXa2CiPjakVpi82NAp57p81cXC7w13iSv8EclsjN2MVSFv-Fy8ZUMH-5jYcUw7LwxXN0pCJqI8ru_ItiFZyIsuumIuMiB9fsg-waBW6fWKi84zraCj41NmUaziPKhFkqlOZ8D5z2dypHoP5iz3Ky8DmIU86QlCYmqfFYQm5gvJ89hdhhRBpPn_MyNiviysf9fqUzzzzu1X3BLCWKLcWSFZDCOYQvJnVgAOy1b5klKZ1UWJReswuc6-PdSwtoxEXgP91N4MQo91mLMHO61v_ECeSyYUu29s3fH5W9N-OpbC-ShSdwqy4-xKphfSD-VOhF7aoUqn-2RDhzKdx-7NDsfRq7NJxz5ju5bCmaaGSRwz2eftF1VyGq_WmgxooOm21JSmTJxe2JYlbjdoRpy5vizvIqutlmQM5B6BLa6zlRXMVceZncKiSeBXzGEceS0lTJ-3WBZFBYqDeny-EKnE-nqzL9T50U7L-wZBn3ws7KZ6A-mCosPFU7UhJEVmCx2Zda8KoaoKp7BlZ6QuNpvuvcfmF6lQw4opvUhypr1FI79dyONJr1DZ8HrBgt_UiSjGKHg7joeGsO1ht1N7Z-rr8qpo9QNfS7TkW8RfSiaLGvh26eE73Zo_djm4oG6PBNP_M6wXTllDGEwuenT9-_AweJhmZYBwuOgHQ0lD7iDPssj5ppquFboriVDsjnJQUldjs_TGyKkB7Ja4RrNNf5Rdb0ei_d3ZucnOBlhVuQRNqP4lMQJnk6zpwqVKwtSarNT8R0i2eKFxwNIib8FWG1aCkY6f5n0KkqLbXfVed9gKHvjsYWfOWXPOF3_Gx-x2vVhXU7cKY5ajCTfGmYeDXCvy2YoFZ3KdBmAASFWfdlYGRNMvqzMt9az1w1swc8eR1hNCPEAiE2eWckhkgaPrgLaoQt956uL684aPtvgJDjqyKrLxKuBhFnO_WIIBEYMNlXg5MOGzj8I9uJyH_Fe9s4FvnX5TT-_mfVeVdXRs2WHtB_-kChZ_v2UE6rDfYaDSMG6fNrKekq5mK4ZDQCnmikaV9BkaBXUGTQv04jvqOPKDrkjdVNpV3pmjEY7Cx9v9abojmjQErzynmSyk0KqXTq9H8R41877uoRA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_069ac99f7f1e4696016ae65a2632e887d0aeacc9da5f123484",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481252,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 239,
+      "prompt_tokens": 902,
+      "total_tokens": 1141,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 32,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004194,
+        "upstream_inference_prompt_cost": 0.001804,
+        "upstream_inference_completions_cost": 0.00239
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "cb21a16ed5633e52f4d7ef412a6a75fbd8192ee338a452b2a421e4fba05a33f1",
+  "elapsed_ms": 3921
+}

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are an independent second-round expert reviewer evaluating rewritten conversational requests.\nProvide an independent, fresh critical analysis evaluating the candidate rewrite against the criteria.\nStrictly assess input fidelity, output quality, pair validity, and mode requirements.\nGive a concrete critique for EVERY pair, citing specific details."
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"exp-bench-051\", \"row_sha256\": \"40e8023a51b43a7f68b4e87347961b127df6c618f1fadc2cb46c709b0d36e9fb\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"level\": \"high\", \"profile\": \"technical note\", \"files\": [\"config/server.properties\", \"kafka-core/partition_assignor.java\", \"cluster-manager/controller.py\", \"metadata/kraft.properties\", \"docs/runbooks/kafka_rebalance.md\"]}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"incident response team we have a critical operational post-mortem and mitigation plan for the kafka cluster partition leader rebalance failure during yesterday's traffic surge. first examine server dot properties in the config directory to confirm that auto-leader-rebalance-enable is set to true and verify that leader-imbalance-per-broker-percentage is configured to one percent. next check file reference at kafka-core slash partition assignor dot java in the kafka-core directory and inspect controller dot py in the cluster-manager package. the primary root cause was an unexpected network partition between availability zones us-east-1a and us-east-1b causing twenty-four brokers to simultaneously trigger leader elections across two thousand partitions. during the cascading election phase message production halted because min-insync-replicas was set to three while replica lag exceeded replica-lag-time-max-ms of ten thousand milliseconds. to remediate this cascade we must tune zookeeper session timeouts from eighteen seconds scratch that six seconds to thirty seconds and adjust group-initial-rebalance-delay-ms from three seconds to zero seconds for low latency consumer group handoffs. in addition update controller dot py to ensure that partition state machine transitions throttle concurrent leader reassignments to fifty partitions per second rather than unconstrained batch elections. under no circumstances should any engineer modify the unclean-leader-election-enable setting to true as that would risk catastrophic data loss across financial audit logs. the principal systems architect requires that all broker nodes configure socket-send-buffer-bytes to one megabyte and socket-receive-buffer-bytes to one megabyte to prevent tcp buffer starvation under high load. confirm that consumer applications utilizing the java client library implement backoff retries using exponential jitter starting at two hundred milliseconds capped at five thousand milliseconds. incident coordinators should also review the runbook in docs slash runbooks slash kafka underscore rebalance dot md to verify that manual topic partition rebalancing commands specify explicit throttle rates. furthermore the observability team must establish automated grafana alerts triggered when under-replicated-partitions count exceeds zero for more than three consecutive minutes. also verify that all broker nodes emit jmx metrics to datadog tracking active controller count and offline partition count with zero second reporting intervals. the data platform engineering manager confirmed that all storage volumes must maintain twenty percent free disk space before resuming high throughput bulk ingestion pipelines. network engineers must inspect edge load balancers to ensure tcp keepalive probes are enabled with an interval of thirty seconds and probe count of three. in addition verify that consumer group heartbeat threads execute on dedicated high priority cpu cores to avoid false positives during heavy garbage collection pauses. the billing ingestion pipeline must also configure consumer max-poll-interval-ms to three hundred thousand milliseconds to accommodate long running batch database transactions. do not execute broker rolling restarts during peak business hours between nine am and six pm eastern time without vice president approval. all schema registry client libraries must enable local in-memory schema caching with a maximum capacity of ten thousand schemas to minimize http request overhead. in addition security operations must audit ssl certificate expiration dates across all broker nodes and ensure automated rotation thirty days prior to expiration. site reliability engineers will execute simulated broker failure drills in staging next tuesday morning to validate that partition rebalancing completes in under forty-five seconds. the backup and disaster recovery team must confirm that mirror maker two replication lag between primary and secondary cloud regions remains below two seconds. furthermore log segment compaction threads must be configured with min-cleanable-dirty-ratio set to zero point five to avoid excessive disk io during active hours. client application connection pools must enforce idle connection timeouts of sixty seconds to prune orphaned tcp sockets. the platform security team requires mutual tls authentication between all producers and brokers using certificates issued by our internal vault pki. incident leads must also ensure that post-incident action items are tracked in jira with assigned engineering owners and target completion dates within two sprints. regarding our upcoming migration to kraft consensus architecture please inspect kraft dot properties in the metadata directory. confirm that controller-quorum-voters lists all five dedicated kraft controller nodes across independent rack topologies. verify that metadata log replication segment size is configured to sixty-four megabytes and metadata snapshot interval is set to one hour. all transactional producer applications must enforce enable-idempotence set to true with transaction-timeout-ms configured to thirty thousand milliseconds. in addition the jvm runtime flags on all broker instances must pin the g1 garbage collector with max-gc-pause-millis set to twenty milliseconds and initiating-heap-occupancy-percent set to forty-five percent to eliminate stop the world latency spikes during active partition movements. tiered storage offloading must be enabled for all historical topic partitions older than forty-eight hours streaming compressed segments directly to encrypted s3 buckets. the data governance team mandates that topic deletion operations require dual authorization signatures in the cluster administration portal. finally schedule a comprehensive architectural readiness review for friday morning at ten am with the infrastructure director to audit all verified configuration diffs and authorize rollout to the production cluster.\", \"output\": \"Incident response team, we have a critical operational post-mortem and mitigation plan for the Kafka cluster partition leader rebalance failure during yesterday's traffic surge.\\n\\nFirst, examine server.properties in the config directory to confirm that auto-leader-rebalance-enable is set to true and verify that leader-imbalance-per-broker-percentage is established at 1%. Next, inspect kafka-core/partition_assignor.java in the kafka-core directory and controller.py in the cluster-manager package. The primary root cause was an unexpected network partition between availability zones us-east-1a and us-east-1b, causing 24 brokers to simultaneously initiate leader elections across 2,000 partitions. During the cascading election phase, message production halted because min-insync-replicas was set to 3 while replica lag exceeded replica-lag-time-max-ms of 10,000 milliseconds. To remediate this cascade, we must tune ZooKeeper session timeouts from 6 seconds to 30 seconds, and adjust group-initial-rebalance-delay-ms from 3 seconds to 0 seconds to accelerate consumer group handoffs.\\n\\nIn addition, update controller.py to ensure that partition state machine transitions throttle concurrent leader reassignments to 50 partitions per second rather than unconstrained batch elections. Under no circumstances should any engineer modify the unclean-leader-election-enable setting to true, as this introduces severe risk of catastrophic data loss across financial audit logs. The principal systems architect requires that all broker nodes configure socket-send-buffer-bytes to 1 megabyte and socket-receive-buffer-bytes to 1 megabyte to eliminate TCP buffer starvation under heavy loads. Confirm that consumer applications utilizing the Java client library implement backoff retries using exponential jitter starting at 200 milliseconds capped at 5,000 milliseconds. Incident coordinators should also review the runbook in docs/runbooks/kafka_rebalance.md to verify that manual topic partition rebalancing commands specify explicit throttle rates.\\n\\nFurthermore, the observability team must configure automated Grafana alerts when under-replicated-partitions count exceeds zero for more than three consecutive minutes. Verify that all broker nodes emit JMX metrics to Datadog tracking active controller count and offline partition count with zero-second reporting intervals. The data platform engineering manager confirmed that all storage volumes must maintain 20% free disk space before resuming high-throughput bulk ingestion pipelines. Network engineers must inspect edge load balancers to ensure TCP keepalive probes are enabled with an interval of 30 seconds and probe count of 3. In addition, verify that consumer group heartbeat threads execute on dedicated high-priority CPU cores to avoid false positives during heavy garbage collection pauses.\\n\\nThe billing ingestion pipeline must configure consumer max-poll-interval-ms to 300,000 milliseconds to accommodate long-running batch database transactions. Do not execute broker rolling restarts during peak business hours between 9:00 AM and 6:00 PM Eastern Time without vice president approval. All schema registry client libraries must enable local in-memory schema caching with a maximum capacity of 10,000 schemas to minimize HTTP request overhead. In addition, security operations must audit SSL certificate expiration dates across all broker nodes and ensure automated rotation 30 days prior to expiry. Site reliability engineers will execute simulated broker failure drills in staging next Tuesday morning to validate that partition rebalancing finishes in under 45 seconds. The backup and disaster recovery team must confirm that MirrorMaker 2 replication lag between primary and secondary cloud regions remains below 2 seconds. Furthermore, log segment compaction threads must configure min-cleanable-dirty-ratio to 0.5 to avoid excessive disk I/O during active hours.\\n\\nClient application connection pools must enforce idle connection timeouts of 60 seconds to prune orphaned TCP sockets. The platform security team requires mutual TLS authentication between all producers and brokers using certificates issued by our internal Vault PKI. Incident leads must also ensure that post-incident action items are tracked in Jira with assigned engineering owners and target completion dates within two sprints. Regarding our upcoming migration to KRaft consensus architecture, please inspect kraft.properties in the metadata directory. Confirm that controller-quorum-voters lists all five dedicated KRaft controller nodes across independent rack topologies. Verify that metadata log replication segment size is configured to 64 megabytes and metadata snapshot interval is established at 1 hour. All transactional producer applications must enforce enable-idempotence set to true with transaction-timeout-ms configured to 30,000 milliseconds. In addition, JVM runtime flags across all broker instances must pin the G1 garbage collector with max-gc-pause-millis set to 20 milliseconds and initiating-heap-occupancy-percent set to 45% to eliminate stop-the-world latency spikes during active partition movements. Tiered storage offloading must be enabled for all historical topic partitions older than 48 hours streaming compressed segments directly to encrypted S3 buckets. The data governance team mandates that topic deletion operations require dual authorization signatures in the cluster administration portal. Finally, schedule a comprehensive architectural readiness review for Friday morning at 10:00 AM with the infrastructure director to audit all verified configuration diffs and authorize rollout to the production cluster.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "exp-bench-051"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "40e8023a51b43a7f68b4e87347961b127df6c618f1fadc2cb46c709b0d36e9fb"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "c46501a2679f6eaf23a969d5f08007eecbadc6ba081be577b0110d52d7e4f869",
+  "started_at": "2026-10-31T21:23:51.060316+00:00",
+  "result": {
+    "id": "gen-1793481831-jz0aYMtwJ5KH7ZsBKR4H",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"exp-bench-051\",\"row_sha256\":\"40e8023a51b43a7f68b4e87347961b127df6c618f1fadc2cb46c709b0d36e9fb\",\"critique\":\"The input is suitable for /polish: it supplies a complete technical note with dictated punctuation, spelled-out paths and quantities, and an explicit self-correction. The rewrite faithfully resolves “eighteen seconds scratch that six seconds” to 6 seconds, preserves the configuration values, owners, deadlines, prohibitions, and file references, and retains the original certainty about the root cause and required actions. It also correctly preserves unusual requirements such as zero-second reporting intervals rather than silently correcting the technical content. Capitalization, punctuation, numeric formatting, and paragraph breaks substantially improve readability. No new greeting, conclusion, or substantive operational requirement is introduced; the opening address and final review instruction both come from the input. Minor polish weaknesses remain: “established at 1%” is less natural than “set to 1%,” the kafka-core directory reference is redundant, and “compaction threads must configure” is less precise than “must be configured with.” The final paragraph could also be divided by topic. These are minor stylistic shortcomings, not material fidelity or mode violations.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lxt0-uj2dhTwcrVO9HBk1nIiGWZQh3BC6KwL1PmcnJPeaNXikhN7M7AyMUeSooKKl7oVKfpypoGrpEJ1qy1YcXgSwezeNiS-HgUdLTPOLCcwc0pSGjRnK50o_ncJ-vj4-8szMzsSpYr1V8QXqOCzSF5tnrHCPkXI4ye3Xem6Z1LGV-0skLvV5E35cdmA8B4R2WaDa4z1QJeC74UMqiB_N4HaYRhCfytZDluJN2csn6kE2tZHMEJg4umZOItCuC0v8zK2JAbJoK0uiGAzSTAUR6CUBrX9BmzSpsR89Anb-HkxPNYNTwkP7tl2UkWHBDefg9r-uc0ASTweATYIzIZ4t_a2BCs4QqKXoJnS7I4A5z70mXKjrwtn9Nc3dtGayEDehsMvoFyDSLzp6Yc_bowZWCSu05V9c09lH0s5bgVh2kqR2MQpJiuENglTE5EZoDqTkIv1rRkp5PONYq3nSvPKaLnGBeOYV-Ah0uhLyyyh6Y8iTMknMDjVEZUg4IEzJTV0dGMbB1IkW9FRZ9l0eOzhJq1-FRU5C7antc-fOjDSMzda6pDOd_i3rmVuXL9uZf22ku0W-9sy11sYmF5ooLfXjThbx7pXxsJ2qmPhjxy422ZEvWHUT7dI1UgcbWc855iaVQvU8v-orvWvtaZkk7t73In4M4cMMZiIbF5M7UgoNifkZRdNEW7DkZjgsS1WG6nliDnbJq8D0C2AV0bSN70eUzlTQL7_VEn8ucv6AgOIODkIOmzxIpqfB6HpYJVPHM1AM-nq2Py_773EtMLffBbZvIOVg8zl8HKomcnFui_rqkf9HgLv9IEsQv8A8yfBJeGIIloMEy59rZjAU_lt3xntWENJg7ixDbAv1J3y3XK95pWeMb4GokxC63P1lB48htP3xl0OqGY6BG9ORxK_-IsvXeUdaOkZrX0_OCBrs8PioaS4bbohbfCINb2UUDBgz8x3y9PW-RTtCLH3GV5ZzQ5hWYBXbw4IiRwYp8pgFIui77RRv7cP5avTJ36QnOa5256WxP7SJsCAXXOy8n7iNJfTki88SnCy7CjehzHQ77CLZznxkkuQFUQN5J9KK9NIvOwT7DReHtcufPKUx5uOJPlp25nQNwZXqDL0CeiKt609k4-Awj8BhtucXrD7F_Ru2WmZGH56jcYNRQAF3z6uGzyypIscHDsqJ1HncmBehc567QNPcKHUcHoUwoB-IYczQ1WtdKfkPf2x6mqYV8_oWRfUJgIAPAvcI33XAVnaTNBdcEEBl6X0YzIibKb3xs8yFIpHDNhdf-DR0u9VpdS0F8Gw6yJeLZF-1PPCiVCM_GVGI_q2ZgF9jfqOSVG5hNO8Jy1WXAP3USzyZ4GUtOpU75322fdcrlNyxoN83b_UIBslki3Ip4opPhXMnTo5qU0V8cvVVjdrU4QMs49j2iqZWVXxHMHEQvV3CdkYLEPcpgmt_z-16R772MH0WFjuFIMK2mY3LL9GXsao2ZniVE3um7ZGst_S2UQZbo3dQMhd9Zp7u1Q6uUdm2CatRPn5tyPpjfINXU9hvkUGt1O9tpUoC6XIKJyIuKA-GJ7Yi2wUYyuPSmNGEm5WBQJ9yioRx_V0Xp-02hIlocQ7KcPnF7qViPxQ5v_Vjz6hWC32I6_v3FqINH7XAeuK1i8f3dIniVpcmiiMwc5s1RKbpTPkwABkgBMh0HVrCu02dxc5dCsd3UMHLlPoozORP1PXV-4Qed42ho9Sb94jUYF26U_5AkkIK0QkTfGdZ9buy1BGEJgorRk82r2kzvoprM0sgYLfrkeYbGBZ5qbp4utwVL_2WUigSKrg6x2mNdnpbVqzJM3xDvDh3ciy9gAiYRBjuaF4HjlMEzKvAJ2nSYPS-gSGgsryptrXzhBBVB-pYP5fkmudpl5kHdrH5lPr9Q6FYbFaGUyiY0ygFsKSCdAKdyZJnfQI_Qj1v-h-OR40Q0FHl66H6MLpzwGPzgZZt2u8V5rvw0aet6tgbp59fBcdJoxvHGlzPJCTIrk8De8-8T3JWLi7WXspxMrdozHbCJR9P6qDw9_nmnkArZwUOF-_XMjEWE2xEYbcCFjKAE5LIc6McMI75r5Vafwxzp3wPTq45rpxtqsuRCz9l3789U5tIipEf91jxDj6L8F2FaRzrAJWjvrIn0JJ-Tsz4LLyXaOc1Q8es6Y4_PlFrWdnJ5T7QNziDTDvGKtcKdO1oemvflKW4gzI57U-sLmxyOX9vFhy1Z4OsNEApSf6BpblucqbnaJkKqUPUpwFcyJuYP4n8EI3PdCFgThbzQVVYD1MBxN99Bou0TpIiAVERYBsJ6aFY6xATOSAVeVwhts62fc3Sj9ZVI8vd-otH8dCM25zMYLvJJzxGQ4-r8l9t9u0ZGN3DVfXbnsJEGoQiTfni-qcMGEC0U63m3zWKQMlGXLk8LZTnOO5sUs7GyYT-gBzipfv0DY3S8JmeGQSnRs7mdwlFPw_wb9wvtynCsBr-3twCHIUaVR1HxKfpk3by4i79Ht_deAn6CPxZE7OeD1KpppWMx8zQ6sCFmX4_UyX4QVpFCq-LEJAHsNMpb1vnmQ85A64wH6qCJ-gnlLs-0bGsT929QZ-Ar-nv-Jx8DZ5Jq8u3pKOTvqMQeosMXXJx2XwcsMdDlA5Ou5VWSqhZhO0btYm11GemeCVve768IdE4jIu4lURFa8Dlrew-UHsZcFjP2OEoW4kev4wngA1ugrYlInSZJMjA7Hg7NO5kbb0GmbaR3NJRCt8v0KLJpPB_WFTx_BizH8Wvh-5PA1KdSoVDNBjRpTj6xXiymz3W83pUZfzlVSi5sSiSDXYXVZRpwyxSu14XgrLbyPeE3cEIQ_ACQ44rlGQZLpYz2S_DaSEIHVWMy_EdSXGzDKxbbxjsMVPdxhCHOApAIbnBfk8ZFjG1rFA-D5rQ_Y9SBBtnbxrdv74A7WmmiXaqWJbHgtRV51f6AaQIzxXw7QCZujyqXj7jyGSBJ0kdtQCcTnbTOhf1t_rVSgx0z2Wkj_t8paEaQROkaxaLF5i-l9XYUtdfaITiTdvkSV9v5dRdvNRMcKbmuM6dkjfZAwEANv2tcJzCDnBd01CVepo2kI0ZTp4mJKpK68sNxBzYPYkSLz1s2MNKKJbvH1RcpkwQ4Z--5n8Su4t5Xsd6iEoWQDIL9BGa_UoILKnzj0Po22i4qNZ3KwsQPefQZoJmQ3mA7CtmkwXE8KGF0dOAACJhd23xutTdn-7vNhiK_IVX9cm4lWWvPtaAaV4PANejNitsokQFCgeO6REFwCBIiJ2P1dX2NlVo8E4Nuya2z9_iMWLiXDP-VcvXaWE59qwaqVX_C1fBBde2dloA6O7gHbN6VBo-lz1ysQtr1QcEPWiYhEbkD20wUeGcBsOC1oiMeXlWkynvVnqoXgo5wV4_pbSPNO60pJkUwd3nMA0lMlcwgE0tV33KoVb_zh8Z3WEJpgW5ZPYBzwIkFQYiGGm0VrCzIaw7pJlSMoFibK8OJbmIAh05v7M0lfmuq0jwx4l9ofVlq91weQh7xFJ9UA7wrST3n7__5oYT8zWD6R2bNq8tjicSIYRisKZ7y8i1eW4Fyu5dABNnGdIDd3vjAV7aFmTOoQshLDc4EYbGdxMm65LLdaxOydzwH4lZwFQC6vJLc-2VFDC-uqyOdc5R6WC1NzFKFISZcL4Dk3Sq94IqcYfW6hAi-FZIbnBAhHmey7VvRTlSJt44Ph0PLNIQBmoFLz-1QP2JP53aBJgOERfoOQzDN0HuwJB2yaII8SQ1QTwwXn78ULbNec1nOZWSdY-8GlFbYTDNmGUQYyAZIPHlWpa76BXS92rHctbfxNqkpj4HDK0OJm8DYFKRNdfWz7j9uZgbbxCpYGg4prULUEofvAf-wDvSCBJU7Ec3nq2EXsgoYvVKrKX4lYFUeQhUc-GxsO2y7JLCBQ9LSrW_2bbnvN_cK7XDg6lcjfhDHpE0M6CD2X-cv-EIFtUQp4aEBH5TTj8qw2JuGFY1f2rtDImhnOVi5jND-oY8KHDu9l0jEPhb2FWKCLFptYmfwR_KR6FD7FDc7UVv7Ds3ZrVPv14lQ88eS0tuHeetvMglj-19nmAiGTHKfq3I4OmGlKtNP8wTlqoGmt0QtAq3HRcr56Mkx0h8-LaFrxf8obueNNueNV9SBDhgiaoFD9IoWK.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_096bbda77dfdff0f016ae65c68171887d088a23718542a3812",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481831,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 491,
+      "prompt_tokens": 2468,
+      "total_tokens": 2959,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 182,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2465,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0051625,
+        "upstream_inference_prompt_cost": 0.0002525,
+        "upstream_inference_completions_cost": 0.00491
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "b44570a3877e29d279822002d41502d797916bd4c1041628f0b10d6c3ffb7287",
+  "elapsed_ms": 9836
+}

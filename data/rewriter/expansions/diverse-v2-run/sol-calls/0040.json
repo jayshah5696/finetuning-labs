@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-03-polish-high\", \"row_sha256\": \"86f8e391d5a8f022de8c9116d1403cf7a4805efcd0bc374366cf20d5d51303c2\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"level\": \"high\", \"profile\": \"notes\", \"files\": [\"k8s/deployment.yaml\", \"services/worker.py\"]}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"we had a deployment failure in our kubernetes cluster earlier today during the staging release. please inspect deployment dot yaml in the k8s folder and check pod logs in worker dot py across our worker nodes. the backend api pods entered CrashLoopBackOff because the database migration job had not completed schema updates before new pods started accepting traffic. we should add an init container to check migration status before application containers launch, and configure liveness probe initial delay to thirty seconds scratch that forty-five seconds so pods do not restart prematurely. also verify that resource limits in the pod specification prevent memory starvation during startup, and ensure on-call notifications route to the devops channel. the platform engineering lead requested that we document all container restart events in the incident retrospective before promoting images to production.\", \"output\": \"We had a deployment failure in our Kubernetes cluster earlier today during the staging release. Please inspect deployment.yaml in the k8s folder and check pod logs in worker.py across our worker nodes. Backend API pods entered CrashLoopBackOff because the database migration job had not completed schema updates before new pods started accepting traffic. We should add an init container to check migration status before application containers launch and configure the liveness probe initial delay to 45 seconds so pods do not restart prematurely. Additionally, verify that resource limits in the pod specification prevent memory starvation during startup, and ensure on-call notifications route to the devops channel. The platform engineering lead requested that we document all container restart events in the incident retrospective before promoting images to production.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-03-polish-high"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "86f8e391d5a8f022de8c9116d1403cf7a4805efcd0bc374366cf20d5d51303c2"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "dc5663386b866e9eab8f327fa44428553c4448b5e532acbee9a9e18f04bb5581",
+  "started_at": "2026-10-31T21:14:07.980498+00:00",
+  "result": {
+    "id": "gen-1793481248-ZrLECColbdRzbXuZoieQ",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-03-polish-high\",\"row_sha256\":\"86f8e391d5a8f022de8c9116d1403cf7a4805efcd0bc374366cf20d5d51303c2\",\"critique\":\"The input is a plausible dictated incident note with recoverable intent and an explicit timing correction. The output appropriately polishes capitalization, filenames, and sentence structure while preserving the incident cause, proposed init container, resource-limit verification, notification routing, and retrospective requirement before production promotion. It correctly resolves “thirty seconds scratch that forty-five seconds” to 45 seconds and preserves requests and recommendations rather than presenting them as completed actions. No material omissions or added facts.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing technical logs**\n\nI need to assess the plausible technical oddity logs in worker.py, ensuring everything functions properly. I must address any input issues that might arise from natural dictation or scratch corrections, yet maintain the integrity of the output. It's essential that all preserved data is accounted for, so I'll provide concise confirmations. This way, I'll make sure the process is reliable and transparent!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing technical logs**\n\nI need to assess the plausible technical oddity logs in worker.py, ensuring everything functions properly. I must address any input issues that might arise from natural dictation or scratch corrections, yet maintain the integrity of the output. It's essential that all preserved data is accounted for, so I'll provide concise confirmations. This way, I'll make sure the process is reliable and transparent!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lojY3-fIqHoJv5tAUUCbchF6kRoFqw-b_xOtHKmG23U1Vloi0KvkrFo0rT4EKe2NWKrsDybEoH7uicEYFSuOoGYJBindGY33WD4gw9qZOIi6WH1Kw2Q3zQVNoydzN2hdqZo0qmbq1NddsLb_ERti67hnE4EhVaYGipINH0CsJUGlIGUoFhX3iMQ3foPwyYC3sa61KtwVfSF2GxLvy_r7JYkIzMpKlodJS-2KLGJMqNSem6rgXEOserXWswPghW9bvrBKMicjgSLl-iwPngAvHokLR7k-Z6S9qul3iXV8sQ4-_cmBXjIrx7XivH54ETrEmDi-_lFNZRVFocAu7YI_omkyIJ7fWoAkNzLutYiP8cZ7Z8l78qpzNPvB5fDTxE0CJATmtW-UM9AW8sdAleS5AQbHALy_JPFjV3cXWQnH3AQ3ezcDvpnjNq6lK-DiFgYbxW0Mj8jkYeed3pbnQspJPs2_Q1VUFY0l2OvxacWrCvxfQ8Pnp8qMQrtQ4bREEcZx7nAaaaw26TBfi04dYTxoMley0zEXAh7V4_atZT6KcFOJV1cJwoQ4pt_O_rdncxvBAM0-YcXU6zBo57qeu6e0J4_Ckhhzn3okx49nYyRwUcrxBWB4vdCdur1GBHRkAwR1NyBFfnN5PecA3a9cFXThej38UQu6UBgKCTctix98hOeb450_3_OwjwOanIHScJHSTBceeHjHN-s1eZQlnrDcs6k9fXDSogXTrn014F_vrhS65tz0a-AMfIVxOJLd-dUX69vWpwlzE3NIDvakYV6aLu8i74nbelR53nM5GWigQf3xsLa2xubSZjamFfCsaolW6FgKOw4R7bX51PymdFYUdueSN7Mo-N09U-D8mqLdc9BEH6coGl5DqlzWfxcDBCRLKaF_ePN1swOaii-hyrNQ3nXYfG4tciv5tkVwFIkyeq9kAvu4IWVhjZW31AxfHMSKnKuWvXRhAfsq0S3DH3r_Ge_w445LPdj4aUmQz1nzpZi89BPBtam4xsZbA5ciQK8pAABTOf6WbPmgTzKc9-Dl_qGpGZp4cw6tkCdHH6nYDh8mXogWjYRzRG1FSA451uH-emXyqBCbvbEKAuEMjpJuyJcfZResO7m3blKgBaxmJpzFQXCk4Ml0YM4pk5ecijPyD0jjM8vOviVKU-DAVnTuUNkZhFblphfgGTsxQEfDjFzdRPPYF63_CWwR6NVie3QJh1qNQqMSwIOVwxrfC-ynf8U5UaKLldAt1l8q_86SkUIoKv9R70CC9QiH1opMG9BJbX6kH1QdrfBamvUIdIsBmLuRccyNdCPHDmx28wo_QdFG0C0bb0eg4LhKLmtkVdslLeJXa6YqSd09prU-GWT-Idv2cDlLPTN6HyivhjBRIHSrvIpoXi8YaGfM903Miax3ZVBVY9s6eKGs3mo1ggHstAGOZ4WGuLvRXEgr1AA66cTJEXgDgQLxA9j-nGJL1PErrYTaqL68BzGdRXLIqG18QUv_e4yi7razQjHQtO45QEBJtlEMMwpfwW8tyd-0dNfaMSV3vtuqkm9RP8v1YPgTsb-JeSxQfbjuxIKchyi4bKvBjMXkqxKlQJK4Uf4NO_ED0lRCxw2U8AsGsWh4fSsivznCRWrlT_RbIw5TPmJLctfBDIDwDIwo0FaOMUKNPMOIpYSqnTiGLGZMZshyUnS3yW93IcjMDtduTxztMIutPsyTyxvECUkVNwN9uIsgVUNcUIQFmOdBl9lA3NnSly3n67SHjfPOK_Ctz6FT-cmyrf4hBpnFohQXegUlHY84j-dxSpeoM2qZIXifgs0KT3346wSGvBfReWgJ4dPjsWgZ4CtSMrBQDaOjqKgzyDTkmH1MD8mjkLBWOP5Ut7pL0zZcT1p0TRmcb7egPXQhYbpTWFpnWIcUbU7PGQvgHph9CuiA7ymdp8Pnq7YJ3sNmRYyATEYUqvdt2eiHwJnWmnoDO47CED-7LO0rNCnC6t8Zlqx-S2iC77eisZwfSb7LiPyxuKWKERqdEfT0bf-MGJSsgs-JehF12A0ywYo65l9DNQ4XrFEBtPQNAsW2SpAjkyAXkgTg4jLlM8eBUsXeGnNIVTcphnjmc4mZ4Z02zgt0fbNk7Ds.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_02247ea78514ae8a016ae65a21187c87d0ab69c3d07c2d6e96",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481248,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 224,
+      "prompt_tokens": 950,
+      "total_tokens": 1174,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 37,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.00414,
+        "upstream_inference_prompt_cost": 0.0019,
+        "upstream_inference_completions_cost": 0.00224
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "dd3c3c1ce7a412b4bea3622d0c90306dd50eff5b09871523a8c6cf021f12f1ce",
+  "elapsed_ms": 4298
+}

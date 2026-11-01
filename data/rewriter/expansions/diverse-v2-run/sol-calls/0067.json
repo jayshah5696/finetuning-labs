@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-07-prompt-custom\", \"row_sha256\": \"92a94547d98486a35c82c632ff933640ffc5a12c368e869d4277c54dcd5a151e\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"level\": \"custom\", \"profile\": \"developer\", \"files\": [\"payments/webhook_listener.py\", \"infra/dead_letter.tf\"], \"instructions\": \"Create a technical remediation task and infrastructure specification with file tags and retry parameters\"}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we are seeing intermittent webhook delivery failures from payment processors during our flash sale events. please inspect webhook listener dot py in the payments service and check dead letter dot tf in our terraform infrastructure repository. incoming stripe and adyen webhook notifications authenticate via hmac sha-two-fifty-six signature verification headers. when downstream account balance services experience database lock contention incoming events queue up in redis streams. we must configure the consumer group dead letter retry backoff to ten seconds scratch that thirty seconds with exponential backoff up to five minutes. furthermore ensure that webhook listener dot py records payment idempotency keys in postgres with twelve hour expiration time-to-live. update dead letter dot tf to provision an amazon simple queue service dead-letter queue with fourteen day message retention and maximum receive count set to five attempts. also configure cloudwatch alarms in alarms dot tf to trigger pagerduty alerts when the dead-letter queue depth exceeds twenty messages over three evaluation periods. site reliability engineers must ensure that consumer worker pods scale horizontally from four replicas up to twenty replicas when redis stream consumer lag exceeds five hundred messages. to prevent replay attacks each webhook signature timestamp must be validated against local ntp clocks rejecting any payload with clock drift exceeding three hundred seconds. database connection pools in db pool dot py must maintain sixty maximum connections with a connection lifetime of thirty minutes. all sensitive payment event payloads containing customer cardholder information must be encrypted using aws kms customer managed keys before persistence. the compliance security officer mandates that raw payload logs redact billing address and account token fields before exporting to centralized datadog logs. if the primary payment ingestion pipeline experiences total cluster network partition incoming traffic must automatically route to the secondary backup region within forty-five seconds. in addition consumer workers must execute payment balance reconciliation jobs every fifteen minutes checking for mismatched transaction status codes across payment provider ledger APIs. payment failure alert notifications must route directly to the financial operations slack channel with transaction trace IDs and gateway error response codes. during high traffic volume bursts the redis cluster sentinel manager must trigger automatic failover if the primary redis node fails to respond within three seconds. finance reconciliation audits require that all processed payment records retain billing country code currency identifier and authorization reference numbers. furthermore the database connection pool in db pool dot py must dynamically recycle idle socket connections after forty-five seconds of inactivity to prevent connection leaks. site reliability engineers must configure autoscaling rules in autoscaling dot tf to trigger preemptive pod scaling when incoming webhook ingress rates exceed one thousand requests per second. finally all automated webhook ingestion tests must be executed against staging sandbox environments before releasing new consumer container images to production.\", \"output\": \"Remediate intermittent webhook delivery failures from payment processors according to the following requirements:\\n\\n1. Investigate and remediate intermittent webhook delivery failures from payment processors during our flash sale events.\\n2. Inspect @payments/webhook_listener.py in the payments service and check @infra/dead_letter.tf in our Terraform infrastructure repository.\\n3. Incoming Stripe and Adyen webhook notifications authenticate via HMAC SHA-256 signature verification headers.\\n4. Account for events queueing up in Redis streams when downstream account balance services experience database lock contention.\\n5. Configure the consumer group dead letter retry backoff to 30 seconds with exponential backoff up to 5 minutes.\\n6. Ensure that webhook_listener.py records payment idempotency keys in Postgres with 12-hour expiration time-to-live.\\n7. Update dead_letter.tf to provision an Amazon Simple Queue Service dead-letter queue with 14-day message retention and maximum receive count set to 5 attempts.\\n8. Configure CloudWatch alarms in alarms.tf to trigger PagerDuty alerts when the dead-letter queue depth exceeds 20 messages over 3 evaluation periods.\\n9. Direct site reliability engineers to ensure that consumer worker pods scale horizontally from 4 replicas up to 20 replicas when Redis stream consumer lag exceeds 500 messages.\\n10. Prevent replay attacks by validating each webhook signature timestamp against local NTP clocks, rejecting any payload with clock drift exceeding 300 seconds.\\n11. Maintain 60 maximum connections with a connection lifetime of 30 minutes in db_pool.py database connection pools.\\n12. Encrypt all sensitive payment event payloads containing customer cardholder information using AWS KMS customer managed keys before persistence.\\n13. Enforce the compliance security officer mandate that raw payload logs redact billing address and account token fields before exporting to centralized Datadog logs.\\n14. Automatically route incoming traffic to the secondary backup region within 45 seconds if the primary payment ingestion pipeline experiences total cluster network partition.\\n15. Require consumer workers to execute payment balance reconciliation jobs every 15 minutes checking for mismatched transaction status codes across payment provider ledger APIs.\\n16. Route payment failure alert notifications directly to the financial operations Slack channel with transaction trace IDs and gateway error response codes.\\n17. Configure the Redis cluster sentinel manager to trigger automatic failover if the primary Redis node fails to respond within 3 seconds during high traffic volume bursts.\\n18. Meet finance reconciliation audit requirements by ensuring that all processed payment records retain billing country code, currency identifier, and authorization reference numbers.\\n19. Configure the database connection pool in db_pool.py to dynamically recycle idle socket connections after 45 seconds of inactivity to prevent connection leaks.\\n20. Direct site reliability engineers to configure autoscaling rules in autoscaling.tf to trigger preemptive pod scaling when incoming webhook ingress rates exceed 1000 requests per second.\\n21. Execute all automated webhook ingestion tests against staging sandbox environments before releasing new consumer container images to production.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-07-prompt-custom"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "92a94547d98486a35c82c632ff933640ffc5a12c368e869d4277c54dcd5a151e"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "db7e687fe560fa5f7ab7647872a65373e9481d78a0ae36f2d4b5a5a4ced0a284",
+  "started_at": "2026-10-31T21:14:14.680057+00:00",
+  "result": {
+    "id": "gen-1793481254-dBLQakEX2sJo0ErjXxPw",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-07-prompt-custom\",\"row_sha256\":\"92a94547d98486a35c82c632ff933640ffc5a12c368e869d4277c54dcd5a151e\",\"critique\":\"The input is a plausible dictated technical request with recoverable intent and an explicit correction from ten to thirty seconds. The output organizes it into a clear, self-contained prompt without performing the task. It correctly uses the supplied file tags and preserves all requirements, including the corrected retry backoff, separate connection lifetime and idle-recycling limits, alert thresholds, conditional failover behavior, security controls, audit fields, and staging-test prerequisite. No material omissions, invented requirements, or changes in certainty were found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5loqULQSlL-k7gwhawO3ERiI8CuHkf3e38bRIYa9ycKZuqrmocQ43kmxyV5I8sg45yuVB3KzV75mRoOpB6fivCUPiSKcOBclxPAOD9KTkxst-1sBtiIfFVNMOfaJJ58qjrWxdz3YQV9fNmsBdFgJmIv-9lpQvIKCdRdkE4YJWO1jqihWXIDFwNn-qGXpjsgBG3uf15SP4CAvJga7AoP2BbwR-N7YsblsWV9z-GRCRhi96on6OpOSef4UuHtw7O58ghH4wr9sk0G3DGPGIqPBmZzOaxUPA2JYvytHBQY_fIDyP9Guygs1r9-C0ZH5h2jkC0dOlXxcDYNnoeep_04ggap3G5lVhO2aT1YEUGvYvjDEENkDl6xsGdyh9A2B_pbYZRyqQs38esyYW9IRJg2YX9BomOQzi9ht-LYr0N_djiP20oDwao6wOkQf2iiWEkPmvRsH4FXMzM6CFvcOtKFBPFr0qY9q1je0pY4NC05eqeLEFCqwGa-BXlsgrQrgwxYL6ApqEn1cm3HZCuA9SQUvN4aoLRsJyC6_Gt8TZuOwySmju8PSfyNDCU0mzCrD2jPoNK_qO5YMe-RImFeOSfH2yYnfmNWXw69tw262U5gAwlxhTsOUMXTFhPQVWp9kpxXj1aet0na9dF9IzgcD9HtuzSUrd_8imhSZI0ay2raWfkvqDgGzMwkz9Ft-dBAJw1VabPgvyexmY62pNdVXYa8NCfdSoNx_8HigJSdULvamVXP1Ej5bmXNw1c5yJd30D_9ZiMYD1tQ8hyiTx12C5fA8lC5LSBlHQVzUlK-p-sz3DAQaKCNVdWDCAb1kf_r79IHbo9at4UE1D1KhWUMndQecRzci_Y7g6RrcnRptSIzuNiR_R1Lu_g81-kxH9v6DKOGvTT01RrNyvu4O0r3kPIMrH-6yvEdEjdPadEJ5OMa9D_QoZhqW1EHeUHx3eBiYhPtVSyWwrmoc5uATuknsrNlEu40coWWnjHRjKFqumin4-zeK0tnwKMoUb0Nan0z4UWbEIuqBFaEWWCb0cC_WGF4SOyVelMevGtjYpADz1DaKeMewnee3Co7gAxibSca8NsebjvjKuYWYad2nIMdzga707-4VHEFop1-rw_qj_1CQ4Xz9vm18mUhhRzCSGim_ClDigaxXXOEeXv7oOWqnlNdWq3Cgpon-F5ewNIj9OBVfcVXlodWAGo8pi6zu9LsKEOKXiEx-iEpSDm9tNmxeJ0Q1qOfJyOirD3-6QbaKbveen_LSKyTpczj5vWXfU6VURnjg_qo62Xj6YCO6QQtISqtDqcvbe6h_xtofX69bXcoexdLgbTsvhKydKo5Sf5R_1sA_nKhuTWEDM7LSC4uBjsbJXDdags057Cb8q1tBTjyjzPIUMSPbcrl-EP3nd6vHnXCZmTHDmDUUMkFImJBsv2zlmgVjMd928JJFiqt7y4zLSWs5ZbzI1-gXm-T4flY7BOcN9heMq-tdoMwnS1c7zyAQKxEqNGGWHT5MGVNcNej5kwyx-hTJovxrpG-YT9KAQmbRvOaIDLNmB_7IAsTgK4tXeVEBsPL9ivgTvNXp5x_eCzpQs-dwrIqa_UmQd5irhy8P6tuAIEusdNAogD85XU4QHua-t4WW3a9uVSiQB6iI6C1l_MU44kGYZrG5xFBowjucYaKpP0sJy1kUjymnaI1ny88TcjSkvoE-eurcQIiHTpWIiQshxHQefYF8uk__IKC6nAk4EoH6rprIG6wMZ-Eezo4rImslNt24XmIpBDZvBuQpzzNqX-8S1z5EfYVI-WvEA6pMWYWPiTnNB5j8Zlg6QqtMk2_FmtVxHF9CgoZLCeL5BHAnZVWYvPG8IIYdK13CDdM51RuSiQnlzHERVbbDAuNHbc-74foknnxm9l7YMG4m86wBlyV9ETDWTg7Gycw0xcWJ5voKpuOoIUUTMGphsIl88qxqaU5KPKjWAszadnYQ5gO1kAIyZNQK6cf13BNLkOebM-D1SyBAdLMxlvdun_5ZNapH3UsX6XZl5c-oe6P2bATMvjpe9jEcKrKmGCeF2MYFxAAfUHNmJ4IRLvHnp8u-oYpszgts9PAH4O15Djl5b5IAWxseRhGzRVoHgCQdk2ACTSIuh16QAHcPQI_TNbA0tDQosuO83wPzoWTi3hBruF7t5UZkNVlX5SnCGwC1f1I0gapt2SJFjrRr7Uz8hwflWAFGuTPCuxG65sy2otEBMttvUCKHQUoy2LUx0KYIYsRKvtpYnYJxPRF_VpX-VGKeBz8u5nrxHqs9LRapaEIBB87xt7-IftKSDH4WP3T410BjDAn_-3QVqHZpbBSr-dGTx3A-junEnEzAGJquSBETVfLNeM-afz0xpZsXdsllVXE5JTkVOjc3UUWO843hXyZZEQdZfO3TVoBrPUIfQ0dPU3ESDOcd45_7nnvB-iHNFBXb6RzlZf0Ck20bZUBYsSx4BVp0gjL1TzhB10NKXUxBHEh2yrN1__t0Q85JCd_129H3TeJbcRSdG3dtM0jgdHEu0VcqfrsXiaW3sWdW2N9_gzPY7_Dm5SIdPNPIQcKZphOBgnspdSVX9nOPaMqjWrXbAElncGOJR-cK1kk2ml68kR1hGcS7gKGUFqJGBVQHPKGogRhuaqip3s-9DZcpX-mf4_JuMC307CeKJg0mxAYiWGWYW12-9vWHRl1d443cOqwr9kdzYJ0XF_guYFockm6I9aWbG66DUUIUjGS8M3kZAWJ1jNPYVgJJX09kLyCVkKv00Xw5poHTPjJiFJaG3xK1itEAZEvvSo-JnUJ-n50DXVMzhRh2lj0G4vs6IhOuMT8JQbgToeQMoqRJHukLM5H5MWGqG4OJBShEVVlDEpI4pm69a4NKtZ4bQt0H6f3bqXaVE_X95g-0gxA-drnvDy1x_zvi5koM46bOd9OiW54bATXKf2ArhjL5qJyB86FGIlUrsnCplH2riIn43CkGNpF9O79A9qWMJNDlPRCVcJgg421NEbkRi31_KKygyqNQxYgeJsm8mjaEQ_t5RXpXIphxAQ==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_07515ddb7e60fda6016ae65a27f50c87d0a67c630995dec7a2",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481254,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 297,
+      "prompt_tokens": 1751,
+      "total_tokens": 2048,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 106,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 1748,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0031508,
+        "upstream_inference_prompt_cost": 0.0001808,
+        "upstream_inference_completions_cost": 0.00297
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "af4ca11c262ac9e7816de9f2ebb1418f2c0e9633ef8671b71d05191f0c8a9270",
+  "elapsed_ms": 5836
+}

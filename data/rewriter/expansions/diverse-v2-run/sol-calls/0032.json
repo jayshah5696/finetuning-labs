@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-01-polish-high\", \"row_sha256\": \"785cf11768c4bfb563c6781ecdcd3bf2732ecddcd330da6cbf848d3b2a8411e6\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"level\": \"high\", \"profile\": \"notes\", \"files\": [\"src/tracing/telemetry_service.ts\", \"src/tracing/tracer.ts\"]}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"um hey team we have an issue with trace propagation in tracer dot ts scratch that telemetry service dot ts when calling camel case inject context with missing carrier headers please review this before four pm\", \"output\": \"Hey team, we have an issue with trace propagation in telemetry_service.ts during injectContext execution with missing carrier headers. Please review before 4:00 PM.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-01-polish-high"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "785cf11768c4bfb563c6781ecdcd3bf2732ecddcd330da6cbf848d3b2a8411e6"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "de454a30230396df52468a1e2d054d06799cd0929f3b221de2ef4b9520ccd7a1",
+  "started_at": "2026-10-31T21:14:04.926924+00:00",
+  "result": {
+    "id": "gen-1793481244-mfBLB5cw2qQyReaoZ3et",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-01-polish-high\",\"row_sha256\":\"785cf11768c4bfb563c6781ecdcd3bf2732ecddcd330da6cbf848d3b2a8411e6\",\"critique\":\"The input is a plausible dictated team note with a recoverable explicit correction from tracer.ts to telemetry_service.ts. The output appropriately removes the filler and superseded filename, uses the supplied context to format telemetry_service.ts, and renders the dictated camel-case name as injectContext. It preserves the trace-propagation issue, missing carrier headers, review request, and 4 PM deadline without adding facts or changing certainty. The prose and formatting are appropriate for /polish.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing execution details**\n\nI need to dig into missing carrier headers and clarify the ambiguity in our output execution versus calling for the telemetry service. I’ll check the filenames before 4 PM. I think the input supplied needs some polishing; there might be some disfluency. I also need to ensure \"camel case inject context\" is applied properly. The output should sound natural. While it may be a bit stiff technically, it should still manage to pass critique.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing execution details**\n\nI need to dig into missing carrier headers and clarify the ambiguity in our output execution versus calling for the telemetry service. I’ll check the filenames before 4 PM. I think the input supplied needs some polishing; there might be some disfluency. I also need to ensure \"camel case inject context\" is applied properly. The output should sound natural. While it may be a bit stiff technically, it should still manage to pass critique.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5logMZo9MwMWVaW9nA1xUhDgkfebS7cXWnOmTuryTs_WVbyUEgueO9PN6iIOiEWY5umlWy0A8z3Y_RFQ6mp_jU3Xo7lND-jbRXedqL391kd-L1akkzb5G7Hwg3oHdzAKF33MXtLaqlQbaW0cxbF_zDCXM64DJZ0g-UaSOAA7hGRZRVi_J-w_jPn8aA49DbT0c5mBE-yHWqB6_1bfKhzQfx3wWdvTyuz9sELc7XIGuQZGZ4UTg2nSrMHC76TAE0rNE1sl-M_b6D3oYRVBKRgLORmbW5-yJlNACtapXA3BLAqy8cJzbU-FOsCtt_0-kb4omip9Qv1ZeivSnclZbxfTj52J7MpRr68eXwRF-3pYL2iY0DZwhUxGwWdB7Evegm9CQXCwICdWc0CGA7zIC9BypOR-UcYhSMqLtLOv0589Gx-Owc18nQUqN8wbQgcsTCJKBQIB1XmytqzmGFeOij2HpATKMq0b2VpkxvMITqhCHk6S1MbXdVsr3_LLNU7kFhuzpZEf_m8TnhKzmSQ1MfNyHPGUUSfulJMrNZOqMh93-hH3KP1HVzxpmgCnWKahZuZt64Yoz8XqJkidkXKiHcRvfnzF99hSBeatFqviq9tNwIZ5TY-F28wAyMrImFQ46N14vHBvfF3PQlsshfhXkqwak4cOaHkNS8kMogm3a2LTK_SRw7tUmCpN9hT8s7weuZ2r8bZkkYN-rlzApgsKKN1eLjvQOk9ggEG2xh4u1a3iH-P5auhCHcgr0ZhH8g_45d12bObc4ATZqjzxZwCoCLS6xgDLvc6cYFp16diaRl7TCaQ4vciRWS88Dj4yPrja9gJh9mLFBOSTeESnAP4Wap8id_z3S7AiZ74FjIRd-BpG9wzFPL6kg_LM_lghg6Gipn2Qof5kjAPvi_kMEU5hc8nnQUgp5n7jG7u1-7bK-pUkHJx4DqlVSJDlQHv1ZcGCEYfDEmjRaqFILLms5hewtkZV9l21pyeGbuDgxRB2LftNPSMcv5ZEvH30-IAPRRQckUhnKilhwlmK021SObtH0hJDrv47fLVFqjwhCI62RW4vwdKysJdRE7j8XsqJIoepnBiBVpE59-Rf0M9vtbZ21ksTxMK1j77PSZVLNiQ9VXmF5OoxQ_mjR5wrmeKk8BdO7LGKSjw9Zvt6AlBq2roZDV9C7AK6Nvh0zWdtNzFiyFVumbKW1diI2GUzEIWJSXkUKqJBqBAtJlgdgPzySuQsGmSLhuK_HhuILjNv8h_JaHx_uuDaLdy9F46KgYVsJP8jhtyS8x_IjF7Kkb-XoaJbXhXqIpqiaAsZTlq-A_ctsv1mq8yAdSctgLoVQNuxJwjhw-KGHmJvpiGz9A7atDbaLju-QIVgDFlx_FlaiuzEcOeInPUiBTY2QPT-S_a5yPgjsOt4V2D0FlK7Jj0qSNyD85G9Z97gs_ZtD91w7Cc__Z_W3Bef0hPyw48e8UV2rj9etyUr2yyICNK0u2MOAMixhBRhi1B5eretWdedRr_BxJA6zsZoJ6E6guM8qPGR313en-kbW46rJHiwp_87f1xk3UaeV_sWOWfH5lVz24RUPJT8ZTqfDjnQxh2YLZVNjZGrTkotD21jOqhx73jl_nYy9BsHInE5Tv9HY-6hoFubYWeuF1PqAgg3EYfXrup1noKonsd6DnZRqFh5OtPN7X149slIWZ2bMvvd_QjTOEHZLO0aNqy0b-jHfzt7LuANFAGq04qtmlT5CjiP5sqjPBXE2FV3AX4Tc5YLUulCrF7A1YkgbTXs51mGz7xfnFIvNO7YOtjlPQ8AHuB7XCTi9rHwkbxHKuraUDpu4MJ0BnIPp7nH7YssC3OI2z2Bjv0fY7ibFFurJ9cmDCzOsWiNssk6nqCjNO3ZFFMK4GxhIqZK9pyh0sxl7AClfCzDmA-FrX7UjQQFWzXIptOGXUUw6JRr5F8bIZtbkHo2ye32Ly5qPcPRHQrtdbWCIaPxaP430atXGE8b9mcterUq0hMXg660Ll00PcqsYbpOj-Ct0fDxsTKIe25t7VPF57dyNX_DOrndT2JwOgRhwsxkVxcnOPEKUBwh84d3E5JgpxbfagWd5bfjtlJ57VbQ4KWydMqKWCsHgbG4Yw-v3p7MOkSlmIfae68Bej8SJpU-TTwP7uPcTBeVssDMreAo2Ss8U6G4gXaPrNtoDkwEZQcjJoZSELdpKh1nmBh1x2W1bLV7y_XAai_dKFSFO1NTY5YmmMzTcrNLVE6fGqyB6AQwHltrXb-Ns-2eT1PtOzn3pdNwBLKvdSKG6AeC4mZid5HawWsBnPIHbgz6WC8kqHR60-SrcYKy8-G04Xw_13dG4rsbkhBjM2N0l1YdR9Vwx0l_TGVpBLgUetFOhnE9Vzakah7K7GpoSVysfRz7LJyZngzTSQSMb2gWr3ocG1YwXa-aWKlLeD7zqHcmg9iXWSvPNpIazSdARO1syrc-g3TeK2q1VmDkLLM-Bhgfd84UWhyMtJTbi6ma8brGmt5Pq3aBmkz_qhqP1hmydOIlQUWqZdWiI5gdfar8G1AJkZ8wPuKrc6vwHkO543hYbJ7c.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01756891d4da3041016ae65a1e0eac87d0946a0d9e30e498a4",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481244,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 256,
+      "prompt_tokens": 717,
+      "total_tokens": 973,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 70,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003994,
+        "upstream_inference_prompt_cost": 0.001434,
+        "upstream_inference_completions_cost": 0.00256
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "9f37cb853d421c04ce6d203972051ebe0f36bffd3805db1e9a998415b1c4275e",
+  "elapsed_ms": 4948
+}

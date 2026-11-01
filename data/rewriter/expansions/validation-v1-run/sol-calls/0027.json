@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"exp-contrast-04-t1-prompt-custom\", \"row_sha256\": \"0a5a2284784e70647dd84c62d1bf9c11d8ebfd9754b05644f2fa528871698fea\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"level\": \"custom\", \"profile\": \"developer\", \"files\": [\"src/services/user_service.ts\", \"src/services/auth_service.ts\"], \"instructions\": \"Format as an actionable bug fix task with file tags and deadline\"}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"um hey team we have a crash in auth service dot ts scratch that user service dot ts when calling camel case get user tokens with null session id please fix this before three pm\", \"output\": \"Fix the crash in @src/services/user_service.ts when calling getUserTokens with null session ID before 3:00 PM.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "exp-contrast-04-t1-prompt-custom"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "0a5a2284784e70647dd84c62d1bf9c11d8ebfd9754b05644f2fa528871698fea"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "c7ec26d129908be1786301e2da36ae8d06ad787f7129ffbb0d8170117814f537",
+  "started_at": "2026-10-31T21:23:16.765222+00:00",
+  "result": {
+    "id": "gen-1793481796-2ajAWAQYA4INYpo3k5Hc",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"exp-contrast-04-t1-prompt-custom\",\"row_sha256\":\"0a5a2284784e70647dd84c62d1bf9c11d8ebfd9754b05644f2fa528871698fea\",\"critique\":\"The input is plausible dictation with a clear correction from auth_service.ts to user_service.ts. The output correctly applies that correction, resolves the file tag using the supplied context, renders the dictated camel-case method as getUserTokens, and preserves the null session ID trigger and before-3-PM deadline. It remains an actionable bug-fix request without performing the task or adding requirements.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating user tokens and formatting**\n\nI need to assess the nuances of camel case when getting user tokens, like how getUserTokens works. I also want to correct the authentication bit. Before 3 PM is acceptable, and I’m considering the appropriate profile formatting tag. Is \"null\" meant as a literal code? I should ensure the input maintains natural language and has no leaks, while the output should pass everything. I need to have a concrete critique for the remaining corrections to meet the deadline. JSON might be relevant here too.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating user tokens and formatting**\n\nI need to assess the nuances of camel case when getting user tokens, like how getUserTokens works. I also want to correct the authentication bit. Before 3 PM is acceptable, and I’m considering the appropriate profile formatting tag. Is \"null\" meant as a literal code? I should ensure the input maintains natural language and has no leaks, while the output should pass everything. I need to have a concrete critique for the remaining corrections to meet the deadline. JSON might be relevant here too.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lxIiBepZQv-cp73aJv6Fvv2CmUFVmLIdoDICyFeSo62iyAfte7aZ8uNzT2b_hNkp6t4Mmw7zbrXpGDo7Sg7BpdfKgrzAI1GjYDjA1oZ0nPAA9La_3O2AWOxGKVXdj1ykyJM4BoSBiHgi1r7LBjm23oNgKqa2x0P30sAZCyXX-wfsn2lHLh3AtA6qOEULpJyhTnh7bhTKSo62DZ9jhlX8M3OC96Oeffky4fBmN2H1jo4Peq3q5mO8oDYRv008k33jJ1JyspcJEue1cPh8xw6cHrL7pavD2prlZ03i6IeJXiq2Zy8d-tvT5IKWM80dZQK-beH3DlkOMS89uZl-AIodSCAISECfZMUXrYM2a8K8pohOeyBGfwG-pU8Ig3YsmXZ6OVKtvvTj_gIRE7gAmCPUZZyUflzIXTauuhzm6wlFwQBjj7JCUHnsc6GoUUmuce2zzZNuPEqWfcJS87xAl73bYq4LXkpfEYdkGkEe66SBP9o-nWWiIm0AVqZRdQoIOYlEMdFpRYazjlhMI7Vcaj8mKlcrZ8jf9Qpw-lGSL-kyTBrDHNDSypbZ9zjnSWMHR_jGXZwxR9h1pzCRE-sLdJCu_JQhDt1PdikV7mJiGaWLQVo71weA4fJk1wd9iOsELIQZZeHuwkbvfoz9QQFcjvamSJppTgynBP7l73faiAvknGRVBPmJ6acsXgAE7uo5eAj2apPIf_pS1Gme4_7RBw3EUElVsC0-BIFdbTtsJ4vRH5xQ2yfrMVcm7BfloO_ZMglIig6bGDqqYikVFbWu8vXtqt-p9yEvc8F4I1rL3yuO1U11ryKwmkwQp9NPNu6h0frN4Gc83JJkp_HvoP_PZtXCu6mAKlpeDVKCOyVWUBmaD5mvcaKYeB6cMxT63mw8Qs5pBWndZoLbgUfss1xQBqsvv3HpXaU2AYpTCfWhTBv_OQ5cQI2aNy4dAF_rEi2B_CLj3Dmk8Ylr31irGmR58eRls0iWdjuCjOM3bpUPrdGDfvCmLqZIrfyXTM0lHeyThz_Z2t4-Fg3VCUOF1W3VW0u3FHPcpMvsS70QUj7bz8Oop9pSI5Jx9WhJ9s_6dVIwxWbLnbPZBX17Tlz0DIyRo1bm2_yhEIQKzMs4_aaIrDTFEqPlbePJCSTruOjvKzYy_zYf3lUWzq27EN9qpCXrZynyCuECsm9ty_dsT7nElk8fojhEZadEK-xtWfuDDha7gAR8Wfiv9h70d8Ei6RFPI9qzgDP0VLlKuZ79H3W0MlWL-aTHlQM4-PBydVjVq5ea57vA9qwWvb_yJXgrMCBPdxCYvZG2pREcTws3JZhX7mQpcVfaWmT4Hes6CwiN-BkSgEvv961aTYTgy0vCR7NpEGdKMDY8mElNmRulz1S0RspYn1hEGBFuCIsOXU8gbVcKojhMYuv176WfaCWyMLU3i-sJvvzKw-BTyv0wzDzTijMc-qTKcd76QwT_DibB2XTfM-yI3BekbcxVgPFSeDO4Zv44ZUQ3TOY4Ex5DZg1M2LJMk73zja0jtFadU5dIuhkNRYQGoBNu9tn_w1ljTScFNvTEMUqtZpj0JDf6RAHFQqBXJTwL6wslsqdrMT6S7lfYFw2_sZIg-USjKrfh3ARMuoVcKjprEvVzMY1yfnQ360xxX6SqCQ-cR67Ekikh9aLLh6l5yACPV02LkgpwIvyTx5I6U1ugsFZcSknUxMJ8XOVVIiJEvOF3tFx8yXrqIb40oIiHLaA9jj4MvBhCU02-G9ncym7aZxP1oo-sEXDK3g8xMaHe3lbE0hhzc72PQYDemW8H8rIrD2bipofZ9Corrb_9NBcmjNSduWJTBbWkf-J5s4_1hYk1xZ1WF51vnBnRnPq3nHbe4mb32oB1MALmvTkUHR-paibRUcMwuJp96fMEV6dlb31-PPleni8ZMJrQG4Prs6enpwvvTO_NvQKZkEdM_1SXQQUzqmWPmZ6u39HNLsWUtF7xg99lPfpCVR9S0Mx5wsItNtwOvIwnI5evR5_GMM2UUZiE2JDpKCFBmmmwfRHUaldAMqVGMOajewInhdU7OePyWPCi-U5--N22rP_grQe90f27bBWH_GDG5nbH3ve5aUOP4hRmSX18ickmZWedqAVn8pYGbUUnbSmi3lxCFVkooibkPJn9KBq2Oiuf73y_rwcmbsGGIJLUPNphasFu7RtH_fbJD2o3i9lPwhkr3QQmHBd_5tM2tVr-kq4ggk0Rh1Tv_SfJ_UdcjBguPPkUHyqUzY-iplrfZj9WYYlLtLweZ3k-hyZZ2qVO1J_SzD69RaPhB-2fI7L81m16clc2Ujho3Dn0fFZcpfOx_6YJgIb7gtXpDB-k6HTu_geltNFzenHHL6y5KfvDyuITg7GDREiQ0lQnMweXZhZml-GhwLZhjY8PiRmc5Teur6GlRsmQ434AqpKToOuMrRDAkWjvxGUuctYKJ785xbt2YSOk0Az7_bbiMNQlZENeXIPdxPpqHwUtAr5gLOK1dhwvkw6bFCq7xKjGSN4F_IHASkLnwRPvRWyYkcQWyvSrZBzg5cYwFZgAqasORlI7b_NramAgmbH8ghVoEMD-rtao0BVPR7uoqi4S05xxjvq1AytIKG0vYg=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0965949550dd47be016ae65c45ddd087d08c6bc615f0bc221d",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481796,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 247,
+      "prompt_tokens": 711,
+      "total_tokens": 958,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 75,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003892,
+        "upstream_inference_prompt_cost": 0.001422,
+        "upstream_inference_completions_cost": 0.00247
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "1f6734140e8c1d3948115f2cea0a5cb1d6226532d7cba53247977906c68946e7",
+  "elapsed_ms": 4331
+}

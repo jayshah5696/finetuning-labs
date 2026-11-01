@@ -1,0 +1,164 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 6000,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-05-prompt-custom\", \"row_sha256\": \"33fbe1c12a01457a4391948594d3ed477759a69e2dff613893fcbe130b642ff6\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"level\": \"custom\", \"profile\": \"developer\", \"files\": [\"deploy/cert_manager.yaml\", \"src/origin_router.ts\"], \"instructions\": \"Create an architectural audit and operational runbook with file tags and emergency procedures\"}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"1. Comprehensive Edge Ingress Topology and TLS Lifecycle Scope\\nOur distributed edge ingress infrastructure terminates HTTPS client traffic across forty-five geographic points of presence worldwide. Each edge routing cluster executes Envoy proxy processes behind Anycast BGP routing fabrics, providing resilient layer seven reverse proxying, TLS termination, and DDoS mitigation for our containerized backend services. To ensure high service availability, edge proxies load TLS certificate bundles dynamically through the Envoy Secret Discovery Service. Automatic certificate rotation sequences require close coordination between our internal certificate authority manager and edge proxy nodes. When routing decisions occur at the global edge, incoming connection packets are evaluated against regional routing matrices to direct requests to the closest healthy compute cluster.\\n\\n2. Automated Certificate Renewal and Workspace File Inspections\\nDuring the quarterly certificate renewal cycle, security engineers must inspect cert manager dot yaml in the deployment directory to verify automated certificate issuance pipelines. The ACME challenge handler in responder dot py validates HTTP-01 challenges against regional edge clusters before the certificate authority signs wildcard certificates. Security teams must ensure that private keys use 4096-bit RSA or 256-bit ECDSA parameters and that certificate renewal triggers when remaining certificate validity drops below thirty days scratch that twenty-one days. Review edge proxy dot ts to ensure the SDS client subscribes to certificate update streams without closing active client connections. Cryptographic key generation routines must also verify system entropy levels before creating new keypairs.\\n\\n3. Edge Content Delivery Caching Policies and Invalidation Logic\\nOur edge content delivery network caches static assets and pre-rendered API responses across distributed cache storage nodes. Review cdn config dot json to audit default time-to-live settings and surrogate key header configurations. When backend services deploy new frontend application bundles, the deployment coordinator must trigger targeted cache invalidations rather than blanket global purges to avoid backend database connection spikes. The CDN caching layer must enforce Cache-Control headers containing public max-age and stale-while-revalidate directives. Furthermore, edge cache storage tiers must adhere to LRU memory eviction algorithms, purging stale media assets when total disk volume occupancy exceeds eighty-five percent of capacity.\\n\\n4. Origin Health Probing and Upstream Failover Orchestration\\nEdge proxy clusters monitor origin service health using active HTTP health check probes configured with five-second polling intervals. Inspect origin router dot ts to check upstream cluster failover logic and outlier detection settings. When consecutive health check failures exceed three consecutive probes, the edge proxy must gracefully drain traffic from the degraded origin node and reroute requests to secondary regional backends. Operators must never remove healthy origin targets from load balancer pools without initiating graceful connection draining. The outlier detection system must also track five-hundred-series status code ratios across twenty-second sliding windows, isolating unstable upstream replicas before customer checkout sessions encounter fatal network exceptions.\\n\\n5. Dynamic Rate Limiting and Distributed DDoS Mitigation\\nTo protect upstream authentication and payment APIs from malicious traffic spikes, the edge gateway enforces distributed rate limiting using Redis sliding window counters. The rate limiting filter in limiter dot py tracks client IP addresses and API client keys, restricting unauthenticated requests to one hundred requests per minute. Under sudden DDoS attack conditions, security operators can activate emergency rate limiting profiles via emergency config dot yaml to challenge suspicious client fingerprints with cryptographic proof-of-work challenges. In addition, the edge mitigation harness inspects TCP SYN flood volumes and automatically activates SYN proxy filters when ingress connection rates exceed five hundred thousand handshakes per second across any single regional point of presence.\\n\\n6. Stateful WebSocket Upgrades and Media Stream Handling\\nReal-time customer collaboration features require persistent WebSocket connections through the edge ingress tier. The edge routing rules in ingress route dot yaml must configure HTTP connection upgrade handlers, setting WebSocket idle timeout to three hundred seconds and enabling bidirectional TCP keepalive probes. Ensure that edge proxies preserve client session stickiness across WebSocket reconnections to prevent unexpected session terminations during brief wireless network handoffs. The transport buffer engine must allocate four megabytes of dedicated socket buffer memory per streaming connection to eliminate packet drops during audio keyframe transmissions.\\n\\n7. High-Cardinality Telemetry and Access Log Sanitization\\nEvery edge proxy instance emits high-cardinality OpenTelemetry traces and structured JSON access logs to our centralized telemetry ingestion pipeline. Telemetry collectors inspect request duration, upstream response latency, TLS cipher suite negotiations, and geographic point-of-presence identifiers. Review telemetry logger dot ts to ensure that sensitive authorization headers and cookie tokens are redacted from access log payloads before streaming to external monitoring sinks. Log shippers must compress structured JSON events using zstandard compression to conserve cross-region transit bandwidth.\\n\\n8. Emergency Rollback Playbook and Post-Incident Verification\\nIf an automated certificate renewal deployment introduces malformed certificate chains or invalid intermediate certificates, the incident commander must execute the emergency certificate rollback sequence. The rollback script in rollback dot sh restores the previous verified certificate bundle across all edge points of presence within ninety seconds. Site reliability engineers must monitor edge HTTP 5xx error ratios on the primary Grafana dashboard to verify that customer traffic error rates return to baseline before resolving the incident. The post-incident verification protocol mandates running synthetic TLS handshake probes from sixty global monitoring vantage points to confirm certificate chain validity worldwide.\", \"output\": \"Create an architectural audit and operational runbook for global edge ingress and TLS management:\\n\\n1. Primary Configuration Files:\\n   - Certificate management: @deploy/cert_manager.yaml\\n   - Origin routing: @src/origin_router.ts\\n   - CDN settings: cdn_config.json\\n   - Rate limiting: limiter.py\\n\\n2. Technical Audit Scope:\\n   - Verify ACME challenge verification in responder.py with 21-day renewal thresholds\\n   - Validate SDS stream subscription in edge_proxy.ts during key rotation\\n   - Audit WebSocket 300-second idle timeouts in ingress_route.yaml\\n   - Confirm sensitive token redaction in telemetry_logger.ts\\n\\n3. Emergency Runbooks:\\n   - Validate rollback.sh restores prior valid certificates within 90 seconds\\n   - Document Grafana 5xx error rate stabilization thresholds\"}, {\"id\": \"sched-repair-short-01\", \"row_sha256\": \"789cb074bcee89f1196857ca558569f7f83b1d66881dc3f21e69f93237b1274a\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"in the envoy configuration please configure the upstream connection timeout to ten seconds scratch that five seconds no wait make it three seconds actually four seconds\", \"output\": \"In the Envoy configuration please configure the upstream connection timeout to 4 seconds.\"}, {\"id\": \"sched-repair-short-02\", \"row_sha256\": \"3c911c56652e0d0204c848883b5d3a53b65cfa918ab58497873037b1649e4708\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"deploy the hotfix—no, hold off until tomorrow morning after standup\", \"output\": \"Hold off on deploying the hotfix until tomorrow morning after standup.\"}, {\"id\": \"sched-repair-short-03\", \"row_sha256\": \"93b4802a0d055d86fe2dc9524456b07cd72bc38d17dc37effa8280d2fdd66597\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"set the alert threshold to fifty percent actually make it seventy-five percent\", \"output\": \"Set the alert threshold to 75%.\"}, {\"id\": \"sched-repair-short-04\", \"row_sha256\": \"019e76284f7a4cd9769293f84b7c0c0065a95d1051b3aee0cd0fe48fe65d654e\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"update user model I mean account model in the auth package\", \"output\": \"Update account model in the auth package.\"}, {\"id\": \"sched-repair-short-05\", \"row_sha256\": \"8e41560ab4362c0329ba0d52155cbb4d374b0148177b678114573c73985a6728\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"under no, under no circumstances should you drop the legacy customer table without written approval\", \"output\": \"Under no circumstances should you drop the legacy customer table without written approval.\"}, {\"id\": \"sched-repair-short-06\", \"row_sha256\": \"e11944cca4e60c1358deab2c7e55ca40ffde9aa6669872a70d2a61466770c363\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"write a python script to parse nginx access logs and count, um, count unique ip addresses\", \"output\": \"Write a Python script to parse Nginx access logs and count unique IP addresses.\"}, {\"id\": \"sched-repair-short-07\", \"row_sha256\": \"d801558c2f550aa48b82dffe6d22b76c0a24a527898cf5d564a797f5632b73e3\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"what are the key differences between optimistic locking and, what are the key differences between optimistic locking and pessimistic locking in postgresql\", \"output\": \"What are the key differences between optimistic locking and pessimistic locking in PostgreSQL?\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "row_sha256": {
+                    "type": "string"
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "d3753ff9178b9aa1b104f9805956f8fbd7a40e97571e00e6ab33f6afe73f35e8",
+  "started_at": "2026-10-31T08:54:59.413885+00:00",
+  "result": {
+    "id": "gen-1793436899-paBVjD6HmRNiFes7qL7f",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-05-prompt-custom\",\"row_sha256\":\"33fbe1c12a01457a4391948594d3ed477759a69e2dff613893fcbe130b642ff6\",\"critique\":\"The input is a coherent technical draft with a recoverable 30-to-21-day correction. The output is readable and remains a request, but fails /prompt preservation throughout all eight sections. It omits the 45-PoP topology, Anycast routing and regional routing matrices; key sizes, entropy checks and uninterrupted active connections; TTLs, surrogate keys, targeted invalidations, Cache-Control directives, LRU eviction and the 85% occupancy threshold; five-second health probes, the failure threshold, graceful draining and 20-second outlier windows; Redis counters, the 100-request limit, emergency proof-of-work profiles and the 500,000-handshake SYN threshold; WebSocket keepalives, stickiness and 4 MB buffers; telemetry fields and zstandard compression; and rollback triggers, incident roles and synthetic TLS checks from 60 vantage points. It also attaches the renewal threshold to ACME verification rather than clearly preserving renewal below 21 days, and substitutes documenting Grafana stabilization thresholds for monitoring a return to baseline before incident resolution.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"},{\"id\":\"sched-repair-short-01\",\"row_sha256\":\"789cb074bcee89f1196857ca558569f7f83b1d66881dc3f21e69f93237b1274a\",\"critique\":\"Correctly applies the successive explicit corrections to retain the final four-second timeout. Capitalization, numeric formatting and punctuation are appropriate, with the configuration request preserved.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-repair-short-02\",\"row_sha256\":\"3c911c56652e0d0204c848883b5d3a53b65cfa918ab58497873037b1649e4708\",\"critique\":\"The input is a natural self-correction and the output is fluent, preserving the intended delay. However, /transcribe prohibits lexical paraphrasing: the output moves the initial hotfix reference into the corrected clause and adds 'on deploying' to 'hold off.' This exceeds removing the restart and applying the correction.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"fail\",\"verdict\":\"fail\"},{\"id\":\"sched-repair-short-03\",\"row_sha256\":\"93b4802a0d055d86fe2dc9524456b07cd72bc38d17dc37effa8280d2fdd66597\",\"critique\":\"Correctly replaces the superseded fifty-percent value with the explicitly corrected 75% threshold. The request is preserved without paraphrasing or added requirements.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-repair-short-04\",\"row_sha256\":\"019e76284f7a4cd9769293f84b7c0c0065a95d1051b3aee0cd0fe48fe65d654e\",\"critique\":\"Correctly applies 'I mean account model' as the replacement for 'user model' while retaining the update request and auth-package location. The terse wording is appropriate for technical dictation.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-repair-short-05\",\"row_sha256\":\"8e41560ab4362c0329ba0d52155cbb4d374b0148177b678114573c73985a6728\",\"critique\":\"Removes only the accidental 'under no' restart. The emphatic prohibition, legacy customer table and written-approval condition are all preserved.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-repair-short-06\",\"row_sha256\":\"e11944cca4e60c1358deab2c7e55ca40ffde9aa6669872a70d2a61466770c363\",\"critique\":\"Appropriately removes the English hesitation 'um' and duplicated 'count,' while preserving the request for a Python script that parses Nginx access logs and counts unique IP addresses. Capitalization and punctuation are suitable.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"},{\"id\":\"sched-repair-short-07\",\"row_sha256\":\"d801558c2f550aa48b82dffe6d22b76c0a24a527898cf5d564a797f5632b73e3\",\"critique\":\"Removes the abandoned repeated question opening and retains the complete question comparing optimistic and pessimistic locking in PostgreSQL. No meaningful content is lost or added.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating technical draft**\n\nI need to assess the first input for any plausible contradictions in the lengthy technical draft regarding ACME wildcard and HTTP01. The draft should have no internal contradictions that substantively jeopardize its integrity. It’s important to pass this input as a technical claim without needing fact verification. I’ll review each paragraph systematically, mentioning defects while making sure to keep the critique compact yet extensive. I hope there's enough time for this thorough review!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating technical draft**\n\nI need to assess the first input for any plausible contradictions in the lengthy technical draft regarding ACME wildcard and HTTP01. The draft should have no internal contradictions that substantively jeopardize its integrity. It’s important to pass this input as a technical claim without needing fact verification. I’ll review each paragraph systematically, mentioning defects while making sure to keep the critique compact yet extensive. I hope there's enough time for this thorough review!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5azo2JeZkO5TTId1VZJ0cmorwe7029NYzlKRrn1E4VtoOvZhZ1Pw-y8899zZtHz_9KsLwT7hyNRp7bj7JDS8do43emaZZzwJgu9mJoUnb2XlUeozMukpd8HEbx-XQ4Vip8VpoM7otZ7REui9O7Ej3YMbODK6nSthHXCQYQRU_BEGUawxcxX6Mj83vG7sHwZZ0N1dBMMk4ZrOqs6sWfgVDgCOmV755bHmJbefY1MpZGJQTg6Nq83hqJ827k38b7-dWTCHa3dZNm5txZFwUhRDNgssj17-KcoBz79AqSGvmnp-YMJgMqlZmb1FGfWpH4d9bpRRhHTXIyDT2MB3zTpySe91vm9G-fRwQgPwzmR-V5QEOJ5JTrX1c34bS0YM8FFoL1vR6kjt-9Sgzj01IrPlHSkF8L6G7RgecYe66ZewNm-VDiOWsMb50dihVuCZESrEn-JAnhER-T308Ww4t_8jtp3fOLzfColv1j6TAlhOQlpiNLZE4c-HGnai7Iw_mINRIcoTJE8MoclqnIkJdeM4Bh18r3AEf6t-Yi4pqHxqKXQL-EKhe6KP-x5c5EXmBHUMYqsBt9vJPZkF6KEegMIPSpwTCr5bKN6PtlFfYInli8pSnWaPj-m3N2MrjvWDfHq5yVlM7KWUeTCyMqtM29aA49JAE2U9ZxJxLpCU3qZd1of4h5qzSLJX4zHLmglh2On7KhIHCGrpuAg5LLHHsh3xnSO2Kk9yoHgKYvxq38nxngWmJ8atqNAnorViv13qMsBlu3zx_G2v4vNOmoTV9bKSfylTOAgVzFMm1CInwQimThU4xfJYbxJ8lZx6u1eXqcM8NW1FHRimkavLEdiJ0DTvOa1RJM0L7USqHc7FityG0CUHS9Xtr93e9NOe3hcaeGFs6K12n_-0VY0LwI946m5avqXv-uE7MyLCVj5b4SxNzCQFt6Zrey8hi97HahC1L4Y6cP2WKHPklM_gNg3gar25AaLZkJqbYkDPYJolzGLNpAVdWT3vc_eAiUOIwVAHc67pEdlc5kyBQAMlVPMu8skKtq2kaZukLpSWGLSC7TEe53n8MdNZV8nRpHI1mwF2hKCvRraLHMcsxnojU-t7EDo68BsKdp5jfkqfsPsTJ0ZQv0uC3ptesOiymZu1nb-5Bn8SytqFXtriRp0l5HL7M1NyJDKFQLblBUSZotYTKm3Pm-iXc222clEbzt8BnfEjF1-WLEVjcfisqdwtw3KQbRqyRMiKeMY4nYp4qPSvhj2zXwZ3GfefF5WWkpp076yPJOuYYosq0Pv0rY7tiKrFaAldn89SUAkzPe4X6YDPMBDG688QfhrsqJkCEy4um3JBaG06ZFHChLBAduDF1rGEF84cc9ITtXRlJ3ZPkyyprmxjeer4fxSFQwrJuFJ70OGe0Z2ae3Ddk96ekCOoX45zPao_NRcVvv15SSmwrbgDH-AyCXWP6tvT0UyClLwXPbegOQqWkP92RlSHit3YG1_OSlBGrPiYNL03263dPreI47Mh4XcRoPPbwLCWiWl9P0ukrU2P0lj19lg0sm70ChbkkkV2pk3trm7JQUrbPnwDJbno9ND5QXoNLYYu0Z1tW_5qGusMkXSFCrUmDO85tQYKbcvdcw-kdwYFkvtlEHgCsncEbvqXM2gv_YlFot7HtW8kZ25i-7FyzxMW4U4mNROGicBn40V_4yFh1Vm7lcEdn8yp-uhvzFRA0svOtkXuzqX1Gu5WUgvJqW0ffTGoLDOcCLFYNXpYjCFD5IXLg9d5ucUqBFQ_eNnZC6zNOZm_D9hL8Sb19wbd4H0_UmGmU8JTdMkPHSNro1wowlHLTga-kr2Zue1OuFCixLbdETaX5v_B90bWbXOoxt9C9anfxSPE3-dt2_nSjWdnkB8dm8aTNkdhZSiJcOQ30ACCqbpIMI9xjqO5vP61JJq7Pn3K9VLbGT0HVWEbTcOgtkPba4lbt4aCwdXhOyVzRxSGN4SyJkZsb9Q1qhIsEzG3CAXy_rzzJyTOtxYGe1aFaK6tZvJ00KBIsbWYgEV9tWJe4jZxT2LjXhDfs5Dt3YvLLuEAwDkhq4Xtq3xVW-IelcKsxwQ3LfYpu2j01Rk1MfULInjBj-ueRrJKO8bpOtG_xTfF1XMI-2giQ9ZhCXDP2gMznAABveOnyZAV2x9r0QbpDIZ9aztef_Fvn77RZhBQT_Iip0kpc-Uuo48GVUs0yVDXU0rvLgl0Q1cgcy271Y0Cx7t0_d0VQvXZ8AtKhzueMtpgKVd7hTMkAsZRTlb48uhLXtPii0aS4yJxIreBxtQfigRVgZzHzg739tewhSvttYqPkrcyNTjp3eu8HvKFgU3Ha8VgRgDVdIyKqFEaBqxWRL9heMVmHh2qCMk0413ciVKf_Z01b5pkJbzn_VHDpmIo2WxDRlw7fMxo4bCO5YMOjJ1s7qxbMfpGVPv5mwKGagFZx7UcufBMfxN5xbWpa7TRXf7uCpArpEc-5LrvDcI9Gkp17HSABkhLHkm2e3zA_pJwLegOVSLrjiFcBepEb7n-uPgt6wM2fMem97IQ43CbNHtrLlKS5xTsQ42KrUevoXXYKNTzRq_T2OGH_0Z4gusJvXEjveG4L007P1DB4qc7UP_oXrwiHgUtV_TAT_ZIceEPt8LIzNTF_BpWwE9CDuhRBLLOOXn4-IgHa9IJoRXy66yELL5BLrPWnRLa8ashvTibHqIh542xJh4AVB3bqG29IgpvufW5o3feobGewBw6QmgAA5ZG8j1_c0N96f-VKDu7s0Zu-1-8PUm0tIJLk3xaLFfm22cwGVmJJJFVyaH2o4mHlYPZpzdJZX9kHclGoLRGMECfaL-WHzMQrMxu4hEH7nAskukzY2tD3-z10Yw_qBZERL7Aoq3l4Q6xVv7siY-ks7vxEQm1nBLABTYae43kWi94RxEPCtYPiwQBsKHXt-lFSKeGHZMELCj_YFGCgfx5VLj2IjMrMiH16KuXoW-_eQRYXR3ACDIQY3yOkybM-rUHzJrCYPqi7XLM9x3mAPzizjopw97FzF7AHiYLsS94IBfaWPqQwI4pSW3M7Z1Ai6lmykAIVJea46EY7eHJWBxWDbs2hbXhl6GG3VKVeMJfp6bsPGWxP6AaqLFQ5I6D-paO6gxb7f-90GaaBvSKkjKRK4KIDlWCegwUaTzCJ2gbFlTnqM6qDroPOzy2xgs1wKHiARU2Axdca-5bmMl1NFga5TJq4KNOrvxxIseCxhjStAwQ4lyh7W2uiSo=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0ccdffb66738e0d5016ae5ace4d65887d0bbddde64d3219e67",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793436899,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 1209,
+      "prompt_tokens": 2993,
+      "total_tokens": 4202,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 111,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2990,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.012395,
+        "upstream_inference_prompt_cost": 0.000305,
+        "upstream_inference_completions_cost": 0.01209
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "bb989f7b3b5e1a60144c244a14551ee25124498094aaed0cae8dc84f3b3657bf",
+  "elapsed_ms": 14116
+}

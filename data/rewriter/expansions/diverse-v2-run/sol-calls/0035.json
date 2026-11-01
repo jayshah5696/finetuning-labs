@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-02-slack-medium\", \"row_sha256\": \"654bc48588d9c0584e4782dda3723337200a4138aa8523fde39d82209e4b0435\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"level\": \"medium\", \"files\": [\"src/db/pool_manager.ts\", \"src/db/db.ts\"]}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"hey team we noticed database connection pool exhaustion in db dot ts scratch that pool manager dot ts when handling concurrent checkout requests please review this immediately\", \"output\": \"Hey team, we noticed database connection pool exhaustion in pool_manager.ts when handling concurrent checkout requests. Please review this immediately.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-02-slack-medium"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "654bc48588d9c0584e4782dda3723337200a4138aa8523fde39d82209e4b0435"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "beecc13a53895931f9538c4155eb44d99fa3de9cb1c6f924b1b70f3caf5caae0",
+  "started_at": "2026-10-31T21:14:06.273285+00:00",
+  "result": {
+    "id": "gen-1793481246-daL6twM5ZFtdhgoFbGt2",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-02-slack-medium\",\"row_sha256\":\"654bc48588d9c0584e4782dda3723337200a4138aa8523fde39d82209e4b0435\",\"critique\":\"The input is plausible dictation with a clear explicit filename correction. The output correctly resolves “db dot ts scratch that pool manager dot ts” to “pool_manager.ts,” supported by the supplied file context. It preserves the pool-exhaustion issue, concurrent checkout condition, and immediate review request, adding only appropriate capitalization and punctuation while retaining the casual tone.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5logmCjb8qTt2Kfo4at208lX8imRAQMcGoZELSNXSalbURLwsrUqkW08LqPvdgJrhilHFWBVUTLxYpBhkjU89HqGVgndNq1TNN6g6pARkHlOqHvMN8V_Ph9fzTb1GEAxmZE8D4h52P0YYt4CI3SFQ58ccW9dmBuxI2lW25LHiz-W4gwd-J7GU2MYDdfWtYXQ_eFhuEyEUvp9DE47i1DM9zzS0ZDZyaJjHl2iy_TuR5xRaxGcBTdwRbESedrgUfJLs5Y7Z0v5VEB9_PfnRYXWe5Y_FCp_MFfeQTLrR7T67dk9SYxv_gaFTETph1qYS-0NHgWmI_LWHnT2INIim24SZmz0MfMohfMJ2i4sDi67QvSj8Mb0uLaAoqNths8-qET__JAon0vHTCIlGkA-lOkjT1fBSV-eDRP5GWnDPg6QjTNHT1pFiOGyRn9YSRDVI3C1js0P2pR0s9Lr8scPpDDZ1eK69MQkGhyowxO6_UUC1dqG8CzWTOWN0hM6GKYt3GvQuBgEMygl6r9fJLX4rGl2gC4tv9vjFVXx6tvO8qmVSBzt98ZAmE5D5D79Cs2leNko1Y0bgrLr_GB05UO3e1O-oz9pekrC9pTe5EOR2sf6W4_ppYbw1HyyH_Uo5ycPlwE1RWHj7HdZLG3sGexknnmXEJuBqfmP23agSmk-028Udb3nFh6LJ8BQCygsxw7eduf6OJu8P-uYdaJ6zybtkdpE9pA2Y3H96tsp72Hd-zoPnFMM04ubg5ZVZ45TFeHrDaTpV1h0jTdeAreu9fww2gOPo0BG79REXgmm5EWEJex1CvY42LlRBwhj595464zFnEw1rhre6WpkTHCpA7QuKTo-nTQlTgyryNO8_wl4nzNpWAKJqxBqV1LLo6t-quSTgW_1pkx4dTWPijDF80nOIiVtlsaE4ah3nv4D14ZWG-NL9cKVQHL4XC3uwnv_porxfQ1bSUqv5WmXgw2vMHNXcuvNjK5Gy782P_aVofMBAh_AywJ_uC-GuzwaUW4OyH7Wth9syPfmTVlSYvIjNV4o_orOT_7SiYoGEv8guBaBM00haBuJ8x82I5T9oB-ht21mU-fkBjLiUD8OsiqxPG8YZDVmN31cZXy5C_CJwuxzVrymsJR5LFcr08o-md53p33FxG8k_mZs0m2Jc65iNqBUcSy7IF8ypxwGJF6rdVD3rzb3pjCFZxltgDsd96m4DN2EpXFAQotvmNtc3q3yeIP51wBsngxZjecFm55hP-fWcuS246z80R2ZAVUVdxGxFZTqiOdNJLRduoPW6jjPib4FyAN7ybvhMgxwuR09VQ9zBEaXTMIRkyDn8U0Mabmh62bWT9YE1lKpmdyG385RvtOxiZBDSdA5W9e7RjFmyA79Hx1eS8kr_UzqVBaoNo9bSA1rXJBNzOFTDag-s5iHDCkKD2Y_Kk1yfVF2fYaITT_M6xnJTeadIxbn0P1HlDMkbuVtHUSO1EjVTSaetPCHZgh-egBtG9gBNqYhIlC0ePGRMA62PII3tZTfaM25tti1lSKp4J86UkUCurhKfzHVCbn0XB3yH--aSLtZqpb_ARkDERPBVrdzn72qJJd6Swzj1p5Fd2AYD6tgwipop6-x7zvV6G-b2om83oO_am5RdpnKJ0SG1wYUVU--WqiO8en-TdyCVoZmz8DvLEZDxauzxpSHXrTUKeRjiR5mli6LMqvFpPA5OZcJ6gasbSn2RUdtK8goL9wCGtqPZpZlXRou4owl-fOW-e7OtqWHWWSZ12-Jpq9mYhFlp2Mnz8N5dE_VJkh28qvvlK54cvUTXNmdrlN5I1KORUoaUJn4AauPDxu9v6e_QVEPr9v6UAwUgd8aAR1EbSkbIzzDp-PqMdgAdNdMZpKON-w6N1MY1ZUjoMUHk1eEaDLoyQW9yeP5ri-Jkw_OuzJcDfD7fiLnbYCeD_nBf2esIBSaCb-1jWHC-p92uVmmegp1ovCUhk74zylE6cys37hyn-3lPWFCfwk0WcbSpPL0BhgR8WfoRXsmBPMe5FZ1tld7NYN-gR7g59g7d0sSMwqbVm6kUFebc2q387hWcgzMibrpQF8T8zAIjiGQ5Wyf5BTWpHfPDof4KrCPr8DEr_i46xA897OY2kQuax5aO-13fvv_eKb-QlPFwAMtI9e5FCVkpzlYl-pmqq0tHsCC6009vlQMY9OFiUwCbzF0uipEgpEZf18EJ6XHzFLx3EjNyBS5_dRGIcbsYXlYOBdwULc501FCdeREWFX_7ddd1gn8arQzDI7rERG4I8_Flem-xxxYM1m1XwZhkIQq8x42DaVU8UpCGucKuXcTZaKQPqXxG5ftgQ==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_00721b4f50b829f5016ae65a1f3e6487d09f904753b54c6553",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481246,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 212,
+      "prompt_tokens": 667,
+      "total_tokens": 879,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 51,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003454,
+        "upstream_inference_prompt_cost": 0.001334,
+        "upstream_inference_completions_cost": 0.00212
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "0efe69e5fea8624724b1d2fa686e5eab1958ec0fac8211c0b64d67152cbf5cb0",
+  "elapsed_ms": 3790
+}

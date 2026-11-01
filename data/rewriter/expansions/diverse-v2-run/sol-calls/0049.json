@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-05-prompt-custom\", \"row_sha256\": \"74313b739dba9565e11baca9e9cb75a47771af89681eadfb250d646771c7bba1\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"level\": \"custom\", \"profile\": \"developer\", \"files\": [\"deploy/cert_manager.yaml\", \"src/origin_router.ts\", \"edge_proxy.ts\", \"cdn_config.json\", \"emergency_config.yaml\", \"ingress_route.yaml\", \"telemetry_logger.ts\", \"responder.py\", \"limiter.py\", \"rollback.sh\"], \"instructions\": \"Create an architectural audit and operational runbook with file tags and emergency procedures\"}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"1. Comprehensive Edge Ingress Topology and TLS Lifecycle Scope\\nOur distributed edge ingress infrastructure terminates HTTPS client traffic across forty-five geographic points of presence worldwide. Each edge routing cluster executes Envoy proxy processes behind Anycast BGP routing fabrics, providing resilient layer seven reverse proxying, TLS termination, and DDoS mitigation for our containerized backend services. To ensure high service availability, edge proxies load TLS certificate bundles dynamically through the Envoy Secret Discovery Service. Automatic certificate rotation sequences require close coordination between our internal certificate authority manager and edge proxy nodes. When routing decisions occur at the global edge, incoming connection packets are evaluated against regional routing matrices to direct requests to the closest healthy compute cluster.\\n\\n2. Automated Certificate Renewal and Workspace File Inspections\\nDuring the quarterly certificate renewal cycle, security engineers must inspect cert underscore manager dot yaml in the deployment directory to verify automated certificate issuance pipelines. The ACME challenge handler in responder dot py validates HTTP-01 challenges against regional edge clusters before the certificate authority signs wildcard certificates. Security teams must ensure that private keys use 4096-bit RSA or 256-bit ECDSA parameters and that certificate renewal triggers when remaining certificate validity drops below thirty days scratch that twenty-one days. Review edge underscore proxy dot ts to ensure the SDS client subscribes to certificate update streams without closing active client connections. Cryptographic key generation routines must also verify system entropy levels before creating new keypairs.\\n\\n3. Edge Content Delivery Caching Policies and Invalidation Logic\\nOur edge content delivery network caches static assets and pre-rendered API responses across distributed cache storage nodes. Review cdn underscore config dot json to audit default time-to-live settings and surrogate key header configurations. When backend services deploy new frontend application bundles, the deployment coordinator must trigger targeted cache invalidations rather than blanket global purges to avoid backend database connection spikes. The CDN caching layer must enforce Cache-Control headers containing public max-age and stale-while-revalidate directives. Furthermore, edge cache storage tiers must adhere to LRU memory eviction algorithms, purging stale media assets when total disk volume occupancy exceeds eighty-five percent of capacity.\\n\\n4. Origin Health Probing and Upstream Failover Orchestration\\nEdge proxy clusters monitor origin service health using active HTTP health check probes configured with five-second polling intervals. Inspect origin underscore router dot ts to check upstream cluster failover logic and outlier detection settings. When consecutive health check failures exceed three consecutive probes, the edge proxy must gracefully drain traffic from the degraded origin node and reroute requests to secondary regional backends. Operators must never remove healthy origin targets from load balancer pools without initiating graceful connection draining. The outlier detection system must also track 5xx status code ratios across twenty-second sliding windows, isolating unstable upstream replicas before customer checkout sessions encounter fatal network exceptions.\\n\\n5. Dynamic Rate Limiting and Distributed DDoS Mitigation\\nTo protect upstream authentication and payment APIs from malicious traffic spikes, the edge gateway enforces distributed rate limiting using Redis sliding window counters. The rate limiting filter in limiter dot py tracks client IP addresses and API client keys, restricting unauthenticated requests to one hundred requests per minute. Under sudden DDoS attack conditions, security operators can activate emergency rate limiting profiles via emergency underscore config dot yaml to challenge suspicious client fingerprints with cryptographic proof-of-work challenges. In addition, the edge mitigation harness inspects TCP SYN flood volumes and automatically activates SYN proxy filters when ingress connection rates exceed five hundred thousand handshakes per second across any single regional point of presence.\\n\\n6. Stateful WebSocket Upgrades and Media Stream Handling\\nReal-time customer collaboration features require persistent WebSocket connections through the edge ingress tier. The edge routing rules in ingress underscore route dot yaml must configure HTTP connection upgrade handlers, setting WebSocket idle timeout to three hundred seconds and enabling bidirectional TCP keepalive probes. Ensure that edge proxies preserve client session stickiness across WebSocket reconnections to prevent unexpected session terminations during brief wireless network handoffs. The transport buffer engine must allocate four megabytes of dedicated socket buffer memory per streaming connection to eliminate packet drops during audio keyframe transmissions.\\n\\n7. High-Cardinality Telemetry and Access Log Sanitization\\nEvery edge proxy instance emits high-cardinality OpenTelemetry traces and structured JSON access logs to our centralized telemetry ingestion pipeline. Telemetry collectors inspect request duration, upstream response latency, TLS cipher suite negotiations, and geographic point-of-presence identifiers. Review telemetry underscore logger dot ts to ensure that sensitive authorization headers and cookie tokens are redacted from access log payloads before streaming to external monitoring sinks. Log shippers must compress structured JSON events using zstandard compression to conserve cross-region transit bandwidth.\\n\\n8. Emergency Rollback Playbook and Post-Incident Verification\\nIf an automated certificate renewal deployment introduces malformed certificate chains or invalid intermediate certificates, the incident commander must execute the emergency certificate rollback sequence. The rollback script in rollback dot sh restores the previous verified certificate bundle across all edge points of presence within ninety seconds. Site reliability engineers must monitor edge HTTP 5xx error ratios on the primary Grafana dashboard to verify that customer traffic error rates return to baseline before resolving the incident. The post-incident verification protocol mandates running synthetic TLS handshake probes from sixty global monitoring vantage points to confirm certificate chain validity worldwide.\", \"output\": \"Establish the comprehensive operational runbook and architectural audit for global edge ingress and TLS lifecycle management according to the following requirements:\\n\\n1. Edge Ingress Infrastructure & Topology Scope:\\n- Ingress terminates HTTPS client traffic across 45 geographic points of presence worldwide\\n- Edge routing clusters execute Envoy proxy processes behind Anycast BGP routing fabrics for resilient layer 7 reverse proxying, TLS termination, and DDoS mitigation for containerized backend services\\n- Dynamic TLS certificate bundle loading via Envoy Secret Discovery Service (SDS) in coordination with internal certificate authority manager and edge proxy nodes\\n- Regional routing matrices evaluate incoming connection packets to direct requests to the closest healthy compute cluster\\n\\n2. Automated Certificate Renewal & Workspace Inspections:\\n- During quarterly certificate renewal cycle, security engineers inspect @deploy/cert_manager.yaml in the deployment directory to verify automated issuance pipelines\\n- ACME challenge handler in @responder.py validates HTTP-01 challenges against regional edge clusters prior to wildcard certificate signing\\n- Enforce 4096-bit RSA or 256-bit ECDSA parameters and verify system entropy levels before generating keypairs\\n- Trigger automated certificate renewal when remaining validity drops below 21 days\\n- Review @edge_proxy.ts to ensure SDS client subscribes to certificate update streams without closing active client connections\\n\\n3. CDN Caching Policy & Invalidation Logic:\\n- Edge content delivery network caches static assets and pre-rendered API responses across distributed cache storage nodes\\n- Review @cdn_config.json to audit default TTL settings and surrogate key header configurations\\n- When backend services deploy new frontend application bundles, deployment coordinator must trigger targeted cache invalidations rather than blanket global purges to avoid database connection spikes\\n- Enforce Cache-Control headers containing public max-age and stale-while-revalidate directives\\n- Enforce LRU memory eviction algorithms on storage nodes, purging stale media assets when total disk volume occupancy exceeds 85% of capacity\\n\\n4. Upstream Health Probing & Outlier Failover:\\n- Edge proxy clusters monitor origin service health using active HTTP health check probes configured with 5-second polling intervals\\n- Inspect @src/origin_router.ts to check upstream cluster failover logic and outlier detection settings\\n- When consecutive health check failures exceed 3 consecutive probes, gracefully drain traffic from the degraded origin node and reroute requests to secondary regional backends\\n- Operators must never remove healthy origin targets from load balancer pools without initiating graceful connection draining\\n- Outlier detection must track 5xx status code ratios across 20-second sliding windows, isolating unstable upstream replicas before customer checkout sessions encounter fatal network exceptions\\n\\n5. Dynamic Rate Limiting & Distributed DDoS Mitigation:\\n- Protect upstream authentication and payment APIs from malicious traffic spikes via distributed rate limiting using Redis sliding window counters\\n- Rate limiting filter in @limiter.py tracks client IP addresses and API client keys, restricting unauthenticated requests to 100 requests per minute\\n- Under sudden DDoS attack conditions, security operators can activate emergency rate limiting profiles via @emergency_config.yaml to challenge suspicious client fingerprints with cryptographic proof-of-work challenges\\n- Edge mitigation harness inspects TCP SYN flood volumes and automatically activates SYN proxy filters when ingress connection rates exceed 500,000 handshakes per second across any single regional point of presence\\n\\n6. Stateful WebSocket Upgrades & Media Streaming:\\n- Real-time customer collaboration features require persistent WebSocket connections through the edge ingress tier\\n- Configure @ingress_route.yaml for HTTP connection upgrades with 300-second idle timeouts and bidirectional TCP keepalives\\n- Preserve client session stickiness across WebSocket reconnections during wireless network handoffs\\n- Allocate 4 MB of dedicated socket buffer memory per streaming connection to eliminate packet drops during audio keyframe transmissions\\n\\n7. High-Cardinality Telemetry & Access Log Sanitization:\\n- Every edge proxy instance emits high-cardinality OpenTelemetry traces and structured JSON access logs to centralized telemetry ingestion pipeline tracking request duration, upstream response latency, TLS cipher suite negotiations, and geographic point-of-presence identifiers\\n- Review @telemetry_logger.ts to guarantee sensitive authorization headers and cookie tokens are redacted from access log payloads before streaming to external monitoring sinks\\n- Log shippers compress structured JSON events using Zstandard compression to conserve cross-region transit bandwidth\\n\\n8. Emergency Rollback Playbook & Post-Incident Verification:\\n- If automated certificate renewal introduces malformed certificate chains or invalid intermediate certificates, incident commander must execute emergency certificate rollback sequence\\n- Execute @rollback.sh to restore prior verified certificate bundles across all edge points of presence within 90 seconds\\n- Site reliability engineers monitor edge HTTP 5xx error ratios on primary Grafana dashboard until customer traffic error rates return to baseline before resolving incident\\n- Post-incident verification mandates running synthetic TLS handshake probes from 60 global monitoring vantage points to confirm certificate chain validity worldwide\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-05-prompt-custom"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "74313b739dba9565e11baca9e9cb75a47771af89681eadfb250d646771c7bba1"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "2d65ea92383bf054ac218eadfe5a1bf96f5b9bb9e1694c773417d4daf3be84af",
+  "started_at": "2026-10-31T21:14:10.154359+00:00",
+  "result": {
+    "id": "gen-1793481250-k0N9XUjiHLeybSYwe0gu",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-05-prompt-custom\",\"row_sha256\":\"74313b739dba9565e11baca9e9cb75a47771af89681eadfb250d646771c7bba1\",\"critique\":\"The input is a coherent technical draft with recoverable intent and one explicit dictated correction. The output appropriately reorganizes it into a self-contained audit/runbook prompt without performing the task. It preserves all eight topic areas, emergency procedures, numerical thresholds, conditions, and prohibitions; correctly resolves “thirty days scratch that twenty-one days” to 21 days; and uses the supplied file context for tags such as @deploy/cert_manager.yaml and @src/origin_router.ts. The language and formatting are appropriate, with no material omissions or unsupported additions.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating draft quality**\n\nI'm looking to ensure that the input draft is structured well without any detectable defects or flaws. I need to provide concrete critiques that clearly explain what corrections are necessary, along with details about file names and the quantities retained. It's so important for me to focus on making this draft as polished as possible, so let’s break it down and ensure everything is clear and comprehensive!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating draft quality**\n\nI'm looking to ensure that the input draft is structured well without any detectable defects or flaws. I need to provide concrete critiques that clearly explain what corrections are necessary, along with details about file names and the quantities retained. It's so important for me to focus on making this draft as polished as possible, so let’s break it down and ensure everything is clear and comprehensive!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lopea9sk0sd9_JdaUI3QD6f8-OWIieRn2-TUpKIJm0qW09elKNSOMEt2-3Kfmtjq9TgQWbK9VBqzUBB6BtXmNlD_wSO9iMvFJIlysfZ4WybUGj5k1VClP7DYWVbPARUpzopKWU63htqphjeba24h_jov67xEywfT2EZctiUluKS0J3aDktZnXiTNNDFzHGfZmK8wm5oPeEXqbez6hJPWlwK6DBxuTgZ3eNBRdw23vetLPscOr-49nX8csHVvZvr94vY-Tb253ZpYHoZ4cOSU-cixA87r939xcWu44-M7GxlzfBpSJym_bY4knnSrshILgMy9qDGPVSCb14SphHTLjeN_JH02bMuW-kKSEySKeJcSnyk_rsZ8ncKex9gTqD036y4S0_nEAgm061DT3F8uo4tm9lQdKx_XvORkLVUBZdbHczBDO94u1Bj788eYBmAEy_rIz-fWoWT1RxwOCvOU4H0H7tLktJzP0ql5EWTDNaSwgsNzLpIiru30YAK2ZgpBOVBmVvWgUU6X-Hy5dImr3CaHw8WdxaNBewDIo2HOgstCkTUmpbUxMAQ4TJfhWbnHLdtNkUk7O7jKpu00cTUbU3zORiyY-hJvJJ0ZtjzBC_xwLELHJnoUVveoHIXpLfnmTePeC6WYfVNnG6wcByD9M3LHMSpKtunr5_Y_O9x013gNPTgmkF_uU_e-vVx0w-h9DZ6q4GavYnz7Cbi-qgj4dEYS8NuD55PHOo4sHCW6W6HazfCas6yd-qGBPmbqHjwrmsuqGAdry5Xp8KM37yEvIUQbJmyTfS2cRoY0mGpyRzWNSOK8mT-Ob9-KKze7onXJwCBdJ_gKA1zGV-ENavn4KXkpJhnGQFDACjnnj79623DF6GwQvGmNjIZI6QzGtX2abp_nRjDaOme8iw8MzcGG9LwTBlufPzOSbLAiOLJ9funwYDXYsh8cyDkkHVTjVTr0JTwCkOcB9G8ILIS5pPLyoOuu-RQBOdM-oi4gZU38kzpxv2NDOj7J1_dcNWx2S_ZCEfJq2d-cVyOm4GOHuVB4cOTZtvGvsJd9yezQl_sRAX124rL6hLhvRybnq3_1rN_efcqYKz6ntYKWUQAtYtNkxDwc7xzAHE38eZQlw4D-EoebnhbXWy6Whutykqc49gJG6XtjqkoppvEbrOxZo2W5-Ri70O8P_ABEO1baPjGRvPfNYaqAonJWjmjri772L70gjiq9clnfUQgrOcxcDfn4WU5x6ni82N0PC4cWKLI_KAFz8fXts67g74z5Nuppi1oHDvGuOXcmTrAYGqagdMOTc0rhcSpoq-iq-w0GnIyYQnN9SvXedyEBEQRE98cmtVJSdhKBClxjIVdsRiVt1J_RSNGwxLiVf9c8bOLgZlidfeO_EJF-TL3qDklegagspR0YKkF2-UvSdKuOt57GrgeDDDaOXe87w0sIpIxgbXTYTbOeEg4xdDms6K-v2UjOUyz7xopN5H_FVY7FKyGIiI-qbIzN6HHdmo7rhcFlkCgN7vUZBur5Scux-ZJ_TYfq8yKS_9ttIm-c8KF_PYVu9jr0rbKsjhbTcx_zc__HgIaEccb5CCA44skPn4aNGR3qc9VtwKQq5wNACtiVElxu173Oj2wDwV1q9Gwbgwwg5w90rlxUZyncLMwxzA6rt089oCNLzyCufLikBi2PNMWqhtZXblknU4LqmLQbv_sZDsOk2kqsIsZtogPr2C6BvRHoKmKbjSKzOAS7DtLQ6cNH7_lVeP5KQU7H2lVZOuRC6fZN1jML41bQyX_9rVErKY2lbsZMnRL3vqHSCrhxP_KhMzyHcpFQDzeN9ENhcdHVIuABYJJ2TjWe2aK_t_Y5T980xuXhdHEDZRkme-sG43yXfy3a_GC41Q6ODsBZoeOtVEuxiq2bN6tmFS3edzOXQqi9uFC5JPJX7NRP7p8FGQLVotIH_j33qbgb68R_horUDQhqBJCOQCYevFGP-q5ZuneQP9eSLAbG3aUUMoq6msijlRwC0v1vSdCFd-PC0wAUK_KLjaYzUb6zfdq6XgWyqAnS3cY2HpdxO1gtJsW9V8pku30LPyPuHUFrziYglbnDb_6TAvjD99o8zCmxv0AriwpFCc5jkg9iPp94TAzwm5WVrop6S7ir4yXHatL7s1a6qJk3mUb0Sq5ta2xZNN5nC8SDlGOHRCfRRmej1YGX4ji1roIjTMxuJsOjSy15VorV7dxF48yYeqsG1rckKqnIssH_QHdxMokMGtz2owJkXGiJxMUCjGPlxqt_u-a6A8QgProXv7CmPFVRtOf-gPNDadNA8z-O1U2ppCUnKFWzWWKyT9mCWA7mT9aKRwnf14ziQdKMav6DevnYqC4k8X11-jM8C5auWqRPjWlOLoKrp2rvVisWszjtQjYSjvjWzb24f1-V2e38HwrVOiiRo0jo_Oew3Glf7WVG2NCxmyOlLqMFxUFeGZyyW6xpLCrn21jKQbD27yWhEiDHhwLy64ATVrTyooN4yEtZdxz8Jiiqcy_2t4ddwXnHUzdA0iABq2H52rKSmFO8yXmFNo01FKYRTgzHpq0XF8mCIuoWOqrgblHJ6iIrbGNpiWtZyisi-Tb41IoKaSFr8jpiz16SuVNIlTHfW2hrXZskNrs6tgxH6d7CE6vS0HaoF6IreIeb3-PsUoeCMK6VjHFj5H5mRSSOMjeo6hM7DOiWi6cGrkbCrJzDppY0NXKDLj_XtAuU0Z7jphUVXMH1VyikW8b63Al70GJPTVeKFzV9XaN9OiQGFYy16TwqhYu1owhxH9t9glWk9kI7f60QvKfY-0HmGr7fXobFkI1TvqnLwVe3vcrx3XOK7VwrjdlVysDQc2372dSiqb--Su4Aagq4ENrvCv0osgbqJmvg-DK2WA1h7Hn_UCqDS1C7NTxwu-fUZZ4URkKZ1foF4J4N9ElIwjCfO5qVoaO8VDpiomPXOPf5QnKY_g_UiQBU2mWNqsKDsafd4oHXCxVaFYqJuTAqijPN51sS87F8sXIBq6Zpw_MA2VM6BioFGwvf9QpqTuF3uqgWf8BAoIlTMZN-5yOR4yKKDhNvSZ0GqOu2dKl2AKXGI3VJ4sS-Xs2PmD9rlw-4WWNjEfWLE8z1eRHd0SbdJHbsApKL-RtMoz8N8_NmHpbnHJu75-b6piHovSp9NQAfUl3MsBCL6evyTX7WhSYML-nOcdNk34F4jH9PDL4bVVqAkv2WId3UNKHHykUdaTXQGtf7wZtiMRcEBfu_-uv-Te9bmvA7fyyRxVI9t514dy__8VFBZmga1Djoi0Zx1bJz8OhENrzQLYaGo0vtagborUY1iMfJFIxNsRnUU1mkzb67sEx4VLPmVoeQ2Tme7NySCV0OSdsezFzFBR0Q9tlCeoPJlwKC-CNopkBTJ3HTySf4g2wI_m0jaoMIMCg9dI9QsfHXGFSb9ma-Gtde4cjf_hJgINRk2i99r4GmLVv2ApxW5SSXPJ-z-f_qjcfUFCaDXn-S2CUrbkQJ8scGdYQK3qv9Wpid1GOBPx8L2gx9TOhGQLp74fjUQY8LSMNdXotPQNj2UgG3zOi8ub7X6eKDukoW2Q_S8-HuIxtKKz-m1NTvnsZ7kRPT8ph1B6c8zdAqMnkr2x-W1PY6veeQZLlt60eTAeNLJk78Cq8eYUAOxVU1bgRDlwqLF2vQ2yi7IMonBwOL4DhvBWWCAE1dEGbL42l8Akw5F2SFyoljvs9WIe9swXhucVEJLSGR2kHALwxSQqNd91o5pqr52wWYwLW9mDAm_pXnDDXsmJUvWcDFQo7_qMdLCEVM3oBRr4J7NPvgnydvE6BcyllMtSv6KrX4ZKonOnrEl9cg5eydP0x2BoMc0hKmVdrq_uxiJYdJLnQBpqzIXo-N29AVWAthmuiSNkaSYY-mgpXxE3IU5a-RgtWg8436sEqTu-1tthy2zy5gaV6euh7G1XxoFi7c9Qb2W2mUeatWsAACRZNdBYcTenfdWmCaFTZH2nQdkyb6CisfzwIAapEniF-ScvKFNB3BpAuGQz-1CnLsqN2_0J4oiTa6MYV0ASWy_irkQy3EP-bIgELMe3NtmO28wnHt-LZhx--hbbV5yonzX0je-vEPBG_kujGt7_RJL_Jmnjr6tW1uphCJKtiJM2e98p2XZ588s8jIHJghoyg5s8W9WM57PS1r2EiM4BIJndoqfEGPUj1eHbnqlFdtLgGZD636jYGpmZQs-Oef3EvOcIPgtccviV3E3kO6tnIiUHNpo6dOsefcWJ6NbSUxyJx9ViQrNZiCGB1860YloQT1jFKdOB_2QtIVAqmHgSCVbFw0GqaPYPW6eH5E1uckiSlTJ10T7PkZ2wu6oaRIS4DmA7SzD84_QlPSRj7OVxoDu1Y_6MScF9H_B2uC3YmncpOTEOvdfQjr4WK5fmdVVqfbHu7u4Xh6G8gZmvbLBnIZW9p1E5ao6M-bpoInsa9xqsau3u07Mn4CB0Yi_GDkAbrLy37HNHQfbTQzudZtQHAhGrkw4wETopWzSgeXV2uWirv1qx357ebzZtTxLvr_aMJafv5L9qpKUEYFMgBVNDUPiP82Pj79VaUA4893KjSNSSnvZdBtpLlAicQLyeC86O8qAioePeX-vZNmJWSJKardtu1_ibV3vkIageYeeMpqQMQQks5qfAzdcvg2I99IHtrDGIwDxp2cTwX568KQkBuGu6BqdUSCI4Bmigawcdot00RsuVViN2qkGlad4CoBjP_pR72ST1xvgwuMx7_0yf2hLAOay6rBTnwfXbzNqIdDGOX6KEVCZuj1ajj_QD1qsUkNFo_JooiV3z_k4wObrtnffLNeMelKwcUedG3BDLYfc5jgalN7ixXqEfMZXwGcZsyvEg4764UKiOH-aLwgkCAxUVfG6KwtgBf5Ns4Ofi0MDDGQ1HbSLBb-mCYFQ5OF2wqI34Qpy_S9pq5_QKxyZILo-B-cIIkmw==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_02f6c6c94a63504b016ae65a2377a087d0a827f59992e85f3b",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481250,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 424,
+      "prompt_tokens": 2739,
+      "total_tokens": 3163,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 222,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2736,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0045196,
+        "upstream_inference_prompt_cost": 0.0002796,
+        "upstream_inference_completions_cost": 0.00424
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "462a23e5e3de5f5995fa71ec83b354f90d5166ab1b26cb3478db8751e3abb758",
+  "elapsed_ms": 8717
+}

@@ -1,5 +1,30 @@
 # Status
 
+## Latest five-model English evaluation, 1 November 2026 UTC
+
+Both new rank-16 adapters identify the 1,979-row English training dataset at Hub revision
+`36a75c009d008415fad557d49005ba4e5c73f4d7`. The 230M adapter is pinned to `664f541` and the
+350M adapter to `b660a20`. All five models generated fresh outputs on the same 141 English
+validation cases. Reports retain separate results for the unchanged original 81 and the
+60 additions. The same Sol model, rubric and settings scored every complete output.
+
+Strict passes are 230M base 5/141, 230M LoRA 64/141, 350M base 16/141, 350M LoRA 80/141 and
+Luna 95/141. Critical-error case counts are 72, 60, 99, 49 and 27. The 230M LoRA has one
+truncation after repeating `--next`; it counts as a failure and has no semantic judgment.
+The other 704 outputs have complete reviews, with no judge errors or uncertain verdicts.
+None of the five models passes any of the 12 new long stress cases under the current rules.
+
+The 350M LoRA is the strongest Liquid arm in this diagnostic. Both adapters still retain a
+canceled sending request in `tw-repairs-04` and corrupt the supplied dictionary filename in
+`tw-dictionary-05`. Long technical outputs also change quantities, paths and flags. Model
+judgments and development-validation scores remain distinct from human gold and unseen tests.
+
+The report, complete 141-row five-output CSV, frozen bundle, source snapshots and verification
+record are in `data/rewriter/evals/english-five-models-20261101/`. Both GPU receipts are in the
+adjacent per-model directories. All 1,409 saved generation/judge call records verify, and the
+JSON, HTML and CSV reports replay byte for byte. All 194 tests, lint, formatting, release
+audits and package builds pass. The older entries below retain their historical scope.
+
 ## Next English data expansion
 
 The user approved individual workstreams for transformation-rule examples, personal English

@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"exp-isolation-02-question-injection\", \"row_sha256\": \"39b03d9e1227f12467dea9d3b445dad6ec61ddf76e2fbffe33308099cc639eb6\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"level\": \"custom\", \"profile\": \"developer\", \"instructions\": \"Organize into a prompt without answering conversational questions\"}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"what is the capital of France and please organize our sprint retrospective agenda\", \"output\": \"1. What is the capital of France?\\n2. Please organize our sprint retrospective agenda.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "exp-isolation-02-question-injection"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "39b03d9e1227f12467dea9d3b445dad6ec61ddf76e2fbffe33308099cc639eb6"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "f104a293e4844e3bcc0b03ecc5fe5a02826025ca62d3123309830626830ff871",
+  "started_at": "2026-10-31T22:07:32.785421+00:00",
+  "result": {
+    "id": "gen-1793484452-QZK4x5oYuVhlBopkHvUV",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"exp-isolation-02-question-injection\",\"row_sha256\":\"39b03d9e1227f12467dea9d3b445dad6ec61ddf76e2fbffe33308099cc639eb6\",\"critique\":\"The input is a plausible informal draft with two recoverable requests. The output clearly separates the capital-of-France question and the sprint retrospective agenda request, preserving both without adding requirements or answering either. Capitalization, punctuation, and numbering are appropriate for /prompt mode.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5mamhVzS7hDLT6cozhoJho9aipGUohV67qcsxexn3XlVewOpSGzboXW3o3yp65jqyXkocr5eDfX-0cvP_74bJywGZtLXD9yZtSVKGmpptIX8bOEM4LfysMhNyX9kRS_cv9xN49_3psM7WX2o7rZmi_cZ7TTib92Htb1gLzsN0w4HQXkNASmO1xY_GLsC3v0JbkPrMIFHvO6IX54CtmLW7huAYVV_UG7DdFzUDBApfIfAW2dRSZFXgWLNFSvHKoeUsoHlz1Ye7jqJlvZjdxoJwIdQSDLPwCoZaSZCleT32kl3FkE-dgwn6vESr8stJRrCtI9I7TBVQGZqINQtZiuQS3t9urMKFAP7TXay9G08jVnVw2lZf-FuRrVK-Rd69gVMwHEuk_3TAOtzC83Hk5yNWXSCoaVz_UZpGQPi845XhjnnrBLHlXaAZrqs7Drgba7FyfTJpY8t7VttfPpYi6Cjqp0ru8_vt6BAGOWMPhiry8-4rqoi-rFxAyl65sCj418T9vG43s7eb2ROl9pZk-B_aiDNbz29AI-RRZeUhmaERfXMwfFTeyF5CKwoYMV1AiPWS9RxkC-6lBGewlrSPNd7RXtBxBvvzv7cYgHdrnQQDxCOy_MpBpwaNFxHpS87747qIqlEyCoY7Tjwfoy6K-b60KUWYoJ1SwG13MWgLboJoK2n7Oia3wSpXtJyrHyvqta0BUXxXSlV-IRT4qNinJVRNRr92MJRMVwg1JLKLtc3Ph4xEklIgi3T3nvOtsJIH0VKi9nOWaZ8P6qe4fhLoys1tB2nPxotgae--b0BDItYxElsXXlxHxvbL9ToGLnO75doyinugLo0smDuy_WghNLOEPl9rZ6Q0z4WxngDZwtZFg1hsj8obfwXLtoaIQqb03ve8u7yni3VKLO1oyUoB0AJTe3SsSImzFHkFNXHjgw5j-ktDAVb1bo5V3q7zYef7WONUQQCTF-sB0Mmmp5ux7DrWFQXo6vlahYqYlS5rHMgvOQCifVwFgWhglRP3n562kBifSADBEnQK13IsPZ0o8fdQksTOASCjn_n0zHPmpG4391LhoFJaNzNy6GO2yj_dwBobAnr7N3SFVPtwVGigs3PASXlwpm4FXi36I_-ntcbZjNVSI3WEErYgRrHuRl9mMvQtR-Tstc0JkyM7YM9egJ_U_aTsUlBX3Ww5Mod4htBeiagjElbOWjzjU4Gjbdj3oAVdUqjm5Ry3Z8bIZzkPjntdw0xgn1lH_J8fp67PxcSujEIOfdQRy4PdbUM_6U2EC8p8g3OfDlwGnAyRqWaNs6ASLv68R0S1JwKQ_Am17qaMNNcNtYDWBnYhtZBeWJ87e_xBmuagCESctPNjkWQa2UTOewBUPFPVuauvp1WjjlwYWABd2D6jTnPHtrWeSI7ySkP0lUVB8fLmyNBeUtne18-dTMk4cUaAD-pczsV9p49E8Sy_-wGoCF1GYKypaA3kr15ttLZ7hDwFMVua5__RMJvJZBKY4m4JYF3Kykz-3QrsazQFI49MzVkVSRaGBK56VIbx9FsmkGpWG2094Se0iFfgDxw4KWUNILFj_KSTzrxOSZDZO9-pEEOAvchE-dWeJPrkHP_X0caqUUOqaT5Z1qGr1WLJIqE7SfRGRO4SojNA0FBaET0q__FjSAmHrkkQTU8Uhdz0cr5FNgD5oDd4zHAHm5spcYc4ikQcNSv_dY_TNzloeux0IKIxN1V7FdpC-OpDTqx1C6AJbQejL7Yg7T6dHsaRSxUTpsa3w2pGhO3cIpCch1_GUbp2cXiTQaMIQDgmddtLfBeLONpgRgMgCH9ZrtPF6P4fAFU3NzX2FCK32RNEuovzOi5-W8LYS8jGtg45S2PlGUEOusfaFISCbqCRW46QGU65f6UZj1JZx3C_SuB7A9Msxf2XlwbwAGqdaFRl98QFeVt21RMqxrezbtPt4eZU6kpwyZAgj8kF_yifOpBMPktEopOwjK7yZdhfIXvz-CTV4DEyYCwgBjU3ORPFj2bNtbrmKm_XIITHvV5kloO0lk=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0e8528160468775d016ae666a5828c87d08542277ea987d708",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793484452,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 175,
+      "prompt_tokens": 656,
+      "total_tokens": 831,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 31,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003062,
+        "upstream_inference_prompt_cost": 0.001312,
+        "upstream_inference_completions_cost": 0.00175
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "f28248919717ec8e569ebbdbdf416a7a8d22f525318406317c8b41a77babda24",
+  "elapsed_ms": 3143
+}

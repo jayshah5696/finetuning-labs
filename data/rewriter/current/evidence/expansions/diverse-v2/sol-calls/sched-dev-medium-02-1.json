@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-dev-medium-02\", \"row_sha256\": \"5cb009bcaf8aeb8c6c147a028f6db5d486aaf74d6e14c917c2b3cfb77052d719\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"files\": [\"internal/service.go\", \"buf.gen.yaml\", \"docker-compose.yaml\"], \"level\": \"high\", \"profile\": \"technical note\"}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"For our Go microservices migration, inspect service dot go in the internal directory and review buf dot gen dot yaml before generating Protobuf stubs across our streaming service packages.\\n\\nEvery RPC handler in PascalCase PaymentStreamHandler must handle stream cancellation context properly. When the client closes the HTTP/2 transport connection, the handler should record snake_case retry_count, connection_duration, and error_code in the structured logger. In addition, the dispatch routine must flush pending outbound payload chunks before exiting the handler routine to prevent socket buffer truncation on intermediate proxies.\\n\\nEnsure that you compile the proto definitions with dash dash grpc-web support enabled. Run dash dash race across the streaming unit tests to verify that concurrent mutex locks do not deadlock under elevated connection load. Finally, inspect docker-compose dot yaml to confirm local telemetry collector sidecars are active during local smoke testing before opening a pull request.\", \"output\": \"For our Go microservices migration, inspect service.go in the internal directory and review buf.gen.yaml before generating Protobuf stubs across our streaming service packages.\\n\\nEvery RPC handler in PaymentStreamHandler must handle stream cancellation context properly. When the client closes the HTTP/2 transport connection, the handler should record retry_count, connection_duration, and error_code in the structured logger. In addition, the dispatch routine must flush pending outbound payload chunks before exiting the handler routine to prevent socket buffer truncation on intermediate proxies.\\n\\nEnsure that you compile the proto definitions with --grpc-web support enabled. Run --race across the streaming unit tests to verify that concurrent mutex locks do not deadlock under elevated connection load. Finally, inspect docker-compose.yaml to confirm local telemetry collector sidecars are active during local smoke testing before opening a pull request.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-dev-medium-02"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "5cb009bcaf8aeb8c6c147a028f6db5d486aaf74d6e14c917c2b3cfb77052d719"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "11ff946a8cc35271cd09e4d83626719e5c1e4e5989728a4abe4183e8b322baf2",
+  "started_at": "2026-10-31T21:13:58.711921+00:00",
+  "result": {
+    "id": "gen-1793481239-QKsDq9lHIqgqAS23xJvb",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-dev-medium-02\",\"row_sha256\":\"5cb009bcaf8aeb8c6c147a028f6db5d486aaf74d6e14c917c2b3cfb77052d719\",\"critique\":\"The input is a plausible dictated technical note with recoverable filenames, identifiers, and command-line flags. The output appropriately normalizes spoken punctuation and casing cues into service.go, buf.gen.yaml, PaymentStreamHandler, the snake_case logging fields, --grpc-web, --race, and docker-compose.yaml. Across all three paragraphs, it preserves the migration scope, cancellation and logging conditions, flushing requirement and rationale, test objective, telemetry check, and ordering before opening a pull request. No material omissions, additions, or changes in certainty are apparent.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating naming conventions**\n\nI need to think about whether to remove PascalCase and use snake_case for markers in natural dictation. I noticed that using a dash achieves preservation, but it might not fit perfectly. There's this odd input with \"Every RPC handler in PascalCase PaymentStreamHandler.\" It feels important to critique this since I want to ensure that everything is normalized properly. I’ll keep pondering how best to address this.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating naming conventions**\n\nI need to think about whether to remove PascalCase and use snake_case for markers in natural dictation. I noticed that using a dash achieves preservation, but it might not fit perfectly. There's this odd input with \"Every RPC handler in PascalCase PaymentStreamHandler.\" It feels important to critique this since I want to ensure that everything is normalized properly. I’ll keep pondering how best to address this.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5loaxwSGJY5s-0fVZEWLFHUQIwHCjMUL35eRkqtSN-W9yc5HnA8o5UxFJ7u9mlDvOirB_lNrHVgymQQgrRQmo45fb_qkBTthKFQliayB3a_Ex9ktnxWEdzODSf3qJd6N-MimZCumKzynSaaufX5P4C63SBR150h-cQC014TIvL9H0zWAZIDUQ011hZAlFP4kPMQJm70_YjaKv4CSDxAFFaiOQkrU-vaZL5_OmtlzmAoHH5fbrWhHv6Usl0CkltH5Ak3YuYeQCvPCp7I49PPLhl6k_rIkI4JYs_wATo9VE4buAolIQ2NG1neN4n67FNyoBWxIhrWbHHGoUDtkeRiWJ61oCEeEQ3msNs3iP4rn7Wc8xlHuCj6M7F_QiIuv2WRvRQ5-AGBI_52P6FP01zfWEPD4JOuXfAaSpiLPnwE0Qu31Ar9wT-kKBa0vfW6tIOr0i46pooWtoFDzyZ4tN-_wMD0RRORjYsxN03ZERFn9qIrSzg4gAl-FqPIX0RoORQQC_0uFr2pVrSvxk_Ytc5Zed_QtP9l5fB1Uxksm2BAzxDPOObmJGdAEF7Pg6h1YVpX25iZy_snneajdQNs7skMo_VNk3i5gK0Rkruo7TJ8wDxQ64xTJ0YUO_Se5q8Ao2CcoHzedDsQlW_rzLhZE6NsGESe2qhNZoDcHA3UbSgq0MQFfujSyKFJyz1uqziZLzdZSsLy_5f3DcTC1hkFMa2xMPV26agT4-QxywYVOG2yO22Bsx2HXlmlz3b9biC2qJ3ZSy_wTKaDjaAnzzqTHU6KbdcuqKa9nr14kzsC-2gYkJFv6tsG_lMHSfr-9pC6_9ZCBy_QyGDpHbF7zN3SMfyOfqNQT8Oocs8UBNphWv5YoPjVsm5RidxM76zUOx8ggMMC3vEKnCYsf7rFEgEj0T43nUsralx4zMc6pfoX2AxLFP8qOAnr3l-MP79qqZSUns6LmgnlBWN2srt8mBkOONI4ndnOh2eH0w4Mt3cNt8ipo-XpdFENu0YWSKNc51eF61lVTl9L0vf266PNagXSoyacmkLCaIKNjPO_3cm3oNL3kzeWl42lSi2Wvybs5G9mSUL3dHho042N3OD1VZXJoP1Thl5PJJkKDIp_KHotj0d_7u4gC99huKKA3-jhrl23DafTJOuuzZDgan1WPm12-3Ftt6p9HFqesiemQSB_kgOQFGBVV1OLqy-qJHm6k6emeDnfrVRfBFS4flRWHQbvong47umCSSP8IjiFnqXvB6luRQcQQfm5ZOsLRvdgoSJ7asaqhpzVesyo17XymqnlVCaOAL0TMzB5sfdUEDsPdhGwh76D9jwsA3agNHF4_G5dow0Dbq38H21cEVEWPweoXKJ1xs4nNG3opWf4kWoRN0EHB699J6Uc1qmtKiICe8aWeQHEwl6boz2Bli0U03jVoC_Czk6gUl8n49dVN-60-x7dHsOG9GiiwCaoS4ZyUZ5rPNx3gQ5aNCxPKFbabjCe6Rlp-rzlIZx9JLkYfkWdtOuwf_guzG1F6Vo2MCmml4ntBKlHoRLkP62Iw4XmNaDVAiL0JccuFoZPWxfcfwJFMNDpKUZJrEfi7FEFUxRke4T6ukqPVzQatKsjdjCf3JnL0x6I4oK8rTAMdBK3-T4Wi-4hpdoNm9sje3ks4qLagjzNwKSBYu772s9a6IwE_Q-iYjDjVGJKTnDkuHl2ydL16v_6hEoDIJafgKFoCVOrJ5fGWk2v_DYQ6xbL67UQjXwnARpWfpcYSGbWCldYLQh9rs2e_ZCIOuQDswfF2uBTx2UpNLvCgIznlwOw5MC_GmWcIxQNngKt5WdTTRVnDWRg2eRfTb3v6-eUqGr-YscywyqOhsNvFjAk9dtICECQRNAInh77CZsRzAYqdp7RVClXRiZlmJK1K6YjyiEM0WXVLoTsJQF0WGUAvX0N5QhDO75undkAdHsLvIzBGZDAmXlaHlHfnp5DisbNQ_NEo8st-0moGGNq9pGUv6wyFtkjcSuMAPdIgeWdp8a3X3Zb-QvVeoapfqjWW1b6FwTSpQ-_uonPiRNX1XLyxCs9y2uYq9TpsOsljEVbx5K0WImGGBJR_7_8yifGbXJh3pcornypUFCzyaCgMt__Yvk6YS5EzHpg3gFY2NWqGgOQfMcrbOu5HPTDywcLuQQYribeKfGfmrD6LDAiIfys3aAokLiKUBbWM43gGlwxDD-Iz_AbEiD99Hd4iF-LE_YHH0ojNcLabxqgfifrAmwBle_Z-Ef0Gj4PtTAPb4z2zYE0iqtzP_L1mz8bQNrFgyCLfT2-ZrfW9wBCODkmkZQ0w5qo1drYZbO6D_-NvB0-dP5ca0De6YrlQuS0P9COqCCYsUurx1tn4Eu5gs17Dwvn-Lf4lBpcV99aCD0pcy7w5jMsiG0OfRSG9210J-JSxrP-b6xrjCnjOKJqO1FTLLOXl.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_00436f4869352fb2016ae65a18648c87d0bd785c253d205f70",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481239,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 262,
+      "prompt_tokens": 991,
+      "total_tokens": 1253,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 60,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004602,
+        "upstream_inference_prompt_cost": 0.001982,
+        "upstream_inference_completions_cost": 0.00262
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "528257ed973dac74818d2ac758ffd1cffc5bc2ec9e2bde70754a7c4cfb71264c",
+  "elapsed_ms": 5472
+}

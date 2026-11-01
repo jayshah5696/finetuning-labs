@@ -30,6 +30,7 @@ training-audit:
 reviewed-audit:
 	uv run --locked --group data --group hosted python -c 'from pathlib import Path; from finetuning_labs.rewriter.reviewed_publication import audit_publication; print({"verified_files": len(audit_publication(Path("data/rewriter/current")))})'
 	uv run --locked finetuning-labs --bundle data/rewriter/reviewed-v2/validation-bundle audit
+	uv run --locked finetuning-labs --bundle data/rewriter/current/validation-bundle audit
 
 # Evaluation and publication commands have explicit output paths and run IDs.
 # See README.md. Neither is part of the default offline check.

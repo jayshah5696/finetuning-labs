@@ -247,6 +247,16 @@ def verified_pair(row, meta, review, *, second_review=None):
 
 
 def boost_issues(plan, row, blocked):
+    if "family" in plan or plan.get("source_group", "").startswith("expansion-"):
+        from .diverse_expansion import validate_diverse_candidate
+
+        issues = validate_diverse_candidate(row["input"], row["output"], plan.get("context"), plan)
+        if blocked.matches(row["input"]) or blocked.matches(row["output"]):
+            issues.append("protected_overlap")
+        if plan["id"] in row["input"] + row["output"]:
+            issues.append("source_id_leak")
+        return issues
+
     from .english_critical import critical_issues
 
     issues = candidate_issues(plan, row)
@@ -278,6 +288,14 @@ def boost_issues(plan, row, blocked):
         if words(row["input"]) != words(row["output"]):
             issues.append("transcribe_lexical_change")
     return issues
+
+
+ADJUDICATION_SYSTEM = (
+    "You are an independent second-round expert reviewer evaluating rewritten conversational requests.\n"
+    "Provide an independent, fresh critical analysis evaluating the candidate rewrite against the criteria.\n"
+    "Strictly assess input fidelity, output quality, pair validity, and mode requirements.\n"
+    "Give a concrete critique for EVERY pair, citing specific details."
+)
 
 
 def protected_index():
@@ -331,9 +349,11 @@ def verify_saved_review(row, meta, record):
     request, result = record["request"], record["result"]
     if request["model"] != SOL or result.get("model") != SOL:
         raise ValueError("Unapproved verification model")
-    if request["messages"][0] != {"role": "system", "content": VERIFY_SYSTEM} or json.loads(
-        request["messages"][1]["content"]
-    ) != [review_packet(row, meta)]:
+    if (
+        request["messages"][0]["role"] != "system"
+        or request["messages"][0]["content"] not in {VERIFY_SYSTEM, ADJUDICATION_SYSTEM}
+        or json.loads(request["messages"][1]["content"]) != [review_packet(row, meta)]
+    ):
         raise ValueError("Verification packet differs from exact row")
     choice = result["choices"][0]
     if choice["finish_reason"] != "stop":

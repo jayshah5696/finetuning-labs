@@ -85,6 +85,26 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
             (Path(__file__).resolve().parents[3] / "data/rewriter/holdout-freeze.json").read_text()
         )
         verify_holdouts(contents, freeze)
+    if "validation-bundle/cases.jsonl" in contents and "data/validation.jsonl" in contents:
+        bundle_lines = [
+            line.strip()
+            for line in contents["validation-bundle/cases.jsonl"].splitlines()
+            if line.strip()
+        ]
+        val_lines = [
+            line.strip() for line in contents["data/validation.jsonl"].splitlines() if line.strip()
+        ]
+        if len(bundle_lines) != len(val_lines):
+            raise ValueError(
+                f"validation-bundle/cases.jsonl count ({len(bundle_lines)}) differs from data/validation.jsonl ({len(val_lines)})"
+            )
+        for idx, (b_line, v_line) in enumerate(zip(bundle_lines, val_lines, strict=True)):
+            b_row = json.loads(b_line)
+            v_row = json.loads(v_line)
+            if digest(b_row) != digest(v_row) or b_line != v_line:
+                raise ValueError(
+                    f"validation-bundle/cases.jsonl row {idx} differs from data/validation.jsonl row-for-row"
+                )
     for data in contents.values():
         if (
             re.search(rb"sk-or-v1-[A-Za-z0-9_-]{20,}", data)
@@ -124,20 +144,39 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
         name: json.loads(contents[name])
         for name in {m["native_evidence"] for m in support if "data_review" in m}
     }
-    from .training import LeakageIndex, validation_index
+    from .training import LeakageIndex, normalized, validation_index
 
-    heldout_texts = [
+    train_texts = [
         json.loads(line)[k]
-        for split in ["dev", "validation"]
-        for line in contents[f"data/{split}.jsonl"].splitlines()
+        for line in contents["data/train.jsonl"].splitlines()
         for k in ["input", "output"]
     ]
-    heldout = (
-        LeakageIndex([*validation_index().texts, *heldout_texts]) if native_documents else None
+    dev_texts = [
+        json.loads(line)[k]
+        for line in contents["data/dev.jsonl"].splitlines()
+        for k in ["input", "output"]
+    ]
+    val_texts = [
+        json.loads(line)[k]
+        for line in contents["data/validation.jsonl"].splitlines()
+        for k in ["input", "output"]
+    ]
+    val_frozen_texts = list(validation_index().texts)
+    heldout_by_split = (
+        {
+            "train": LeakageIndex([*val_frozen_texts, *dev_texts, *val_texts]),
+            "dev": LeakageIndex([*train_texts, *val_texts]),
+            "validation": LeakageIndex([*train_texts, *dev_texts]),
+        }
+        if native_documents
+        else {}
     )
     ids, groups, total = set(), {}, 0
-    new_rows, new_texts, overlap_groups, expansion_groups = [], [], {}, {}
+    new_rows, new_meta_rows, new_texts, overlap_groups, expansion_groups = [], [], [], {}, {}
+    new_index = LeakageIndex()
+    text_to_groups = {}
     for split in ["train", "dev", "validation"]:
+        heldout = heldout_by_split.get(split)
         rows = [json.loads(x) for x in contents[f"data/{split}.jsonl"].splitlines()]
         guides = [json.loads(x) for x in contents[f"sft/{split}.jsonl"].splitlines()]
         meta = [m for m in support if m["split"] == split]
@@ -172,6 +211,7 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
                 raise ValueError("publication is missing native decision dimensions")
             if "data_review" in item:
                 from .boost_data import SOL, boost_issues, verified_pair, verify_saved_review
+                from .diverse_expansion import is_candidate_admitted
 
                 report_name = item["data_review"]["report"]
                 report = review_documents[report_name]
@@ -199,9 +239,10 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
                     or records[0]["result"]["id"] == records[1]["result"].get("id")
                 ):
                     raise ValueError("Adjudication must use a distinct provider call")
-                if not verified_pair(
-                    row, item, raw_reviews[0], second_review=second
-                ) or boost_issues(item, row, heldout):
+                is_admitted = is_candidate_admitted(
+                    row, item, raw_reviews[0], sol_review_round2=second
+                ) or verified_pair(row, item, raw_reviews[0], second_review=second)
+                if not is_admitted or boost_issues(item, row, heldout):
                     raise ValueError("New data lacks completed fidelity verification")
                 native = native_documents[item["native_evidence"]][item["id"]]
                 exported = json.loads(contents[item["native_exports"]])
@@ -215,10 +256,33 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
                     or native["scores"]["judge_model"] != "openai/gpt-6-luna-decisions"
                 ):
                     raise ValueError("Native Arka decisions differ from the actual pair")
-                new_index = LeakageIndex(new_texts)
-                if new_index.matches(row["input"]) or new_index.matches(row["output"]):
-                    raise ValueError("New-to-new text overlap in publication")
+                for field in ["output", "input"]:
+                    for m_text in new_index.matching_texts(row[field]):
+                        for g in text_to_groups.get(m_text, ()):
+                            if g != item["source_group"]:
+                                raise ValueError("New-to-new text overlap in publication")
+                same_group_rows = [
+                    (prev_r, prev_m)
+                    for prev_r, prev_m in zip(new_rows, new_meta_rows)
+                    if prev_m["source_group"] == item["source_group"]
+                ]
+                for prev_r, prev_m in same_group_rows:
+                    if (
+                        prev_m["mode"],
+                        (prev_m.get("context") or {}).get("level"),
+                    ) == (item["mode"], (item.get("context") or {}).get("level")):
+                        raise ValueError("Duplicate mode/level in same source group")
+                    if prev_r["input"] != row["input"]:
+                        raise ValueError("Different input in same-input contrast group")
+
+                norm_in = normalized(row["input"])
+                norm_out = normalized(row["output"])
+                new_index.add(row["input"])
+                new_index.add(row["output"])
+                text_to_groups.setdefault(norm_in, set()).add(item["source_group"])
+                text_to_groups.setdefault(norm_out, set()).add(item["source_group"])
                 new_rows.append(row)
+                new_meta_rows.append(item)
                 new_texts.extend([row["input"], row["output"]])
                 overlap_name = item.get(
                     "overlap_evidence", "evidence/boost/final-overlap-check.json"
@@ -254,10 +318,14 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
                 parent = {}
                 for filename in spec["base_files"]:
                     data = contents[filename]
-                    if filename.endswith("/train.jsonl"):
-                        data = b"".join(
-                            data.splitlines(keepends=True)[: spec["base_counts"]["train"]]
-                        )
+                    for split_name in ["train", "dev", "validation"]:
+                        if (
+                            filename.endswith(f"/{split_name}.jsonl")
+                            and split_name in spec["base_counts"]
+                        ):
+                            data = b"".join(
+                                data.splitlines(keepends=True)[: spec["base_counts"][split_name]]
+                            )
                     parent[filename] = data
                 verify_holdouts(parent, spec["base_files"])
     if total != len(support) or Counter(x["split"] for x in support) != quality["splits"]:

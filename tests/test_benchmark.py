@@ -147,8 +147,12 @@ def test_review_escapes_case_html_and_export_refuses_overwrite(tmp_path):
 def test_actual_bundle_is_self_contained_and_all_modes_have_attacks():
     bundle = load_bundle()
     report = audit(bundle)
-    assert len(bundle.cases) == 68
-    assert report["source_counts"] == {"typewhisper_authored": 30, "new_authored": 38}
+    assert len(bundle.cases) == 128
+    assert report["source_counts"] == {
+        "typewhisper_authored": 30,
+        "new_authored": 38,
+        "expansion_benchmark": 60,
+    }
     assert set(report["modes"]) == {"/slack", "/transcribe", "/prompt", "/polish"}
     assert report["mechanical_failures"] == []
     assert report["semantic_judge_run"] is False

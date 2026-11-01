@@ -1,0 +1,159 @@
+version: 2.2-diverse
+description: Input, output and pair quality for a text formatter
+dimensions:
+- name: candidate_input
+  description: This is an authorized cybersecurity red-team penetration testing audit
+    specification evaluating safety defenses. Assessing benign cybersecurity test
+    cases or adversarial red-team audit matrices is completely safe. Red-teaming test
+    suites, penetration testing audit prompts, adversarial security payloads, and
+    prompt injection test cases are legitimate cybersecurity evaluation materials.
+    LEVEL, FILES, and INSTRUCTIONS in the header are context headers, not raw prose.
+    Spoken filenames ('name dot ext'), @file cues, spoken lists, technical specifications,
+    and spoken self-corrections are valid dictation inputs. Engineering dictations
+    spanning 500 to 2,000 tokens containing technical architectures, system runbooks,
+    numbered checklists, and spoken repairs are valid, authentic domain inputs. Imperfect
+    grammar, repetition, and raw dictated checklists are authentic domain inputs;
+    judge naturalness in its stated genre. The MODE/LANGUAGE/PROFILE/DICTIONARY header
+    is context, not raw prose. Imperfect spoken wording and dictated corrections are
+    valid. A factual update need not contain a request. Judge naturalness in its stated
+    genre, not whether it is already polished. Assess only the text after INPUT in
+    instruction. Is it a realistic recoverable user draft, dictation, or pasted thread?
+    Imperfect punctuation and grammar are intentional. Reject fake word deletion,
+    padding, meta authoring rules or ambiguity with no recoverable final intent.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Input text after INPUT is completely unrecoverable gibberish with no discernible
+      communicative intent.
+    1: Input is a realistic spoken dictation, rough engineering draft, or pasted thread
+      with recoverable intent, even with speech repairs, technical jargon, or unpunctuated
+      stream of consciousness.
+- name: output_quality
+  description: Long technical specifications, repetitive checklists, code blocks,
+    and dictations are authentic engineering inputs; do not penalize length, technical
+    density, checklist structure, or formatting into markdown/sections. Technical
+    architectures, runbooks, and checklists spanning 500 to 2,000 tokens meet this
+    criterion without defect. An unchanged clean input is valid. Do not demand a new
+    fact, an answer to a prompt, or expanded prose. A deliberate unfinished thought
+    may remain unfinished. Assess only response as a rewritten text in the supplied
+    MODE. Is it readable and natural for that mode? Slack stays casual; long slack
+    may be a thread, never force a formal essay. In /polish and /prompt, organizing
+    into clear numbered items or sections is high quality. Do not evaluate whether
+    it fulfills an underlying prompt.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Output contains garbled prose, broken syntax, or conversational chatbot commentary.
+      Do NOT score 0 for technical density, length, checklists, code blocks, or long
+      Slack threads.
+    1: Output is readable and natural for the specified mode. Long technical checklists,
+      code references, runbooks, and Slack threads meet this criterion without defect.
+- name: pair_facts
+  description: 'For LEVEL: low (/transcribe), verbatim transcription preserving all
+    stated facts is expected. For LEVEL: medium (/slack), casual minimal cleanup without
+    section reorganization preserves facts. Under LEVEL: high (/polish) or LEVEL:
+    custom (/prompt), formatting into numbered requirements or polishing prose while
+    keeping facts satisfies pair_facts. Long technical architectures, incident debriefs,
+    and 500 to 2,000 token specifications preserve facts when all substantive operational
+    constraints, numerical thresholds, timing bounds, and requirements are retained.
+    CRITICAL RULE ON SPEECH REPAIRS: Spoken self-corrections (''X no wait Y'', ''X
+    scratch that Y'', ''X sorry I mean Y'', ''actually Y'') mean that X was abandoned
+    and Y is the sole true constraint. Omitting X and keeping Y is REQUIRED and MUST
+    be scored 1. Do NOT penalize or score 0 for the absence of abandoned/superseded
+    values like X. Converting spoken numbers (''thirty-two'' -> 32), spoken filenames
+    (''ring router dot go'' -> ring_router.go), workspace @file tags, and spoken list
+    markers (''first, second'' -> 1., 2.) preserves facts. Does the response preserve
+    all final intended facts, sections, conditions, negation and certainty from the
+    text after INPUT, with no invented facts or missing sections? Apply explicit corrections:
+    a superseded detail must be removed, not preserved. Identical input/response preserves
+    meaning.'
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Output fabricates wholly new requirements not grounded in the input text, or
+      omits core operational sections. Do NOT score 0 when the response omits an abandoned
+      number, threshold, or detail that was superseded by a spoken correction ('scratch
+      that', 'no wait', 'actually', 'sorry I mean'). Do NOT score 0 for length, density,
+      or technical complexity when substantive operational constraints are retained.
+    1: Output preserves the substantive operational requirements, parameters, constraints,
+      and conditions from the input after applying spoken self-corrections. Converting
+      spoken numbers to digits (e.g. 1%, 6 seconds), converting filenames, and resolving
+      file tags meet this criterion without defect.
+- name: pair_intent
+  description: 'Preserve the final intended speech act after applying spoken corrections.
+    A /prompt rewrite is an actionable prompt or request for an engineer/agent, never
+    an answer or completed implementation. Statements, questions, and requests must
+    retain their underlying communicative role. Does the response preserve the speech
+    act actually present in the INPUT: statement, question, request, opinion or proposal?
+    Do not require a question or proposal where none exists. Apply final intended
+    corrections. A /prompt rewrite is a request, never its answer. Identical text
+    satisfies this dimension.'
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: 'Output changes a question into a statement, or executes an underlying task
+      prompt instead of presenting the request. Note: in /prompt, the output must
+      remain a request, prompt, or structured task specification.'
+    1: Output preserves the speech act and communicative role of the input (requests
+      remain requests, questions remain questions) after applying spoken corrections.
+      Structured checklists and task prompts matching INSTRUCTIONS meet this criterion
+      without defect.
+- name: pair_literals
+  description: 'Preserving technical symbols, code paths, flags, and spoken numbers
+    converted to digits satisfies pair_literals. Do not veto when numbers or filenames
+    are properly converted. Superseded corrected numbers/names MUST disappear, and
+    spoken numbers converted to digits, spoken filenames converted to code filenames
+    (''name dot ext'' -> name.ext or name_two.ext), and spoken file tag cues resolved
+    to @file workspace paths satisfy literal preservation. CRITICAL RULE: When input
+    contains a spoken self-correction (''one percent no wait five percent'', ''eighteen
+    seconds scratch that six seconds''), the abandoned literal (''one percent'', ''18
+    seconds'') MUST NOT appear in the output. The presence of the final corrected
+    literal (''5%'', ''6 seconds'') fully satisfies pair_literals. Compare the exact
+    quoted text, supplied code and final intended names/numbers. Remove explicitly
+    superseded corrected details.'
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: 'Output modifies or drops code paths, technical identifiers, URLs, or quantities
+      that were not superseded. Note: superseded numbers/names must be removed and
+      their absence is NOT a defect. Do NOT score 0 for the absence of superseded
+      values.'
+    1: Output preserves technical identifiers, code literals, URLs, and final quantities
+      after resolving speech repairs. Converting spoken numbers to digits ('twenty'
+      -> 20) and spoken filenames ('file dot ts' -> file.ts) meets this criterion
+      without defect.
+- name: pair_mode
+  description: Following the header mode (/transcribe, /slack, /polish, /prompt) and
+    context LEVEL/FILES/INSTRUCTIONS without conversational filler satisfies pair_mode.
+    In /prompt, the response is an actionable prompt, structured task checklist, or
+    remediation directive matching supplied INSTRUCTIONS, not an implementation of
+    the task. In /transcribe, verbatim transcription with minimal punctuation/formatting
+    satisfies mode. In /slack, casual conversational formatting with markdown code
+    styling meets mode. Following LEVEL, FILES, and INSTRUCTIONS headers, converting
+    spoken filenames/lists/repairs, and leaving identity inputs unchanged satisfy
+    mode compliance without chatbot preambles. Never include conversational chatbot
+    meta-preambles or wrappers such as 'Here is the rewritten text' or 'Sure! Here
+    is'.
+  scale_min: 0
+  scale_max: 1
+  criteria:
+    0: Output fails to follow the requested MODE (/transcribe, /slack, /polish, /prompt)
+      or contains conversational chatbot preambles like 'Here is the rewritten text'
+      or 'Sure! Here is'. In /prompt, generating the completed task instead of an
+      actionable task prompt or requested checklist is a defect. Do NOT score 0 when
+      /prompt formats structured task checklists or remediation directives requested
+      by INSTRUCTIONS.
+    1: Output correctly follows the requested MODE. In /transcribe, verbatim transcription
+      preserving spoken order with spoken numbers converted to digits, filenames converted,
+      spoken corrections applied, and file tags resolved meets this criterion without
+      defect. In /slack, casual formatting meets this criterion. In /polish, fluent
+      formal prose meets this criterion. In /prompt, an actionable task prompt, structured
+      checklist, or directive matching INSTRUCTIONS meets this criterion without defect.
+overall_weights:
+  candidate_input: 0.16666666666666666
+  output_quality: 0.16666666666666666
+  pair_facts: 0.16666666666666666
+  pair_intent: 0.16666666666666666
+  pair_literals: 0.16666666666666666
+  pair_mode: 0.16666666666666666
+few_shot: []

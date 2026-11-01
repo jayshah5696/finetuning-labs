@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-repair-med-04\", \"row_sha256\": \"5e16b332c176d6b4be1b2fcf34e9f6dc583a34b24859d6e29e005adad10cdba5\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"level\": \"medium\"}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"team here is our operational triage summary for the latency spike on our customer notifications cluster. we need to investigate message routing across our edge push notification gateways. investigate the notification worker backlog in notification underscore worker dot py to determine why message delivery times spiked to twenty seconds. check the redis queue consumer metrics in queue underscore monitor dot py tracking unprocessed notification payloads during peak traffic. set the redis consumer thread pool size to thirty-two threads scratch that sixty-four threads to drain the accumulated queue backlog. verify that apple push notification service and firebase cloud messaging webhook endpoints return http two hundred with valid acknowledgement tokens. configure automated alert thresholds in pagerduty notifying on-call engineers when queue depth exceeds five thousand messages. site reliability engineers must monitor p95 notification dispatch latency on datadog keeping delivery times below two seconds. did the gateway connection pooler drop any inbound webhook packets during the traffic spike. verify the ingress gateway metrics before checking downstream queues. configure the notification worker retry backoff to start at two seconds with exponential multiplier of two capped at sixty seconds. verify that the dead-letter queue in aws sqs holds no more than fifty unprocessed failed notification payloads. inspect the postgresql connection pool in db underscore pool dot py ensuring active connections do not exceed one hundred twenty. audit the apns token refresh worker verifying that invalid push tokens are purged from database records every twenty-four hours. set the notification worker container cpu limit to two cores and memory to four gigabytes in deployment dot yaml. the platform security architect mandates that customer notification payloads containing sensitive verification codes are purged immediately after transmission. site reliability engineers must configure datadog monitors alerting on-call personnel when notification worker pod restarts exceed three in five minutes. the security compliance lead mandates verifying that customer phone numbers and email addresses are masked in all application log files. should we temporarily throttle non-critical marketing notifications to relieve pressure on core workers. confirm queue depths before applying throttling policies. configure the dead-letter queue replay worker to process failed messages in batches of twenty-five payloads. verify that apple push notification service credentials in certs slash apns dot p-twelve are valid for at least six months. site reliability engineers must alert the mobile engineering team if notification delivery failures exceed point one percent. the engineering manager requires running synthetic notification tests sending ten thousand test notifications to verify zero delivery loss before resolving the incident.\", \"output\": \"Team, here is our operational triage summary for the latency spike on our customer notifications cluster. We need to investigate message routing across our edge push notification gateways. Investigate the notification worker backlog in notification_worker.py to determine why message delivery times spiked to 20 seconds. Check the Redis queue consumer metrics in queue_monitor.py tracking unprocessed notification payloads during peak traffic. Set the Redis consumer thread pool size to 64 threads to drain the accumulated queue backlog. Verify that Apple Push Notification service and Firebase Cloud Messaging webhook endpoints return HTTP 200 with valid acknowledgement tokens. Configure automated alert thresholds in PagerDuty notifying on-call engineers when queue depth exceeds 5000 messages. Site reliability engineers must monitor p95 notification dispatch latency on Datadog, keeping delivery times below 2 seconds. Did the gateway connection pooler drop any inbound webhook packets during the traffic spike? Verify the ingress gateway metrics before checking downstream queues. Configure the notification worker retry backoff to start at 2 seconds with an exponential multiplier of 2 capped at 60 seconds. Verify that the dead-letter queue in AWS SQS holds no more than 50 unprocessed failed notification payloads. Inspect the PostgreSQL connection pool in db_pool.py ensuring active connections do not exceed 120. Audit the APNs token refresh worker verifying that invalid push tokens are purged from database records every 24 hours. Set the notification worker container CPU limit to 2 cores and memory to 4 GB in deployment.yaml. The platform security architect mandates that customer notification payloads containing sensitive verification codes are purged immediately after transmission. Site reliability engineers must configure Datadog monitors alerting on-call personnel when notification worker pod restarts exceed 3 in 5 minutes. The security compliance lead mandates verifying that customer phone numbers and email addresses are masked in all application log files. Should we temporarily throttle non-critical marketing notifications to relieve pressure on core workers? Confirm queue depths before applying throttling policies. Configure the dead-letter queue replay worker to process failed messages in batches of 25 payloads. Verify that Apple Push Notification service credentials in certs/apns.p12 are valid for at least 6 months. Site reliability engineers must alert the mobile engineering team if notification delivery failures exceed 0.1%. The engineering manager requires running synthetic notification tests sending 10,000 test notifications to verify zero delivery loss before resolving the incident.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-repair-med-04"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "5e16b332c176d6b4be1b2fcf34e9f6dc583a34b24859d6e29e005adad10cdba5"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "12593dbd5884f302926ccaa4eef7ccfee3fe552b81789636168d0311fcafaab1",
+  "started_at": "2026-10-31T21:14:25.544278+00:00",
+  "result": {
+    "id": "gen-1793481265-5hg4GFpz19asYoJQd7hQ",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-repair-med-04\",\"row_sha256\":\"5e16b332c176d6b4be1b2fcf34e9f6dc583a34b24859d6e29e005adad10cdba5\",\"critique\":\"The input is a coherent dictated operational summary with recoverable filenames and an explicit thread-count correction. The output makes appropriate minimal /slack edits: it resolves “thirty-two threads scratch that sixty-four threads” to 64 threads, renders dictated paths such as certs/apns.p12, and adds capitalization and punctuation. All operational requirements, thresholds, timing constraints, role assignments, questions, and sequencing conditions are preserved, including checking ingress metrics before downstream queues and confirming queue depths before throttling. No material defects found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating ops summary**\n\nI need to assess the entire match and summarize the operations without any extraneous details. I should ensure that any output changes are appropriately decoded for clarity. It looks like the Apple service casing isn't a defect, which is good. I also have to note that everything retained should be accounted for with no omissions. Finally, I need to critique it with concrete details and ensure any corrections or metrics are preserved before returning the JSON.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating ops summary**\n\nI need to assess the entire match and summarize the operations without any extraneous details. I should ensure that any output changes are appropriately decoded for clarity. It looks like the Apple service casing isn't a defect, which is good. I also have to note that everything retained should be accounted for with no omissions. Finally, I need to critique it with concrete details and ensure any corrections or metrics are preserved before returning the JSON.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lo1LLaSvHN8VDfocy3nLeUmenbLluo600GXRddL2IHXa0DgzekWUugDFZ0y5Txc2sMgaWMq4d6BaiarV-Jk4qvWgiaBUN3cl9-2sIFGgImiYuLSFB_FUt3ey8JGrlIDJNzJ4pG75oyDxFumSi2V8l1OGfqbMHAuoS-hvTaXb-Qu3FRJzMrXTf3FVUXrElWFcMxMexJ1MROp0WRraKEwoqBCrw4KE1LQyvCk1C2_jBKgqjefbwo4QBUC3DMHYGSMxFbYvu5mV0iYkf3OfsZQuxu0UHYZ8B7yyurhpCtdPULlY3t7CRpzfSRu7dxxM2tvzQR0muhlBOPDSfTMn15n5rC4b6Nz6PVIYLbgJlP8tSe6fGXCgLH13UvMwylfeqRiwSWHApDN28M6NyKn-5sQzsdnLwJBrCH8hVG2X9ousTlhwKWb19QdNSbsjLFyF1auFXL9JRlsyGLuuriXaUObbtvV7tQKxCsGN4Cwi3RXXbWw-_tpDwx34MuIPD6ckJXAPy8BoeGbz7QTtcy9CUpUoypCagwA8phZqi58f4ri4B1WxThpTY9eP84l46q3TbpLl0W_QeC9V3BU4otgi4D35bIeQ0sJdldjR2BwCjYSRrmw16qBqAbctHBaqAJU0Z0WuPpHMm8QQXj-DEMpsRSeuNDzmM02RoaBMeVGZ0EqvzZgjlGnJjUvgcCMsQsjJeG867yO8zEZCV0XNpAykusgkI0hINBj_PAGwhNaBDhEEjWxKyN_CvzlPgoHXDQIXMjTkYM2O1mex9YignwwmNJmtobMPlf4MExveG1_DEXHRi_W9XZeT_39ZCFFNp9PY8WHKO__4fxBtX3lVg8UP5lDMHwYcTGkEAhwIh34R2bQHHuiHF4qfr51ewe_DZRKG65aPPYINDf_vQXCNV1D8zYuYUmYASRIDbWQEZhA6OJtDwMEry5TebBJZHleMnRkyuAVQmSn_k8-dReUZDv26WId6vtbgLtBPQvl3u-fg6mzi94B9Ub_1Te1XkgUzrEPHgfBMNL6ZdK-CkNW5GmK78uyuhqVExU7qdP03LtvgF_NifPMzSMqtwqpsI2UOdvPsgqwp73CoLZCxbgM-7S-0LV2K3R3jmEQo4Sw2kTKbliPPpT4MvSJgu1sGnVPNfg-yEITqV7z8n_OqyfkWlUZIl0MGYmFGfeQoGY9xtu1MRx5l1J6fFj0kConecadfdPttQTKQEpmpS4kZpsirA6JglnmeA-hQAftQ0QobnzUxFOJps_TJYzU6NcIuZgp11D0jJuyIoNcplL3pgRw0NF_Sz75Ga6Q7392BpuSqvoZHSVJBSUb27V9Arz69XWxw3wHi83v-eITfeqnyIqdmpKzeYm_GQCZl0FUFLeB8BtMDmdjUHhD9Hz6u1YVkCbzgelGbqfs8F-5cBm7uoXmLL6fm26_STE01qHIWgXOG13W9KqTsMnpsmcRiBgfQc2Q3oIsbWymog658P5sMsNdBrcZTxX_VEJBPNdFU2ZSKe-VG6-v51pLUKJ1GpN45iHQej_jbpD1WHF5qqF1pOKa9n7hI_jCVJNQ6Z-RqG0WJ3WY83G4emDSzh5aqx1R-vhLbICxxwB7C56BHykr4iTzwRzUfjo17e7H90kiSJbx3tBuQedoBP_tyYSE0A8_R9cBF0emN_fFRc07WYrl_Il8kcukixwXBN1TcirdXAqos40X32Sc4Bn9y-34JHiu2S9V9htPOuKREeeoI3x9XPMrz4ftkuEbPYEFH_3OeGYgO6ROPJumKH_E2O_-xr1HGEe3VoGxpG5ifYF7XQjA1T_EOZ9fq54OwMxMt0RdLn8_IiM-TUHr_bEuBj2c6mPpBOm34MyLE3SQp6lnN4x5FWfZEHEVdLlusW47b2Hos2iUmzsvVsPfR00ekdwSX30nbhyJKShNjvD7X7cFiJ2lb40L2MB-MQpMGqku--txlHtWMAUvAvUNut9MfUwijR5gebukGSBP8IoFJe4iRo4vIpap7NCxYRzAwj4P4grazRp4z8WJzhcvB28IDTCZMOqmx1YyfyhwfIxaFMl_8aND9R8_QTb9eCDlBvKkxYXwXFLzRpaSmNLxftlumS7V_IIczbH2MBJBhyzmdSqV5gzrxDivTxpQY9VRTKXWeqTtlnKv4UNYUFhY5cVND5VpY7XrpLoBvIYrYg1QwCXKMzzExiWCb-jKC2y3b56_dUkuFqewqR2otsY_I3M1YU_0cYiE9Hne8U18ukBObOTIHDKUMAmZwTtmkza6_6qsgSRfGvAG_9GwzYSjri4PnlC9Mt65R0YFbaPBz5bRXPOqF2_9wQNKo_os4_uTE89ex-m73XQ-sKL2zhRJ8O0Awz31eJKNwWf6End7-L1Mzh2XWcz9nby9DY-1CQ0f8k57nVOhMDYzePC2ueOwQ_6cUJ4xyt30LKTdm76nkcklfjfsOtCPgQ7y9z38JwhGcbAd4U3FBeeyj6qbvr-8h1j8jpM=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_084fd3a5e83120c7016ae65a32931087d0983cc25253213134",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481265,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 265,
+      "prompt_tokens": 1558,
+      "total_tokens": 1823,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 64,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 1555,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0028115,
+        "upstream_inference_prompt_cost": 0.0001615,
+        "upstream_inference_completions_cost": 0.00265
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "d4abe42d9d0a42f09e9a7bdcf3708e4fc560c7c302651ff55d68b37e6f297650",
+  "elapsed_ms": 5287
+}

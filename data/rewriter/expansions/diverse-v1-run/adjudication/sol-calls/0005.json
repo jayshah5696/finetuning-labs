@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 6000,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-repair-medium-02\", \"row_sha256\": \"dcdd19858dbf01ebd3b769c7954bebe2b34174791fecb2815939934e5c00078b\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"level\": \"high\", \"profile\": \"technical note\"}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"When handling failed payment refund requests across our distributed billing workers, the service must execute retries with extreme operational caution.\\n\\nRetry the refund request three times scratch that five times using exponential backoff starting at two seconds. If the remote payment gateway returns an invalid card token error or merchant account mismatch, do not retry the operation under any circumstances and flag the transaction record for manual compliance review.\\n\\nCancel that retry counter if the customer account is marked suspended no wait if the customer account is closed, and notify the payments on-call channel immediately. In addition, record structured audit metrics capturing transaction identifier, refund amount, and failure codes in the primary accounting database before terminating the worker execution. Daily summary reports should be emailed to the compliance auditor.\", \"output\": \"When handling failed payment refund requests across our distributed billing workers, the service must execute retries with extreme operational caution.\\n\\nRetry the refund request 5 times using exponential backoff starting at 2 seconds. If the remote payment gateway returns an invalid card token error or merchant account mismatch, do not retry the operation under any circumstances and flag the transaction record for manual compliance review.\\n\\nCancel that retry counter if the customer account is closed, and notify the payments on-call channel immediately. In addition, record structured audit metrics capturing transaction identifier, refund amount, and failure codes in the primary accounting database before terminating the worker execution. Daily summary reports should be emailed to the compliance auditor.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-repair-medium-02"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "dcdd19858dbf01ebd3b769c7954bebe2b34174791fecb2815939934e5c00078b"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "d62cf192da86f88cbb03e83b32ff7263be4e2deba3e44f1726a413d30a6b29b4",
+  "started_at": "2026-10-31T08:55:21.113501+00:00",
+  "result": {
+    "id": "gen-1793436921-QYvtHqtJW1Nj7YH5CVJf",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-repair-medium-02\",\"row_sha256\":\"dcdd19858dbf01ebd3b769c7954bebe2b34174791fecb2815939934e5c00078b\",\"critique\":\"The input is a plausible dictated technical note with recoverable self-corrections. The output correctly resolves “three times scratch that five times” to five retries and “suspended no wait ... closed” to the closed-account condition. It preserves the backoff timing, non-retryable errors, manual compliance review, immediate notification, audit fields and database destination, termination ordering, and daily reporting requirement. The prose and paragraph formatting are appropriate for /polish, with no material omissions or additions.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating corrections**\n\nI need to evaluate if the input has passed. It seems the dictation corrections should be noted, but I want to make sure they're natural and technical. The output might need to retain some oddities, but those are still allowable. I also noticed that the facts are preserved, with some explicit corrections made. It seems like the natural formatting has passed, so I’ll critique it concisely and mention the necessary points.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating corrections**\n\nI need to evaluate if the input has passed. It seems the dictation corrections should be noted, but I want to make sure they're natural and technical. The output might need to retain some oddities, but those are still allowable. I also noticed that the facts are preserved, with some explicit corrections made. It seems like the natural formatting has passed, so I’ll critique it concisely and mention the necessary points.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5az8ugfAAgPXJp6mJYUQQ39cdX5hZa4Bvqz22muHRPtqsQ9HWq_kkym8H7g_Kia07NrYDV20MCI5j4M2hn5gSVKRbMIToat7I8OSQaKZhRMwUbNHiyaKFkEXKBa_Rbqk4bQ0wI2hg__GBNKSPGh-In7eXtkTRLI2Z_YLCFrXaQtCFyheBQdikxzEenffsS8jD4WVdELJTCfmfThDFkoLXX5Hx3mmU1JTZjS2ApouIXhVlBsji7uMqkvUYxy0u8yORYC7zbgC3gVunJDxK8QAaKdm4IxGNVhbHkflH0x4b4jsVFsql4JzxQ9CTEGTsxTUWMKA__xvOcfMynfY6VdYpZQfJSwpQliVmUXFQZyDaOZc8jE3nyHP0ZQMYWesBDDm6HdFGC9J9_UowFYr27XpO8WPQtldpbyqusrIllEKjPLxkCQ6kEw3cJmycYUpVzEaT1mAfuM5gGdeWZ6wbRQ-4VNFN8DjRrKML2VeS4-1XP8sNfYKNpUj8qFs5nhgWbLiE7LnQMytrMnQV-T0sCahOZABSWt4zFHJZI8d0cgH8A96NPKrbhFE-R7DD-V6VdCKPRKcGabJkTrNp7cMVRGOIkjx52fmsLo9QYJzvZwgwBW2Y0xtMee4_QhB3OHhozua29zKM02d2LmjwcjoeYfHYGolE8NisjObwCgEFxvCpJ3hZ629mccN5qtU6Me-hWxg1PErhJpL0gZfezUgcZK4DFkqXb8qrQ1ot96H7-hQn33LsaKwPbbKaQkI1q7Qt8SMmd8EEmovGXijMiFLemxcERE7SSe0DDcOYCmpGvMawHpKnWumetA7xLEqKG-Cc3LewxeNPL8tCp0bTcT_W3fvIqUZFLX2LncnYWy3QFMkCgzjprnTq3l_qFGTEgd62RpZkYQ-JQ3N5oHQUN5lLeBhfjI7nmNKO-tfzpkyeitfXMIh4abAksRguIO6YlvBw982fGF1Y3rE0Fngjl-noe7jXnIso-jPeaqXd5b5J888usVfI5m3yPjNEvkxNXeMQD2mZufcOzpK7PvXKJextnNk9OXKbv8_Ry3Q4eOoepyfYUJy6DYaR4Wr-fnKFA_oEm1Lh_DaIvpv_G-bsQnA7oit2jCVkhBTAKk5HccpOcMMBgUcCMTDPWvdos5Rj65IcUO8ZHzDI4GNYVSbqYOShguWQUe1uQx-Jwz5UeEG0Vt8Oya_SpOZBQyCuAhbB_nlzipKsA20-6pNAVXerT8EmPcE5IF2-naVyo3Vi5vDJYslSzu2Y9J47af4Tkr2WlRjoLL4b283460qdfGaP2EXQKmJimh_GbHmfMGc-Gx9szoIu6Ok7IK95C16FVGHbrzzjB7a9i-_d3w-ohT0ylsatspPivmXpRQqevtC5SdNC79aJFAS-7Nyd_6Iuz1OL_n7lBj98LYXVeEwOKAeGldXCejQKJosXNw8KbJAhgGGE681NgpmJvGhPUKBpKGXxfy30Mjpim0qsbGlbPe883UqYVPZtimgJUdGaEZ0WxLVQCZfg5mWPcc30zM1KfMpmUyjZPdO5OQDVGw50T3TOkA8JvfZrVQYH7_XMUQQsbBhbgM4tNyQzwrXTj-4YUKAlXKt-Ue_P5jue2_oMWc9BxbAumjxTG_9GwdaJapqdEscY8_Id1a9mQiDjxEg8acybAyfvzL_he8YLZ_3JUIwUYP8hJI26sCj1ouYYzvU8Ta1CS9eicliFwZc6fHH9b8y3Za3-bYcIZ5Usvpm4P0Xs_4OxqZys1o4py4db4d7leX1YTrpoiAFA0oxHvOy4d1DjnsKHONN8rdpkjaNWhHNudsf3jKwmkjTw0HEgaaqfjI03aTbx6sy53Swn5B6iDzqfUeRLZ-xqDHbIIfsjXMZye-gXWn9DGzHwqhSSEs-zpyitmeX-3WtfmSfs1jpaWm0SjsRUxzOnFcAgLvV1KBqaB8JwH4aP7-JsF1EDK61Gq-w4pmLipJd0TnTCe9iXH1JR5B5Eopc3fH8FvadxgEINFJOzdllwob0T7c2iLoT-ZJJyKVtO6Qp5nm06SAvAJC4vJ4wj_9xqy8XqNCG3zg2tU-CmkOXu-kYZbEg5Yh45rm_XdsN7YUYPYbmBhc6xDuTdmyKS801nJYxkpsOhXN3XFzSqiYnHJX99plJE9QqpJMF6pxQywUZY_bQNInVWZaE-kBXUMeIVdrtAFxru_1VTAvnxDo9gR0Gl97fcRo725PgWHZnUucW5-dyxWdbKSxbzebncx3VRLeJ.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0d3aa2a8ebcd613d016ae5acfacdd087d0aee6cfc61c214e35",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793436921,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 233,
+      "prompt_tokens": 902,
+      "total_tokens": 1135,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 45,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004134,
+        "upstream_inference_prompt_cost": 0.001804,
+        "upstream_inference_completions_cost": 0.00233
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "1c570dfff67ba1c59d33f4ddf7f92e5369863a4017f249f2d087fac15cbd432f",
+  "elapsed_ms": 4521
+}

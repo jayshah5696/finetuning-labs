@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-09-transcribe-low\", \"row_sha256\": \"1f08911cb58608c931bf9724ac6792ff5d49e54b8ce7d0dbdd2f458f23e26d39\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\", \"files\": [\"consensus_node.cpp\", \"lease_manager.cpp\"]}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"we need to finalize the operational architecture and failover specification for our distributed consensus engine. the raft cluster operates across five consensus nodes deployed across distinct availability zones to guarantee high availability and partition tolerance. each consensus node in consensus node dot cpp maintains an append-only replicated log on high-performance nvme storage volumes formatted with xfs. the leader election mechanism in election coordinator dot cpp configures randomized election timeouts between one hundred fifty milliseconds and three hundred milliseconds. heartbeat intervals emitted by the active leader in heartbeat sender dot cpp are set to fifty milliseconds to prevent false election triggers during transient network latency. when candidate nodes initiate elections they request votes from peer nodes by broadcasting request vote rpc payloads containing candidate term and last log index. a candidate transitions to leader only upon receiving affirmative vote grants from a strict majority quorum of at least three consensus nodes. for read operations the consensus engine implements linearizable lease reads in lease manager dot cpp allowing the leader to serve reads without quorum rpc round trips. leader leases are granted for a duration of one hundred milliseconds guarded by monotonic clock timestamps to prevent split-brain reads during network partitions. log replication in log replicator dot cpp batches client mutation proposals into sliding windows of sixty-four requests before transmitting append entries rpcs. peer nodes append entries to local log storage and reply with match index acknowledging durable persistence before the leader advances commit index. when active log storage exceeds two gigabytes or twenty thousand entries snapshot coordinator dot cpp generates point-in-time state machine snapshots using zstandard level three compression. once snapshot creation finishes the consensus node truncates superseded log entries up to the snapshot index reclaiming disk space on local storage volumes. if a lagging follower falls behind by more than fifty thousand log entries the leader streams installation snapshots via install snapshot rpc in chunks of one megabyte. network connection pooling in rpc client dot cpp maintains ten persistent tcp connections per peer node with socket send and receive buffers configured to four megabytes each. site reliability engineers must monitor consensus health on the primary grafana dashboard tracking leader election counts commit latency and raft log replication lag. the p99 commit latency threshold must remain below fifteen milliseconds during sustained workloads of fifty thousand client proposals per second. if log replication lag on any follower exceeds five hundred milliseconds the cluster monitoring agent must raise a priority two alert to on-call infrastructure engineers. furthermore split-brain mitigation scripts in partition guard dot sh must simulate sudden network isolation between availability zones verifying zero data loss. the security architecture lead mandates enforcing mutual tls version one point three with rsa-four-thousand-ninety-six certificates on all peer-to-peer consensus channels. client request authentication in auth interceptor dot cpp must validate jwt tokens and verify that administrative commands carry valid authorization signatures. dynamic membership change protocols in membership manager dot cpp must implement single-server joint consensus ensuring safe cluster expansion without service disruption. the disaster recovery runbook mandates automated nightly snapshot exports to geo-distributed s-three cold storage with pgp cryptographic signatures. the principal distributed systems architect requires running continuous jepsen fault injection tests simulating message delays packet loss and node crashes for twenty-four hours before production release. in addition wal pre-allocation routines in disk allocator dot cpp must pre-allocate contiguous disk blocks in increments of sixty-four megabytes to eliminate filesystem fragmentation under high append volumes. the state machine applier in state applier dot cpp must process committed log entries asynchronously using dedicated worker threads while enforcing deterministic serial execution order. hardware watchdog timers in watchdog supervisor dot cpp must trigger automated kernel panics if the main event loop stalls for longer than two seconds. cluster telemetry exporters in prometheus exporter dot cpp must expose detailed metric counters for raft term transitions uncommitted entries and disk write queue depth. the infrastructure operations director requires verifying complete disaster recovery failover restoring full consensus cluster state from s-three snapshot archives within thirty minutes. storage durability policies in fsync controller dot cpp must enforce group commit fsync operations flushing dirty write buffers to nvme storage every five milliseconds. the consensus engine must maintain an active thread pool of thirty-two worker threads dedicated to disk i-o operations preventing disk stalls from blocking network event loops. memory management in raft memory pool dot cpp must pre-allocate a fixed pool of four gigabytes to eliminate runtime heap allocation latencies during packet processing. when cluster nodes undergo scheduled rolling upgrades the cluster operator in rolling upgrade dot py must transfer leader authority gracefully using raft leader transfer protocol. site reliability engineers must configure automated prometheus alert rules in alerts dot yaml notifying on-call engineers when consensus disk utilization exceeds eighty-five percent. the chief technology officer requires that all automated backup systems archive encrypted cluster state snapshots to secondary cloud regions every twelve hours. the engineering team mandates continuous performance profiling with perf and valgrind on all pull requests verifying zero memory leaks and bounded stack depth.\", \"output\": \"We need to finalize the operational architecture and failover specification for our distributed consensus engine. The Raft cluster operates across 5 consensus nodes deployed across distinct availability zones to guarantee high availability and partition tolerance. Each consensus node in consensus_node.cpp maintains an append-only replicated log on high-performance NVMe storage volumes formatted with XFS. The leader election mechanism in election_coordinator.cpp configures randomized election timeouts between 150 milliseconds and 300 milliseconds. Heartbeat intervals emitted by the active leader in heartbeat_sender.cpp are set to 50 milliseconds to prevent false election triggers during transient network latency. When candidate nodes initiate elections they request votes from peer nodes by broadcasting RequestVote RPC payloads containing candidate term and last log index. A candidate transitions to leader only upon receiving affirmative vote grants from a strict majority quorum of at least 3 consensus nodes. For read operations the consensus engine implements linearizable lease reads in lease_manager.cpp allowing the leader to serve reads without quorum RPC round trips. Leader leases are granted for a duration of 100 milliseconds guarded by monotonic clock timestamps to prevent split-brain reads during network partitions. Log replication in log_replicator.cpp batches client mutation proposals into sliding windows of 64 requests before transmitting AppendEntries RPCs. Peer nodes append entries to local log storage and reply with match index acknowledging durable persistence before the leader advances commit index. When active log storage exceeds 2 GB or 20,000 entries snapshot_coordinator.cpp generates point-in-time state machine snapshots using Zstandard level 3 compression. Once snapshot creation finishes the consensus node truncates superseded log entries up to the snapshot index reclaiming disk space on local storage volumes. If a lagging follower falls behind by more than 50,000 log entries the leader streams installation snapshots via InstallSnapshot RPC in chunks of 1 MB. Network connection pooling in rpc_client.cpp maintains 10 persistent TCP connections per peer node with socket send and receive buffers configured to 4 MB each. Site reliability engineers must monitor consensus health on the primary Grafana dashboard tracking leader election counts, commit latency, and Raft log replication lag. The p99 commit latency threshold must remain below 15 milliseconds during sustained workloads of 50,000 client proposals per second. If log replication lag on any follower exceeds 500 milliseconds the cluster monitoring agent must raise a priority 2 alert to on-call infrastructure engineers. Furthermore split-brain mitigation scripts in partition_guard.sh must simulate sudden network isolation between availability zones verifying zero data loss. The security architecture lead mandates enforcing mutual TLS version 1.3 with RSA-4096 certificates on all peer-to-peer consensus channels. Client request authentication in auth_interceptor.cpp must validate JWT tokens and verify that administrative commands carry valid authorization signatures. Dynamic membership change protocols in membership_manager.cpp must implement single-server joint consensus ensuring safe cluster expansion without service disruption. The disaster recovery runbook mandates automated nightly snapshot exports to geo-distributed S3 cold storage with PGP cryptographic signatures. The principal distributed systems architect requires running continuous Jepsen fault injection tests simulating message delays packet loss and node crashes for 24 hours before production release. In addition WAL pre-allocation routines in disk_allocator.cpp must pre-allocate contiguous disk blocks in increments of 64 MB to eliminate filesystem fragmentation under high append volumes. The state machine applier in state_applier.cpp must process committed log entries asynchronously using dedicated worker threads while enforcing deterministic serial execution order. Hardware watchdog timers in watchdog_supervisor.cpp must trigger automated kernel panics if the main event loop stalls for longer than 2 seconds. Cluster telemetry exporters in prometheus_exporter.cpp must expose detailed metric counters for Raft term transitions uncommitted entries and disk write queue depth. The infrastructure operations director requires verifying complete disaster recovery failover restoring full consensus cluster state from S3 snapshot archives within 30 minutes. Storage durability policies in fsync_controller.cpp must enforce group commit fsync operations flushing dirty write buffers to NVMe storage every 5 milliseconds. The consensus engine must maintain an active thread pool of 32 worker threads dedicated to disk I/O operations preventing disk stalls from blocking network event loops. Memory management in raft_memory_pool.cpp must pre-allocate a fixed pool of 4 GB to eliminate runtime heap allocation latencies during packet processing. When cluster nodes undergo scheduled rolling upgrades the cluster operator in rolling_upgrade.py must transfer leader authority gracefully using Raft leader transfer protocol. Site reliability engineers must configure automated Prometheus alert rules in alerts.yaml notifying on-call engineers when consensus disk utilization exceeds 85%. The Chief Technology Officer requires that all automated backup systems archive encrypted cluster state snapshots to secondary cloud regions every 12 hours. The engineering team mandates continuous performance profiling with perf and Valgrind on all pull requests verifying zero memory leaks and bounded stack depth.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-09-transcribe-low"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "1f08911cb58608c931bf9724ac6792ff5d49e54b8ce7d0dbdd2f458f23e26d39"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "2746f3de56e43589c74be8edd4ab834d6a5d7d6b3b5e9b6e59fffc6b4ac5f3c0",
+  "started_at": "2026-10-31T21:14:26.548983+00:00",
+  "result": {
+    "id": "gen-1793481266-uf6sdBznh9IGvix2oMLP",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-09-transcribe-low\",\"row_sha256\":\"1f08911cb58608c931bf9724ac6792ff5d49e54b8ce7d0dbdd2f458f23e26d39\",\"critique\":\"The input is a coherent, detailed technical dictation with recoverable intent and no apparent leaked instructions or padding. The output preserves every requirement, condition, quantity, and named component, including the snapshot thresholds, alert conditions, and distinct nightly and twelve-hour backup requirements. Changes are transcription-appropriate capitalization, punctuation, and written forms for spoken filenames, numbers, units, and technical identifiers. There is no material omission, lexical paraphrasing, or change in certainty.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing technical input**\n\nI'm considering whether I need to assess input that's synthetic and technical. I want to be concrete about defects and not just rely on density alone — all output should have exact terms, proper spelling, and filenames. There could be contradictions in the input, like “guarantee high availability and partition tolerance,” which isn't concrete. I need to ensure everything passes scrutiny, critiques concrete mentions of counts and periods, and follows stylistic guidelines without omissions.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing technical input**\n\nI'm considering whether I need to assess input that's synthetic and technical. I want to be concrete about defects and not just rely on density alone — all output should have exact terms, proper spelling, and filenames. There could be contradictions in the input, like “guarantee high availability and partition tolerance,” which isn't concrete. I need to ensure everything passes scrutiny, critiques concrete mentions of counts and periods, and follows stylistic guidelines without omissions.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lo3npGQU1s8LNpNCHogrkhmLMT_EHK8eSrV3khC8PFQKjP5krCgfb4Zy3CMXwLkZk2rsUWp9yqAruYFMuCVwD__Xd4I2uQIC89onZlSjZAFnBQhFoXGEGGoWlun5741xhVclEuoVuXmqRPVw7KFDz73AeYWwYGIExWrjLMTcYp0Jt7kSeF_PpOkP1uBxEsPr0jqEoRAyqWamhI9ZVu7UtIDmR_Mok32p3eqokPwOzglq0sf6Ch4XKp-MypHCPLMpXrNuv8oGI3O5ibTogTNDXrRh6Ndg_SFL8Ls61Kc2V0-ekCC10V13PfBecmk-dB_DCHNB3cZnhMs-MIvTGmZ0ERg9QvepaZfDuXee4LYbAQw4h7UXWc07CssVjOe_4bFJ_TDYbT7IpLrJ5IkgYbXh0okMIH39jo7ifl2hqQpd7_CLbDJVRHUYSaWk7WO05V_UHCthPo0P78xVXGv1YehUYo-OpNNMNWf_Ey-KLSMkUWzsUjvjKoVFJ_jbEmczcREsu1m1GxbyFcTjSvP6OYAA2fiuVPOxcxJ1VtVF-PUrwIdjlLoV_LHywZ0tgS8XVC9F-TIltL-0bPt3zycYEluFq3xBM6lywfmq7X75kBIpWaQ2u-MFzN9FYxQZLCfZ9JQqlDosLkBHUMxLEL_k1rlxwq22k_kEKIOsiposzBFHCPIA4Cp6ddonBVgxKRCGbyobR1xoJs48qwy6eQdgXGXRekNFG4oEi0nzpNdOMcDI0XKhAHSR5azrPMU0GYxSTYFzFJ4JOFWoCE33hnuLbBbTe6qArUg1Q6Xxh2V_V5-QsvmblTx2bR9eLddXANKTINERZaHaIsXpnME2yXVDjfI748Js0RMExvFgnYdjCLvyLZKLJmdr4C-_4xRI_Zgnt7CwqDH6qQTK8ZqOLCJCZ5COLb-T43pNmBQi6B_grWDPrzOAEOUFBwzQoAPLgQTeSGkKGFAS2MBdF_WpxSwXDt-AQlsj6Kh0G3V2bq4zQROuAibARmmbSjUQ9-WsZO6kFeO3JcA4EMKDl0BYgcsbxmQP-SZOotdtdMBjL9sQLcqGl-xqQyC2OiLNrpCVK589qP_bAE4ANmb3CvaKBk4oThZ30nnmTv6oRj3Lsu_pTZx4_csIkCMXlt5ZWC3kucYG0VHETXodH3_wRDPlW6Ckhu15o-lAUaZicpDF74ycrHfbcrYl-5lRFH5wT48XgS0Hh1zaylWMMjnWGEb8YE10F-P9bG569x82oRKi0ndBbraGoVsdzDlcQrdjF-zTRVpH6-vT3TlFP4UmbUwupNyPc1kGMEwDHxEu3naW4TomXb2xaaVlXRIlfrCNdWHKUXSnrbuNLtSJBgTpSdgsdRz0oMiWeimf0e1AVoQjTiu6bIlXM75_Mc_4Zki_HHzTTXJjZNQXy0dm8FKnejmcVvXcWpoBvMJR7E1C459CYcvuVf5EuCQSqBvf4ak6T0OkWkvDFrtuVHFB4YMlwDG6TmvrPIYqHdlJ11byai6BM4KFSKnfML3mCX11EHr5mT55a85TyaqbmgqaKbEgpO_JVW52Y4CRwV6Gpkk81GdHInkaMDiclZPDszQjOPPLU_UYe-QswrchV784RzIgUUl3pfhjegqcop6X0lPLxuJWikIEPhpMvYc7uI3taX4RoDH5u05KK4zAMMBMsZyNdFlHqUfSQMxgZJM9rxB6bbP2eaSr9vyH_H_R_yCApbIUC8cTxZ-EmEXR5Mx12vCADzeCzVM2TbwA51TXz6aiw5YeJ3kUXtJ23SfEty69ftkPn1iP-WoLtyaLECvdo_XZ_jMsTn5WWXBy7_oW5YimYa4ZhDCwXg6cT3X7yRQM6tfw_vc2psaH88CGE8YoDIFiZmpKiLPKiNi1yphMoDGBPRaUzIOM2ePdsWXtbEVBRJdiklvhA8D7d5zdlGFZ5voN9kFXzmj5JlYtRosmO1ra-YSin7iVi5X4nKhy3_ZBh5GwvjXprEhbija1dPEdkae2CreHkezw84gcLIBdI7b4xK-bs1fuIhgHXutXqKVAZpD9f9MHvcmpLW_kzES2ycvc2g4JD_fGVDoq2e83DZUGkuceZnflRjOXPuST4udrJyZ5g_MZo3bbS04BmPkBwcreScW01Fhb3LfXeG1muYrtvs5v9u-UbaKNK1_tsqjebG2h51bRxakMypk46RIENRFwHIU4YLDqJ1MPZ23q5kRJ2I9ba6EAGmMY9oTAWi9LVVSk7w9iku2pJXSAOw4XlDdxNRUVk9_vRrzOf9zZMgm2XznNSBn3iZWdRhQ3G-PDMs7nWokuw49TQk0eQEL6iFGHZHoiceZjo_MIq0bsMLF8ejN6lH6fyUaYpdPSMR_2EW59YhfX5mOHgWXJdCUYZdmwpurO81rJU3TGWvIJHarLhwlVSE2lBHkT_a0N_W2snh812xnqoTkO7cT5WG2P1suK6rUDiFiqjxo94AHpFzRQy7aVGw7BtQJu-GlSPUbVrlgK-rTBTlCHbVUmMxfTETnxFPZN3NSsZ5Y6W4xNDF57Byo_H8q50-tHCxyGfYHMPHZ_k7uniRWSiS_VGiWPMS63YCl7TwGBqDUM6dj9sTL2z2V0gYLsOQTlOCsa-w8pAyFPQwNBB6KJ4Lkp8665at-bQUiiWD6RxsweRdllKbWZ6vkWcdBPT5tOFBUnwo0BlqCg99dBoW1ISxP4lwnpryExBbirgYb9N8SaxcO4rP_dqsIECWk72-ZKFvCT0LDowkvyIGzgiolvkq-ggm45gcESXn9K499ZBr1RZdtIxhp86VmXt2c35zZziiv0jOse45eX0udY8_Fmf1V-sLX1N7R8cCcBtg7PkZjq-yNqNnvT_r7EapkWYIKNvSGDopfml5Pwn7QlwsZE7-g_IHPxcb2u7UfwmaMxneQOTb87X5pBWYHacigAJQX3mJiGuZ1TdoRRdwmYnAhlgugOpDb90lNdzuR2qzvEB6O572iyEj_U-5JkYOGSWh00cqh_cL1S7qs8Er1eSO6aJDBA6HJmPFojIqoeeV-AWCqBpvKRzusc-suwwn13HtqWAiGShx5hfa1mAfiN771Fy8Uk73I6KKbgH7rHXibyTV11FylSUB4jX-8u82_tnW0PiVE4b12Fx8eakiuKmj_le_A-AqO4fHDHfeK69X4YFK23V_LGaX9Ih6oyds2pdAUkW-UVUVGzP_Eiq3NY4r13629OR1sjXKVE_4bh41QOMoPfe3ExqUrAJYtS_CU0TpMW6hGkZWp3b7SAMpojoTMVhJqCzoIM2imYJaiOAzvyfudJ7u0QTzwPICL7MJ4iHS5z5XzA-HowYq5J4XTWiESxEiBLL67-yRdIg_lq7t7rQ7A9JOkOA3wL0zXMsNlU_oJR93TnunG0w1G1SDCjkzseh7-aiMBJZE-FJNujxlBE87zfuqiO3RPj0HzeEErQXJ8o4UmGEzHX343BAGCsk2mHEMoRDNT.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_06110996597f8d6e016ae65a337e7087d0aadebdb538b21d32",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481266,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 313,
+      "prompt_tokens": 2528,
+      "total_tokens": 2841,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 125,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 2525,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0033885,
+        "upstream_inference_prompt_cost": 0.0002585,
+        "upstream_inference_completions_cost": 0.00313
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "667c8ec2d2af119140e3fc765a94245023a2848685f3bb258b91a1446380dd06",
+  "elapsed_ms": 7113
+}

@@ -243,6 +243,8 @@ def review_candidates(
     prefix="opus",
     batch_size=8,
     max_tokens=6000,
+    system_prompt=VERIFY_SYSTEM,
+    temperature: float | None = None,
 ):
     from arka.config.models import LLMConfig
     from arka.llm.openai_client import build_openai_client
@@ -319,6 +321,21 @@ def review_candidates(
     )
     batches = [packet[i : i + batch_size] for i in range(0, len(packet), batch_size)]
 
+    calls_dir = root / f"{prefix}-calls"
+    calls_by_id = {}
+    if calls_dir.exists():
+        for cp in calls_dir.glob("*.json"):
+            try:
+                crec = json.loads(cp.read_text(encoding="utf-8"))
+                if crec.get("status") == "completed":
+                    content = crec["result"]["choices"][0]["message"]["content"]
+                    rev = json.loads(content)
+                    if rev.get("reviews") and len(rev["reviews"]) == 1:
+                        cid = rev["reviews"][0]["id"]
+                        calls_by_id[cid] = (cp, crec.get("request_sha256"))
+            except (json.JSONDecodeError, OSError, KeyError, IndexError, TypeError):
+                pass
+
     def read_call(path, request, batch):
         result = saved_call(
             path,
@@ -344,7 +361,7 @@ def review_candidates(
             "model": model,
             "max_tokens": max_tokens,
             "messages": [
-                {"role": "system", "content": VERIFY_SYSTEM},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": json.dumps(batch, ensure_ascii=False)},
             ],
             "response_format": {
@@ -352,14 +369,30 @@ def review_candidates(
                 "json_schema": {"name": "rewrite_reviews", "strict": True, "schema": schema},
             },
         }
+        if temperature is not None:
+            request["temperature"] = temperature
         if len(batch) == 1:
             request = copy.deepcopy(request)
             array = request["response_format"]["json_schema"]["schema"]["properties"]["reviews"]
             array["minItems"] = array["maxItems"] = 1
             for key in ["id", "row_sha256"]:
                 array["items"]["properties"][key]["enum"] = [batch[0][key]]
-        paths = [root / f"{prefix}-calls/{index:04}.json"]
-        paths += sorted((root / f"{prefix}-calls").glob(f"{index:04}-retry-*.json"))
+        req_hash = digest(request)
+        cid = batch[0]["id"] if len(batch) == 1 else None
+        if cid and cid in calls_by_id and calls_by_id[cid][1] == req_hash:
+            paths = [calls_by_id[cid][0]]
+        else:
+            cand_name = cid if cid else f"{index:04}"
+            cand_path = root / f"{prefix}-calls/{cand_name}.json"
+            if cand_path.exists():
+                try:
+                    existing_rec = json.loads(cand_path.read_text(encoding="utf-8"))
+                    if existing_rec.get("request_sha256") != req_hash:
+                        cand_path.unlink()
+                except (json.JSONDecodeError, OSError, KeyError):
+                    cand_path.unlink(missing_ok=True)
+            paths = [cand_path]
+            paths += sorted((root / f"{prefix}-calls").glob(f"{cand_name}-retry-*.json"))
         reviews = []
         for path in paths:
             reviews = read_call(path, request, batch)

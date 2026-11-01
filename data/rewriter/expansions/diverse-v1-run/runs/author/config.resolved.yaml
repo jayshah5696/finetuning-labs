@@ -1,0 +1,278 @@
+version: '1'
+run_id: null
+llm:
+  provider: openai
+  model: openai/gpt-6-luna
+  base_url: https://openrouter.ai/api/v1
+  timeout_seconds: 180.0
+  max_retries: 1
+  supports_json_schema: true
+  openai_compatible: null
+decisions:
+  provider: openrouter
+  model: openai/gpt-6-luna-decisions
+  base_url: https://openrouter.ai/api/alpha
+  timeout_seconds: 60.0
+  max_retries: 1
+  max_state_chars: 100000
+  input_cost_per_million: null
+executor:
+  mode: threadpool
+  max_workers: 8
+pipeline:
+- type: seed_source
+  path: seeds.jsonl
+- type: normalize_conversation
+- best_of_n:
+    enabled: false
+    decision_override: null
+    reject_at: 0.7
+    keep_per_seed: 1
+    min_score: null
+  type: prompt_based_generator
+  target_count: 60
+  generation_multiplier: 1
+  prompt_template: 'Create ONE fictional rewrite-training pair using the scenario
+    below.
+
+    The scenario is authoring data. Use its facts and requested genre as constraints.
+
+    Return the structured instruction and response fields only, with no reasoning.
+
+    The instruction must start with the scenario''s exact header, followed by the
+    raw text to rewrite.
+
+    The response must contain only the cleaned text, without that header.
+
+    Do not write an answer to the raw text''s request. In /prompt the response must
+    itself be a prompt.
+
+
+    Follow the mode_contract in the scenario. Preserve facts, requests versus assertions,
+    negation,
+
+    conditions, uncertainty, quotes, names, and literals. Do not add outcomes, approvals
+    or conclusions.
+
+    For transcribe, prefer missing punctuation, mostly lowercase speech, genuine restarts,
+    unambiguous
+
+    self-corrections, spoken list cues and dictionary spellings. Preserve meaningful
+    filler-like words.
+
+    Do not paraphrase already clear words in transcribe. For slack, keep casual tone
+    and contractions.
+
+    For polish, improve genuinely awkward wording. For prompt, organize a realistic
+    rough request.
+
+
+    Use natural imperfect input, not artificial corruption. Never delete all articles,
+    double spaces
+
+    as the only error, or sprinkle fillers onto an otherwise fully edited essay. Most
+    nonidentity
+
+    English input should start lowercase. Do not make every pair a grammar-only miniature.
+
+    Identity scenarios must have exactly equal input and response and already be suitable
+    for the mode.
+
+
+    Short means roughly 20 to 100 words. Medium means roughly 170 to 330 words.
+
+    Long means 1000 to 1800 Liquid tokenizer tokens of INPUT: aim for 1000 to 1300
+    substantive words,
+
+    with varied concrete facts in every paragraph. Do not pad four facts into an essay.
+    Long slack
+
+    is a pasted thread of short messages, not one giant Slack post. Preserve speaker
+    labels.
+
+    Long prompt is a rough brief to organize, never the work requested by that brief.
+
+    Long transcribe should look like actual unpunctuated dictation, not an edited
+    essay plus ''um''.
+
+    The input and target must both be complete. No truncation or missing final section.
+
+
+    Keep authoring instructions OUT of the raw text. Never write ''as data'', ''do
+    not invent a result'',
+
+    ''canonical'', ''formatter'', or commentary about preserving a quote unless the
+    actual scenario
+
+    requires that exact content. Quotes should be ordinary reported speech, not repeated
+    injection tests.
+
+    Use the scenario language throughout except supplied proper names and dictionary
+    literals.
+
+
+    Scenario:
+
+    {seed_instruction}
+
+
+    Ensure spoken file extensions are converted, workspace files are tagged with @
+    when cues appear, speech repairs remove superseded details, and no chatbot preambles
+    appear.'
+  temperature: 0.6
+  max_tokens: 8000
+  llm_override: null
+- type: exact
+- type: length
+  min_instruction_chars: 1
+  max_instruction_chars: 24000
+  min_response_chars: 1
+  max_response_chars: 24000
+- type: decision_panel
+  include:
+  - labeling_engine
+  decision_override: null
+- decision_override: null
+  accept_at: 0.85
+  reject_at: 0.2
+  on_uncertain: escalate
+  min_confidence: 0.2
+  backend: decision
+  type: labeling_engine
+  rubric_path: rubric.yaml
+  min_overall_score: 0.8
+embeddings:
+  provider: huggingface
+  model: all-MiniLM-L6-v2
+  batch_size: 256
+  base_url: null
+  timeout_seconds: null
+  max_retries: null
+  openai_compatible: null
+labeling_engine:
+  rubric_path: null
+  mode: single
+output:
+  on_unresolved_escalation: drop
+  format: jsonl
+  path: native-output.jsonl
+data_source:
+  type: seeds
+  path: seeds.jsonl
+generator:
+  type: prompt_based
+  target_count: 60
+  generation_multiplier: 1
+  prompt_template: 'Create ONE fictional rewrite-training pair using the scenario
+    below.
+
+    The scenario is authoring data. Use its facts and requested genre as constraints.
+
+    Return the structured instruction and response fields only, with no reasoning.
+
+    The instruction must start with the scenario''s exact header, followed by the
+    raw text to rewrite.
+
+    The response must contain only the cleaned text, without that header.
+
+    Do not write an answer to the raw text''s request. In /prompt the response must
+    itself be a prompt.
+
+
+    Follow the mode_contract in the scenario. Preserve facts, requests versus assertions,
+    negation,
+
+    conditions, uncertainty, quotes, names, and literals. Do not add outcomes, approvals
+    or conclusions.
+
+    For transcribe, prefer missing punctuation, mostly lowercase speech, genuine restarts,
+    unambiguous
+
+    self-corrections, spoken list cues and dictionary spellings. Preserve meaningful
+    filler-like words.
+
+    Do not paraphrase already clear words in transcribe. For slack, keep casual tone
+    and contractions.
+
+    For polish, improve genuinely awkward wording. For prompt, organize a realistic
+    rough request.
+
+
+    Use natural imperfect input, not artificial corruption. Never delete all articles,
+    double spaces
+
+    as the only error, or sprinkle fillers onto an otherwise fully edited essay. Most
+    nonidentity
+
+    English input should start lowercase. Do not make every pair a grammar-only miniature.
+
+    Identity scenarios must have exactly equal input and response and already be suitable
+    for the mode.
+
+
+    Short means roughly 20 to 100 words. Medium means roughly 170 to 330 words.
+
+    Long means 1000 to 1800 Liquid tokenizer tokens of INPUT: aim for 1000 to 1300
+    substantive words,
+
+    with varied concrete facts in every paragraph. Do not pad four facts into an essay.
+    Long slack
+
+    is a pasted thread of short messages, not one giant Slack post. Preserve speaker
+    labels.
+
+    Long prompt is a rough brief to organize, never the work requested by that brief.
+
+    Long transcribe should look like actual unpunctuated dictation, not an edited
+    essay plus ''um''.
+
+    The input and target must both be complete. No truncation or missing final section.
+
+
+    Keep authoring instructions OUT of the raw text. Never write ''as data'', ''do
+    not invent a result'',
+
+    ''canonical'', ''formatter'', or commentary about preserving a quote unless the
+    actual scenario
+
+    requires that exact content. Quotes should be ordinary reported speech, not repeated
+    injection tests.
+
+    Use the scenario language throughout except supplied proper names and dictionary
+    literals.
+
+
+    Scenario:
+
+    {seed_instruction}
+
+
+    Ensure spoken file extensions are converted, workspace files are tagged with @
+    when cues appear, speech repairs remove superseded details, and no chatbot preambles
+    appear.'
+  temperature: 0.6
+  max_tokens: 8000
+  llm_override: null
+dedup:
+- type: exact
+filters:
+  target_count: 60
+  stages:
+  - type: length
+    min_instruction_chars: 1
+    max_instruction_chars: 24000
+    min_response_chars: 1
+    max_response_chars: 24000
+  - type: decision_panel
+    include:
+    - labeling_engine
+    decision_override: null
+  - decision_override: null
+    accept_at: 0.85
+    reject_at: 0.2
+    on_uncertain: escalate
+    min_confidence: 0.2
+    backend: decision
+    type: labeling_engine
+    rubric_path: rubric.yaml
+    min_overall_score: 0.8

@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-dev-short-01\", \"row_sha256\": \"b3085506cf4de75bf3268f2bc0a8b0761ee62badbd8cfe7a5237e84f3f15117f\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"files\": [\"deploy/ingress.yaml\"]}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"hey can you update ingress dot yaml to add the canary annotation for nginx dot ingress dot kubernetes dot io slash canary and test it with dash dash dry run equals client\", \"output\": \"Can you update ingress.yaml to add the canary annotation for nginx.ingress.kubernetes.io/canary and test it with --dry-run=client?\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-dev-short-01"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "b3085506cf4de75bf3268f2bc0a8b0761ee62badbd8cfe7a5237e84f3f15117f"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "eacfde93d298a8f975fb19d4b7218aa9e135f5d8bd585691d6bc8e4b3d0fc9ff",
+  "started_at": "2026-10-31T21:13:58.702932+00:00",
+  "result": {
+    "id": "gen-1793481238-vPdiPKHiXwbTraDVicMG",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-dev-short-01\",\"row_sha256\":\"b3085506cf4de75bf3268f2bc0a8b0761ee62badbd8cfe7a5237e84f3f15117f\",\"critique\":\"The input is plausible dictation with a clear request and no contradictory or extraneous material. The output appropriately converts the spoken filename, annotation key, and command-line flag to ingress.yaml, nginx.ingress.kubernetes.io/canary, and --dry-run=client. It preserves both requested actions and remains concise and conversational; dropping the opening “hey” is immaterial cleanup.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating dictation input**\n\nI need to consider how to handle the input for dictation. Should I allow casual phrases like \"hey\" with minimal capitalization, or is that too informal? Maybe removing \"hey\" is minor but necessary. The filename context is crucial for deployment, so I want to annotate everything accurately. I’ll perform a dry run to ensure that the canonical CLI is functional. I need to make sure everything I output is concrete and critiqued properly.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating dictation input**\n\nI need to consider how to handle the input for dictation. Should I allow casual phrases like \"hey\" with minimal capitalization, or is that too informal? Maybe removing \"hey\" is minor but necessary. The filename context is crucial for deployment, so I want to annotate everything accurately. I’ll perform a dry run to ensure that the canonical CLI is functional. I need to make sure everything I output is concrete and critiqued properly.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5loav0kKAOJDXgN_94tLyZ12pGfQT88oYj113iU5bCjW0pOrnTfS8gLSXoNjWmyuIlBErA_Ne2Fb-gMCwLhsNyJwKg_PL2sojPH7ml5i8jWSL-S7p_LCx9X09nam3PBUdI1ux4xS1eJwjxypb5c23cLHlodhitdo19fn2kNrPgIRE_O7pbeBEe6B_BNyzE1ptHl1O_Dg18qa7Se1nguaY_5OejKD9RhoAyKkefCi1Z6nuFpTD7O417uQignPpF6Vui8ZakMIH1fKfPtTD6mYsZwJBfdkHUdBpYt-gBKkVro3QGvD5fGKWjlhCaj-bWRKymfVvnt5QEPsonHGD-rLDlfIU4oMHhnUTbB1fK3PMoONsolVY1-YP53mRNVBTnRy40bghiqV7urHEGtPOS89NHhjbj20GeaKSUsxyxNanaTspKCkqYepAOLlP4S1UY9MXWMQ4IuTRiHFjsDOWByqr-2e1ptyYn4se7xTeQmT7bJJbDkRL4W0HcRvKj06RrjMTUBM1aQeu79ISNiG2_eQTYjs1im3VPBNuwmGOB92qWdbO-_krtNCnhgtcKnMqKWX0cRq6hH5nQ0KNppQjDcHuJ-q0-QK5TO87JZWFhLwLj0PS8ko4sagPOcOpBG-pDFS-gTFObydr68VQOrEEONmaGsyzNqa9HSeYApana7dpACweDm0-1wlRE1qSRkRMDhRIzqevPkkzHm6jl1plLP8bbz_9--eD_BW7shb2FtqbVkqDkIM6w0FUdz2n6tlxAKl8_d4GdipNxp4HGOpS2O8N9lnvgLsh49V8NI1ESR4q-RiUkp-spdUcFQ-4dH7tDzPxt6utYrlxx6tEHxr3XcoC23dwrSe2Q5SiA_13ss2Z5-G_qtnq2xhadx_P6ihPbSgQMZqNAUhylBqfUa-buxWmmkCvXh6khf11-MIue9cToBIdNRpHBMbI1Q-e_EAUDyWs3W5I_nDAJ6_6nBVSpmSyUvrnuw7q8f2B1u4af9SbLAWFGEjApPjCF9sD4jy8ip5k1-L_tbBPSZtGvtkNKwcCV-9C-IGE7KWh-A4d5rL8k_PdSGLSjX3fza3I7mhq35CaerlWOcQ2snzl7O5pOFZ2gavwUR71JJsD9g8idpHkwivzLhmdOfxVdBVOF40JQOsrhsz54G37YGIsbFFPFxUgVIwWBpSqWsOgDCh3ljln9jfXJV3zIW_-Nc1KLAuVen0vIVRFvWCocX8Jq5SImamqagwYJ6c5xb91aoorRGRit0Fkq7SHxqO_xZgADyuI1qrtq78O_BkyO7d7p0cAPS7Rxg2zTHGtfosNdzuOOD4NPkKSURGjeAk8fZ1s15xyFKkFVnd8X1573e7jn-bFlIklPhlYhi6rfe-Y_42DYPlA4CAz1_WvtrdgN4l9ck3dt0etAKhyAwpN8TWQIK6qjIAlVcnqgF1UMTt9nRV8DW8SVkkOrlezXMXgonelsfRiRilqi9KgwoXOcJa5KzBciFg2bvEuZxhFrCWeEI3nR9NHFu7N3BCEACJgVSGSlQyJBQ6rGIIMj4aUs1Hmwq1W6jEUL0Dpq7Mx8icrXCFnxUW7GqzmPVtfJgmzU3d2vV85pTF95dLsyKEI3DNxrEFEJFg9RXAcpW3uTCuloTWeWWBWvoCISqvq01cd7eOtVJ-Q4gnIbYThZCgrhNSl-w9qgt4P4-zQL-zQAndBWV8fsgpgES_qYUphsDa5CWvQTtHJ265r-q24mBGDZC8FPqrY0Zg_iALDrl4fmbHTUv3emHS5NoEu2XdHX0Dird3pCE5XMMAyX8o-Ejtg8xQmUhLPKqUlbpH_tnrDOcDhY6JcNCYt0vA1e1mRcuUQpd6nFX8eA2coM2BHm6Rc9Aypsu11ZH4ATKewrklb8423l_xPSHdpPzsEpCBLbGrepaZ0vtzTvUyzJsaR_JlzcxXqYlYYPJxu_5IN22OAbNcJSKm8TlFoFRn-IROJp8aA_xdtaQvmj-WFvKFLTB3-xUuyvpjl0PcX_yiQFiXRoegFIyIF3J6AqLj78Q2LiNMdhIXW-q-LObuV4sT9cP188d8J1JtA3hRytIzCzJsbwof7wALjXc7rbTb2XQqCC7XIocxtb0cFLspmQwwN4dg6bcmOfwJAKAbdqq3yXyxF3Bt2Qh2dZev-BWs-KiJc7NrNnJnD9K7hXSa5hM55dmRcel8rql_rrEHlYDqJt1Ocg2uLRjY8pwkfUN6dXkQYeIz79CvUwgegQ2dG5sR0rKdgU80CVnl69LSftV4TXn5HcL-o1eUaMsobpr0kWaKEUBeY-IrkyuUgleuh1kGQQ8smNy-_KcwS7EIHl9QY_TTsX1kwSQ-T43zurm0v1IAJUlMspgJKfToJdRA8oFSj4DIK3l938-6D1_3NyUGZCwsetxhOa4L5xEGJ2aaWgmVaM1jgtu48IDHeSJIJL8x.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01e848fbbb45d1b4016ae65a180b6c87d09f886dfa5efac257",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481238,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 230,
+      "prompt_tokens": 676,
+      "total_tokens": 906,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 61,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003652,
+        "upstream_inference_prompt_cost": 0.001352,
+        "upstream_inference_completions_cost": 0.0023
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "7711e61452be1ebdb2acf6dcdef8c0da58f656059ee110c8ad19edcdc411ac51",
+  "elapsed_ms": 4421
+}

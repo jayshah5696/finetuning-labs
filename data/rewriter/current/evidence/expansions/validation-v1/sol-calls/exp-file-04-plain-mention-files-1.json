@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"exp-file-04-plain-mention-files\", \"row_sha256\": \"2907ad0fdf649f91febba91b04ba413988b5cdfc86e713c4c9a08adc8162e3be\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"files\": [\"src/utils/logger.py\", \"config/settings.json\"], \"level\": \"medium\"}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"we should check logger dot py before releasing\", \"output\": \"We should check logger.py before releasing.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "exp-file-04-plain-mention-files"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "2907ad0fdf649f91febba91b04ba413988b5cdfc86e713c4c9a08adc8162e3be"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "be7feb070dc86bb06b93d3a6a7a05bdefd21a3a1e14d34f68f3d27f4093540ff",
+  "started_at": "2026-10-31T21:23:12.092165+00:00",
+  "result": {
+    "id": "gen-1793481792-BbUdIApPbx5ViU9fQGFx",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"exp-file-04-plain-mention-files\",\"row_sha256\":\"2907ad0fdf649f91febba91b04ba413988b5cdfc86e713c4c9a08adc8162e3be\",\"critique\":\"The input is a plausible casual draft with clear intent. The output makes minimal /slack edits: capitalization, final punctuation, and normalization of “logger dot py” to “logger.py,” consistent with the supplied file context. It preserves the suggestion to check that file before releasing without adding or omitting material.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lxCzjPDg7IouoE-Huy-PwnDsmfy8Bxr9-l4qJfJz02JwmHXr4s1X4WeTp6VD8SQkXVbifzC8gNLp0wYMCSP8ZudJOo6a0uwc_eE21RnpLxne6IiwPW-VX5tVuNJp0EQmgYr4sqjTa7ejUVyj2XX32Xdqd34ql0hdiTTEePYj8JMSL6DAC1SSCtPjftdxLJ0NcwhZfQZAX-B6rmPfzIjfNGbDuvdDr5PVRECdVZG3vnmf3rTIr3-WJjmXg6StvD9VdqP28a2ObJghQwdArxBWdkxxIQKgGDBrCPomCCtGYWSbLlsNG3wDlYFjyIVkQA8aM6YZdOYl-sopB1HAhHqbO4dNRsRxPck4soJX5H-H4HmhGCdDmBIjeT7k_H4aq4fCwgMCaHFk4CMWuOKo0SrkwNREVaQaIFPy51AiflM2cTRKh_kaunfpext5yp5u8vTRS7oOxOXTSG1zxYvjr4qcrhZ9U-W2_Zxo-PCk3AZCH3iTZKUccABh8_O5KPykNvAp5eQXAmzJFREHv_e6WyhZkUBenWmz86oTw_PMOiglgJjSLIJEUb5UeBf2W5v2msmQsJwXSpli9ccm7O4KhKOfnXCRrbh5U72qKcjtQlWhE7ihMCL1l-wLZt06UCyKgaET6JJWXwxP0pTPBa5XA-6KoZ2ZEF7kusIq9TmxgElTRtd0gRSumIptjDkFYQATcFzy6l684x7s7aIFmUKIt-gvQtMsJBKnc-UQPkA20nPLSYd9B7TloPaQMyjQFJAS7CNuVE8UbqlnlCxOt7EGd5XSI3rNe2xDS4GJ05ncGR0k8G0D30dd9e66ND5AtmFplYK4QgEn1Zz7bYoc0SZMyVgFue_bKewg_7InG3BVpcRC6bEguN69ObxZ7cOdb_mAkeFHezIoaP2ySecMbD1DtYfee7p78015fwfG-is1SzlVYnE-ktr8HkD_SyirEq4uNNeY5Mk2FQfW4qid4IRg7DGtRG6v7A5YaH1K8NaU8qxcP-GQjwQnlERcNAXUMa3WbJLGX6QfUQHiiQkz_MDF8BpvLJ3EhwbP-B3IOrzcCNnK-2fayZNQlNB77N-1OG8jT6Z-GtuAjz1E7p516AIBg5MnyXmrmV6gPzzy3EsJNvIOH46v21tSNDxZ-h2LuxcfF0KTfNRNJzueDKUSKtIxNfCqf1hER6Wy3YL0UqEXnGgzpF413HSPLx74K_TjIWmOqkLZdx34jLYd8X9eipdmpnp4Hmdd7DQ2YjP-GOqJjfmfJN4PoUwC9uSuJ_ZW8jChPUrAjB7B4qO7rkNl4kwMdOxXdtfPfrnt-pTSpqJmsQJh9FB-lWH2B11erLFTD2oqfKuQ40W_aHSBS4k1oA51m8BaAiarQ1Q1Y4MaFfLfTLEsoVHLwY8-B-GkUG54YTDTeoEkiW6V_5hfLHARyqthIbEQhKqqAJSzCbTuow40QvOliq5nRR0qCV0ZzJBdY9bS8FpplkhZfaV_5r2uZiNZ-1ub0sfZ0kMro3Gl_pBS3De_BvEZszT01baEQJ_oSN9Dhf-woyZrULvO-z74Esr06CZ8QCUrkTaetQAR7xt1X_ijaHoOrtvMhPooukzDG0EG7RLzT3pRfQIC9QxPaQ6xs4jiEI3cP7NjM8bhBTaC8WXnEQEcPUbTgyqeCnvJM0JLAaGJUX00OJywSmhn1KwFo-HVDYf5B260rcmRrqzu00n8zUs3KPqYVNzJqJQCiI0R9J2QrSMKWSKrCRt-hiVoc0YtkuBhGKYypmqr72zZEC15N7bCeg2t3Cs2VcqHAraPEvGecH1Mkuph8ZWwshAD-KV3kr_eDfDCdzc12S26IV4Q5gACTpFE3MTDH-vPpjEQnlop2b8pi-ZABRjNjTyxEAkrDP1BRuMOWZ6N4UQJU9Tqn7S6x4v6_YqFzvdAnzDGLim-mHQg9TT5CAzUYrdXH4ZZGeZe_lawiUVVIGiLY39xzly1Uvz_BDRnYT_Qe0tlti80fhuDAEda_6RYWVnXM2Wix264V_L-tOdtYnIWevSSHvcx649OQIkHhOUGAc1hw8gaQyAmeSkb-ycohF_NGWVuXnGo_KLRmZDIOI2Phln8tlVpBGeFhgw9QqKOFeh4jh9vryzKxZmOQGqn8zyp_fF3RcUfA==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_099763b5eb5eb79d016ae65c414da087d08becab72c6c2cfbd",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481792,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 191,
+      "prompt_tokens": 636,
+      "total_tokens": 827,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 35,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.003182,
+        "upstream_inference_prompt_cost": 0.001272,
+        "upstream_inference_completions_cost": 0.00191
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "e6fc2f20abe04794cf11bcf5295d8f05d12d517c6d63e02edac03c12d2c32707",
+  "elapsed_ms": 3627
+}

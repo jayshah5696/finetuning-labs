@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-04-polish-high\", \"row_sha256\": \"54aa97c89cce467b0e23cb14b231012425c3fa5048b81c6d9d96c0192bb44095\", \"mode\": \"/polish\", \"language\": \"en\", \"context\": {\"level\": \"high\", \"profile\": \"notes\", \"files\": [\"gateway/schema.graphql\", \"security/auth_middleware.ts\"]}, \"identity\": false, \"mode_instructions\": \"Rewrite awkward phrasing into readable prose for the supplied profile, or plain prose when none is supplied. Preserve intent and certainty. Do not add a greeting, subject, signature, conclusion, or fact that the input did not supply.\", \"input\": \"our graphql api gateway is rejecting valid user requests with unauthorized status codes during key rotation periods. please inspect schema dot graphql in the gateway directory and check auth middleware dot ts in the security package. the token verification handler fails when decoding rsa signatures with twenty-forty-eight bit keys because the public key cache was invalidated during key rotation. we must update the key resolver to fetch refreshed keys from jwks endpoint before returning authentication errors, and cache valid public keys for twelve hours scratch that twenty-four hours. also verify that rate limiting middleware returns HTTP 429 rather than 500 when upstream key servers experience transient network timeouts. the security team requires an automated smoke test suite verifying key rotation handling before closing the authentication vulnerability ticket.\", \"output\": \"Our GraphQL API gateway is rejecting valid user requests with unauthorized status codes during key rotation periods. Please inspect schema.graphql in the gateway directory and check auth_middleware.ts in the security package. The token verification handler fails when decoding RSA signatures with 2048-bit keys because the public key cache was invalidated during key rotation. We must update the key resolver to fetch refreshed keys from the JWKS endpoint before returning authentication errors, and cache valid public keys for 24 hours. Also verify that rate limiting middleware returns HTTP 429 rather than 500 when upstream key servers experience transient network timeouts. The security team requires an automated smoke test suite verifying key rotation handling before closing the authentication vulnerability ticket.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-04-polish-high"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "54aa97c89cce467b0e23cb14b231012425c3fa5048b81c6d9d96c0192bb44095"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "af5707edf6738225fb5766826165b0b3386243c64907399c289dbe50004982c5",
+  "started_at": "2026-10-31T21:14:09.091924+00:00",
+  "result": {
+    "id": "gen-1793481249-SMRZetMSWio4UUXT0Izc",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-04-polish-high\",\"row_sha256\":\"54aa97c89cce467b0e23cb14b231012425c3fa5048b81c6d9d96c0192bb44095\",\"critique\":\"The input is plausible technical dictation with a clear correction from twelve to twenty-four hours. The output appropriately normalizes capitalization, filenames using the supplied context, and the dictated 2048-bit key size. It preserves the failure diagnosis, required JWKS refresh before authentication errors, corrected 24-hour cache duration, HTTP 429 rather than 500 under transient upstream timeouts, and the smoke-test requirement before ticket closure. No material omissions, additions, or certainty changes.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Assessing 2048 phrase usage**\n\nI need to evaluate the phrase for 2048, focusing on the filenames and ensuring that they support underscores. Keeping everything intact is essential, so I need to provide feedback that is clear and thorough. Input should be effectively processed with natural dictation correction, and my output needs to be formatted as concise JSON. I want to ensure there are no issues with the output before proceeding. Let's get this right!",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Assessing 2048 phrase usage**\n\nI need to evaluate the phrase for 2048, focusing on the filenames and ensuring that they support underscores. Keeping everything intact is essential, so I need to provide feedback that is clear and thorough. Input should be effectively processed with natural dictation correction, and my output needs to be formatted as concise JSON. I want to ensure there are no issues with the output before proceeding. Let's get this right!",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5loka-rT1LMrJ7qtf-QujNoT4NeXyTwDY46C5hE5GaTG8693kPUrGRzuf6yGgdKudm9pvMnvKhRU92jXo6cxcHaFyN_gwm1cbJMGonhXGyS72uuQpAbd_H5fqSkZTOzVL9mXT406HeRny4XcWocp7P6v9da693WK2T6AL833Tazn_p5xdD6VCdDouOW7na-llqttOCfrIsIB2UmAef1GF3-lVqWfivGhYPD6vcKrhdv5l7HWk_SBeknoaG8-hy64Jyi6XLiDWcClkQwjVsBbLz37TA_LyNMttMS-L5VLl6VnT131BzdEC4U0k8N8vvkLQ7Urx_teQhxdqc-t93oDolPgsNyZvKMcchBm13PBneuvpLjiicmBhPWSNH1knSXYdp_b_lhhLGuviim-myC_wjfCN64ss45lVv_XmPRpTugfD1dFuLJBiMVmGxNwR8qJWlrkA6wzul0LKG3hrTNfpcLrjW4HVqmtTGkMy8x50yqtdikT-LwI_g7mJ9B646vVFLR09LXtskKV39Oi3yUCvTnZ0dr1GZJb-1ud1AnrW0gcBPlwHNRsi08cv_fuEhSAbooU561wnswuw1GWiT79ncVWvxFqW8LBAOGPYYivu5PVUoPD7GYEaWmmBJBEDr3h0xNbX0XLEkTL8iu5ha7uuXlyhrD7HivroET-tsG9LOzCh1qsOPaCqxDXeIh_1Kpjzn8nRXnkrS1rzjqOnN9mZjg_usgoR0MZDS58ap9VvjMCBaoCkA7tvJC5q71j96HLtlWF3yh9j5QOT0os0LqPwrnasPMvXJijaDF_r45hptPeWAxNxmBldy3jrqF3wgQHPXKVbvgz8YjX8_WKohxDCC7F563Pnv0LiQcYr_UwuMzBWF8Zuse4vWYtLJbUWaSlxnM88fKVMTaYaxqR87H_KER_-QZM9ovn_TdHkYgF3GIgsEIn9_4CGs244B10_2YUe4hx_sb9un30egJWajzGw2GzqhPTK6PUcpcXlHvJanVD6lbMQxK8Z4N4Qiy44WRQTdt8TmpVJv9fYFceuxnnF5t4kvB3p-FpVij-F1yo3bXMKSFPunLf6o2H3iKcn3UZKfPnIoxxQTIV_2CK3YJJYKFzRFm9AQktFaDHOV8lC52OOHZA1MPEhb-uDFBnuL2VoeoeSB4QIq7N3KMxIE_m_nXczDsm5AoAqpISsS2_adzHi9ARt9RxeZybVyHOS61GBROlDUd_KMkGJQVRO8qb285_uumTL01h5XSzyuRDptQjiijtYQUoUhQDVdMKuMCAzcc2_1BVIes7y9pwwKHPCz0i9HGKlp7Vs_ltwAp8DJIb9onTFsWefbCj5321pLOjewC32lkCd3lkztafL0kVLdodHScRs9Oq-38uj3tNCPwPZqB-dU1woI2j9q7xqRHuiOOqcH8ZZouD8BfbnxFVTIWPaRcx51VcWuuOB12aliJHEHSNuadb4l0-l-To_T6O_WDaSHF3iv_8ybnLt0oUe_VLFIMJED1DQHS8l6YJKwuGe2P1zaNXraMiCjYbHiznj0sg0hVmccrbacoufww-7nvY7dA6Ebjwi71foVfmcA6d3OFipS8LPEru-nPaXAZ0Vn5dyShFT6yyix5o0ClKUA1U_sbbfFMCiuUbUHFzbFwr3Y4LI0W4qF16ZvLSmD-AgcCjE3bHwaCKbLD0nArKgl1HIAqNseYWs3RsVJ2aUlm7O5jflOUd1yAjz_5o6XIjJZXNcdp5o3lThMbfmls6mTeDpZ9ULsUxzWcD_15NNmtrl9eQsAuMyryhhFgLoV1SwQzm6-ZiLZ1zuHGgZnxQsqV6cMKRNcV-MdA5JDnGFzLg1wrZXN4qOczgDrs6PRum92D_wgXoiKHgGZSTJjijCf7SQssdsqTp8-1jrw7Hi7aj10MoWXkQ8z6GE1JAItxepMAmMQO9ELo6F3_Y0GQsJ-l-W3mknwAcTdKanpxjtnzwZ0DPXsi-IXjIgfKANom63aJqzSb9AKLpKN43IUXF-yIS94ajTcq-oxtUX9i60UPPt3egW2il_9COvvHYwPl_7f4Obc6iTWUGCQ_ZdKEpqhZMuUKsmZA8X_pKyM9cbTJzBV3dX8P-9uSNucpuSq-DTHedEZa-R1ixf9JepWLOrVbVsJJqClR--Wwp5sn3VM-9bSx2f52WQofYS_HvzPdvaj3CywpB0A3ufPCMhDlr_soiQL3sJMsWXUEUFEixbvLpg0JDHYWihYT7zikyeWvDLMn12ObIpATKaOKzDKmNDRHZ3Q==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0ec99e39cb5857c0016ae65a22212487d084acbe63488e7d49",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481249,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 237,
+      "prompt_tokens": 929,
+      "total_tokens": 1166,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 49,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.004228,
+        "upstream_inference_prompt_cost": 0.001858,
+        "upstream_inference_completions_cost": 0.00237
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "e38f8ae1794f4612c369b2c6a855a2aa06364b7ae8356188e783771a2feea08a",
+  "elapsed_ms": 3814
+}

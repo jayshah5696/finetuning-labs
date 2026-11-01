@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-contrast-03-prompt-custom\", \"row_sha256\": \"69006b83094c0c6497ea38ed2288b71e3e2bc914514be6d732ebb4d676867ee9\", \"mode\": \"/prompt\", \"language\": \"en\", \"context\": {\"level\": \"custom\", \"profile\": \"developer\", \"files\": [\"k8s/deployment.yaml\", \"services/worker.py\"], \"instructions\": \"Format as a structured technical issue with file tags and remediation steps\"}, \"identity\": false, \"mode_instructions\": \"Organize the supplied request into a clear prompt. Preserve scope and constraints. Do not invent context, requirements, or missing information. Do not perform the task.\", \"input\": \"we had a deployment failure in our kubernetes cluster earlier today during the staging release. please inspect deployment dot yaml in the k8s folder and check pod logs in worker dot py across our worker nodes. the backend api pods entered CrashLoopBackOff because the database migration job had not completed schema updates before new pods started accepting traffic. we should add an init container to check migration status before application containers launch, and configure liveness probe initial delay to thirty seconds scratch that forty-five seconds so pods do not restart prematurely. also verify that resource limits in the pod specification prevent memory starvation during startup, and ensure on-call notifications route to the devops channel. the platform engineering lead requested that we document all container restart events in the incident retrospective before promoting images to production.\", \"output\": \"Create a structured technical remediation issue for the Kubernetes cluster staging deployment failure earlier today:\\n\\nTarget Files & Diagnostics:\\n- Inspect @k8s/deployment.yaml in the k8s folder for deployment configuration\\n- Check pod logs in @services/worker.py across worker nodes\\n\\nIncident Context:\\n- Backend API pods entered CrashLoopBackOff because database migration schema updates were not completed before new pods started accepting traffic\\n\\nRemediation Steps:\\n- Add an init container to verify database migration status before application containers launch\\n- Configure liveness probe initial delay to 45 seconds to prevent premature pod restarts\\n- Verify that resource limits in the pod specification prevent memory starvation during startup\\n- Ensure on-call alert notifications route to the devops channel\\n- Document all container restart events in the incident retrospective before promoting images to production, as requested by the platform engineering lead\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-contrast-03-prompt-custom"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "69006b83094c0c6497ea38ed2288b71e3e2bc914514be6d732ebb4d676867ee9"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "94c528b1ed551ceefc44e1f4208e47a204bb0c7eaedde71301fb2f23357b3626",
+  "started_at": "2026-10-31T21:14:08.417732+00:00",
+  "result": {
+    "id": "gen-1793481248-xJ5iv23oJkk1VH7zytiV",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-contrast-03-prompt-custom\",\"row_sha256\":\"69006b83094c0c6497ea38ed2288b71e3e2bc914514be6d732ebb4d676867ee9\",\"critique\":\"The input is a plausible dictated technical request with a clear correction from thirty to forty-five seconds. The output appropriately organizes it as a technical issue prompt with file tags drawn from the supplied context, without claiming to inspect files or perform remediation. It preserves the staging incident, migration-related failure cause, init-container sequencing, corrected 45-second delay, startup memory checks, devops notification routing, and the platform engineering lead’s requirement to document all restart events before production promotion. No material defect found.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lokVj81H3Iplfcdi23flPHQ9mR_ijYBvL0AI7e5z2AWiwn8XWANSoBdu6ItmFlMkLKw3K4QVJesFYlrxw5fkER_M0dTtHZHCnZpX7AVX63cXok5mRx1JuYVzrb5OQ_XE5IPNHQ0dfd8HuhXuC_7TnHIQV9q8s3a_gpPleG1L1CTYdMgirqSse6simPvlFiXvve96cNGoV2zoQAo0AvsRnddJghOJrbh9TR8SbKq4Z5wCVa0EY09b-SeFLECiQauXzy_LQo_k2K8m2mIFHhsVV-rLuGEd9FbTJTwO_XIVC_mMN6Vw0EOL-3qbJTjuJgaFHp9U0W-mTgz_Qet3KKJIMtNc6uvnnD1r9Fp2IPnPYLIx7dBXVlWoz2BFjRC3LdDg52spHeJvvJ8z1F7bmYqLRze2iP08TJV4q0573wwPw7sYO8aaaEURzzy9LW2Nb080ZW98tbx4wh0nM7ucd6LopPijMiZ9NYdeyIJ2pENvwR5Xduh7CR3viftP4s1jwfEjwC9Gdr3kyiVYJzerV9W7KiUKeMc5C8fmgZY_-FwLct8Bizeel_uzLGylHQCQGKA56ICeNuwvSuZrb1M01cht504O4onlELMR_PAi_L_3Q8wRxhmibIf_u6HhOJXZay112kBrDU8G96iWrJ3IKZlXpA9lz0b1QouEfPA8OM3T57uMe3rSemJInRh8t-SKh4P0gSw3Sud113t93KiQhMOC4KvWZfuAdj0tvfkPsgZFmns9bW4NkUsuo2CU1NFG-Ol1Rffn8mIxrjUkBAg-9Z2T9OamXx-8GdQTIzhRHtr3jBzFQZHEVvXSe2g_beOQQKiI6mhk3b9CtyvUyShcIMtp7FQKvyhk5yL31huZyJIWG4c_ahN0xv1zPxjmHaVzlS42ZMVxJx-JPRsVpQAiKensG3keyfb9aSpOWteYgwE7cpEwG3yhu6dgj3bcTegm2bjSGH6DGdacjt10XlI3MaIiCeOSa1BRShNjoSkUilhXME7YvaXHBuZEDOYIyfBo1usHFoPPlKlqmS7laqxFM0d0KHIzWifc7g3K2V0xFA1i3qOvxokdidiztE2u46XwxJfqAflbSrpfQmwUqWBEQH69Z9bv3QvVQw7bYybhTguiGzmbARex4aIGnP8Vy_9x1gqJVa-rVNVEG_u7VFg3e3ITJROebz1G1vj-fVYjJOK9WEsyCoUU4US4BG2b-RxYhzGElYu_pUso9S3c6rrzkHPhc1FVyj6KuybassQgU--bfLYncA1AjSFg2i6gJG232cjB3K3isW-SAqfm5UpX5EtE09XDOTxZfnBgqdo-F7vnlckTtRrrRe2wuwQdYbzdpH-XBGdZTj_7O12j1L3nNNut3mmK_-QqPkfB0oZws3OnjdtUbAQr9E6gwkGWSZBOQ9wM3oVg_pG5sgwbdDRw6Y70d6boxcyVmWM_CVrEzChqYXZVrWbcIgu1aKL67QOyiYWMHoS7avXi1Hbf9kroLd7mO7ATEGvvm_JI8GnnymIS-IXRjJkT0PnAXkM4ViDYJd-sPBqCKwErD0HJraXCLbr9qVdxHz-2JRciE-tsUq34SDfj2eje_QeO0wVtHotTjhg09piQvNoRm7iRR-OCrdrq5r0WYnf4F0T4VOnercLcf6LiEBvoqqHX__v08Br05kM8RNgrav-VseRD-tGqrs5mWJsexo-8qjlHyQTo5Wekbmka-5wKb3jaosztRN_r91jdITP9PL7YAL3uyFMlm4_0n8aJjCq6MvocuZPbZoYl5XxFkpstSGS9uAQTexdDm0wfo8pHsS8v_gNmd5l_sZcgXy5IueDQY_Bbdz8yqgeMIChDzXRN8wRfY0aon-k5gan4-_SuNba4LqOnkWgFZSY7J4FHfDxFOH6USXh0wjeld7pco7ZWhut2ghY2zqUv7WkbZmysTyQLjzr_MbYijZo7F88J1qAYvZDXL6hITO9C8ttBv4nmRdGbz0-dPH2lMye2Pxoul_c-xcPA2mRnuFCYcNcQimT6REJbWW6t16_lYdJQzc_g16VCInvaUweh4JJNrP3vI3h1u2gvb7ZuRqdJORQTEIybBJHfpuF57RfseFNkuzf5mKhyDCrLmeFs3wu0C-IcZJAgx-XFHkBYyClP4emV7J7oXTA-NIoGo1V0u-9qjLahVWycMH2KGJiwIo1lbrE_RUIbNBVEzMB-nIetvCGo9yMXlPg7LLQiod44DGjZEdQmVnJMwt4VzFUcdWlZ07HVXNVmbbjw_7PkPa3wAhQ5EpvOrDbmqGWwfIB_rJvI2IQJc3v9oRgZq56ANjCAmwyxknERcSk5of9PASS0MTNzsVvJmtIv491k7Rn0kb-Mc08e9KBsE54ydn6v0fbmCJ6NKCEk-eXAvx4k1JapjrRtzCmNTjQ3ssuKOLPtQavb8HtoFcCvGo5Sv1H225YypRJi5PuI5YT4-KWl11CVQrgq86V373VFSsQ0rXsTyqjwawaCU64v0XVgBQt000T-x2Xc5W5uNTfqbm4rODzmBpAohXgL8TFU55rzqA8ZEtvbi8MQ0nWTa5iHYF4CEDkLTUxfg2UGy0us3Ag498C9I9V4BDqZ0mrlKWWYgw8Y3gyZ8OfLyG0Gf0y1rEV4CE3q0yxF8ulgj0NccbS6KvLiL7QUQPyJpgVyLW9inR4dM3-aiTJ1WGpelJyRh8_sNuhOu6CT0Eqp5NiE7kQAo6HwuDOF0oeBXrPDX-5ISKbn0eP9IkuB-UH6K2eXuFeVw1JBzcV49SvtZ-0Ees9LBfPU08oqPh29MvIqEOHx6uoe3VG27TUmDGgMWktvEsKZ4FY1EKk3orh6G2irLDXZPDAs0ekwYXerKgj1zh0dKS3zE8qAFkCSj_pB2NCEa7K8vLE_7Xo8Wy21PV4j6raqvxjvOYgZaQpmAi1q81vAbiA3olzqpwNgKAQaTg_u0mz6qZaWmglcGKvcsmZPA6XiYIKkwn7pt8CpMbVfhLLZU35R215u7L7PdxgVJ35tYLmlzc62ZkSvuM-rf4kyDR-opYnFoOzvqwL8g8b34o-_2BJR5doiKtVMRL-zJs3YWCQGfOVA1osC1zu8bGVqi5kAPhUUynqJenAye-xPgWeE_7eOL9bF-lrmRwo-H-9tmk2kPOfwVdUHU11k8GPpKtMDCKUYr2Or2ipzuHuLU8NQO6mzjNXNF2JliPvJW45-oIFxALEqnEzn9kYfikWNa4LnoRCP-p_iWOzktTBF_eX1cMMt1Q99MwaIGgt6OYuuHL0vUxxKelUqOIMtpy0v2o-zMIr0rKHwlc7vyuZaQu-mbJV9R-zvw1K4cBgCkvJrMkOnZqsFuA-2FpgpP4aI-6PHbdvp7xk2QGCVn_TR3GAlLWAzfcR3YL332XdhdxPJ3632FiybSs6hpC02P4ox-ZI5r41UF5bpvJ4dw06eAn4DvQQtismIdMw0ddKGqnt7DhrERx_1lyskhqZ8iPaffxxclQdrG84U-FxgA_hZygmLsiLS01GAnfB2Uezb_n5BscOGULD2PkmDcTH2w-xJIKQRcoF1wWgl457gq5fWptGxEXXfm1dxr9NxQQWXHztPZ-5ViTmEzo4XvxtSBEiIl04LRmTEJ1kGKwZZaba3YTyBdZhOhG7LLGQos1vdvKk2TLQuUs35x6h6CkpozzMG6OFfdoHz9E9yV5SjpAH-hY9eZyG9bFPkY8=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_09a49e29d34d7ea3016ae65a21417087d08a16245cd2a9db2e",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481248,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 334,
+      "prompt_tokens": 974,
+      "total_tokens": 1308,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 144,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.005288,
+        "upstream_inference_prompt_cost": 0.001948,
+        "upstream_inference_completions_cost": 0.00334
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "b323c2ebf0399934ae583b94f2ceabebdf98d47ed0b30b3ac3b6fa436e5e53c8",
+  "elapsed_ms": 6594
+}

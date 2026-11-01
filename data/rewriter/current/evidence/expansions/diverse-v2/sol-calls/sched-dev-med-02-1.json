@@ -1,0 +1,166 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-dev-med-02\", \"row_sha256\": \"32e308981f4237191450664b656dfd154a3b606da32c20ac13659c8b5523de02\", \"mode\": \"/transcribe\", \"language\": \"en\", \"context\": {\"level\": \"low\"}, \"identity\": false, \"mode_instructions\": \"Remove true hesitation and accidental restarts. Apply explicit corrections to the final stated intent. Preserve meaningful filler-like words and unfinished thoughts. Apply clearly spoken punctuation and list cues. Keep the supplied language.\", \"input\": \"we need to tune our primary postgresql database instance for high concurrent transaction throughput across thirty-two virtual cpus with one hundred twenty-eight gigabytes of memory. please inspect postgresql dot conf in the database configuration directory and check pg hba dot conf in the security folder. we must configure max connections to two thousand and set shared buffers to thirty-two gigabytes in postgresql dot conf. furthermore set effective cache size to ninety-six gigabytes and configure work mem to sixty-four megabytes for complex aggregation queries. update maintenance work mem to two gigabytes to accelerate automated index creation and vacuum routines. in addition configure min wal size to four gigabytes and max wal size to sixty-four gigabytes to reduce checkpoint frequency during bulk data imports. set checkpoint completion target to zero point nine and enable wal compression to conserve storage throughput on local nvme volumes. review sysctl dot conf to verify that vm dot dirty background ratio is set to five and vm dot dirty ratio is set to ten. also ensure that vm dot overcommit memory is configured to two with vm dot overcommit ratio set to eighty to prevent kernel oom killer terminations. the database administrator mandates that all client connections authenticate using scram-sha-two-fifty-six passwords enforced in pg hba dot conf. site reliability engineers must monitor pg stat activity on the primary grafana dashboard keeping active connection waits below five hundred milliseconds. if lock wait contention exceeds two seconds the transaction manager must log a warning to postgres dot log and increment our prometheus error counter. to protect the database during heavy analytical query loads the connection pooler in pgbouncer dot ini must enforce transaction pooling with a default pool size of fifty connections per database user. background writer parameters must be adjusted by setting bgwriter delay to twenty milliseconds and bgwriter lru maxpages to eight hundred pages per round to avoid backend write stalls. the replication coordinator must verify that synchronous commit is set to on for the primary standby replica while maintaining off for asynchronous reporting replicas. network socket buffers in the linux kernel must be enlarged by setting net dot core dot rmem max and wmem max to sixteen megabytes each to eliminate tcp socket drops under sudden query surges. database administrators must schedule automated vacuum analyze jobs every morning using vacuum cron dot sh. finally the lead database architect requires running pgbench with one thousand concurrent clients for fifteen minutes demonstrating zero connection dropouts and minimum thirty thousand transactions per second before approving the configuration changes.\", \"output\": \"We need to tune our primary PostgreSQL database instance for high concurrent transaction throughput across 32 virtual CPUs with 128 GB of memory. Please inspect postgresql.conf in the database configuration directory and check pg_hba.conf in the security folder. We must configure max_connections to 2000 and set shared_buffers to 32 GB in postgresql.conf. Furthermore set effective_cache_size to 96 GB and configure work_mem to 64 MB for complex aggregation queries. Update maintenance_work_mem to 2 GB to accelerate automated index creation and vacuum routines. In addition configure min_wal_size to 4 GB and max_wal_size to 64 GB to reduce checkpoint frequency during bulk data imports. Set checkpoint_completion_target to 0.9 and enable wal_compression to conserve storage throughput on local NVMe volumes. Review sysctl.conf to verify that vm.dirty_background_ratio is set to 5 and vm.dirty_ratio is set to 10. Also ensure that vm.overcommit_memory is configured to 2 with vm.overcommit_ratio set to 80 to prevent kernel OOM killer terminations. The database administrator mandates that all client connections authenticate using scram-sha-256 passwords enforced in pg_hba.conf. Site reliability engineers must monitor pg_stat_activity on the primary Grafana dashboard keeping active connection waits below 500 milliseconds. If lock wait contention exceeds 2 seconds the transaction manager must log a warning to postgres.log and increment our Prometheus error counter. To protect the database during heavy analytical query loads the connection pooler in pgbouncer.ini must enforce transaction pooling with a default pool size of 50 connections per database user. Background writer parameters must be adjusted by setting bgwriter_delay to 20 milliseconds and bgwriter_lru_maxpages to 800 pages per round to avoid backend write stalls. The replication coordinator must verify that synchronous_commit is set to on for the primary standby replica while maintaining off for asynchronous reporting replicas. Network socket buffers in the Linux kernel must be enlarged by setting net.core.rmem_max and wmem_max to 16 MB each to eliminate TCP socket drops under sudden query surges. Database administrators must schedule automated vacuum analyze jobs every morning using vacuum_cron.sh. Finally the lead database architect requires running pgbench with 1000 concurrent clients for 15 minutes demonstrating zero connection dropouts and minimum 30,000 transactions per second before approving the configuration changes.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-dev-med-02"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "32e308981f4237191450664b656dfd154a3b606da32c20ac13659c8b5523de02"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "3ef34359bee6cba5159957fd3501fe5b7688c9add32301da279d33d63b49d421",
+  "started_at": "2026-10-31T21:14:16.881606+00:00",
+  "result": {
+    "id": "gen-1793481256-eZacaK05r4LQ9sgnBVl7",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-dev-med-02\",\"row_sha256\":\"32e308981f4237191450664b656dfd154a3b606da32c20ac13659c8b5523de02\",\"critique\":\"The input is a coherent technical dictation with recoverable intent and no apparent padding or leaked authoring instructions. The output appropriately normalizes capitalization, spoken numbers, and technical identifiers such as postgresql.conf, max_connections, and pg_stat_activity without lexical paraphrasing. All configuration values, monitoring thresholds, authentication and replication requirements, scheduling instructions, and final pgbench approval conditions are preserved. The output remains a set of requested actions rather than claiming they were performed.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lorOl1j4DBE7K7VPln6quVMj5wqNe-Zb_Il3yg51YnJm7FRKpdZxzDuwpqerbrRZmZEBhnphOFL6xjaQto7FZLcHpE27in1vitMN9mDZiqYYF-vE8goLXRVnwdlmOy5wg1QjsYFIT4erwZDj4QdVzu6RaGf841Tc5spm34_AuHouHoDw-CnAjqMr1tcXzCfbKH9svrYOhkY7cUoDCRr1ndSEOZo7CpwplsuSjOBxip5_vtNBynm1rKDrugF4kEjiTFWnyss-2K8X8ZMYu0GxaZb54XqYfXztmIMnPvB0PUb7ZSU9evb9ngPFksAUfoCDiCWcxDn8NDgFwJFvQwuyVLlqEYvsaAXPl5sRl2ptxYGEzqukBgH0_2ayPMwy7kCGJeaZYJYZxwUj-txMIIQC-71FY9VV3Jg42zeQklk0nz48CJgVBB5lMZbVK_8c57DmmHLz1VOReugBoMb6xPyAgZ-SSyVLjo6c7CNqh2mCQupPtXur0Sn89f_14tlIW5y7VBjpL9rIbus8ac3C_YvFbscSbtQ72dgjUhmEKZZul9UoHesmehVqt0hBsjoLJBy8f6dUdZDMR0nL7LnjMPfCwsEbZLGW7-1pHoy1WuYlIGMXUViA0euQA1ITgBr91_0VKkB6zGebtC4oOoaceR6LASx6jRigtMbs3jGV9j7lEOW7Xx641Z3O0va2UV-DfKN-nk-cl_Hd8jmiAwgB-0xLoOfBcB_7vEHiHdoFVh4rGYAwnbWDz2Cpugm4wWbZNOrOindOApfRfwEYCRieeLvpQc7res43UhN0a6GJBLbparQID8zSCZdKq3rvxmwUTWzfsf1V2hVcd6crrX2hjTG9fLYHY_aLsdv1UWhjX66HXxgxFf5LaAvSrE5AiMVxNFWQJCtaWwPptGsUce7BSvMlf130NcpOz_onXH-oMLOOBcZkSeIYnhRbOq8wC_YXJ_7QgTMv2aMK-9coDpg9gUD7xR5_oWLTHBKvJn_I_k4F_J6-eorflo9RTs-pGcuvZBA64I-slKkwXHmd4oas7OvfqnMeCSk8BaMF4C6Xl1vF05PFN0Z8O870z9NlUta-XpcMaW437NOJmS-tEYpSsu3O57mvelmXv7VBF81estclBdkfn3npMjS8ZUOhEDAKDqOfXblSRm5SkeNlarH6MIKeneXTd5asKJa0_KTnvccdtpmHHUyFQezbXppELzO7hn5n1flzuJoZiyAlBmlOJPuBOQo7H4XETMASgVfA2O90cSqiM3QUfu4tadcqOJu59TS6mH7sKxZQLQrZ4JX2wnovaCo3r_dyFn3YDyd_rZCbhXXBTDx-KciWdjtAozwNNgM3phYdPbgp5-TO3Ff-8gYWYFwHDeoaYnRxj-BKOEnRFwELB81uZHejBWQUU0r7OYAJ0F_OiunMu4NhhlIs8m_4_TAW9X-4nN0XPag7DS6PKofpaGWUv4kpR4f_TgWz5Q0cNiAgoV_1oATyAvpfZbaarbUpuk83iFwPlZ645HrSgVHbbMeHwt7ag-ch4DBVNbS9gqzCJEJ6QZuyxFwxY8HEz7bdTNsC2aYrVnN6Ov5omX2uxUsHKTAEXqreAWc4Oens5gk2qVAyJzgbTmHE0nGQDZSuEpL5zDGRNlKBVmYm-fHur1emvvHsbFWR0XTHQwwgzjtAi5QowyAj95lphyWL-DuUe-GGOgVe0O9G96Dl5SEMRZhZiVdTNfkbLrCU9-kiY3f9zTclF0FLw1jHk2ZvIEZsoqwm0mP4bxRhdvqw8E9cH1JvB3R4R2uxXPhh33bmSuRwLW4abk_edkjFAkfvmER25BqrANT49zfaukbaSHVCYbvMJJcqFTd-5OIe4G5tKJ-DlR7t_NgeVuo49ylflmw0zAc2pfnqV7uUAPyvY0P-K773GFdgtQqnquEhoZLzTl-jv_2lUgqArzxQEYT7wEFmd7AeJTuia46eG3juf45-g9H4B2S4ZA21UEtORV0Z5FSXc8Jy9rNyfSIchNfaj7b5jRD7iY5kGUmPoIZFDTB4Jr4ZySORdm3vHWl93uVj1LQLZUpDqDL61LBuSyXX3MRTSTsp1iJs7wrWu4ANF9mwIvgYirDbi_aCzOZhFCdXzHEhe818KTmuZjJR3YbLz5tyIBD0DP8MBA2OMqtGY6TqWnFQtdldTWrKyKjqiGstFR1gfq0zjwXPq6XbVwXMTsLn0ZXZQfTP4PZaJEzzWhpbmy__Jh6TMbXfpHE5O-inG_OpMXCCbPOlHwPQdIUnxmRwFxXmniTNQA41lAGsjQmDxRI1FojFIS0AoOfl7folUmYr-7ApGuHJG_hogIg1xpIQV8FZ2QiPO_NIk8v03-7-4WShUZNxa06Ykcy-4GzF5ZkHTMBU9vtroknR9rr_--LhcB25Tnz9n3nJelhodjdIXWU-GCt--3dDV-ZtrBCJAnsGf4F0dgIp6zSUO8yJ1uu_KtskZaTJyddL3vyK-ri0aPfivlHuhBx2zXjDi2VNUX0sDub24z6RbBLsgZsAPw_CrETWpMP8sGZ5njEkGyjImQdaigMZ8qWfxCdMdPx9Kpc3ndgxDVEfjPfdCRS9q4geg==.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_01f6e5671a2e5e5a016ae65a2a00a087d0abdebdaa47375c9c",
+              "index": 0
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481256,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 251,
+      "prompt_tokens": 1563,
+      "total_tokens": 1814,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 71,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 1560,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.002672,
+        "upstream_inference_prompt_cost": 0.000162,
+        "upstream_inference_completions_cost": 0.00251
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "b5b037ca77ecc67176c34bbb346b89f01d4d82ce9e956004a2ff11da86c82a67",
+  "elapsed_ms": 4837
+}

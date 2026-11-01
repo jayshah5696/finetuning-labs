@@ -1,0 +1,172 @@
+{
+  "status": "completed",
+  "request": {
+    "model": "openai/gpt-6.1-sol",
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Verify rewrite DATA ONLY. Do not write improved examples or solve the user's task.\nRead every input and target in full. Return one review per exact id and row_sha256.\ninput_verdict checks plausible natural drafts or dictation, recoverable intent, contradictions,\nfake noise, padding and leaked authoring instructions. output_verdict checks natural appropriate\nlanguage and formatting. pair_verdict checks ALL facts, uncertainty, conditions, negation,\nquantities, names, quotations, literals, requests versus assertions, and the supplied mode.\n/transcribe permits punctuation, true disfluency removal and explicit corrections, not lexical\nparaphrasing. Preserve meaningful words like German 'um' and 'er', colloquial Portuguese and\nunfinished thoughts. /slack is casual minimal cleanup; a long input may be a pasted thread.\n/prompt reorganizes a self-contained request and never answers it. It must not drop supplied\nmaterial, hedges or constraints. /polish improves prose without omissions or changed certainty.\nIdentity inputs must remain byte-identical. Apply only supplied dictionary/profile context.\nCheck long texts paragraph by paragraph. Fail concrete defects. Uncertain means not confidently\njustifiable. Pass requires no material defect. Overall verdict is fail if any dimension fails,\nuncertain if any dimension is uncertain and none fails, otherwise pass. Give a concrete critique\nfor EVERY pair, citing the changed detail for defects. These are model judgments, not human labels.\n"
+      },
+      {
+        "role": "user",
+        "content": "[{\"id\": \"sched-dev-med-03\", \"row_sha256\": \"a6115c0c7ddc6743348d843bce1ff5785d5b2e2ec43846dbca678759e54a69fc\", \"mode\": \"/slack\", \"language\": \"en\", \"context\": {\"level\": \"medium\"}, \"identity\": false, \"mode_instructions\": \"Fix grammar, punctuation, and shorthand with minimal edits. Keep casual tone, contractions, emoji, and the original request. Return correct text unchanged.\", \"input\": \"we are seeing unexpected memory fragmentation in our rust high frequency trading execution engine across our linux bare metal compute nodes. please inspect cargo dot toml in the root repository and check allocator dot rs in the memory package. our release build profile currently compiles with default system allocators causing heap latency jitter during order matching spikes. we must switch the global allocator to jemalloc in allocator dot rs enabling profiling and background thread purging. update cargo dot toml to configure profile dot release with opt-level set to three codegen-units set to one and lto set to thin. furthermore set panic to abort to eliminate unwinding metadata tables and configure overflow-checks to false. in allocator dot rs set jemalloc option background thread to true and configure dirty page decay time to zero milliseconds. the performance team requires exporting jemalloc statistics every thirty seconds to our centralized telemetry collector in stats dot rs. ensure that memory allocations for order book structs use cache-aligned memory blocks using the repr c align sixty-four attribute. site reliability engineers must monitor resident set size on the primary datadog dashboard keeping memory consumption below four gigabytes under full load. if heap allocation spikes exceed five hundred megabytes within a ten-second window the watchdog thread must dump jemalloc heap profiles to var log memory dot prof. memory mapped files in mm file dot rs must enforce madv willneed flags to prefetch market depth tables into physical memory buffers. the networking subsystem in socket rx dot rs must configure epoll edge-triggered polling with a ring buffer size of sixty-four thousand packets. compiler optimization flags in build dot rs must verify cpu instruction support for avx-five-hundred-twelve vector extensions before compiling hardware intrinsics. in addition order matching threads must be pinned to isolated cpu cores using pthread setaffinity in core scheduler dot rs to eliminate kernel context switching overhead. the lock free queue in ring queue dot rs must enforce cache line padding to prevent false sharing between concurrent producer and consumer threads. storage volumes for order logs in disk manager dot rs must enable direct io flags to bypass operating system page cache overhead during high throughput writes. operating system kernel parameters in slash etc slash sysctl dot d slash ninety-nine dash trading dot conf must set net dot core dot somaxconn to sixty-five thousand five hundred thirty-five. the systems programming lead mandates running cargo clippy with all targets and all features before committing changes. build automation in github workflows ci dot yaml must enforce cargo fmt check on every opened pull request. finally verify that synthetic microbenchmarks run via cargo bench demonstrate sub-microsecond tick-to-trade order processing latency before shipping to staging.\", \"output\": \"We are seeing unexpected memory fragmentation in our Rust high frequency trading execution engine across our Linux bare metal compute nodes. Please inspect `Cargo.toml` in the root repository and check `allocator.rs` in the memory package. Our release build profile currently compiles with default system allocators, causing heap latency jitter during order matching spikes. We must switch the global allocator to jemalloc in `allocator.rs`, enabling profiling and background thread purging. Update `Cargo.toml` to configure `[profile.release]` with `opt-level = 3`, `codegen-units = 1`, and `lto = \\\"thin\\\"`. Furthermore, set `panic = \\\"abort\\\"` to eliminate unwinding metadata tables, and configure `overflow-checks = false`. In `allocator.rs`, set jemalloc option `background_thread: true` and configure dirty page decay time to 0 ms. The performance team requires exporting jemalloc statistics every 30 seconds to our centralized telemetry collector in `stats.rs`. Ensure that memory allocations for order book structs use cache-aligned memory blocks using the `#[repr(C, align(64))]` attribute. Site reliability engineers must monitor resident set size on the primary Datadog dashboard, keeping memory consumption below 4 GB under full load. If heap allocation spikes exceed 500 MB within a 10-second window, the watchdog thread must dump jemalloc heap profiles to `/var/log/memory.prof`. Memory mapped files in `mm_file.rs` must enforce `MADV_WILLNEED` flags to prefetch market depth tables into physical memory buffers. The networking subsystem in `socket_rx.rs` must configure epoll edge-triggered polling with a ring buffer size of 64,000 packets. Compiler optimization flags in `build.rs` must verify CPU instruction support for AVX-512 vector extensions before compiling hardware intrinsics. In addition, order matching threads must be pinned to isolated CPU cores using `pthread_setaffinity` in `core_scheduler.rs` to eliminate kernel context switching overhead. The lock-free queue in `ring_queue.rs` must enforce cache line padding to prevent false sharing between concurrent producer and consumer threads. Storage volumes for order logs in `disk_manager.rs` must enable direct IO flags to bypass operating system page cache overhead during high throughput writes. Operating system kernel parameters in `/etc/sysctl.d/99-trading.conf` must set `net.core.somaxconn = 65535`. The systems programming lead mandates running `cargo clippy --all-targets --all-features` before committing changes. Build automation in `.github/workflows/ci.yaml` must enforce `cargo fmt --check` on every opened pull request. Finally, verify that synthetic microbenchmarks run via `cargo bench` demonstrate sub-microsecond tick-to-trade order processing latency before shipping to staging.\"}]"
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "rewrite_reviews",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "sched-dev-med-03"
+                    ]
+                  },
+                  "row_sha256": {
+                    "type": "string",
+                    "enum": [
+                      "a6115c0c7ddc6743348d843bce1ff5785d5b2e2ec43846dbca678759e54a69fc"
+                    ]
+                  },
+                  "critique": {
+                    "type": "string"
+                  },
+                  "input_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "output_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "pair_verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "uncertain"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "row_sha256",
+                  "critique",
+                  "input_verdict",
+                  "output_verdict",
+                  "pair_verdict",
+                  "verdict"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "required": [
+            "reviews"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "request_sha256": "f7ad0020ca83046ce44c9999e9bb31fd22fb81313087f7f185b001786a1f0755",
+  "started_at": "2026-10-31T21:14:18.766208+00:00",
+  "result": {
+    "id": "gen-1793481258-WmwoSb8eJv5I32sVA2Wf",
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"reviews\":[{\"id\":\"sched-dev-med-03\",\"row_sha256\":\"a6115c0c7ddc6743348d843bce1ff5785d5b2e2ec43846dbca678759e54a69fc\",\"critique\":\"The input is a coherent technical request with recoverable dictated filenames, configuration keys, and quantities; it contains no contradictory or leaked authoring instructions. The output appropriately cleans up capitalization, punctuation, and technical shorthand without answering the request. It preserves all requested changes, file references, thresholds, timing conditions, monitoring requirements, and pre-shipping checks, including 64,000 packets, the 500 MB/10-second trigger, and sub-microsecond latency. No material omission or change in certainty is evident.\",\"input_verdict\":\"pass\",\"output_verdict\":\"pass\",\"pair_verdict\":\"pass\",\"verdict\":\"pass\"}]}",
+          "refusal": null,
+          "role": "assistant",
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": null,
+          "reasoning": "**Evaluating technical input coherence**\n\nI need to assess a fake noise input, which is quite technical and dense, yet it should be coherent for natural dictation. I’ll check whether all details are preserved with the normalization technique, ensuring no ambiguity arises. The input mentions \"var log memory dot prof,\" and the output seems reasonable. There’s a conventional GitHub path included, and “pthread” is correctly handled. It appears everything is intact, so I'll formulate a single formal paragraph that maintains the essence and clarity of the original request.",
+          "reasoning_details": [
+            {
+              "type": "reasoning.summary",
+              "summary": "**Evaluating technical input coherence**\n\nI need to assess a fake noise input, which is quite technical and dense, yet it should be coherent for natural dictation. I’ll check whether all details are preserved with the normalization technique, ensuring no ambiguity arises. The input mentions \"var log memory dot prof,\" and the output seems reasonable. There’s a conventional GitHub path included, and “pthread” is correctly handled. It appears everything is intact, so I'll formulate a single formal paragraph that maintains the essence and clarity of the original request.",
+              "format": "openai-responses-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "gAAAAABq5lovWo7csOiAOU4m5yN-B0xMFbJIO-FzEV7WfUFuQVi86OaOwUTfhKA7UmbOBS2v9w6lXdDSRgjgs69uDbfFasC9dzAeLYwKedyjdQb0gRnBFr2JnfsTNjLThUdOO1UMHrnvi_BOx0NhNXKuxfm8V1zKlmRxwmTZy_tMSFRv90lPah8g7Atdff-2C3XznizDvIyvKVq5QVLV-lisbnA89itOjH-s9O4MwpP44opDfmevdbrc86qaCZFBu8QVn8u43b_JxQyk2Yg98gdRznXtOq5TvnXtR17k-D9qlmhKDi3e1EPSvOQf8nK-rBmOQVdsaP-NQicGpAvbek7V6ZK3WR0JD1T6ZbqN8fwyzL1NzNhJYDGKRfCoa2k3_nbRxWWg7_PxClhzcDETE_vkkHX_LJvlQIAQ5yYXmoCO7jA1W0a4OauXVJKNmgz7yG6cpAHm3OZmml93HJnBAaiJICJuO9x89oasr8J4QFPVrNqMJOFrJq6Wl70yDlq8TOohxpHWWSlot1RKkB3Oy91fjVNTA5OGFBrTeV66uQ-ar9_atIw0OfkbE4gJr2bxfJiVPxbkfdsqscsHvldHXx0xIlK03tqi180Pp4szNJ9X-MrAlVpl2F924b4Nt9wvPWMyp4zKDz0sWC9ZR8JoybpE8Z-n4WrvpOwzMtzHlfj6IFxCoyF7i9-t0WxO2mziB6uNGNxMYFUh47VlB5Sqq_UYIPXgSDHPzEGdCEKCH8KImEyUAj1PPzuu43MOI4AiJmEXkTmIISCJJZoBiB1IvWXIFhlMYLIAaLGgglbuhvOBUYXK93E9mLpb8TDRrYY-YFo_X7LxX6WKxl1m1G4KPOIz7hZylsZ5eK3YfAyyzm0P-nHf27SB87aunWPEpToDrEfzAIAWL4l7jhn7SoDBu5rI4ZDBJIY-Y1f6ITKb6mq7Lyh814v33-rKo8DRaiwyA0SrpFFoWLpEhzhwuCL5S-NIZoZEfP1P1b8_ZFRqi7-aW7s78wh9f6xuXoywDuiGAXZTNwHuj5y6Dy64yHzEO_ZaAy2ZBFtWIIvmNzwfpvfeheCJB8W0u9e0c996EAe705UhGuL9bayLouo39lsTq_2wlBzJHquQqrlvaTp3Kf7jEaVMgqduP9maOyRXCOzu0RftbECwuKFXbo-vzi8eTJ6Ef1zOuNY-cA1icr4WjZ0Xb7sirp94M2zJekz1Yhx0EzW9B3GkSDHgPjON-SJXR-CDYc2_oK6xmtkX_7PMmF-CLPQxIS716P9zF7JI3Jj7b2-xMKu7KXGufE7_hj4sD8LTcwNakQ7avbQbI1okg8eB4WGWS1mD3H13t6DVVdmnDgStTMRY16hwsBQpVIr1bAbxlWoSDpGppTdirhcfqeMHxFmzpOFhTRVSKFRtqtWJCYgJx9MA2I80-jdjttD-eTCpRMP9QR_S6kbOYaBwn9BSukozwdoXyw7ASDR21SCV2MKkjvCGBL7SXnzuGjv7-hn24BIyhmVJ8U7-mTyDl4gYsvZ1Mr2h4pIrvNkWN-UtDbPk4ysDvFCCb93c7atP_sDExmbaiv5Mf1HdqQ_uTFFvAVyPEbT5eCFP39F7Ex6cD9O9imjigtiNUkcUQSzbqK5vmJkkDZXBx5wm3qQcCDzFT8p9rKHPnSxM2ekpq5XJCVyaRKNcm6wyl2O8LkTsWksmqvLbbmLDDlLipTToANPz3OKDgvOZ0roWPo1hG64SXPhxp9D1RJNwuylOMKCouz0hbSMqPLPUR_9j_k52JU9HBSDqkJpk0s2V_quLJ_9C7zIkU9hvNVQxaDy8a0o8eY8Gbg_PVVBbhpaIqvVZ6b4GhLvHOtFlrUywlfBX-ViUHPXGOIwQ2oTcBxHH0ErcSxv94IE7LBFKiyu8fovqxHSchRKBKW-_3YzSI9MYAHhV_ge7DdfIUIss4w1IGWnr9gpx6x_7JWoQ1bmt_uf6z7m2pGxqILQLzVjd0iGPpKm-vzXOjqXT7JXYLILFX6QGwGiqZ2MIq8mjg2Y5XLXD6j4imz7cLHHx5p2VkuHFTKfYUJvyoCan7StS0pDMpYw48v2APbktHF1E-IIMulxaSgsbK8m0dWtD8-Q4mgIgdXFBEhkupzPYM-38Os7KDLT9QJcYu8yqG3oiRe1MCOuPANpDQNzfAGY-p9fk9hA0UTTBOGigsMHqbHFgSdUR9Tek7a9B_fkTQmDIksF2gRIp1XmHVBPCRjbmGgMUakj_0o0bv1XpuhckcMJLSezX4B_KAJQrmOdDtx_rBnCslS7ayvSsR5-1P2HjQE7iCtN1932BzuzcrFyFj07ITXIjvtG4ro0JGqibzoR1sf-TsiODJ23fBKvoyMkWjV-zayEXtAcK57QxH3-JAvNRcGCTh5hCjLUU2juzxF8z4XHwmQdWtdNON13m0nkKBZ7o5N6_etwBmEX1eTXrabNmbpq-5uc0ReLrOvfccgJB20dz_iJJCzF7CDZfAhmt4ErPwv0-U4YE8kCYk6cIwdl2xCONLviJjtBOUVT6Yqp3HRjau9jlqFImmDavdWOvM89mO_nAkZBOfK0M48Ay3geDZW9EA6o47hm-JltmyA6VDdgfetJwbxYEeXkNbL-EDsZWgwuqV6ujaUlH693IQyrTJeJyBJl2WncbmBZvTzBmcbmw68FOExS73GUAFb9rvsmB2DZM7ikI5Gr8DMAfFwdZ0s-XGIB-YZfSFnKRQyeCMm5F5VZry0XGRFOIgXVvqU869ZU_G95ZG42-NqbLKiPX_HplhXqASGyV5PmhrHw95zxgngJzp7iTUloF37XyWTQJT49Ybz6Q97USgdoEe16bpuztbN-QZJj-WjSHaKzRJw6G1CBHg-1gVq0VW5zM3jrd6bNvJkouHwKDz3UVwLOLBYttsr5ylw_ngS6fYlVqiVkdmANuWIGiwp7eIvloaIWp-MDlmZD2ISGe566fKu38vzguM1d9MOWLcF1rwix1uEV8PH8gPKo71qzMAPe9sSU8LaeS6yngAU2a46laboxWbhMhOzssv847b7O10C6RRcZ1HZhAcEUdxqO3v6RoKtmoafFb9SMf1zYtxN62Ht6F8mPhOcP8Oc9etd32Fi9zHtNFmayXrADJxnOBLCPl-o0=.eyJlbmRwb2ludF9zbHVnIjoib3BlbmFpL2dwdC02LjEtc29sLTIwMjYwOTI5fG9wZW5haSJ9",
+              "format": "openai-responses-v1",
+              "id": "rs_0dbff3bc4d19f7dd016ae65a2bd84487d0ad68ecdbaae620ce",
+              "index": 1
+            }
+          ]
+        },
+        "native_finish_reason": "completed"
+      }
+    ],
+    "created": 1793481258,
+    "model": "openai/gpt-6.1-sol",
+    "object": "chat.completion",
+    "moderation": null,
+    "service_tier": "default",
+    "system_fingerprint": null,
+    "usage": {
+      "completion_tokens": 297,
+      "prompt_tokens": 1692,
+      "total_tokens": 1989,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 103,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 1689,
+        "video_tokens": 0
+      },
+      "cost": 0,
+      "is_byok": true,
+      "cost_details": {
+        "upstream_inference_cost": 0.0031449,
+        "upstream_inference_prompt_cost": 0.0001749,
+        "upstream_inference_completions_cost": 0.00297
+      }
+    },
+    "provider": "OpenAI"
+  },
+  "result_sha256": "7fe19cc31d4b6142c461c2d9730e810da24003fdfb0007e6e5e852015519fc1c",
+  "elapsed_ms": 7247
+}
