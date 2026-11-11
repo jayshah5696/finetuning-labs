@@ -23,6 +23,16 @@ REPLACEMENTS = {
 }
 
 
+def restore_baseline(commit: str, destination: Path) -> Path:
+    """Extract the original dataset from this project's Git history."""
+    dataset = "data/rewriter/current"
+    archive = subprocess.check_output(["git", "archive", commit, dataset], cwd=boost_data.PROJECT)
+    destination.mkdir(exist_ok=False)
+    with tarfile.open(fileobj=io.BytesIO(archive)) as bundle:
+        bundle.extractall(destination, filter="data")
+    return destination / dataset
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
@@ -92,21 +102,7 @@ def main():
     )
     swapped = False
     try:
-        root = Path(__file__).resolve().parents[3]
-        archive = subprocess.check_output(
-            [
-                "git",
-                "archive",
-                args.baseline_commit,
-                "projects/finetuning-labs/data/rewriter/current",
-            ],
-            cwd=root,
-        )
-        base = run / "quality-rebuild-base"
-        base.mkdir(exist_ok=False)
-        with tarfile.open(fileobj=io.BytesIO(archive)) as bundle:
-            bundle.extractall(base, filter="data")
-        rebuilt = base / "projects/finetuning-labs/data/rewriter/current"
+        rebuilt = restore_baseline(args.baseline_commit, run / "quality-rebuild-base")
         boost_data.CURRENT = rebuilt
         boost_data.apply_boost(run)
         assert [

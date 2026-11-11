@@ -4,7 +4,7 @@ sync:
 	uv sync --locked
 
 test:
-	uv run --locked pytest -q
+	uv run --locked --group data --group hosted pytest -q
 
 check: test
 	uv run --locked ruff check .

@@ -569,7 +569,7 @@ def hosted_backend(config: dict, *, judge=False):
 
 
 def code_provenance() -> dict:
-    root = Path(__file__).resolve().parents[5]
+    root = Path(__file__).resolve().parents[3]
     try:
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
         dirty = bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=root, text=True))

@@ -4,6 +4,10 @@ Fine-tune an English rewriter with a LoRA adapter. The same notebook supports Li
 and LiquidAI/LFM2.5-350M. The larger trial defaults to 350M.
 Code and notebooks stay in Git. Hugging Face hosts the public data and trained adapters.
 
+This project now lives in [jayshah5696/finetuning-labs](https://github.com/jayshah5696/finetuning-labs).
+The repository is private. [Migration notes](docs/repository-migration.md) describe the preserved
+history and the original checkout.
+
 [Read the English experiment log](https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-experiment-log)
 for the setup, data iterations, Arka review process and matched Luna comparison.
 
@@ -81,8 +85,10 @@ data = load_dataset("jayshah5696/finetuning-labs-rewriter-training", "sft")
 
 ## Train in Colab
 
-Open [the notebook in Colab](https://colab.research.google.com/github/jayshah5696/jadoo-labs/blob/main/projects/finetuning-labs/notebooks/rewriter_train_l4.ipynb)
+Open [the notebook in Colab](https://colab.research.google.com/github/jayshah5696/finetuning-labs/blob/main/notebooks/rewriter_train_l4.ipynb)
 in a fresh L4 runtime. The [notebook file](notebooks/rewriter_train_l4.ipynb) is in Git.
+While this repository is private, Colab needs GitHub access. You can instead download the notebook
+and use Colab's File > Upload notebook command.
 Its first cell shows version `public-parquet-lora-current`. This is the only supported notebook in
 the project. Public dataset and base-model downloads use `token=False`.
 Add two Colab Secrets and enable access:
@@ -105,11 +111,17 @@ See [COLAB_TRAINING.md](COLAB_TRAINING.md) for the short run guide.
 ## Check and publish
 
 ```sh
-uv sync --locked
+git clone https://github.com/jayshah5696/finetuning-labs.git
+cd finetuning-labs
+uv sync --locked --group data --group hosted
 make check
 make build
 uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.hf_data
 ```
+
+Checks use the data and hosted dependency groups. Export `OPENROUTER_API_KEY` before commands
+that call hosted models. Keep credentials in an untracked local `.env` file if needed, and load
+them into the shell before running those commands. No credentials moved from the old repository.
 
 The last command prepares the public Parquet files locally. Add `--publish` to update the
 two project dataset repositories. It removes non-data files from their current trees.

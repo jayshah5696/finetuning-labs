@@ -108,7 +108,7 @@ dataset = load_dataset("{"jayshah5696/finetuning-labs-rewriter-training" if "tra
 ```
 
 Data files are Parquet. This repository contains data and source notices only. Training code,
-notebooks and verification records are in [Finetuning Labs](https://github.com/jayshah5696/jadoo-labs/tree/main/projects/finetuning-labs).
+notebooks and verification records are in [Finetuning Labs](https://github.com/jayshah5696/finetuning-labs).
 Review judgments are model judgments. Independent human labels and an unseen final test remain
 pending. Synthetic dictation is not recorded speech-recognition evidence. No personal history
 or recordings are included. See DATA_LICENSE.md for source rights and attribution.
