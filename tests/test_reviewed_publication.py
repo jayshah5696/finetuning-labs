@@ -274,3 +274,118 @@ def test_sol_verified_addition_must_bind_to_its_actual_provider_call(release, ch
     seal(release)
     with pytest.raises(ValueError, match="verification|review"):
         audit_publication(release)
+
+
+def test_diverse_expansion_adjudication_cannot_bypass_distinct_critique_via_fallback(release):
+    from finetuning_labs.rewriter.boost_data import ADJUDICATION_SYSTEM, SOL, review_packet
+    from finetuning_labs.rewriter.evaluation import saved_call
+    from finetuning_labs.rewriter.scale_data import VERIFY_SYSTEM
+
+    meta = json.loads((release / "supporting.json").read_text())
+    item = meta[0]
+    row = json.loads((release / "data/train.jsonl").read_text())
+    item.update(
+        family="developer_symbols",
+        identity=False,
+        native_accepted=False,
+        protected_literals=[],
+        record_id="native-one",
+    )
+    # Weak score on one dimension so round 2 adjudication is required
+    for value in item["decisions"].values():
+        value["confidence"] = 0.8
+    item["decisions"]["labeling_engine.pair_facts"]["score"] = 0.65
+
+    saved = item.pop("opus_review")
+    review1 = {k: v for k, v in saved.items() if k != "report"}
+    review2_distinct = review1 | {"critique": "Second independent round confirms the question."}
+    item["data_review"] = saved
+    item["adjudication_review"] = review2_distinct
+    item["verification_calls"] = ["evidence/sol-1.json", "evidence/sol-2.json"]
+    item["native_evidence"] = "evidence/native.json"
+    item["native_exports"] = "evidence/native-exports.json"
+    item["overlap_evidence"] = "evidence/boost/final-overlap-check.json"
+
+    report = json.loads((release / "reviews/one.json").read_text())
+    report["reviewer_model"] = SOL
+    save(release, "reviews/one.json", report)
+
+    req1 = {
+        "model": SOL,
+        "messages": [
+            {"role": "system", "content": VERIFY_SYSTEM},
+            {"role": "user", "content": json.dumps([review_packet(row, item)])},
+        ],
+    }
+    res1 = {
+        "model": SOL,
+        "id": "call-round-1",
+        "choices": [
+            {"finish_reason": "stop", "message": {"content": json.dumps({"reviews": [review1]})}}
+        ],
+    }
+    saved_call(release / "evidence/sol-1.json", req1, lambda: res1)
+
+    req2 = {
+        "model": SOL,
+        "messages": [
+            {"role": "system", "content": ADJUDICATION_SYSTEM},
+            {"role": "user", "content": json.dumps([review_packet(row, item)])},
+        ],
+    }
+    res2 = {
+        "model": SOL,
+        "id": "call-round-2",
+        "choices": [
+            {
+                "finish_reason": "stop",
+                "message": {"content": json.dumps({"reviews": [review2_distinct]})},
+            }
+        ],
+    }
+    saved_call(release / "evidence/sol-2.json", req2, lambda: res2)
+
+    native = {
+        item["id"]: {
+            "id": item["record_id"],
+            "payload": {
+                "instruction": Case(id=item["id"], **row).user_message(),
+                "response": row["output"],
+            },
+            "scores": {
+                "decisions": item["decisions"],
+                "judge_model": "openai/gpt-6-luna-decisions",
+            },
+        }
+    }
+    save(release, "evidence/native.json", native)
+    save(
+        release,
+        item["overlap_evidence"],
+        {"rows": 1, "new_to_new_overlap": 0, "rows_sha256": digest([row])},
+    )
+    save(release, "evidence/native-exports.json", [])
+    save(release, "supporting.json", meta)
+    seal(release)
+
+    # Distinct second round passes audit
+    assert "data/train.jsonl" in audit_publication(release)
+
+    # Now make the second round critique identical to the first round
+    item["adjudication_review"] = dict(review1)
+    res2_same = {
+        "model": SOL,
+        "id": "call-round-2",
+        "choices": [
+            {"finish_reason": "stop", "message": {"content": json.dumps({"reviews": [review1]})}}
+        ],
+    }
+    rec2 = json.loads((release / "evidence/sol-2.json").read_text())
+    rec2["result"] = res2_same
+    rec2["result_sha256"] = digest(res2_same)
+    save(release, "evidence/sol-2.json", rec2)
+    save(release, "supporting.json", meta)
+    seal(release)
+
+    with pytest.raises(ValueError, match="fidelity verification"):
+        audit_publication(release)
