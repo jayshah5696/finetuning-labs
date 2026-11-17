@@ -67,3 +67,8 @@ def test_resume_refuses_a_changed_dataset_or_training_configuration(tmp_path):
     with pytest.raises(FileExistsError):
         bind_run(tmp_path, {"revision": "one", "lr": 1e-5}, resume=False)
     bind_run(tmp_path, {"revision": "one", "lr": 1e-5}, resume=True)
+
+
+def test_pad_batch_rejects_empty_feature_list():
+    with pytest.raises(ValueError, match="features cannot be empty"):
+        pad_batch([], pad_id=9)

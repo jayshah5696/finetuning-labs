@@ -375,7 +375,7 @@ class LeakageIndex:
             ):
                 matches.append(blocked)
                 continue
-            if 40 <= min(len(candidate), len(blocked)) and max(len(candidate), len(blocked)) < 600:
+            if min(len(candidate), len(blocked)) >= 40 and max(len(candidate), len(blocked)) < 600:
                 matcher = SequenceMatcher(None, candidate, blocked, autojunk=False)
                 # Both quick ratios are upper bounds, so they cannot discard a real match.
                 if (
@@ -595,7 +595,7 @@ def export_training(examples, reviews, blocked, tokenizer, destination: Path) ->
 def _tokenizer():
     from transformers import AutoTokenizer
 
-    return AutoTokenizer.from_pretrained(TOKENIZER, revision=REVISION)
+    return AutoTokenizer.from_pretrained(TOKENIZER, revision=REVISION, token=False)
 
 
 def _unexpected_call():
@@ -729,7 +729,9 @@ def run_pipeline(
     reuse_from: Path | None = None,
 ) -> dict:
     """Calls are durable and never silently retried. Rejected sources remain in the ledger."""
-    config = tomllib.loads(settings.read_text())
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    config = tomllib.loads(settings.read_text(encoding="utf-8"))
     plans = planned_sources()
     if canonical_long or extended_long:
         plans = [
@@ -901,20 +903,23 @@ def main():
     parser.add_argument("--extended-long", action="store_true")
     parser.add_argument("--reuse-from", type=Path)
     args = parser.parse_args()
-    result = (
-        audit_run(args.run)
-        if args.audit
-        else run_pipeline(
-            args.run,
-            args.config,
-            pilot=args.pilot,
-            workers=args.workers,
-            canonical_long=args.canonical_long,
-            extended_long=args.extended_long,
-            reuse_from=args.reuse_from,
+    try:
+        result = (
+            audit_run(args.run)
+            if args.audit
+            else run_pipeline(
+                args.run,
+                args.config,
+                pilot=args.pilot,
+                workers=args.workers,
+                canonical_long=args.canonical_long,
+                extended_long=args.extended_long,
+                reuse_from=args.reuse_from,
+            )
         )
-    )
-    print(json.dumps(result, indent=2))
+        print(json.dumps(result, indent=2))
+    except (ValueError, TypeError, OSError, KeyError, RuntimeError) as error:
+        parser.exit(1, f"Error: {error}\n")
 
 
 if __name__ == "__main__":

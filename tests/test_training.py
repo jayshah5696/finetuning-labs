@@ -207,3 +207,20 @@ def test_overlap_screen_matches_original_rules_for_close_and_unrelated_text():
             for other, grams in zip(index.texts, index.shingles, strict=True)
         )
         assert index.matches(raw) == expected
+
+
+def test_training_pipeline_rejects_nonpositive_workers_and_cli_handles_errors(
+    monkeypatch, tmp_path
+):
+    from finetuning_labs.rewriter.training import main, run_pipeline
+
+    with pytest.raises(ValueError, match="workers"):
+        run_pipeline(tmp_path / "run", tmp_path / "missing.toml", workers=0)
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["training", "--run", str(tmp_path / "missing"), "--audit"],
+    )
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == 1
