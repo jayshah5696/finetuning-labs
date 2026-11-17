@@ -51,7 +51,7 @@ uv run --locked --group data --group hosted python scripts/check_english_release
 just reviewed-audit
 ```
 
-See [the run guide](../COLAB_TRAINING.md) for the two Colab Secrets and upload configuration.
+See [the run guide](../docs/colab-training.md) for the two Colab Secrets and upload configuration.
 
 ## Historical work
 

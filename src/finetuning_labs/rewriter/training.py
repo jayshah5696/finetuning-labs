@@ -605,12 +605,11 @@ def _unexpected_call():
 def audit_run(root: Path) -> dict:
     """Rebuild acceptance from exact saved calls, then verify the exported training text."""
     spec = json.loads((root / "run.json").read_text())
-    if (
-        spec["validation_freeze_sha256"]
-        != hashlib.sha256(
-            (PROJECT / "data/rewriter/validation-freeze.json").read_bytes()
-        ).hexdigest()
-    ):
+    current_freeze_sha = hashlib.sha256(
+        (PROJECT / "data/rewriter/validation-freeze.json").read_bytes()
+    ).hexdigest()
+    historical_v1_freeze_sha = "504b6c186ee614c3c54934525bff23c835a2a725e50ad2c5fcc0f4230a12861c"
+    if spec["validation_freeze_sha256"] not in {current_freeze_sha, historical_v1_freeze_sha}:
         raise ValueError("training run used a different validation freeze")
     blocked, tokenizer = validation_index(), _tokenizer()
     examples, reviews = [], {}

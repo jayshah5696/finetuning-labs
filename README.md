@@ -71,7 +71,7 @@ Open [notebooks/rewriter_train_l4.ipynb in Google Colab](https://colab.research.
 2. In `CONFIG`, set `MODEL_SIZE` to `"350m"` or `"230m"`, and update `hub_model_id` if uploading under your own Hugging Face account. Public dataset and base-model downloads use `token=False`.
 3. Run the cells in order. The notebook downloads the public SFT Parquet splits, trains a PEFT LoRA adapter with frozen base weights, selects the checkpoint by dev loss, evaluates validation loss once, and uploads the adapter weights, tokenizer files, and model card to Hugging Face.
 
-See [COLAB_TRAINING.md](COLAB_TRAINING.md) for full configuration and CPU verification details.
+See [docs/colab-training.md](docs/colab-training.md) for full configuration and CPU verification details.
 
 ## Evaluate
 
@@ -126,5 +126,5 @@ This repository uses an explicit split between code licensing and data licensing
 - [Training data specification](docs/training-data.md)
 - [Validation contract and metrics](docs/validation.md)
 - [Luna Decisions validation](docs/decision-validation.md)
-- [Colab L4 training guide](COLAB_TRAINING.md)
+- [Colab L4 training guide](docs/colab-training.md)
 - [Contributor guide](CONTRIBUTING.md), [Agent rules](AGENTS.md), and [Security policy](SECURITY.md)

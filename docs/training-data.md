@@ -1,12 +1,12 @@
 # Rewriter training data
 
-## Current English export, 1,864 training examples
+## Current English export, 1,979 training examples (115-row diverse-v2 expansion)
 
-The public dataset now selects English only. It has 1,864 train, 89 dev and 81 validation
-pairs. The English dev and validation cases keep their original text and order, bound by
-`data/rewriter/english-holdout-freeze.json`. The complete multilingual 100/84 source holdouts
-remain byte-identical in Git, alongside all earlier training examples. The source training
-pool has 2,000 rows. Filtering the public view does not rewrite those sources.
+The public dataset selects English only. In the current release (`36a75c009d008415fad557d49005ba4e5c73f4d7`), it has 1,979 train, 89 dev and 141 validation pairs (expanded from the 1,864 train / 89 dev / 81 validation release `00d59dda95867fe5bcb147b1b1c5a34b5ad7f071` by adding 115 `diverse-v2` training pairs and 60 `validation-v1` validation pairs across five dictation families). The English dev and validation cases keep their original text and order, bound by `data/rewriter/english-holdout-freeze.json`. The complete multilingual 100/144 source holdouts (including the original 84-case validation prefix) remain byte-identical in Git, alongside all earlier training examples. The source training pool has 2,115 rows (2,359 total rows across splits). Filtering the public view does not rewrite those sources.
+
+## Earlier 1,864-example English expansion (500 critical-error episodes)
+
+Before the 115-row `diverse-v2` append, the English export had 1,864 train, 89 dev and 81 validation pairs (from a 2,000-row source training pool).
 
 The latest 500 fictional English episodes target failures in the uploaded 1,500-example
 adapter. They include recipient and amount exclusions, explicit spoken corrections with

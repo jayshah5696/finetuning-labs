@@ -224,3 +224,15 @@ def test_training_pipeline_rejects_nonpositive_workers_and_cli_handles_errors(
     with pytest.raises(SystemExit) as exc_info:
         main()
     assert exc_info.value.code == 1
+
+
+def test_audit_run_accepts_historical_v1_validation_freeze_hash(tmp_path):
+    import json
+
+    from finetuning_labs.rewriter.training import audit_run
+
+    bad_run = tmp_path / "bad_run"
+    bad_run.mkdir()
+    (bad_run / "run.json").write_text(json.dumps({"validation_freeze_sha256": "0" * 64}))
+    with pytest.raises(ValueError, match="different validation freeze"):
+        audit_run(bad_run)

@@ -88,8 +88,8 @@ but should preserve the identifiers so the other threads can map their coverage.
 obvious PII. The existing raw-personal-data restrictions continue to protect the source records.
 
 - Inspect the existing ignored personal bundle at the main checkout's
-  `projects/finetuning-labs/data/rewriter/personal/calibration-10/`, its source manifest, and the
-  read-only TypeWhisper repository at `/home/jshah/Documents/GitHub/typewhisper-linux`.
+  `projects/finetuning-labs/data/rewriter/personal/calibration-10/`, its source manifest, and a
+  read-only local checkout of `jayshah5696/typewhisper-linux`.
   Inspect only related app history/config paths discovered from those sources.
 - Keep the existing ten calibration records held out. Select additional records covering actual
   dictation errors, rewrite shortcuts/profiles, shorthand and supplied dictionary behavior.

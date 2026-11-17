@@ -9,7 +9,7 @@ This directory contains project documentation, evaluation histories, data specif
 - [training-data.md](training-data.md): Synthetic training data pipeline, Arka generation, Luna Decisions checks, Sol verification, and release reproduction.
 - [validation.md](validation.md): Deterministic and semantic validation contract, metric definitions, and LLM-judge calibration rules.
 - [decision-validation.md](decision-validation.md): Luna Decisions validator setup, criteria thresholds, and audit results.
-- [COLAB_TRAINING.md](../COLAB_TRAINING.md) (also indexed at [colab-training.md](colab-training.md)): Guide for running `notebooks/rewriter_train_l4.ipynb` on a Google Colab L4 GPU and uploading adapters to Hugging Face.
+- [colab-training.md](colab-training.md): Guide for running `notebooks/rewriter_train_l4.ipynb` on a Google Colab L4 GPU and uploading adapters to Hugging Face.
 - [english-rewriter-experiment-log.html](english-rewriter-experiment-log.html): Standalone HTML experiment log covering setup, data iterations, Arka review, and model comparisons.
 
 ## Historical notes
