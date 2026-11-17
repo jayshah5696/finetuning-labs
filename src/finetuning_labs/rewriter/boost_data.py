@@ -1,4 +1,9 @@
-"""Target observed rewrite failure types with new Arka pairs and exact Sol verification."""
+"""Target observed rewrite failure types with new Arka pairs and exact Sol verification.
+
+Historical generation schedule for the frozen ``supplement-v3-boost`` release, kept for
+deterministic replay; its ``verify_saved_review`` and ``verified_pair`` helpers remain active
+in release auditing.
+"""
 
 from __future__ import annotations
 
@@ -231,10 +236,19 @@ def verified_pair(row, meta, review, *, second_review=None):
             value
             and value.get("id") == meta["id"]
             and value.get("row_sha256") == digest(row) == meta["row_sha256"]
+            and isinstance(value.get("critique"), str)
+            and value["critique"].strip()
             and all(
                 value.get(k) == "pass"
                 for k in ["input_verdict", "output_verdict", "pair_verdict", "verdict"]
             )
+        )
+
+    def distinct_second_pass():
+        return bool(
+            exact_pass(second_review)
+            and second_review is not review
+            and second_review["critique"].strip() != review["critique"].strip()
         )
 
     return bool(
@@ -242,7 +256,7 @@ def verified_pair(row, meta, review, *, second_review=None):
         and complete_decisions(meta)
         and not native_rejection(meta)
         and exact_pass(review)
-        and (strong_decisions(meta) or exact_pass(second_review))
+        and (strong_decisions(meta) or distinct_second_pass())
     )
 
 

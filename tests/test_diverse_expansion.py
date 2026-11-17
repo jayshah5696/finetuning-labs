@@ -848,7 +848,7 @@ class TestDiverseExpansionFixes:
         rows = []
         metas = []
         reviews = []
-        for i, (lvl, md) in enumerate(zip(levels, modes)):
+        for i, (lvl, md) in enumerate(zip(levels, modes, strict=True)):
             cid = f"{group_id}-{lvl}"
             # Variant 3 has different input!
             raw_in = "identical input" if i != 3 else "different input"
@@ -902,7 +902,7 @@ class TestDiverseExpansionFixes:
         rows = []
         metas = []
         reviews = []
-        for lvl, md in zip(levels[:3], modes[:3]):
+        for lvl, md in zip(levels[:3], modes[:3], strict=True):
             cid = f"{group_id}-{lvl}"
             r = {
                 "input": "shared input",
@@ -1175,7 +1175,7 @@ class TestDiverseExpansionFixes:
             row, meta_uncertain, sol_pass, sol_review_round2=sol_pass_missing_call_2
         )
 
-    def test_native_arka_provenance_and_state_db_cache(self):
+    def test_native_arka_provenance_and_state_db_cache(self, monkeypatch):
         """Verify:
         1. Every lineage.root_id in 06_decision_panel/data.parquet exists in 01_source/data.parquet (id column), and all seeds < 15,000 chars.
         2. Every staged row's content_hash in 06_decision_panel/data.parquet matches Arka's hash of its (instruction, response) payload.
@@ -1191,6 +1191,7 @@ class TestDiverseExpansionFixes:
 
         from finetuning_labs.rewriter.diverse_expansion import load_openrouter_api_key
 
+        monkeypatch.setenv("OPENROUTER_API_KEY", "offline-cache-audit-key")
         load_openrouter_api_key()
         run_dir = Path(__file__).resolve().parents[1] / "data/rewriter/expansions/diverse-v1-run"
         writer = OutputWriter()
@@ -1268,7 +1269,7 @@ class TestDiverseExpansionFixes:
             hits = sum(k in db_keys for k in keys)
             assert hits == 6, f"Row {idx} ({rec.id}) has only {hits}/6 cache hits in state.db"
 
-    def test_diverse_v2_and_validation_v1_decision_cache_and_parquet_sync(self):
+    def test_diverse_v2_and_validation_v1_decision_cache_and_parquet_sync(self, monkeypatch):
         """Verify 100% of retained rows in diverse-v2 (115 rows) and validation-v1 (60 rows)
 
         have exact cache hits in state.db (decisions_cache) across all 6 dimensions,
@@ -1286,6 +1287,7 @@ class TestDiverseExpansionFixes:
 
         from finetuning_labs.rewriter.diverse_expansion import load_openrouter_api_key
 
+        monkeypatch.setenv("OPENROUTER_API_KEY", "offline-cache-audit-key")
         load_openrouter_api_key()
         writer = OutputWriter()
 
@@ -1364,3 +1366,19 @@ class TestDiverseExpansionFixes:
                 for q in questions:
                     k = client._key(s_rec, q)
                     assert k in db_keys, f"Missing cache key in {run_name} for {rec.id} {q.name}"
+
+    def test_load_openrouter_api_key_reads_only_from_environment(self, monkeypatch):
+        """load_openrouter_api_key must read only from os.environ and never inspect personal dotfiles."""
+        import inspect
+
+        from finetuning_labs.rewriter import diverse_expansion
+
+        source = inspect.getsource(diverse_expansion.load_openrouter_api_key)
+        assert "/home/" not in source
+        assert "zshrc" not in source
+
+        monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+        assert diverse_expansion.load_openrouter_api_key() is None
+
+        monkeypatch.setenv("OPENROUTER_API_KEY", "test-env-key")
+        assert diverse_expansion.load_openrouter_api_key() == "test-env-key"

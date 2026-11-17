@@ -1,4 +1,4 @@
-"""Independent fictional authoring briefs, split before any candidate is generated."""
+"""Frozen v2 fictional authoring briefs (180 scenarios), split before generation and kept for replay."""
 
 BRIEFS = {
     "/slack": [

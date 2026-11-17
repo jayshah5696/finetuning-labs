@@ -1,4 +1,4 @@
-"""Native Arka generation and decision stages for independently reviewed rewrite data."""
+"""Active core Arka generation, rubric scoring, and mechanical validation pipeline."""
 
 from __future__ import annotations
 

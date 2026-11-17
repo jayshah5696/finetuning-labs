@@ -1,4 +1,4 @@
-"""Audit local reviewed data and exact-row reviews. Publication uses hf_data."""
+"""Active release auditor verifying local reviewed data, supplements, and exact-row reviews."""
 
 from __future__ import annotations
 
@@ -239,9 +239,33 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
                     or records[0]["result"]["id"] == records[1]["result"].get("id")
                 ):
                     raise ValueError("Adjudication must use a distinct provider call")
-                is_admitted = is_candidate_admitted(
-                    row, item, raw_reviews[0], sol_review_round2=second
-                ) or verified_pair(row, item, raw_reviews[0], second_review=second)
+                is_diverse = "family" in item or item.get("source_group", "").startswith(
+                    ("expansion-", "contrast-")
+                )
+                if is_diverse:
+                    r1_prov = dict(
+                        raw_reviews[0],
+                        round=1,
+                        call_id=records[0]["result"].get("id"),
+                        request_sha256=records[0].get("request_sha256"),
+                        response_sha256=records[0].get("result_sha256"),
+                    )
+                    r2_prov = (
+                        dict(
+                            second,
+                            round=2,
+                            call_id=records[1]["result"].get("id"),
+                            request_sha256=records[1].get("request_sha256"),
+                            response_sha256=records[1].get("result_sha256"),
+                        )
+                        if second is not None and len(records) == 2
+                        else second
+                    )
+                    is_admitted = is_candidate_admitted(
+                        row, item, r1_prov, sol_review_round2=r2_prov
+                    )
+                else:
+                    is_admitted = verified_pair(row, item, raw_reviews[0], second_review=second)
                 if not is_admitted or boost_issues(item, row, heldout):
                     raise ValueError("New data lacks completed fidelity verification")
                 native = native_documents[item["native_evidence"]][item["id"]]
@@ -263,9 +287,10 @@ def audit_publication(root: Path, private_needles=()) -> dict[str, bytes]:
                                 raise ValueError("New-to-new text overlap in publication")
                 same_group_rows = [
                     (prev_r, prev_m)
-                    for prev_r, prev_m in zip(new_rows, new_meta_rows)
+                    for prev_r, prev_m in zip(new_rows, new_meta_rows, strict=True)
                     if prev_m["source_group"] == item["source_group"]
                 ]
+
                 for prev_r, prev_m in same_group_rows:
                     if (
                         prev_m["mode"],

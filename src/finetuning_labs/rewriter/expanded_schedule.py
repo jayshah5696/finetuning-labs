@@ -1,4 +1,4 @@
-"""Comprehensive coverage schedule generator for diverse rewriter expansion (60+ scenarios).
+"""Frozen 160-scenario coverage schedule for ``supplement-v5-diverse``, kept for replay.
 
 Covers all 5 core target areas:
 1. Spoken Coding Filenames & Developer Symbols

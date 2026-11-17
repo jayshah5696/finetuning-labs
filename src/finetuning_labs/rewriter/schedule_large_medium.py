@@ -1,4 +1,5 @@
-"""
+"""Frozen large-medium coverage schedule (36 scenarios) for ``supplement-v5-diverse``, kept for replay.
+
 Large Medium Coverage Schedule (36 scenarios):
 - 3 contrast groups (12 plans): sched-contrast-06, 07, 08
 - 6 developer_symbols (6 plans): sched-dev-med-02 through 07
