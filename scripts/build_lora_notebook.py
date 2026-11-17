@@ -94,6 +94,7 @@ LoRA adapter on the configured model, logs loss to W&B and uploads the final ada
 Change `hub_model_id` if you use a different Hugging Face account. Code stays in Git.
 The active data is English-only. Set `MODEL_SIZE` to `350m` or `230m` in the config cell;
 the base revision and adapter destination change together. Both choices use this same notebook.
+See the [English rewriter experiment log](https://github.com/jayshah5696/finetuning-labs/blob/main/docs/english-rewriter-experiment-log.html) for evaluation context.
 """,
         ),
         cell(

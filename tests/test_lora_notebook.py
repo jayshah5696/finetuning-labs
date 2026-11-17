@@ -100,6 +100,35 @@ def test_saved_notebook_pins_the_selected_base_and_public_split_counts():
     assert cfg["expected_split_counts"] == {"train": 1979, "dev": 89, "validation": 141}
 
 
+def test_saved_notebook_is_clean_and_links_public_experiment_log():
+    root = Path(__file__).resolve().parents[1]
+    raw = (root / "notebooks/rewriter_train_l4.ipynb").read_text()
+    notebook = json.loads(raw)
+    assert [c["id"] for c in notebook["cells"]] == [
+        "intro",
+        "install",
+        "config",
+        "auth",
+        "helpers",
+        "data",
+        "training-note",
+        "train",
+        "save",
+        "upload",
+    ]
+    for cell in notebook["cells"]:
+        if cell["cell_type"] == "code":
+            assert cell["execution_count"] is None
+            assert cell["outputs"] == []
+    assert "widgets" not in notebook["metadata"]
+    assert "ts.net" not in raw
+    assert "coreweave.com" not in raw
+    assert (
+        "https://github.com/jayshah5696/finetuning-labs/blob/main/docs/english-rewriter-experiment-log.html"
+        in "".join(notebook["cells"][0]["source"])
+    )
+
+
 class Tokenizer:
     eos_token_id = 9
 
