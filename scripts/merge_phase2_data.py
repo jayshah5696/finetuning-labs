@@ -1,4 +1,4 @@
-"""Execute Phase 2 merge of diverse-v2 and validation-v1 into current and benchmark-draft."""
+"""Historical migration script: execute Phase 2 merge of diverse-v2 and validation-v1 into current and benchmark-draft."""
 
 from __future__ import annotations
 

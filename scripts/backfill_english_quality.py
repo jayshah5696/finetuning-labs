@@ -1,4 +1,4 @@
-"""Replace reviewed-but-defective new pairs, then rebuild from the unchanged Git baseline.
+"""Historical backfill script: replace reviewed-but-defective new pairs, then rebuild from the unchanged Git baseline.
 
 Refuse a changed selection, incompatible replacement, overlap or incomplete verification.
 Keep original verdicts and both selections. Audit the rebuilt release before the atomic swap.

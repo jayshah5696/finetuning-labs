@@ -1,4 +1,4 @@
-"""Exercise the actual notebook cells with public Hub data and a tiny random CPU LFM.
+"""Current verification script: exercise the actual notebook cells with public Hub data and a tiny random CPU LFM.
 
 The auth/install cells are skipped. W&B uses offline mode. The student weight loader
 and final Hub model upload are replaced explicitly; adapter training/save/reload is real.

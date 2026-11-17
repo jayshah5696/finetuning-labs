@@ -1,4 +1,4 @@
-"""Describe training coverage and repeated wording, without assigning semantic quality."""
+"""Current diagnostic script: describe training coverage and repeated wording, without assigning semantic quality."""
 
 import argparse
 import hashlib

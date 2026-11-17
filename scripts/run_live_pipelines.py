@@ -1,3 +1,5 @@
+"""Historical expansion runner: execute live Arka pipelines and stage diverse-v2 and validation-v1 datasets."""
+
 import json
 from pathlib import Path
 

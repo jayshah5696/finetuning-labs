@@ -1,4 +1,4 @@
-"""Run the same Liquid baseline on an L4 and collect durable artifacts."""
+"""Current evaluation script: run the same Liquid baseline or LoRA adapter on an L4 and collect durable artifacts."""
 
 import json
 import tomllib
