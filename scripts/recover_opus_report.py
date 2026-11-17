@@ -1,4 +1,4 @@
-"""Recover the omitted review array from the reviewer's saved tool command.
+"""Historical recovery script: recover the omitted review array from the reviewer's saved tool command.
 
 This parses literals only. It does not execute the command or invent verdicts.
 Keep the incomplete original report and the original command as evidence.

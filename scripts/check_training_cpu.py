@@ -1,4 +1,4 @@
-"""Exercise the real Trainer, collator and checkpoint with a tiny RANDOM Liquid model.
+"""Historical verification script: exercise the real Trainer, collator and checkpoint with a tiny RANDOM Liquid model.
 
 No student weights are downloaded. This is an implementation check, not a fine-tune result.
 Run in a uv environment with torch, transformers and accelerate installed.

@@ -1,4 +1,4 @@
-"""Check public downloads, exact rows and Dataset Viewer splits without credentials."""
+"""Current verification script: check public downloads, exact rows and Dataset Viewer splits without credentials."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Judge matched English runs and export stock, LoRA and hosted-model comparisons."""
+"""Current evaluation script: judge matched English runs and export stock, LoRA and hosted-model comparisons."""
 
 import argparse
 import csv

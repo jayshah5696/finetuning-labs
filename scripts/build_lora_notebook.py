@@ -1,4 +1,4 @@
-"""Build the self-contained Colab notebook from the tested LoRA helpers in Git."""
+"""Current notebook builder: build the self-contained Colab notebook from the tested LoRA helpers in Git."""
 
 import argparse
 import ast

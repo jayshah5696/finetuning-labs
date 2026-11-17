@@ -1,4 +1,4 @@
-"""Apply recorded data corrections after Opus review, preserving all earlier artifacts."""
+"""Historical curation script: apply recorded data corrections after Opus review, preserving all earlier artifacts."""
 
 from __future__ import annotations
 

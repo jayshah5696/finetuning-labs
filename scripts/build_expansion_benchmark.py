@@ -1,4 +1,4 @@
-"""Build the diverse expansion benchmark bundle v1 (60 diverse cases).
+"""Historical authoring script: build the diverse expansion benchmark bundle v1 (60 diverse cases).
 
 Validates coding filenames, workspace file tagging, spoken list formatting,
 multi-level contrasts, and speech repairs / anti-chatbot isolation.
