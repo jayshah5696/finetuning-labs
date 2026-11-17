@@ -1,4 +1,8 @@
-"""Generate English fidelity examples through Arka; preserve exact native and Sol evidence."""
+"""Generate English fidelity examples through Arka; preserve exact native and Sol evidence.
+
+Historical generation and curation workflow for the frozen ``supplement-v4-english-critical``
+release, kept for audit and deterministic replay.
+"""
 
 from __future__ import annotations
 
@@ -417,7 +421,7 @@ def balance_run(run):
         }:
             groups.setdefault((e["row"]["mode"], m["length"], m["focus"]), []).append(i)
     replacements, exclusions, sources, cell_keys = [], [], {}, {}
-    for group_index, (key, indices) in enumerate(sorted(groups.items())):
+    for _group_index, (key, indices) in enumerate(sorted(groups.items())):
         for index in indices[: len(indices) // 2]:
             old = original[index]
             source_plan = json.loads(
