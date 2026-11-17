@@ -101,3 +101,49 @@ def test_cleanup_removes_code_reports_and_old_data_paths():
     ]
     with pytest.raises(ValueError, match="data"):
         cleanup_paths(existing, {**files, "runtime/train.py": b"code"})
+
+
+def test_build_dataset_uses_configured_repo_id():
+    from finetuning_labs.rewriter.hf_data import BENCHMARK_REPO, DEFAULT_HF_OWNER, TRAIN_REPO
+
+    assert DEFAULT_HF_OWNER == "jayshah5696"
+    assert TRAIN_REPO == "jayshah5696/finetuning-labs-rewriter-training"
+    assert BENCHMARK_REPO == "jayshah5696/finetuning-labs-rewriter"
+    row, guide = example()
+    files = build_dataset(
+        {"train": [row]},
+        {"train": [guide]},
+        title="Rewriter",
+        description="Test",
+        license_text=b"License",
+        source_license=b"Source",
+        repo_id="custom-owner/custom-repo",
+    )
+    assert b'load_dataset("custom-owner/custom-repo", "sft")' in files["README.md"]
+
+
+def test_hub_and_hf_data_cli_handle_errors_cleanly(monkeypatch, tmp_path):
+    from finetuning_labs.rewriter import hf_data, hub
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "hub",
+            "upload",
+            "--package",
+            str(tmp_path),
+            "--repo-id",
+            "owner/repo",
+            "--receipt",
+            str(tmp_path / "r.json"),
+        ],
+    )
+    with pytest.raises(SystemExit) as exc_info:
+        hub.main()
+    assert exc_info.value.code == 1
+
+    monkeypatch.setattr(hf_data, "_sources", lambda **_: (_ for _ in ()).throw(ValueError("bad")))
+    monkeypatch.setattr("sys.argv", ["hf_data", "--output", str(tmp_path / "out")])
+    with pytest.raises(SystemExit) as exc_info:
+        hf_data.main()
+    assert exc_info.value.code == 1

@@ -561,7 +561,7 @@ def main() -> None:
 
             model = "LiquidAI/LFM2.5-230M"
             revision = "40cb2ad3b3044d5a41eee083a6103c8b523afa45"
-            tokenizer = AutoTokenizer.from_pretrained(model, revision=revision)
+            tokenizer = AutoTokenizer.from_pretrained(model, revision=revision, token=False)
             report = token_length_report(
                 bundle,
                 tokenizer,
