@@ -62,3 +62,11 @@ def test_insufficient_mode_cannot_be_hidden_by_total_count():
     ]
     with pytest.raises(ValueError, match="/transcribe"):
         select_balanced(list(zip(rows, meta, strict=True)), train_per_mode=250, dev_per_mode=25)
+
+
+def test_review_candidates_requires_openrouter_api_key_env(tmp_path, monkeypatch):
+    from finetuning_labs.rewriter.scale_data import review_candidates
+
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="OPENROUTER_API_KEY is required"):
+        review_candidates(tmp_path)

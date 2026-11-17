@@ -1,6 +1,6 @@
-"""Diverse dataset scenario generator and mechanical validators for rewriter expansion.
+"""Active diverse dataset scenario generator, mechanical validator, and staging pipeline.
 
-Prepares Arka scenario families across coding filenames, workspace file tagging,
+Prepares and verifies Arka scenario families across coding filenames, workspace file tagging,
 spoken list structures, multi-level contrasts, and speech repairs / anti-chatbot isolation.
 """
 
@@ -23,20 +23,8 @@ from .training import Example, LeakageIndex, _tokenizer, token_audit, validation
 
 
 def load_openrouter_api_key() -> str | None:
-    """Load OPENROUTER_API_KEY from environment or dotfiles .zshrc without logging."""
-    if key := os.environ.get("OPENROUTER_API_KEY"):
-        return key
-
-    zshrc = Path("/home/jshah/Documents/GitHub/dotfiles/zsh/.zshrc")
-    if zshrc.exists():
-        for line in zshrc.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line.startswith(("export OPENROUTER_API_KEY=", "OPENROUTER_API_KEY=")):
-                val = line.split("=", 1)[1].strip().strip("\"'")
-                if val:
-                    os.environ["OPENROUTER_API_KEY"] = val
-                    return val
-    return None
+    """Load OPENROUTER_API_KEY strictly from environment without logging."""
+    return os.environ.get("OPENROUTER_API_KEY") or None
 
 
 # Known file extensions for developer dictation
@@ -425,10 +413,7 @@ def check_missing_at_tags(
         matched_wf = (
             _find_exact_workspace_file(target, workspace_files) if workspace_files else None
         )
-        if matched_wf:
-            expected_tag = f"@{matched_wf}"
-        else:
-            expected_tag = f"@{target}"
+        expected_tag = f"@{matched_wf}" if matched_wf else f"@{target}"
 
         # Check presence in output rejecting trailing suffixes like @main.py.bak
         # We also accept @<basename> if workspace path was used
@@ -1924,7 +1909,7 @@ def stage_expansion_dataset(
     # Filter supporting.json so it contains ONLY the retained/admitted rows in the exact same count
     # and positional order as viewer/train.jsonl, data/train.jsonl, and sft/train.jsonl.
     staged_supporting = []
-    for row, meta in verified_entries:
+    for _row, meta in verified_entries:
         entry = dict(meta)
         entry["sol_review"] = "passed"
         entry["admission_tier"] = "native_strong" if is_native_strong(meta) else "double_sol"

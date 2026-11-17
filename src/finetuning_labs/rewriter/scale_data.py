@@ -1,4 +1,8 @@
-"""Scale native Arka pairs with independent Opus verification and frozen holdouts."""
+"""Scale native Arka pairs with independent Opus/Sol verification and frozen holdouts.
+
+Active review runner (``review_candidates``, ``parse_reviews``, ``saved_call``) paired with the
+historical multilingual v3 scale schedule (``expanded_plans``, ``select_balanced``) kept for replay.
+"""
 
 from __future__ import annotations
 
@@ -249,6 +253,12 @@ def review_candidates(
     from arka.config.models import LLMConfig
     from arka.llm.openai_client import build_openai_client
 
+    if prefix not in {"opus", "sol"} or batch_size < 1:
+        raise ValueError("Invalid verifier prefix or batch size")
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENROUTER_API_KEY is required")
+
     source = root / "generation"
     rows = [json.loads(x) for x in (source / "candidates.jsonl").read_text().splitlines()]
     scored = source / "scored-supporting.json"
@@ -262,9 +272,12 @@ def review_candidates(
     protected = validation_index()
     clean = []
     for row, m in zip(rows, meta, strict=True):
-        if len(m["decisions"]) != 6:
+        if len(m["decisions"]) != 6 and "incomplete_native_decisions" not in m["mechanical_issues"]:
             m["mechanical_issues"].append("incomplete_native_decisions")
-        if any(frozen.matches(row[k]) or protected.matches(row[k]) for k in ["input", "output"]):
+        if (
+            any(frozen.matches(row[k]) or protected.matches(row[k]) for k in ["input", "output"])
+            and "v2_or_original_or_personal_overlap" not in m["mechanical_issues"]
+        ):
             m["mechanical_issues"].append("v2_or_original_or_personal_overlap")
         if not m["mechanical_issues"]:
             clean.append((row, m))
@@ -307,13 +320,11 @@ def review_candidates(
         "required": ["reviews"],
         "additionalProperties": False,
     }
-    if prefix not in {"opus", "sol"} or batch_size < 1:
-        raise ValueError("Invalid verifier prefix or batch size")
     client = build_openai_client(
         LLMConfig(
             provider="openai",
             model=model,
-            api_key=os.environ["OPENROUTER_API_KEY"],
+            api_key=api_key,
             base_url="https://openrouter.ai/api/v1",
             timeout_seconds=240,
             max_retries=1,
@@ -324,7 +335,7 @@ def review_candidates(
     calls_dir = root / f"{prefix}-calls"
     calls_by_id = {}
     if calls_dir.exists():
-        for cp in calls_dir.glob("*.json"):
+        for cp in sorted(calls_dir.glob("*.json")):
             try:
                 crec = json.loads(cp.read_text(encoding="utf-8"))
                 if crec.get("status") == "completed":
