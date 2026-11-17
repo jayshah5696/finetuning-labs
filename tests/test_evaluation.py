@@ -240,3 +240,58 @@ def test_hub_package_is_an_allowlist_and_retains_simple_rows_and_license(tmp_pat
     assert "pending" in (output / "README.md").read_text().lower()
     with pytest.raises(FileExistsError):
         package_dataset(bundle, output, code_commit="test-commit")
+
+
+def test_generate_and_judge_reject_nonpositive_workers(tmp_path):
+    c = sample()
+    b = Bundle(cases=(c,), fixtures=(), manifest={})
+    with pytest.raises(ValueError, match="workers"):
+        generate_cases(b, tmp_path / "gen", {"model": "test"}, lambda _: {}, workers=0)
+    with pytest.raises(ValueError, match="workers"):
+        judge_cases(
+            b, tmp_path / "gen", tmp_path / "judge", {"model": "test"}, lambda _: {}, workers=0
+        )
+
+
+def test_aggregate_rejects_empty_bundle_and_assessments():
+    bundle = Bundle(cases=(), fixtures=(), manifest={})
+    with pytest.raises(ValueError, match="empty|case"):
+        aggregate(bundle, [])
+
+
+def test_evaluation_cli_rejects_api_key_file_and_handles_missing_config(monkeypatch, tmp_path):
+    from finetuning_labs.rewriter.evaluation import main
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "evaluation",
+            "--api-key-file",
+            str(tmp_path / "key"),
+            "generate",
+            "--model",
+            "luna",
+            "--output",
+            str(tmp_path / "out"),
+        ],
+    )
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == 2
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "evaluation",
+            "--config",
+            str(tmp_path / "missing.toml"),
+            "generate",
+            "--model",
+            "luna",
+            "--output",
+            str(tmp_path / "out"),
+        ],
+    )
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == 1
