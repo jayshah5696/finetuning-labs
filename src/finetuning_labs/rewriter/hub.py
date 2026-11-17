@@ -10,14 +10,16 @@ from pathlib import Path
 
 from .benchmark import audit, load_bundle, render_review
 
-CARD = """---
+DEFAULT_HF_OWNER = "jayshah5696"
+
+CARD = f"""---
 language:
 - en
 - de
 - pt
 license: other
 license_name: mixed-source-draft
-license_link: https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter/blob/main/DATA_LICENSE.md
+license_link: https://huggingface.co/datasets/{DEFAULT_HF_OWNER}/finetuning-labs-rewriter/blob/main/DATA_LICENSE.md
 task_categories:
 - text-generation
 tags:
@@ -120,14 +122,17 @@ def main():
     upload.add_argument("--repo-id", required=True)
     upload.add_argument("--receipt", type=Path, required=True)
     args = parser.parse_args()
-    if args.command == "package":
-        result = package_dataset(args.bundle, args.output, code_commit=args.code_commit)
-        print(json.dumps({k: v for k, v in result.items() if k != "files"}, indent=2))
-    else:
-        result = upload_dataset(args.package, args.repo_id)
-        args.receipt.parent.mkdir(parents=True, exist_ok=True)
-        args.receipt.write_text(json.dumps(result, indent=2) + "\n")
-        print(json.dumps(result, indent=2))
+    try:
+        if args.command == "package":
+            result = package_dataset(args.bundle, args.output, code_commit=args.code_commit)
+            print(json.dumps({k: v for k, v in result.items() if k != "files"}, indent=2))
+        else:
+            result = upload_dataset(args.package, args.repo_id)
+            args.receipt.parent.mkdir(parents=True, exist_ok=True)
+            args.receipt.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+            print(json.dumps(result, indent=2))
+    except (ValueError, TypeError, OSError, KeyError, RuntimeError) as error:
+        parser.exit(1, f"Error: {error}\n")
 
 
 if __name__ == "__main__":
