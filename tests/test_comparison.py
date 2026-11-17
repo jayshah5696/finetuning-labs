@@ -122,3 +122,94 @@ def test_adapter_comparison_rejects_different_generation_settings(tmp_path):
     bundle = prepare(tmp_path, generation_configs={"left": stock, "right": tuned})
     with pytest.raises(ValueError, match="generation settings"):
         compare(bundle, tmp_path)
+
+
+def test_adapter_comparison_also_checks_left_adapter_settings(tmp_path):
+    stock = {"model": "base", "revision": "a" * 40, "max_new_tokens": 64}
+    tuned = stock | {
+        "adapter_model": "owner/lora",
+        "adapter_revision": "b" * 40,
+        "max_new_tokens": 128,
+    }
+    bundle = prepare(tmp_path, generation_configs={"left": tuned, "right": stock})
+    with pytest.raises(ValueError, match="generation settings"):
+        compare(bundle, tmp_path)
+
+
+def test_usage_ignores_boolean_cost_and_token_fields():
+    from finetuning_labs.rewriter.comparison import _usage
+
+    records = [
+        {
+            "status": "completed",
+            "result": {
+                "usage": {
+                    "input_tokens": True,
+                    "output_tokens": 10,
+                    "cost": True,
+                    "cost_details": {"upstream_inference_cost": False},
+                    "is_byok": True,
+                }
+            },
+        }
+    ]
+    summary = _usage(records)
+    assert summary["gateway_reported_cost_usd"] is None
+    assert summary["upstream_reported_cost_usd"] is None
+    assert summary["upstream_cost_coverage"] == 0
+    assert summary["input_tokens"] == 0
+
+
+def test_markdown_handles_none_pooled_gain():
+    from finetuning_labs.rewriter.comparison import markdown
+
+    empty_stats = {
+        "scheduled": 0,
+        "counts": dict.fromkeys(
+            [
+                "pass",
+                "fail",
+                "uncertain",
+                "judge_error",
+                "generation_error",
+                "truncated",
+                "pending",
+            ],
+            0,
+        ),
+        "verified_pass_rate_pct": None,
+        "decided_case_pass_rate_pct": None,
+        "assessment_coverage_pct": None,
+        "critical_error_count": 0,
+        "critical_error_rate_pct": None,
+        "semantic_reviewed": 0,
+        "semantic_review_coverage_pct": None,
+        "identity_count": 0,
+        "identity_unchanged": 0,
+        "identity_rate_pct": None,
+        "judge_error_events": 0,
+    }
+    side = {
+        "pooled": empty_stats,
+        "headline_equal_mode_pass_rate_pct": None,
+        "per_mode": {},
+        "by_length": {"short": empty_stats, "long": empty_stats},
+    }
+    report = {
+        "scheduled_pairs": 0,
+        "left_model": "left",
+        "right_model": "right",
+        "judge_config": {"model": "judge"},
+        "left": side,
+        "right": side,
+        "pairs": {
+            "both_pass": 0,
+            "right_only_pass": 0,
+            "left_only_pass": 0,
+            "neither_verified_pass": 0,
+        },
+        "pooled_gain_percentage_points": None,
+        "assessments": {"left": [], "right": []},
+    }
+    rendered = markdown(report)
+    assert "N/A" in rendered
