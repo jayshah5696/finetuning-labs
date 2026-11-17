@@ -63,3 +63,25 @@ def test_recovery_reads_project_relative_git_baseline(tmp_path, monkeypatch):
     restored = script["restore_baseline"](baseline, tmp_path / "restored")
     assert (restored / "data/train.jsonl").read_bytes() == original
     assert source.read_bytes() != original
+
+
+def test_justfile_replaces_makefile_and_runs_list():
+    justfile = PROJECT / "justfile"
+    assert justfile.exists()
+    assert not (PROJECT / "Makefile").exists()
+    output = subprocess.check_output(["just", "--list"], cwd=PROJECT, text=True)
+    for recipe in [
+        "default",
+        "sync",
+        "test",
+        "check",
+        "build",
+        "review",
+        "export",
+        "tokens",
+        "training-audit",
+        "reviewed-audit",
+        "notebook",
+        "notebook-check",
+    ]:
+        assert recipe in output
