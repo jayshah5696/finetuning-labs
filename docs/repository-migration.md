@@ -1,7 +1,8 @@
 # Repository migration
 
+> **Historical note:** This document records the initial extraction of `finetuning-labs` from the `jadoo-labs` monorepo into a standalone repository before it was made public.
+
 The standalone repository is https://github.com/jayshah5696/finetuning-labs.
-It starts private. Changing GitHub visibility later is a separate action.
 
 ## Source and history
 
@@ -21,7 +22,7 @@ Use the extracted ID for Git operations in this repository, including
 Historical reports retain original commit IDs, paths, URLs and exact file contents.
 Those records still refer to the original repository.
 
-The standalone checkout is `/home/jshah/Documents/GitHub/finetuning-labs`.
+The standalone checkout is `finetuning-labs`.
 The original project folder remains in `jadoo-labs` as a backup.
 Make new project changes in the standalone repository, not both copies.
 
@@ -31,10 +32,9 @@ Evaluation provenance now reads the project repository instead of its old monore
 The recovery script reads `data/rewriter/current` directly from the extracted Git history.
 Two tests exercise these operations against temporary Git repositories.
 
-`make test` now requests the data and hosted dependency groups that the existing tests need.
-The README and generated dataset-card source point to the new repository.
-Colab needs GitHub access while this repository is private. Downloading and uploading the
-notebook to Colab is an alternative.
+`just test` requests the data and hosted dependency groups that the existing tests need.
+The README and generated dataset-card source point to the standalone repository.
+Now that the repository is public, the Colab GitHub link opens `notebooks/rewriter_train_l4.ipynb` directly.
 
 The repository ignores `.env` and `.env.*`, except `.env.example`.
 No credentials, virtual environments, personal data or ignored artifacts were copied.
@@ -42,12 +42,13 @@ No Hugging Face datasets, model repositories or hosted services changed during m
 
 ## Verification
 
-The standalone checkout passed these commands:
+The standalone checkout passed these commands (using [just](https://github.com/casey/just)):
 
 ```sh
-make check
-make build
-make review export
+just check
+just build
+just review
+just export
 ```
 
 The test suite passed all 196 tests. Ruff checks and the benchmark audit passed.
@@ -58,4 +59,4 @@ These checks do not establish model quality or replace human review.
 Gitleaks 8.30.1 scanned the extracted history before publication. Its 20 findings were
 checked against the corresponding historical JSON lines. All were file checksums or the
 pinned Arka Git revision. No credential was confirmed. This scan is not a guarantee that
-all material is suitable for public release. Review the history and data before changing visibility.
+all material is suitable for public release.

@@ -84,7 +84,7 @@ uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.e
 
 Run completion only when the main selection is short. The final append requires all 500
 verified pairs, the exact identity quota and a valid direction-balance report. Use
-`make reviewed-audit` to verify committed data and review evidence without new model calls.
+`just reviewed-audit` to verify committed data and review evidence without new model calls.
 
 ```sh
 uv run --locked --group data --group hosted python scripts/check_english_release.py --tokenizers
@@ -184,7 +184,7 @@ files from the current Hub trees; previous commits remain in history.
 The notebook loads the public SFT data and pinned 230M base, trains LoRA using dev loss for
 checkpoint selection, records loss in W&B and uploads the final adapter to a model repository.
 Add HF_TOKEN with write access and WANDB_API_KEY in Colab Secrets.
-[COLAB_TRAINING.md](COLAB_TRAINING.md) explains this workflow and its limits.
+[colab-training.md](colab-training.md) explains this workflow and its limits.
 The actual notebook cells passed a tiny native LFM CPU check with all public data encoded,
 frozen base weights, adapter updates and exact adapter reload. W&B was offline and the model
 upload was mocked. Actual 230M L4 training remains pending. Human labels, human judge calibration
@@ -202,7 +202,7 @@ Opus 5.5 pass bound to its exact contents. These are model judgments, not human 
 The original 219-pair pilot failed the first independent Opus review. Do not train on it.
 Its files and publication receipts remain for reproduction. The rejected pilot's repeated
 count-check template, artificial noise and padded long texts are documented in
-[data/rewriter/reviews/opus-first-pass.md](data/rewriter/reviews/opus-first-pass.md).
+[../data/rewriter/reviews/opus-first-pass.md](../data/rewriter/reviews/opus-first-pass.md).
 
 ## Sources and splits
 
@@ -287,8 +287,8 @@ It has no new authored output-control fixtures.
 Run the offline project checks:
 
 ```sh
-make check
-make build
+just check
+just build
 uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.reviewed_publication \
   --release data/rewriter/reviewed-v2 --prepare-only
 uv run --locked finetuning-labs --bundle data/rewriter/reviewed-v2/validation-bundle audit

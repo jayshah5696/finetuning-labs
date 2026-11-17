@@ -50,8 +50,7 @@ One older staged prompt row contains formatter headers and is quarantined by exa
 Original attempts and model verdicts remain unchanged. A separate data-prep thread is recorded
 as a pending verified handoff; its concurrent root-checkout work is not part of these counts.
 
-The [English experiment log](https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-experiment-log)
-uses the same private access as the original plan. Its HTML is in
+The [English experiment log](english-rewriter-experiment-log.html) is stored in
 `docs/english-rewriter-experiment-log.html`. The current comparison includes both stock models,
 both uploaded LoRAs and a fresh GPT-6 Luna run on all 81 frozen English cases. All five use the
 same prompts, references, output budget and Sol settings. The historical 64-case Luna comparison
@@ -166,7 +165,7 @@ names stay the same. Hugging Face contains only Parquet data, cards and licenses
 
 New data uses Luna generation, six Luna Decisions checks and exact GPT-6.1 Sol input/output/pair
 verification. Native uncertainty requires two separate passing Sol calls; confident native
-rejection stays blocked. These are model judgments. See TRAINING_DATA.md and the current
+rejection stays blocked. These are model judgments. See [training-data.md](training-data.md) and the current
 quality report for the policy and counts. The code review and release evidence remain in Git.
 
 The single notebook uses the updated data receipt and dynamic split-count checks. Run it in a
@@ -246,7 +245,7 @@ The public-download and Viewer check is `data/rewriter/releases/public-viewer-ch
 The next user action is to run the notebook on Colab L4 with the two secrets. Actual 230M
 training and semantic stock-versus-tuned validation remain pending. Human labels and an unseen
 final test also remain pending. The sections below record historical work; their former private
-Hub layouts and notebook commands are superseded by this section and COLAB_TRAINING.md.
+Hub layouts and notebook commands are superseded by this section and [colab-training.md](colab-training.md).
 
 ## Historical reviewed v3, 1,000 training examples
 
@@ -354,20 +353,19 @@ All 49 tests pass on Python 3.12. Ruff checks and formatting pass.
 All authored mechanical fixture expectations match. Forty-nine deliberately wrong outputs still
 pass term checks and require semantic review; this is an explicit validation boundary.
 
-`make review` generated the four-column review page. Desktop and narrow-screen previews had no
+`just review` generated the four-column review page. Desktop and narrow-screen previews had no
 console errors. The expanded export has 68 guide-format references with only system, user, and
 assistant fields, saved at `artifacts/benchmark-guide-68.jsonl`. The original 60-row export is
 preserved. A real overwrite attempt failed and preserved the existing export. Required
 dictionary and profile context survive export. A changed code identifier is rejected.
 
-`make build` produced the source distribution and wheel. An isolated wheel environment outside
+`just build` produced the source distribution and wheel. An isolated wheel environment outside
 the repository audited all 68 cases and exported all 68 references without the TypeWhisper
 checkout. The imported source snapshot matches its original SHA-256.
 
-Private review page: https://sangam.jay-hirajoshi.ts.net/p/finetuning-labs-benchmark-draft
 Sangam document: `a43249ab-3ed4-4055-97ef-f646b1710441`.
-Benchmark revision: `92b2712f-b807-4c8b-987d-728c1e3a062d`, publication version 2, private.
-Plan revision: `c7d18d71-2527-4763-a882-00fa1fbaa3a1`, publication version 5, private.
+Benchmark revision: `92b2712f-b807-4c8b-987d-728c1e3a062d`, publication version 2.
+Plan revision: `c7d18d71-2527-4763-a882-00fa1fbaa3a1`, publication version 5.
 Both stored documents match their local HTML exactly.
 
 ## Personal sample
@@ -413,7 +411,7 @@ count-check scenarios and limited language coverage. Earlier malformed or unders
 attempts and the initial transport rehearsal remain as evidence and are excluded from this
 release. The original 68 validation cases and their fixtures remain byte-for-byte unchanged.
 
-`TRAINING_DATA.md` documents the exact formats, commands, checks, limitations, and next Colab
+[training-data.md](training-data.md) documents the exact formats, commands, checks, limitations, and next Colab
 step. Training rows have four fields. The separate guide-format SFT export has only system,
 user, and assistant. Supporting metadata and review critiques never enter supervised text.
 
@@ -438,7 +436,7 @@ training-pilot audit has 157 pass, 48 uncertain, and 14 failure flags. Six flagg
 unchanged input and output. Flags are disagreements, not confirmed data defects.
 
 The 62 uncertain or flagged training pairs are in the second run's `review-queue.csv`.
-`DECISION_VALIDATION.md` explains the source data, limited earlier Arka integration, current
+[decision-validation.md](decision-validation.md) explains the source data, limited earlier Arka integration, current
 decision client, criteria, thresholds, measured errors, and reproduction commands. These
 thresholds are provisional. Independent human agreement has not been measured. The published
 dataset, frozen 68 cases, and original Sol baseline records are unchanged.
@@ -457,7 +455,7 @@ The native Liquid tokenizer at revision `40cb2ad3b3044d5a41eee083a6103c8b523afa4
 fits a 4,096-token context. The earlier 1,024-token setting is no longer suitable. No text was
 truncated. These lengths do not establish L4 memory use or model quality.
 
-`make tokens` reproduces the length check with the optional locked data dependencies. Saved
+`just tokens` reproduces the length check with the optional locked data dependencies. Saved
 long-case evidence is in `supporting/long-form-tokens.json`. An independent check serialized the
 actual exported chats as text and encoded them again. All eight complete lengths matched, every
 quote survived, and all numbered sections remained. The review page links to all eight long
