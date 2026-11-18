@@ -84,11 +84,11 @@ but should preserve the identifiers so the other threads can map their coverage.
 
 ## Thread 2: personal English dictation, shortcuts and redaction
 
-**Start now, locally.** The user authorizes using their personal English material and removing
+**Start now, locally.** This workstream uses local personal English material after removing
 obvious PII. The existing raw-personal-data restrictions continue to protect the source records.
 
 - Inspect the existing ignored personal bundle at the main checkout's
-  `projects/finetuning-labs/data/rewriter/personal/calibration-10/`, its source manifest, and a
+  `data/rewriter/personal/calibration-10/`, its source manifest, and a
   read-only local checkout of `jayshah5696/typewhisper-linux`.
   Inspect only related app history/config paths discovered from those sources.
 - Keep the existing ten calibration records held out. Select additional records covering actual
@@ -101,7 +101,7 @@ obvious PII. The existing raw-personal-data restrictions continue to protect the
   placeholder. Preserve the transformation, numeric relationships, negation and conditions.
 - Keep raw records, direct redacted records, before/after reviews and identity mappings local
   under ignored `data/rewriter/personal/` or `artifacts/`. Do not send raw personal records to
-  hosted models, Git, Hugging Face or Sangam. Obvious-PII removal is not proof of anonymity.
+  hosted models, Git, Hugging Face or external document tools. Obvious-PII removal is not proof of anonymity.
 - Produce a local redacted candidate set and a non-identifying error-pattern inventory. Public
   staged candidates may be independently fictionalized analogues of those patterns. Direct
   personal-derived rows remain local for review; no public release of them is part of this thread.

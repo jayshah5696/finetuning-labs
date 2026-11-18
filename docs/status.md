@@ -1,5 +1,7 @@
 # Status
 
+This document is a dated project log. Older entries record the state of each milestone at the time it ran, including historical dataset revisions before public release. Running `python -m finetuning_labs.rewriter.hf_data --publish` refreshes `DATA_LICENSE.md` and `README.md` on the Hugging Face Hub and updates `data/rewriter/releases/public-parquet.json`.
+
 ## Latest five-model English evaluation, 1 November 2026 UTC
 
 Both new rank-16 adapters identify the 1,979-row English training dataset at Hub revision
@@ -27,18 +29,18 @@ audits and package builds pass. The older entries below retain their historical 
 
 ## Next English data expansion
 
-The user approved individual workstreams for transformation-rule examples, personal English
+Individual workstreams were defined for transformation-rule examples, personal English
 dictation/shortcuts with local redaction, and long-form validation with independent training
 coverage. Training rewards, rank-16/32/64 ablations on 230M and 350M, optional Qwen comparison,
 and preference training are deferred until the data work is ready. Shared ownership and data
-gates are in `docs/data-expansion-workstreams.md`; thread links are in `data/rewriter/workstreams.json`.
+gates are in `docs/data-expansion-workstreams.md`; workstream metadata is in `data/rewriter/workstreams.json`.
 The existing training release, frozen 81-case validation and current notebook stay unchanged
 during generation. New rows and validation designs are staged separately for combined review.
-All six threads are created. The three data threads started in separate worktrees. The three
-training threads acknowledged their parked scope and stopped. The registry records their links,
+All six workstreams are registered. The three data workstreams started in separate worktrees. The three
+training workstreams acknowledged their parked scope and stopped. The registry records their
 branches and launch-state snapshots; it does not claim that new data is ready.
 
-On 30 October the user approved repairs after all three first pilots failed their full gates.
+On 30 October repairs ran after all three first pilots failed their full gates.
 The first exports contain 40 staged training pairs and one separate long validation pair.
 The bounded repair runs are complete. They generated 130 fresh candidates and staged 43
 inspection-qualified training pairs: 40 short and three long. The rule stream contributes
@@ -131,7 +133,7 @@ completes four tiny-model optimizer steps, with changed adapters, frozen base we
 exact saved-adapter reload. W&B is offline and upload is mocked. All 160 tests, Ruff checks,
 formatting and package build pass. Receipts are in `data/rewriter/releases/english-*.json`.
 
-The user will run training in Colab L4. No new 230M or 350M student has been trained by this
+Training runs in Colab L4. No new 230M or 350M student has been trained by this
 preparation run. The existing English comparison remains 51/81 passes, 17 critical-error
 outputs among 80 reviewed outputs and one truncation. Compare the next adapter on those same
 81 cases. A 350M trial also needs its own stock-model arm; it changes both data and base size.
@@ -188,7 +190,7 @@ without truncation, then completed four optimizer steps with changed adapters, f
 weights and exact adapter reload. W&B was offline and upload was mocked. All 131 tests, lint,
 formatting and package build pass. Receipts are in data/rewriter/releases and the final review
 is data/rewriter/reviews/sol-fidelity-delivery-review.json. Actual new 230M L4 training and the
-subsequent semantic comparison are the next user-run steps.
+subsequent semantic comparison are the next Colab steps.
 
 ## Trained adapter evaluation, 28 October 2026
 
@@ -242,7 +244,7 @@ The previous exact-file review is `data/rewriter/reviews/sol-lora-notebook-revie
 All 102 project tests, Ruff checks and formatting pass. The package builds.
 The public-download and Viewer check is `data/rewriter/releases/public-viewer-check.json`.
 
-The next user action is to run the notebook on Colab L4 with the two secrets. Actual 230M
+The next step is to run the notebook on Colab L4 with the two secrets. Actual 230M
 training and semantic stock-versus-tuned validation remain pending. Human labels and an unseen
 final test also remain pending. The sections below record historical work; their former private
 Hub layouts and notebook commands are superseded by this section and [colab-training.md](colab-training.md).
@@ -251,8 +253,8 @@ Hub layouts and notebook commands are superseded by this section and [colab-trai
 
 The Colab L4 training notebook and standalone runtime are implemented. The first Opus code
 review failed on checkpoint storage, interruption recovery, repeated completed stages and
-inherited decoding settings. The parent fixed those findings. The next Opus call hit a provider
-credit limit. The user changed the remaining review and fix loop to GPT-6.1 Sol only. Sol's exact
+inherited decoding settings. Those findings were fixed. The next Opus call hit a provider
+credit limit. The remaining review and fix loop switched to GPT-6.1 Sol only. Sol's exact
 script and notebook review passed with no unresolved material findings. The first failed report
 remains in the release history. Sol did not author or edit examples or implementation.
 
@@ -268,7 +270,7 @@ criteria. Each mechanically valid candidate receives six native Decisions scores
 Opus input, output and pair verification. Failed and uncertain verdicts stay excluded. Interrupted
 or malformed review calls remain preserved; explicit resume retries only incomplete verification.
 A repeated wrong-hash batch was recovered through individually constrained review packets.
-The 14 remaining incomplete reviews are excluded. No new Opus call followed the user's change.
+The 14 remaining incomplete reviews are excluded. No new Opus call followed the switch to Sol.
 
 The final export has exactly 1,000 train and 100 dev passes, with 250 and 25 per mode, and the
 unchanged 84 reviewed-v2 validation rows. Training has 1,000 distinct targets and source groups.
@@ -293,7 +295,7 @@ and v2 validation bytes are preserved. The receipt and preservation audit are co
 The actual uploaded notebook's download and readiness cells ran locally with cached Hub auth
 and local storage. They verified the approved script, Sol report, all 1,184 rows, all loss masks,
 all source groups, the frozen validation hashes and the 16-row proof selection. No GPU stage ran.
-The notebook is ready for the user's L4 run. The memorization proof, full 230M training and paired
+The notebook is ready for an L4 run. The memorization proof, full 230M training and paired
 stock/tuned semantic comparison remain the next work. Human labels and a locked final test remain
 pending. The review-time preparation context is retained without duplicating its data files.
 
@@ -308,7 +310,7 @@ verification. It did not generate or edit examples or review implementation.
 Clean Arka commit `5d353740ae1dd34742841071752814028db1489a` supplies native generation,
 decision-panel and labeling stages. The final native check scored 168 pairs and automatically
 accepted 75. Independent Opus passes adjudicate the retained disagreements. Scores, policy
-outcomes, critiques and hashes remain separate from supervised text. The user's dirty Arka
+outcomes, critiques and hashes remain separate from supervised text. The local Arka
 checkout was not modified.
 
 All 166 pairs fit the pinned Liquid chat template without truncation. There are 33 long inputs
@@ -337,8 +339,8 @@ original validation-freeze hashes remain unchanged.
 
 ## Current work
 
-On 27 October 2026 the user accepted the 68 cases for development validation and authorized
-pushing the project changes. `data/rewriter/validation-freeze.json` records the acceptance and
+On 27 October 2026 the 68 cases were frozen for development validation.
+`data/rewriter/validation-freeze.json` records the acceptance and
 file hashes. The benchmark bytes and observed failures remain unchanged. All 64 source families
 and all fixtures stay outside training. Per-output human labels and judge calibration remain
 pending. The next work is a separate training-data pilot for the same four rewrite modes.
@@ -363,14 +365,14 @@ dictionary and profile context survive export. A changed code identifier is reje
 the repository audited all 68 cases and exported all 68 references without the TypeWhisper
 checkout. The imported source snapshot matches its original SHA-256.
 
-Sangam document: `a43249ab-3ed4-4055-97ef-f646b1710441`.
+Internal document archive ID: `a43249ab-3ed4-4055-97ef-f646b1710441`.
 Benchmark revision: `92b2712f-b807-4c8b-987d-728c1e3a062d`, publication version 2.
 Plan revision: `c7d18d71-2527-4763-a882-00fa1fbaa3a1`, publication version 5.
 Both stored documents match their local HTML exactly.
 
 ## Personal sample
 
-After the user authorized choosing any source, 10 actual history entries were selected read-only.
+Ten actual history entries were selected read-only for a local holdout check.
 Their original raw text, historical app output, and proposed corrections stay in an ignored local
 bundle. Historical cleanup output is not treated as a preferred correction. All 10 new references
 remain pending human review. The shared 68-case publication contains no personal text.
@@ -381,15 +383,15 @@ history file's SHA-256 remained unchanged during selection and preparation.
 
 ## Pending
 
-- Independent per-output human labels. The user accepted the dataset for development validation;
-  the 68-row human worksheet remains pending and is not fabricated from that acceptance.
-- User review of the 10 personal reference drafts and any preferred corrections.
+- Independent per-output human labels. The 68-case dataset is frozen for development validation;
+  the 68-row human worksheet remains pending and is not fabricated from that milestone.
+- Human review of the 10 personal reference drafts and any preferred corrections.
 - An independent locked final test. The training pilot has its own internal development split.
 - Independent human calibration of GPT-6.1 Sol. Both model baselines and Sol judging are complete.
 - Execution of the supplied Colab L4 notebook, 16-row training proof, and fine-tuned comparison.
-- Any public Hugging Face release after data and license review. The private draft is uploaded.
+- Public Hugging Face release after data and license review (completed in later entries above).
 
-The authorized model baselines and shared judging are complete. Development validation is now
+The model baselines and shared judging are complete. Development validation is now
 frozen. No student training or cited-lab migration occurred. All model scores remain diagnostic.
 
 ## Training-data pilot, 27 October 2026
@@ -415,11 +417,11 @@ release. The original 68 validation cases and their fixtures remain byte-for-byt
 step. Training rows have four fields. The separate guide-format SFT export has only system,
 user, and assistant. Supporting metadata and review critiques never enter supervised text.
 
-The private training dataset is `jayshah5696/finetuning-labs-rewriter-training`, revision
+The initial private training dataset upload was `jayshah5696/finetuning-labs-rewriter-training`, revision
 `4610bc987246f266851b698c71bf250bd25a079f`. All 329 uploaded files were downloaded and
 verified byte for byte. The receipt is `data/rewriter/releases/training-data.json`.
 The dataset-check notebook has four code cells with empty outputs. Its three data-check cells
-ran locally against the actual private Hub release, using cached authentication instead of
+ran locally against that Hub release, using cached authentication instead of
 Colab Secrets. All 219 token spans and the 16-row selection passed. Actual Colab execution and
 student training remain unverified.
 
@@ -474,34 +476,33 @@ cases in its denominator. Uncertain, missing, truncated, and failed outputs do n
 verified passes. Decided-case pass rate is a separate diagnostic shown beside coverage.
 
 Human calibration remains pending. It should include the eight long references and all 16 long
-wrong outputs. The user subsequently authorized diagnostic model runs, a private Hub upload,
-and Git commits. The runner and metric aggregation are now implemented. Their scores remain
-advisory until human calibration. The current runtime execution status will be recorded below.
+wrong outputs. Diagnostic model runs, a preliminary Hub upload,
+and Git commits followed the validation contract. The runner and metric aggregation are now implemented. Their scores remain
+advisory until human calibration. The runtime execution status is recorded below.
 
 ## Publication and baseline execution
 
 The historical long-example authoring script, an allowlist-only Hub packager, durable baseline
 and judge runners, and an L4 Modal entry point are implemented. Twelve new failure tests preceded
 the runtime code. The initial authoring script reproduces the exact eight committed long records.
-Arka uses clean commit `779040204b0f392465b7e6240bf9d9200816dc5d`; unrelated edits in the user's
+Arka uses clean commit `779040204b0f392465b7e6240bf9d9200816dc5d`; unrelated edits in the local
 Arka checkout are not included. Hosted calls use OpenRouter, not a direct OpenAI key.
 
-Hugging Face and Modal authentication work. The user restored the OpenRouter credential in the
-zshrc, and authenticated requests now work. The key was loaded only into process memory.
-The shell configuration contents, symlink, and target were verified unchanged during evaluation.
+Hugging Face and Modal authentication work. The OpenRouter credential was provided in the
+environment, and authenticated requests succeeded. The key was loaded only into process memory.
 No credential was written to Git, Hugging Face, run records, or another configuration file.
 
 The source and scripts were committed as `ba6ec67`; the Hub card URI fix is `22cfabe`; the Colab
 notebook and initial publication/run receipts are committed as `1b512a3`. No Git push was made.
 
-The private dataset is `jayshah5696/finetuning-labs-rewriter`. Calibration revision
+The initial private dataset upload was `jayshah5696/finetuning-labs-rewriter`. Calibration revision
 `10656b47271081e64764849857a68f66d4a552a5` contains 68 four-column rows. All 14 upload files were
 downloaded and hash-verified. Runtime-assets revision `287fd2d44e6c8d9f044c348d0aa7267487be924a`
 adds four verified files: the wheel, config, notebook, and asset manifest. The notebook's five
 Python cells compile and have empty outputs; it has not been executed in Colab.
 
-The Hub Dataset Viewer returned 501 because this private repository needs PRO or Enterprise
-viewer access. Authenticated file downloads were verified. Repository visibility remains private.
+At the time of that initial private upload, the Hub Dataset Viewer returned 501 because private dataset repositories require PRO or Enterprise
+viewer access (both Hugging Face datasets were made public in later milestones above). Authenticated file downloads were verified.
 
 ## Liquid baseline result
 

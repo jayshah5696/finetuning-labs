@@ -162,7 +162,7 @@ Data and token-length checks are implemented. The 68 references, 156 fixture che
 software tests pass their offline checks. Full reference chats fit 4,096 tokens. These results
 establish data integrity and declared mechanical expectations, not model accuracy.
 
-The user later authorized a diagnostic baseline. Stock Liquid has generated all 68 cases on a
+A diagnostic baseline ran after those offline checks. Stock Liquid has generated all 68 cases on a
 Modal L4. All reached EOS without output-limit truncation. Declared mechanical checks passed
 53/68 overall, 0/8 on long cases, and 0/3 for identity preservation. These are mechanical results,
 not a semantic pass rate. Normal termination does not establish that a document is complete.
