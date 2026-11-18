@@ -304,7 +304,7 @@ def main():
                 writer.writeheader()
                 writer.writerows(reviews)
         print(markdown(report))
-    except (ValueError, TypeError, OSError, KeyError) as error:
+    except (ValueError, OSError, RuntimeError, json.JSONDecodeError) as error:
         parser.exit(1, f"Error: {error}\n")
 
 

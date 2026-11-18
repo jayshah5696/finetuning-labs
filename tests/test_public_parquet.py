@@ -148,6 +148,27 @@ def test_hub_and_hf_data_cli_handle_errors_cleanly(monkeypatch, tmp_path):
         hf_data.main()
     assert exc_info.value.code == 1
 
+    monkeypatch.setattr(hf_data, "_sources", lambda **_: (_ for _ in ()).throw(TypeError("bug")))
+    with pytest.raises(TypeError, match="bug"):
+        hf_data.main()
+
+    monkeypatch.setattr(hub, "upload_dataset", lambda *_: (_ for _ in ()).throw(KeyError("bug")))
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "hub",
+            "upload",
+            "--package",
+            str(tmp_path),
+            "--repo-id",
+            "owner/repo",
+            "--receipt",
+            str(tmp_path / "r.json"),
+        ],
+    )
+    with pytest.raises(KeyError, match="bug"):
+        hub.main()
+
 
 def test_default_hf_owner_is_pure_constant_and_env_var_only_affects_cli_default(
     monkeypatch, tmp_path

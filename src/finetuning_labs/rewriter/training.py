@@ -766,6 +766,9 @@ def run_pipeline(
         ]
     if pilot:
         plans = plans[:16]
+    for section in ("author", "judge"):
+        if section not in config:
+            raise ValueError(f"Missing [{section}] section in {settings}")
     rubric = (PROJECT / "data/rewriter/benchmark-draft/supporting/judge-system.txt").read_text()
     judge_config = {**config["judge"], "rubric": rubric}
     author_config = config["author"]
@@ -941,7 +944,13 @@ def main():
             )
         )
         print(json.dumps(result, indent=2))
-    except (ValueError, TypeError, OSError, KeyError, RuntimeError) as error:
+    except (
+        ValueError,
+        OSError,
+        RuntimeError,
+        tomllib.TOMLDecodeError,
+        json.JSONDecodeError,
+    ) as error:
         parser.exit(1, f"Error: {error}\n")
 
 

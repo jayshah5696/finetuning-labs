@@ -333,7 +333,7 @@ def main():
             )
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_text(json.dumps({"repositories": receipts}, indent=2) + "\n")
-    except (ValueError, TypeError, OSError, KeyError, RuntimeError) as error:
+    except (ValueError, OSError, RuntimeError, json.JSONDecodeError) as error:
         parser.exit(1, f"Error: {error}\n")
 
 

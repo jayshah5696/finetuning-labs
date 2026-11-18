@@ -213,3 +213,20 @@ def test_markdown_handles_none_pooled_gain():
     }
     rendered = markdown(report)
     assert "N/A" in rendered
+
+
+def test_comparison_cli_handles_io_errors_and_does_not_hide_type_errors(monkeypatch, tmp_path):
+    from finetuning_labs.rewriter import comparison
+
+    monkeypatch.setattr("sys.argv", ["comparison", "--run", str(tmp_path / "missing")])
+    with pytest.raises(SystemExit) as exc_info:
+        comparison.main()
+    assert exc_info.value.code == 1
+
+    monkeypatch.setattr(
+        comparison,
+        "evaluation_bundle",
+        lambda *_, **__: (_ for _ in ()).throw(TypeError("internal-bug")),
+    )
+    with pytest.raises(TypeError, match="internal-bug"):
+        comparison.main()

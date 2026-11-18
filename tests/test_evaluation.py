@@ -295,3 +295,30 @@ def test_evaluation_cli_rejects_api_key_file_and_handles_missing_config(monkeypa
     with pytest.raises(SystemExit) as exc_info:
         main()
     assert exc_info.value.code == 1
+
+    empty_cfg = tmp_path / "empty.toml"
+    empty_cfg.write_text("")
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "evaluation",
+            "--config",
+            str(empty_cfg),
+            "generate",
+            "--model",
+            "luna",
+            "--output",
+            str(tmp_path / "out"),
+        ],
+    )
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == 1
+
+    from finetuning_labs.rewriter import evaluation
+
+    monkeypatch.setattr(
+        evaluation, "evaluation_bundle", lambda *_, **__: (_ for _ in ()).throw(TypeError("bug"))
+    )
+    with pytest.raises(TypeError, match="bug"):
+        main()

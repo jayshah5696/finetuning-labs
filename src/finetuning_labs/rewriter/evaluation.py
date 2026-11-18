@@ -472,6 +472,10 @@ def hosted_backend(config: dict, *, judge=False):
     from arka.config.models import LLMConfig
     from arka.llm.openai_client import build_openai_client
 
+    required = ("model", "reasoning_effort", "max_output_tokens") + (("rubric",) if judge else ())
+    missing = [k for k in required if k not in config]
+    if missing:
+        raise ValueError(f"Missing required hosted backend config keys: {', '.join(missing)}")
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key:
         raise RuntimeError("OPENROUTER_API_KEY is required for the requested Luna and Sol calls")
@@ -609,10 +613,14 @@ def main():
         if any(c.source_kind == "personal_transcription" for c in bundle.cases):
             raise ValueError("This shared evaluation runner does not send personal transcriptions")
         if args.command == "generate":
+            if args.model not in settings:
+                raise ValueError(f"Missing [{args.model}] section in {args.config}")
             config = settings[args.model] | code_provenance()
             backend = liquid_backend(config) if args.model == "liquid" else hosted_backend(config)
             generate_cases(bundle, args.output, config, backend, workers=args.workers)
         else:
+            if "judge" not in settings:
+                raise ValueError(f"Missing [judge] section in {args.config}")
             root = (
                 args.bundle or Path(__file__).resolve().parents[3] / "data/rewriter/benchmark-draft"
             )
@@ -627,7 +635,13 @@ def main():
                 hosted_backend(config, judge=True),
                 workers=args.workers,
             )
-    except (ValueError, TypeError, OSError, KeyError, RuntimeError) as error:
+    except (
+        ValueError,
+        OSError,
+        RuntimeError,
+        tomllib.TOMLDecodeError,
+        json.JSONDecodeError,
+    ) as error:
         parser.exit(1, f"Error: {error}\n")
 
 

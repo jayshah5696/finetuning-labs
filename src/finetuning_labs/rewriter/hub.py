@@ -147,7 +147,7 @@ def main():
             args.receipt.parent.mkdir(parents=True, exist_ok=True)
             args.receipt.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
             print(json.dumps(result, indent=2))
-    except (ValueError, TypeError, OSError, KeyError, RuntimeError) as error:
+    except (ValueError, OSError, RuntimeError, json.JSONDecodeError) as error:
         parser.exit(1, f"Error: {error}\n")
 
 

@@ -212,10 +212,16 @@ def test_overlap_screen_matches_original_rules_for_close_and_unrelated_text():
 def test_training_pipeline_rejects_nonpositive_workers_and_cli_handles_errors(
     monkeypatch, tmp_path
 ):
+    from finetuning_labs.rewriter import training
     from finetuning_labs.rewriter.training import main, run_pipeline
 
     with pytest.raises(ValueError, match="workers"):
         run_pipeline(tmp_path / "run", tmp_path / "missing.toml", workers=0)
+
+    bad_cfg = tmp_path / "bad.toml"
+    bad_cfg.write_text("[author]\nmodel = 'test'\n")
+    with pytest.raises(ValueError, match=r"Missing \[judge\] section"):
+        run_pipeline(tmp_path / "run", bad_cfg, workers=1)
 
     monkeypatch.setattr(
         "sys.argv",
@@ -224,6 +230,12 @@ def test_training_pipeline_rejects_nonpositive_workers_and_cli_handles_errors(
     with pytest.raises(SystemExit) as exc_info:
         main()
     assert exc_info.value.code == 1
+
+    monkeypatch.setattr(
+        training, "audit_run", lambda *_, **__: (_ for _ in ()).throw(TypeError("bug"))
+    )
+    with pytest.raises(TypeError, match="bug"):
+        main()
 
 
 def test_audit_run_requires_explicit_opt_in_for_historical_v1_validation_freeze(
