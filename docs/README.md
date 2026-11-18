@@ -17,3 +17,8 @@ This directory contains project documentation, evaluation histories, data specif
 - [repository-migration.md](repository-migration.md): Notes on extracting `finetuning-labs` from the `jadoo-labs` monorepo and [migration-commit-map.tsv](migration-commit-map.tsv).
 - [data-expansion-workstreams.md](data-expansion-workstreams.md): Handoff contract for the six parallel data and training workstreams.
 - [data-pilot-repair-20261030.md](data-pilot-repair-20261030.md): Results and coordinator verification from the October 2026 data pilot repair runs.
+
+## Hub release note
+
+`data/rewriter/PUBLIC_DATA_LICENSE.md` and `src/finetuning_labs/rewriter/hf_data.py` point to `https://github.com/jayshah5696/finetuning-labs`. The tracked receipt in `data/rewriter/releases/public-parquet.json` records the SHA-256 hashes of the currently uploaded Hugging Face files. The next `python -m finetuning_labs.rewriter.hf_data --publish` run will refresh `DATA_LICENSE.md` and `README.md` on the Hub and update `data/rewriter/releases/public-parquet.json`.
+
