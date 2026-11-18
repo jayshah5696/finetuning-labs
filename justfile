@@ -25,7 +25,7 @@ tokens:
     uv run --locked --group data finetuning-labs tokens --report artifacts/benchmark-tokens.json
 
 training-audit:
-    uv run --locked --group data python -m finetuning_labs.rewriter.training --run data/rewriter/training/v3-20261027 --audit
+    uv run --locked --group data python -m finetuning_labs.rewriter.training --run data/rewriter/training/v3-20261027 --audit --allow-historical-freeze
 
 # The target above audits historical mechanics; that pilot failed independent data review.
 reviewed-audit:

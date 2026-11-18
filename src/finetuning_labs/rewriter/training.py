@@ -602,14 +602,21 @@ def _unexpected_call():
     raise RuntimeError("An offline audit must never issue a provider call")
 
 
-def audit_run(root: Path) -> dict:
+HISTORICAL_V1_FREEZE_SHA256 = "504b6c186ee614c3c54934525bff23c835a2a725e50ad2c5fcc0f4230a12861c"
+
+
+def audit_run(root: Path, *, allow_historical_freeze: bool = False) -> dict:
     """Rebuild acceptance from exact saved calls, then verify the exported training text."""
     spec = json.loads((root / "run.json").read_text())
     current_freeze_sha = hashlib.sha256(
         (PROJECT / "data/rewriter/validation-freeze.json").read_bytes()
     ).hexdigest()
-    historical_v1_freeze_sha = "504b6c186ee614c3c54934525bff23c835a2a725e50ad2c5fcc0f4230a12861c"
-    if spec["validation_freeze_sha256"] not in {current_freeze_sha, historical_v1_freeze_sha}:
+    run_freeze_sha = spec["validation_freeze_sha256"]
+    if run_freeze_sha == current_freeze_sha:
+        freeze_version = "current"
+    elif allow_historical_freeze and run_freeze_sha == HISTORICAL_V1_FREEZE_SHA256:
+        freeze_version = "historical_v1"
+    else:
         raise ValueError("training run used a different validation freeze")
     blocked, tokenizer = validation_index(), _tokenizer()
     examples, reviews = [], {}
@@ -712,8 +719,20 @@ def audit_run(root: Path) -> dict:
         "validation_and_personal_overlap_detected": False,
         "assistant_only_loss_checked": True,
         "prompt_and_judge_bindings_checked": True,
+        "validation_freeze_version": freeze_version,
     }
-    write_json(root / "audit.json", report)
+    audit_path = root / "audit.json"
+    if audit_path.exists():
+        existing = json.loads(audit_path.read_text())
+        comparable = {
+            k: v
+            for k, v in report.items()
+            if k != "validation_freeze_version" or "validation_freeze_version" in existing
+        }
+        if existing != comparable:
+            raise ValueError("saved audit report differs from recomputed audit")
+    elif not allow_historical_freeze:
+        write_json(audit_path, report)
     return report
 
 
@@ -898,13 +917,18 @@ def main():
     parser.add_argument("--pilot", action="store_true", help="First 16 source documents, 64 pairs")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--audit", action="store_true", help="Offline saved-call and export audit")
+    parser.add_argument(
+        "--allow-historical-freeze",
+        action="store_true",
+        help="Allow the retired v1 validation-freeze hash during offline historical audits",
+    )
     parser.add_argument("--canonical-long", action="store_true")
     parser.add_argument("--extended-long", action="store_true")
     parser.add_argument("--reuse-from", type=Path)
     args = parser.parse_args()
     try:
         result = (
-            audit_run(args.run)
+            audit_run(args.run, allow_historical_freeze=args.allow_historical_freeze)
             if args.audit
             else run_pipeline(
                 args.run,
