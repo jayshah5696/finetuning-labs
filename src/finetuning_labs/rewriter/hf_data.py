@@ -14,7 +14,7 @@ PAIR_COLUMNS = ("input", "output", "mode", "checks")
 SFT_COLUMNS = ("system", "user", "assistant")
 SPLITS = ("train", "dev", "validation")
 PROJECT = Path(__file__).resolve().parents[3]
-DEFAULT_HF_OWNER = os.environ.get("FINETUNING_LABS_HF_OWNER", "jayshah5696")
+DEFAULT_HF_OWNER = "jayshah5696"
 TRAIN_REPO = f"{DEFAULT_HF_OWNER}/finetuning-labs-rewriter-training"
 BENCHMARK_REPO = f"{DEFAULT_HF_OWNER}/finetuning-labs-rewriter"
 GITHUB_REPO_URL = "https://github.com/jayshah5696/finetuning-labs"
@@ -224,7 +224,10 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=PROJECT / "artifacts/public-parquet")
-    parser.add_argument("--owner", default=DEFAULT_HF_OWNER)
+    parser.add_argument(
+        "--owner",
+        default=os.environ.get("FINETUNING_LABS_HF_OWNER", DEFAULT_HF_OWNER),
+    )
     parser.add_argument("--publish", action="store_true")
     args = parser.parse_args()
     try:
@@ -323,7 +326,12 @@ def main():
                 flush=True,
             )
         if receipts:
-            destination = PROJECT / "data/rewriter/releases/public-parquet.json"
+            destination = (
+                PROJECT / "data/rewriter/releases/public-parquet.json"
+                if args.owner == DEFAULT_HF_OWNER
+                else args.output / "public-parquet.json"
+            )
+            destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_text(json.dumps({"repositories": receipts}, indent=2) + "\n")
     except (ValueError, TypeError, OSError, KeyError, RuntimeError) as error:
         parser.exit(1, f"Error: {error}\n")
