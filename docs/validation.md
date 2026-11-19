@@ -7,7 +7,7 @@ All 168 generation records returned; one LoRA output truncated. The 167 eligible
 judgments completed, with exact cached judgments retained for unchanged packets.
 The updated LoRA has 18 judge-flagged critical-error outputs among 83 reviewed outputs,
 4/13 long passes and 7/8 exact identities. The truncation remains a failure, not a semantic pass.
-See [the full report](data/rewriter/evals/lora-1500-validation-20261029-a10g/comparison/REPORT.md).
+See [the full report](../data/rewriter/evals/lora-1500-validation-20261029-a10g/comparison/REPORT.md).
 The historical 68-case results below remain separate. Human calibration and a final test are pending.
 
 The next training and comparison scope is English only. Use the fixed 81-case English view,
@@ -64,7 +64,7 @@ Never reward length or formality by itself.
 
 The semantic fixtures include errors that deliberately pass literal checks. Their authored labels
 must never be reported as measured judge performance. GPT-6.1 Sol calibration and human review
-are still pending. No automatic judge is called by `make check`, `make review`, or `make export`.
+are still pending. No automatic judge is called by `just check`, `just review`, or `just export`.
 
 ## Report outcomes
 
@@ -162,7 +162,7 @@ Data and token-length checks are implemented. The 68 references, 156 fixture che
 software tests pass their offline checks. Full reference chats fit 4,096 tokens. These results
 establish data integrity and declared mechanical expectations, not model accuracy.
 
-The user later authorized a diagnostic baseline. Stock Liquid has generated all 68 cases on a
+A diagnostic baseline ran after those offline checks. Stock Liquid has generated all 68 cases on a
 Modal L4. All reached EOS without output-limit truncation. Declared mechanical checks passed
 53/68 overall, 0/8 on long cases, and 0/3 for identity preservation. These are mechanical results,
 not a semantic pass rate. Normal termination does not establish that a document is complete.
@@ -195,7 +195,7 @@ The eight appended examples represent four authored source families. Keep each f
 variants together. Their source groups are recorded in the supporting case records. They are
 calibration examples and must not be split into training and locked-test sets.
 
-Run `make tokens` to measure with the pinned Liquid tokenizer and native chat template. Require
+Run `just tokens` to measure with the pinned Liquid tokenizer and native chat template. Require
 1,000 to 2,000 tokens for each designated long input. Count the complete reference chat and the
 prompt plus the generation allowance separately. Check both against the selected context limit.
 Any overflow is an error. Do not cut a long case down to fit without a new review.

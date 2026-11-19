@@ -1,4 +1,5 @@
-"""
+"""Frozen long-context coverage schedule (40 scenarios) for ``supplement-v5-diverse``, kept for replay.
+
 Long Coverage Schedule (40 scenarios):
 - 3 contrast groups (12 plans): sched-contrast-09, 10, 11 (4 modes each)
 - 7 developer_symbols (7 plans): sched-dev-long-02 through 08

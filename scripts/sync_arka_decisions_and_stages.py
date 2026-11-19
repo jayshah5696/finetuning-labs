@@ -1,7 +1,8 @@
-"""Sync Arka DecisionClient, state.db decisions_cache, and parquet stages for diverse-v2-run and validation-v1-run."""
+"""Historical migration script: sync Arka DecisionClient, state.db decisions_cache, and parquet stages for diverse-v2-run and validation-v1-run."""
 
 import json
 import os
+import runpy
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
@@ -32,7 +33,10 @@ from finetuning_labs.rewriter.diverse_expansion import (
 from finetuning_labs.rewriter.evaluation import digest, write_json
 from finetuning_labs.rewriter.expanded_schedule import get_expanded_coverage_schedule
 from finetuning_labs.rewriter.training import Example, _tokenizer, token_audit
-from scripts.run_live_pipelines import get_validation_plans
+
+get_validation_plans = runpy.run_path(
+    str(Path(__file__).resolve().parent / "run_live_pipelines.py")
+)["get_validation_plans"]
 
 
 def sync_run_dir(run_dir: Path, plans: list[dict], namespace: str):

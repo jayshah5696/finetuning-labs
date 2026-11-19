@@ -18,4 +18,4 @@ project. The current training dataset's 84 validation rows preserve the reviewed
 The separate historical calibration dataset preserves the original 68-case references.
 
 Code, notebooks, source snapshots and verification records are maintained in
-https://github.com/jayshah5696/jadoo-labs/tree/main/projects/finetuning-labs .
+https://github.com/jayshah5696/finetuning-labs .

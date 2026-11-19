@@ -1,7 +1,9 @@
 # English data pilot repairs, 30 October
 
-The user approved repairing the authoring briefs and running fresh bounded pilots. The same
-three workstream threads resumed at 14:26 UTC. Their exact run IDs and request times are in
+> **Historical note:** This document records the 30-31 October 2026 bounded pilot repair runs across the three data expansion workstreams. See [status.md](status.md) for subsequent releases and evaluations.
+
+The authoring briefs were repaired and fresh bounded pilots ran across the three workstream
+threads starting at 14:26 UTC. Their exact run IDs and request times are in
 `data/rewriter/workstreams.json`. The bounded repairs are complete. The coordinator verified
 the result on 31 October. All three complete pilot gates failed, so scaling remains blocked.
 
@@ -56,7 +58,7 @@ hash mismatches. The rule exporter was replayed without hosted calls, followed b
 tests, lint, format checks, the benchmark audit and package builds. Personal and long branches
 record 177 and 184 passing project tests and passing exports/builds. The rule runtime hit a
 usage limit after committing; its artifacts were recovered and verified directly.
-The main checkout also passed `make check` and `make build` on 31 October, with 191 tests.
+The main checkout also passed `just check` and `just build` (via [just](https://github.com/casey/just)) on 31 October, with 191 tests.
 That checkout includes concurrent uncommitted expansion work; these checks do not establish
 that the three data branches have been combined or that their release gates pass.
 

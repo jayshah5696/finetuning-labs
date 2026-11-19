@@ -5,10 +5,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 from pathlib import Path
 
 from .benchmark import audit, load_bundle, render_review
+
+DEFAULT_HF_OWNER = "jayshah5696"
 
 CARD = """---
 language:
@@ -17,7 +20,7 @@ language:
 - pt
 license: other
 license_name: mixed-source-draft
-license_link: https://huggingface.co/datasets/jayshah5696/finetuning-labs-rewriter/blob/main/DATA_LICENSE.md
+license_link: https://huggingface.co/datasets/{owner}/finetuning-labs-rewriter/blob/main/DATA_LICENSE.md
 task_categories:
 - text-generation
 tags:
@@ -61,7 +64,13 @@ Personal history entries are excluded. This draft is for review and diagnostic e
 """
 
 
-def package_dataset(source: Path, destination: Path, *, code_commit: str) -> dict:
+def package_dataset(
+    source: Path,
+    destination: Path,
+    *,
+    code_commit: str,
+    owner: str = DEFAULT_HF_OWNER,
+) -> dict:
     bundle = load_bundle(source)
     report = audit(bundle)
     if report["mechanical_failures"]:
@@ -82,7 +91,7 @@ def package_dataset(source: Path, destination: Path, *, code_commit: str) -> dic
         shutil.copyfile(original, target)
     (destination / "data").mkdir()
     shutil.copyfile(source / "cases.jsonl", destination / "data/calibration.jsonl")
-    (destination / "README.md").write_text(CARD)
+    (destination / "README.md").write_text(CARD.format(owner=owner))
     (destination / "DATA_LICENSE.md").write_text(LICENSE_NOTE)
     (destination / "review.html").write_text(render_review(bundle))
     files = {
@@ -115,19 +124,31 @@ def main():
     package.add_argument("--bundle", type=Path, default=Path("data/rewriter/benchmark-draft"))
     package.add_argument("--output", type=Path, required=True)
     package.add_argument("--code-commit", required=True)
+    package.add_argument(
+        "--owner",
+        default=os.environ.get("FINETUNING_LABS_HF_OWNER", DEFAULT_HF_OWNER),
+    )
     upload = commands.add_parser("upload")
     upload.add_argument("--package", type=Path, required=True)
     upload.add_argument("--repo-id", required=True)
     upload.add_argument("--receipt", type=Path, required=True)
     args = parser.parse_args()
-    if args.command == "package":
-        result = package_dataset(args.bundle, args.output, code_commit=args.code_commit)
-        print(json.dumps({k: v for k, v in result.items() if k != "files"}, indent=2))
-    else:
-        result = upload_dataset(args.package, args.repo_id)
-        args.receipt.parent.mkdir(parents=True, exist_ok=True)
-        args.receipt.write_text(json.dumps(result, indent=2) + "\n")
-        print(json.dumps(result, indent=2))
+    try:
+        if args.command == "package":
+            result = package_dataset(
+                args.bundle,
+                args.output,
+                code_commit=args.code_commit,
+                owner=args.owner,
+            )
+            print(json.dumps({k: v for k, v in result.items() if k != "files"}, indent=2))
+        else:
+            result = upload_dataset(args.package, args.repo_id)
+            args.receipt.parent.mkdir(parents=True, exist_ok=True)
+            args.receipt.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+            print(json.dumps(result, indent=2))
+    except (ValueError, OSError, RuntimeError, json.JSONDecodeError) as error:
+        parser.exit(1, f"Error: {error}\n")
 
 
 if __name__ == "__main__":

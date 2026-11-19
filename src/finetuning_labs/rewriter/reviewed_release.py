@@ -1,4 +1,4 @@
-"""Build releases only from exact rows independently verified by Opus."""
+"""Historical v2 release builder assembling releases from exact rows verified by Opus."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from .benchmark import COMMON_SYSTEM, MODES, Case, Rules, deterministic_checks
-from .evaluation import digest
+from .evaluation import digest, write_json
 from .training import Example, _tokenizer, token_audit, validate_splits, validation_index
 
 
@@ -141,12 +141,8 @@ def export_release(pool_root: Path, review_paths: list[Path], destination: Path)
             (destination / name).write_text(
                 "".join(json.dumps(x, ensure_ascii=False) + "\n" for x in values)
             )
-    (destination / "supporting.json").write_text(
-        json.dumps(support, ensure_ascii=False, indent=2) + "\n"
-    )
-    (destination / "excluded.json").write_text(
-        json.dumps(excluded, ensure_ascii=False, indent=2) + "\n"
-    )
+    write_json(destination / "supporting.json", support)
+    write_json(destination / "excluded.json", excluded)
     long_inputs = [x["tokens"]["input_tokens"] for x in support if x["length"] == "long"]
     report = {
         "status": "opus_verified_synthetic_release",
@@ -173,15 +169,13 @@ def export_release(pool_root: Path, review_paths: list[Path], destination: Path)
         "original_baseline_modified": False,
         "locked_final_test": False,
     }
-    (destination / "quality.json").write_text(json.dumps(report, indent=2) + "\n")
+    write_json(destination / "quality.json", report)
     hashes = {
         str(p.relative_to(destination)): hashlib.sha256(p.read_bytes()).hexdigest()
-        for p in destination.rglob("*")
-        if p.is_file()
+        for p in sorted(destination.rglob("*"))
+        if p.is_file() and p.name != "manifest.json"
     }
-    (destination / "manifest.json").write_text(
-        json.dumps({"role": "reviewed_rewriter_v2", "files": hashes}, indent=2) + "\n"
-    )
+    write_json(destination / "manifest.json", {"role": "reviewed_rewriter_v2", "files": hashes})
     return report
 
 

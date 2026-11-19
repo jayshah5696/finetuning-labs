@@ -4,7 +4,7 @@ The current release is reviewed v2. Arka commit `5d353740ae1dd347428410717528140
 runs native `decision_panel` and `labeling_engine` stages with six input, output and pair
 criteria. It scored all 168 final candidates and automatically accepted 75. Independent Opus
 data reviews retain 166 exact rows, including 91 that did not receive automatic Arka approval.
-Both outcomes remain visible. [TRAINING_DATA.md](TRAINING_DATA.md) explains the current policy
+Both outcomes remain visible. [training-data.md](training-data.md) explains the current policy
 and exclusions. The sections below preserve the earlier five-question direct-client audit of
 the retired pilot. Its thresholds and results are historical and are not v2 acceptance rules.
 

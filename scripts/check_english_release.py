@@ -1,6 +1,6 @@
-"""Check exact expansion rows, anchors and code; optionally encode both pinned model presets.
+"""Current verification script: check exact expansion rows, anchors and code; optionally encode both pinned model presets.
 
-The full native-record and raw-review audit is `make reviewed-audit`. These checks do not
+The full native-record and raw-review audit is `just reviewed-audit`. These checks do not
 establish semantic quality or replace the targeted review recorded with the release.
 """
 
@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tokenizers", action="store_true")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "artifacts/releases")
     args = parser.parse_args()
     source = ROOT / "data/rewriter/current"
     metadata = json.loads((source / "supporting.json").read_text())
@@ -70,7 +71,7 @@ def main():
     ids = {m["id"] for m in metadata}
     assert all(v["excluded_id"] not in ids and v["replacement_id"] in ids for v in excluded)
     write_json(
-        ROOT / "data/rewriter/releases/english-expansion-check.json",
+        args.output_dir / "english-expansion-check.json",
         {
             "selected_rows_sha256": digest([e["row"] for e in entries]),
             "rows": len(entries),
@@ -106,7 +107,7 @@ def main():
         ]
         support = [m for m in metadata if m["split"] == split]
         splits[split] = [r for r, m in zip(guides, support, strict=True) if m["language"] == "en"]
-    assert {s: len(r) for s, r in splits.items()} == {"train": 1864, "dev": 89, "validation": 81}
+    assert {s: len(r) for s, r in splits.items()} == {"train": 1979, "dev": 89, "validation": 141}
     previous, proofs = None, []
     for cfg in json.loads((ROOT / "configs/training-models.json").read_text()).values():
         tokenizer = AutoTokenizer.from_pretrained(
@@ -136,7 +137,7 @@ def main():
             }
         )
     write_json(
-        ROOT / "data/rewriter/releases/english-tokenizer-check.json",
+        args.output_dir / "english-tokenizer-check.json",
         {
             "source_sft_file_sha256": {
                 s: hashlib.sha256((source / f"sft/{s}.jsonl").read_bytes()).hexdigest()

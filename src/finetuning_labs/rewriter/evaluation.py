@@ -151,6 +151,8 @@ def generate_cases(
     *,
     workers: int = 1,
 ) -> list[dict]:
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
     spec = {
         "stage": "generation",
         "bundle_sha256": bundle_identity(bundle),
@@ -214,6 +216,8 @@ def judge_cases(
     *,
     workers: int = 1,
 ) -> list[dict]:
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
     generations = _load_generations(bundle, generation_dir)
     spec = {
         "stage": "judge",
@@ -295,6 +299,8 @@ def assess(case: Case, generation: dict, judgment: dict | None, *, judge_error=F
 
 
 def aggregate(bundle: Bundle, assessments: list[dict]) -> dict:
+    if not bundle.cases:
+        raise ValueError("bundle cannot be empty")
     if Counter(row["case_id"] for row in assessments) != Counter(case.id for case in bundle.cases):
         raise ValueError("assessments must contain every scheduled case exactly once")
     by_id = {case.id: case for case in bundle.cases}
@@ -466,6 +472,10 @@ def hosted_backend(config: dict, *, judge=False):
     from arka.config.models import LLMConfig
     from arka.llm.openai_client import build_openai_client
 
+    required = ("model", "reasoning_effort", "max_output_tokens") + (("rubric",) if judge else ())
+    missing = [k for k in required if k not in config]
+    if missing:
+        raise ValueError(f"Missing required hosted backend config keys: {', '.join(missing)}")
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key:
         raise RuntimeError("OPENROUTER_API_KEY is required for the requested Luna and Sol calls")
@@ -586,7 +596,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bundle", type=Path)
     parser.add_argument("--config", type=Path, default=Path("configs/rewriter.toml"))
-    parser.add_argument("--api-key-file", type=Path)
     parser.add_argument("--english-only", action="store_true")
     commands = parser.add_subparsers(dest="command", required=True)
     gen = commands.add_parser("generate")
@@ -598,27 +607,42 @@ def main():
     judge.add_argument("--output", type=Path, required=True)
     judge.add_argument("--workers", type=int, default=4)
     args = parser.parse_args()
-    if args.api_key_file:
-        os.environ["OPENROUTER_API_KEY"] = args.api_key_file.read_text().strip()
-    settings = tomllib.loads(args.config.read_text())
-    bundle = evaluation_bundle(args.bundle, english_only=args.english_only)
-    if any(c.source_kind == "personal_transcription" for c in bundle.cases):
-        raise ValueError("This shared evaluation runner does not send personal transcriptions")
-    if args.command == "generate":
-        config = settings[args.model] | code_provenance()
-        backend = liquid_backend(config) if args.model == "liquid" else hosted_backend(config)
-        generate_cases(bundle, args.output, config, backend, workers=args.workers)
-    else:
-        root = args.bundle or Path(__file__).resolve().parents[3] / "data/rewriter/benchmark-draft"
-        config = settings["judge"] | {"rubric": (root / "supporting/judge-system.txt").read_text()}
-        judge_cases(
-            bundle,
-            args.generation,
-            args.output,
-            config,
-            hosted_backend(config, judge=True),
-            workers=args.workers,
-        )
+    try:
+        settings = tomllib.loads(args.config.read_text(encoding="utf-8"))
+        bundle = evaluation_bundle(args.bundle, english_only=args.english_only)
+        if any(c.source_kind == "personal_transcription" for c in bundle.cases):
+            raise ValueError("This shared evaluation runner does not send personal transcriptions")
+        if args.command == "generate":
+            if args.model not in settings:
+                raise ValueError(f"Missing [{args.model}] section in {args.config}")
+            config = settings[args.model] | code_provenance()
+            backend = liquid_backend(config) if args.model == "liquid" else hosted_backend(config)
+            generate_cases(bundle, args.output, config, backend, workers=args.workers)
+        else:
+            if "judge" not in settings:
+                raise ValueError(f"Missing [judge] section in {args.config}")
+            root = (
+                args.bundle or Path(__file__).resolve().parents[3] / "data/rewriter/benchmark-draft"
+            )
+            config = settings["judge"] | {
+                "rubric": (root / "supporting/judge-system.txt").read_text(encoding="utf-8")
+            }
+            judge_cases(
+                bundle,
+                args.generation,
+                args.output,
+                config,
+                hosted_backend(config, judge=True),
+                workers=args.workers,
+            )
+    except (
+        ValueError,
+        OSError,
+        RuntimeError,
+        tomllib.TOMLDecodeError,
+        json.JSONDecodeError,
+    ) as error:
+        parser.exit(1, f"Error: {error}\n")
 
 
 if __name__ == "__main__":

@@ -1,12 +1,12 @@
 # Rewriter training data
 
-## Current English export, 1,864 training examples
+## Current English export, 1,979 training examples (115-row diverse-v2 expansion)
 
-The public dataset now selects English only. It has 1,864 train, 89 dev and 81 validation
-pairs. The English dev and validation cases keep their original text and order, bound by
-`data/rewriter/english-holdout-freeze.json`. The complete multilingual 100/84 source holdouts
-remain byte-identical in Git, alongside all earlier training examples. The source training
-pool has 2,000 rows. Filtering the public view does not rewrite those sources.
+The public dataset selects English only. In the current release (`36a75c009d008415fad557d49005ba4e5c73f4d7`), it has 1,979 train, 89 dev and 141 validation pairs (expanded from the 1,864 train / 89 dev / 81 validation release `00d59dda95867fe5bcb147b1b1c5a34b5ad7f071` by adding 115 `diverse-v2` training pairs and 60 `validation-v1` validation pairs across five dictation families). The English dev and validation cases keep their original text and order, bound by `data/rewriter/english-holdout-freeze.json`. The complete multilingual 100/144 source holdouts (including the original 84-case validation prefix) remain byte-identical in Git, alongside all earlier training examples. The source training pool has 2,115 rows (2,359 total rows across splits). Filtering the public view does not rewrite those sources.
+
+## Earlier 1,864-example English expansion (500 critical-error episodes)
+
+Before the 115-row `diverse-v2` append, the English export had 1,864 train, 89 dev and 81 validation pairs (from a 2,000-row source training pool).
 
 The latest 500 fictional English episodes target failures in the uploaded 1,500-example
 adapter. They include recipient and amount exclusions, explicit spoken corrections with
@@ -54,7 +54,7 @@ passed the targeted audit. Original verdicts and both selections remain in the e
 This is a known limit of automatic judging, not a reason to relabel the original passes.
 The findings are in `data/rewriter/reviews/sol-english-quality-findings-round1.json`.
 
-Use the same Colab notebook, with `MODEL_SIZE` set to `350m` or `230m`. The user runs training.
+Use the same Colab notebook, with `MODEL_SIZE` set to `350m` or `230m`, to run training.
 The 350M adapter uses a different model repository because it requires a different base.
 After upload, compare both models on the same frozen 81 English cases with the same Sol
 rubric. The current available 230M LoRA passes 50/81, with 17 critical-error outputs among 80
@@ -84,7 +84,7 @@ uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.e
 
 Run completion only when the main selection is short. The final append requires all 500
 verified pairs, the exact identity quota and a valid direction-balance report. Use
-`make reviewed-audit` to verify committed data and review evidence without new model calls.
+`just reviewed-audit` to verify committed data and review evidence without new model calls.
 
 ```sh
 uv run --locked --group data --group hosted python scripts/check_english_release.py --tokenizers
@@ -122,7 +122,7 @@ Only Parquet data, the dataset card and license notices are published to Hugging
 new expansion. `holdout-freeze.json` protects dev and validation. The public publication receipt
 pins the notebook to the same data commit and expected counts. The final notebook check encodes
 every row, then exercises real LoRA training, save and reload on a tiny CPU model. GPU training
-and the new adapter's semantic comparison are still required after the user reruns Colab.
+and the new adapter's semantic comparison are still required after a fresh Colab run.
 
 ## Original 1,000-example selection
 
@@ -138,7 +138,7 @@ records stay in Git. Dataset publication no longer uploads those artifacts to Hu
 
 This release retains 65 train, 17 dev and all 84 validation pairs from v2. It adds 935 train and
 83 dev pairs from new fictional scenarios. All retained exact inputs, outputs and pairs have
-completed Opus data passes. The user later selected GPT-6.1 Sol for the remaining implementation
+completed Opus data passes. GPT-6.1 Sol was used for the remaining implementation
 review and fix loop. Sol approved the exact notebook and runtime script. No further Opus calls
 were made after that change. The code review and data verdicts are separate evidence.
 
@@ -184,7 +184,7 @@ files from the current Hub trees; previous commits remain in history.
 The notebook loads the public SFT data and pinned 230M base, trains LoRA using dev loss for
 checkpoint selection, records loss in W&B and uploads the final adapter to a model repository.
 Add HF_TOKEN with write access and WANDB_API_KEY in Colab Secrets.
-[COLAB_TRAINING.md](COLAB_TRAINING.md) explains this workflow and its limits.
+[colab-training.md](colab-training.md) explains this workflow and its limits.
 The actual notebook cells passed a tiny native LFM CPU check with all public data encoded,
 frozen base weights, adapter updates and exact adapter reload. W&B was offline and the model
 upload was mocked. Actual 230M L4 training remains pending. Human labels, human judge calibration
@@ -202,7 +202,7 @@ Opus 5.5 pass bound to its exact contents. These are model judgments, not human 
 The original 219-pair pilot failed the first independent Opus review. Do not train on it.
 Its files and publication receipts remain for reproduction. The rejected pilot's repeated
 count-check template, artificial noise and padded long texts are documented in
-[data/rewriter/reviews/opus-first-pass.md](data/rewriter/reviews/opus-first-pass.md).
+[../data/rewriter/reviews/opus-first-pass.md](../data/rewriter/reviews/opus-first-pass.md).
 
 ## Sources and splits
 
@@ -252,7 +252,7 @@ probabilities of agreement with people.
 Opus reviewed data only. It did not generate examples, edit data, review code, or invoke other
 models. Its packets contain mode instructions, required context, input and output. They omit
 Luna scores, previous verdicts and separate reference answers. The first full replacement review
-covered 161 pairs. The parent corrected 23 rows and added seven complete examples. Opus then
+covered 161 pairs. A curation pass corrected 23 rows and added seven complete examples. Opus then
 rechecked all 30 changed or new pairs. The release excludes:
 
 - `arka-v2-prompt-08`, whose output still drops an explicit budget constraint.
@@ -287,8 +287,8 @@ It has no new authored output-control fixtures.
 Run the offline project checks:
 
 ```sh
-make check
-make build
+just check
+just build
 uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.reviewed_publication \
   --release data/rewriter/reviewed-v2 --prepare-only
 uv run --locked finetuning-labs --bundle data/rewriter/reviewed-v2/validation-bundle audit
@@ -303,7 +303,7 @@ uv run --locked --group data --group hosted python -m finetuning_labs.rewriter.a
   --run artifacts/new-arka-run
 ```
 
-`scripts/curate_arka_v2.py` records the exact parent corrections. Historical bundle builders
+`scripts/curate_arka_v2.py` records the exact curation corrections. Historical bundle builders
 are available in Git history. The current tree contains the single supported training notebook.
 
 To reproduce the six data and SFT files from committed evidence alone:

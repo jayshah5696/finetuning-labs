@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import io
 import json
+import os
 import re
 from pathlib import Path
 
@@ -13,8 +14,10 @@ PAIR_COLUMNS = ("input", "output", "mode", "checks")
 SFT_COLUMNS = ("system", "user", "assistant")
 SPLITS = ("train", "dev", "validation")
 PROJECT = Path(__file__).resolve().parents[3]
-TRAIN_REPO = "jayshah5696/finetuning-labs-rewriter-training"
-BENCHMARK_REPO = "jayshah5696/finetuning-labs-rewriter"
+DEFAULT_HF_OWNER = "jayshah5696"
+TRAIN_REPO = f"{DEFAULT_HF_OWNER}/finetuning-labs-rewriter-training"
+BENCHMARK_REPO = f"{DEFAULT_HF_OWNER}/finetuning-labs-rewriter"
+GITHUB_REPO_URL = "https://github.com/jayshah5696/finetuning-labs"
 
 
 def english_splits(rows, guides, support):
@@ -49,7 +52,15 @@ def _parquet(rows, columns):
 
 
 def build_dataset(
-    rows, guides, *, title, description, license_text, source_license, languages=None
+    rows,
+    guides,
+    *,
+    title,
+    description,
+    license_text,
+    source_license,
+    languages=None,
+    repo_id: str | None = None,
 ):
     import yaml
 
@@ -84,6 +95,7 @@ def build_dataset(
         "tags": ["text-rewriting", "synthetic"],
         "configs": configs,
     }
+    target_repo = repo_id or (TRAIN_REPO if "train" in rows else BENCHMARK_REPO)
     table = "\n".join(f"| {s} | {len(v)} |" for s, v in rows.items())
     card = f"""---
 {yaml.safe_dump(metadata, sort_keys=False).strip()}
@@ -104,11 +116,11 @@ Both configurations contain the same examples in the same order.
 ```python
 from datasets import load_dataset
 
-dataset = load_dataset("{"jayshah5696/finetuning-labs-rewriter-training" if "train" in rows else "jayshah5696/finetuning-labs-rewriter"}", "sft")
+dataset = load_dataset("{target_repo}", "sft")
 ```
 
 Data files are Parquet. This repository contains data and source notices only. Training code,
-notebooks and verification records are in [Finetuning Labs](https://github.com/jayshah5696/finetuning-labs).
+notebooks and verification records are in [Finetuning Labs]({GITHUB_REPO_URL}).
 Review judgments are model judgments. Independent human labels and an unseen final test remain
 pending. Synthetic dictation is not recorded speech-recognition evidence. No personal history
 or recordings are included. See DATA_LICENSE.md for source rights and attribution.
@@ -127,10 +139,12 @@ def cleanup_paths(existing, files):
     return sorted(set(existing) - set(files) - {".gitattributes"})
 
 
-def _sources():
+def _sources(*, owner: str = DEFAULT_HF_OWNER):
     from .benchmark import COMMON_SYSTEM, MODES, load_bundle
     from .reviewed_publication import audit_publication
 
+    train_repo = f"{owner}/finetuning-labs-rewriter-training"
+    benchmark_repo = f"{owner}/finetuning-labs-rewriter"
     release = PROJECT / "data/rewriter/current"
     # Audit the retained Git records, then export only the data columns.
     audit_publication(release)
@@ -175,7 +189,7 @@ def _sources():
     return (
         [
             (
-                TRAIN_REPO,
+                train_repo,
                 rows,
                 guides,
                 "English rewriter training data",
@@ -190,14 +204,14 @@ def _sources():
                 ),
             ),
             (
-                BENCHMARK_REPO,
+                benchmark_repo,
                 {"validation": old_rows},
                 {"validation": old_guides},
                 "Rewriter calibration benchmark",
                 f"The expanded {len(old_rows)} authored calibration cases. "
                 "These historical references and expansion cases are preserved. The current training dataset has the "
                 "separate frozen English validation view: "
-                "[rewriter-training](https://huggingface.co/datasets/" + TRAIN_REPO + ").",
+                "[rewriter-training](https://huggingface.co/datasets/" + train_repo + ").",
             ),
         ],
         license_text,
@@ -210,100 +224,117 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=PROJECT / "artifacts/public-parquet")
+    parser.add_argument(
+        "--owner",
+        default=os.environ.get("FINETUNING_LABS_HF_OWNER", DEFAULT_HF_OWNER),
+    )
     parser.add_argument("--publish", action="store_true")
     args = parser.parse_args()
-    sources, license_text, source_license = _sources()
-    api, receipts = HfApi(), []
-    for repo, rows, guides, title, description in sources:
-        # Check uncompressed text, since a compressed Parquet byte scan is insufficient.
-        text = json.dumps([rows, guides], ensure_ascii=False).encode()
-        needles = []
-        personal = PROJECT / "data/rewriter/personal/calibration-10"
-        if personal.exists():
-            needles += [
-                json.loads(line)["input"].encode()
-                for line in (personal / "cases.jsonl").read_text().splitlines()
-            ]
-            needles += [
-                x["source_id"].encode()
-                for x in json.loads((personal / "supporting/cases.json").read_text())
-            ]
-        if re.search(rb"sk-or-v1-[A-Za-z0-9_-]{20,}|hf_[A-Za-z0-9]{25,}", text) or any(
-            n in text for n in needles
-        ):
-            raise ValueError("Private content in uncompressed data")
-        files = build_dataset(
-            rows,
-            guides,
-            title=title,
-            description=description,
-            license_text=license_text,
-            source_license=source_license,
-            languages=["en"] if repo == TRAIN_REPO else None,
-        )
-        output = args.output / repo.split("/")[1]
-        output.mkdir(parents=True, exist_ok=True)
-        for name, data in files.items():
-            path = output / name
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes(data)
-        cleanup_paths([], files)
-        if not args.publish:
+    try:
+        sources, license_text, source_license = _sources(owner=args.owner)
+        api, receipts = HfApi(), []
+        for repo, rows, guides, title, description in sources:
+            # Check uncompressed text, since a compressed Parquet byte scan is insufficient.
+            text = json.dumps([rows, guides], ensure_ascii=False).encode()
+            needles = []
+            personal = PROJECT / "data/rewriter/personal/calibration-10"
+            if personal.exists():
+                needles += [
+                    json.loads(line)["input"].encode()
+                    for line in (personal / "cases.jsonl").read_text().splitlines()
+                ]
+                needles += [
+                    x["source_id"].encode()
+                    for x in json.loads((personal / "supporting/cases.json").read_text())
+                ]
+            if re.search(rb"sk-or-v1-[A-Za-z0-9_-]{20,}|hf_[A-Za-z0-9]{25,}", text) or any(
+                n in text for n in needles
+            ):
+                raise ValueError("Private content in uncompressed data")
+            files = build_dataset(
+                rows,
+                guides,
+                title=title,
+                description=description,
+                license_text=license_text,
+                source_license=source_license,
+                languages=["en"] if repo.endswith("-training") else None,
+                repo_id=repo,
+            )
+            output = args.output / repo.split("/")[1]
+            output.mkdir(parents=True, exist_ok=True)
+            for name, data in files.items():
+                path = output / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(data)
+            cleanup_paths([], files)
+            if not args.publish:
+                print(
+                    json.dumps(
+                        {
+                            "repo": repo,
+                            "files": sorted(files),
+                            "splits": {s: len(r) for s, r in rows.items()},
+                        }
+                    )
+                )
+                continue
+            before = api.repo_info(repo, repo_type="dataset")
+            existing = api.list_repo_files(repo, repo_type="dataset", revision=before.sha)
+            removed = cleanup_paths(existing, files)
+            commit = api.create_commit(
+                repo_id=repo,
+                repo_type="dataset",
+                parent_commit=before.sha,
+                commit_message="Use public Parquet splits; keep code and audit artifacts in Git",
+                operations=[
+                    *[CommitOperationDelete(path_in_repo=n) for n in removed],
+                    *[
+                        CommitOperationAdd(path_in_repo=n, path_or_fileobj=data)
+                        for n, data in files.items()
+                    ],
+                ],
+            )
+            for name, data in files.items():
+                downloaded = hf_hub_download(repo, name, repo_type="dataset", revision=commit.oid)
+                if Path(downloaded).read_bytes() != data:
+                    raise ValueError(f"Uploaded bytes differ: {name}")
+            actual = api.list_repo_files(repo, repo_type="dataset", revision=commit.oid)
+            if set(actual) != set(files) | ({".gitattributes"} & set(existing)):
+                raise ValueError("Non-data files remain in the current Hub tree")
+            api.update_repo_settings(repo_id=repo, repo_type="dataset", private=False)
+            if api.repo_info(repo, repo_type="dataset").private:
+                raise ValueError("Dataset must be public for the viewer")
+            receipt = {
+                "repo_id": repo,
+                "revision": commit.oid,
+                "previous_revision": before.sha,
+                "private": False,
+                "removed_current_paths": removed,
+                "files": {n: hashlib.sha256(data).hexdigest() for n, data in files.items()},
+                "splits": {s: len(r) for s, r in rows.items()},
+            }
+            receipts.append(receipt)
             print(
                 json.dumps(
                     {
-                        "repo": repo,
-                        "files": sorted(files),
-                        "splits": {s: len(r) for s, r in rows.items()},
+                        k: v
+                        for k, v in receipt.items()
+                        if k not in {"files", "removed_current_paths"}
                     }
-                )
+                ),
+                flush=True,
             )
-            continue
-        before = api.repo_info(repo, repo_type="dataset")
-        existing = api.list_repo_files(repo, repo_type="dataset", revision=before.sha)
-        removed = cleanup_paths(existing, files)
-        commit = api.create_commit(
-            repo_id=repo,
-            repo_type="dataset",
-            parent_commit=before.sha,
-            commit_message="Use public Parquet splits; keep code and audit artifacts in Git",
-            operations=[
-                *[CommitOperationDelete(path_in_repo=n) for n in removed],
-                *[
-                    CommitOperationAdd(path_in_repo=n, path_or_fileobj=data)
-                    for n, data in files.items()
-                ],
-            ],
-        )
-        for name, data in files.items():
-            downloaded = hf_hub_download(repo, name, repo_type="dataset", revision=commit.oid)
-            if Path(downloaded).read_bytes() != data:
-                raise ValueError(f"Uploaded bytes differ: {name}")
-        actual = api.list_repo_files(repo, repo_type="dataset", revision=commit.oid)
-        if set(actual) != set(files) | ({".gitattributes"} & set(existing)):
-            raise ValueError("Non-data files remain in the current Hub tree")
-        api.update_repo_settings(repo_id=repo, repo_type="dataset", private=False)
-        if api.repo_info(repo, repo_type="dataset").private:
-            raise ValueError("Dataset must be public for the viewer")
-        receipt = {
-            "repo_id": repo,
-            "revision": commit.oid,
-            "previous_revision": before.sha,
-            "private": False,
-            "removed_current_paths": removed,
-            "files": {n: hashlib.sha256(data).hexdigest() for n, data in files.items()},
-            "splits": {s: len(r) for s, r in rows.items()},
-        }
-        receipts.append(receipt)
-        print(
-            json.dumps(
-                {k: v for k, v in receipt.items() if k not in {"files", "removed_current_paths"}}
-            ),
-            flush=True,
-        )
-    if receipts:
-        destination = PROJECT / "data/rewriter/releases/public-parquet.json"
-        destination.write_text(json.dumps({"repositories": receipts}, indent=2) + "\n")
+        if receipts:
+            destination = (
+                PROJECT / "data/rewriter/releases/public-parquet.json"
+                if args.owner == DEFAULT_HF_OWNER
+                else args.output / "public-parquet.json"
+            )
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(json.dumps({"repositories": receipts}, indent=2) + "\n")
+    except (ValueError, OSError, RuntimeError, json.JSONDecodeError) as error:
+        parser.exit(1, f"Error: {error}\n")
 
 
 if __name__ == "__main__":

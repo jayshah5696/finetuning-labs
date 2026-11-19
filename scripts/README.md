@@ -13,9 +13,8 @@ data and source notices. Model repositories receive the trained adapter and toke
 - `data_distribution.py` measures wording repetition and coverage. It does not assign meaning quality.
 - `check_english_release.py` checks the exact 500 additions, anchors, code and exclusion mapping.
   With `--tokenizers`, it encodes every English row with both pinned model tokenizers.
-- `backfill_english_quality.py` records the three exclusions found by the final targeted review.
-  It uses saved Arka artifacts and a pristine Git baseline, audits a rebuilt release and swaps it
-  into place. It makes no new model calls and is not part of Colab training.
+- `verify_state_db_and_parquets.py` verifies 100% decision cache hits in `state.db` and exact
+  byte parity across Arka Parquet stages for the expansion runs.
 - `modal_eval.py::submit_lora` evaluates a pinned stock model and adapter on Modal. Select
   `--model-size 230m` or `--model-size 350m`. Use `--english-only` with the current public data.
   It performs inference only and saves each exact request and response to the evaluation volume.
@@ -39,8 +38,7 @@ The source reviewed rows stay unchanged. Publication receipts stay in Git.
 Rebuild the notebook using the current public-data revision:
 
 ```sh
-uv run --locked python scripts/build_lora_notebook.py \
-  --dataset-revision 00d59dda95867fe5bcb147b1b1c5a34b5ad7f071 --model-size 350m
+just notebook 36a75c009d008415fad557d49005ba4e5c73f4d7 350m
 ```
 
 This rebuilds the same notebook. Both model presets select their base revision and adapter
@@ -50,15 +48,35 @@ Verify the local English data without generating examples:
 
 ```sh
 uv run --locked --group data --group hosted python scripts/check_english_release.py --tokenizers
-make reviewed-audit
+just reviewed-audit
 ```
 
-See [the run guide](../COLAB_TRAINING.md) for the two Colab Secrets and upload configuration.
+See [the run guide](../docs/colab-training.md) for the two Colab Secrets and upload configuration.
 
 ## Historical work
 
-`check_training_cpu.py` checks historical full-training utilities locally. The former Colab
-runner is retired. Use the current LoRA notebook for training.
+- `append_long_cases.py` (historical): authored the eight long calibration examples against the
+  original 60-case bundle.
+- `backfill_english_quality.py` (historical): recorded the three exclusions found by the targeted
+  review and rebuilt the release from saved Arka artifacts and the Git baseline.
+- `build_expansion_benchmark.py` (historical): built the 60-case `expansion-benchmark-v1` bundle
+  (reads `all_20_cases.json` for the medium and long expansion cases).
+- `check_training_cpu.py` (historical): checks historical full-training utilities locally. The
+  former Colab runner is retired. Use the current LoRA notebook for training.
+- `curate_arka_v2.py` (historical): applied recorded data corrections after Opus review while
+  preserving earlier v2 artifacts.
+- `merge_phase2_data.py` (historical): executed the one-off Phase 2 merge of `diverse-v2` and
+  `validation-v1` into `current` and `benchmark-draft`.
+- `recover_opus_report.py` (historical): recovered the omitted review array from a saved Opus
+  reviewer tool command using AST literal parsing.
+- `report_generation.py` (historical): generated mechanical-only reports for the initial stock
+  Liquid baseline before semantic judging.
+- `run_live_pipelines.py` (historical): ran the live Arka expansion pipelines and staged
+  `diverse-v2` and `validation-v1`.
+- `run_sol_reverification.py` (historical): re-ran live GPT-6.1 Sol verification on two repaired
+  workspace-context scenarios (`sched-ws-med-02` and `sched-ws-med-06`).
+- `sync_arka_decisions_and_stages.py` (historical): synced `DecisionClient` cache entries in
+  `state.db` and Parquet stage files for `diverse-v2-run` and `validation-v1-run`.
 
 The scripts that uploaded wheels, notebooks, review reports and raw evaluation runs to datasets
 have been removed. The legacy Hub upload entry points refuse writes. Previous Git commits

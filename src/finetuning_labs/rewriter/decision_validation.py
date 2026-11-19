@@ -1,4 +1,4 @@
-"""Blind criterion checks through Arka's Luna Decisions client, beside the Sol judgments."""
+"""Active blind validation benchmark runner using Arka's Luna Decisions client alongside Sol."""
 
 from __future__ import annotations
 

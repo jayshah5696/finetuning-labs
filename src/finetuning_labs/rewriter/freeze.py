@@ -1,4 +1,4 @@
-"""Update and verify freeze manifests for rewriter benchmarks and holdouts."""
+"""Active freeze manifest builder and verifier for rewriter benchmarks and holdouts."""
 
 from __future__ import annotations
 

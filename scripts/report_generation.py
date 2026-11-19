@@ -1,4 +1,4 @@
-"""Report only what a collected generation run proves before semantic judging."""
+"""Historical reporting script: report only what a collected generation run proves before semantic judging."""
 
 import argparse
 from collections import Counter

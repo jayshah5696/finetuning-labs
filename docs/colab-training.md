@@ -1,6 +1,7 @@
 # Train and upload a rewriter LoRA
 
-Open [rewriter_train_l4.ipynb](notebooks/rewriter_train_l4.ipynb) in Google Colab.
+Open [rewriter_train_l4.ipynb](../notebooks/rewriter_train_l4.ipynb) in Google Colab
+([open directly on Google Colab](https://colab.research.google.com/github/jayshah5696/finetuning-labs/blob/main/notebooks/rewriter_train_l4.ipynb)).
 Choose a fresh L4 GPU runtime.
 The first cell identifies the current notebook as `public-parquet-lora-current`.
 
@@ -38,24 +39,24 @@ Run the cells in order:
 
 Only adapter parameters receive updates. System and user tokens are masked in the training
 loss. Assistant text and its EOS are supervised. Oversized examples raise an error instead of
-being truncated. The English export has 1,864 train, 89 dev and 81 validation rows. Checkpoint selection
+being truncated. The current English export (`36a75c009d008415fad557d49005ba4e5c73f4d7`) has 1,979 train, 89 dev and 141 validation rows (expanded from the earlier 1,864 / 89 / 81 release at `00d59dda95867fe5bcb147b1b1c5a34b5ad7f071`). Checkpoint selection
 uses dev loss. The final validation pass does not select a checkpoint.
 
 Use a fresh runtime for this rerun. The notebook starts from the pinned base model and trains
-a fresh adapter on all 1,864 English examples. It does not continue the previous adapter.
+a fresh adapter on all 1,979 English examples. It does not continue the previous adapter.
 The dataset repository and split names stay the same. The last cell uploads the replacement
 adapter to the configured model repository; earlier weights remain available in Hub commit history.
 The notebook pins the updated data commit and checks its published split counts.
 
-If you already have the earlier notebook open, keep that copy and update its existing CONFIG
+If you already have an earlier notebook copy open, keep that copy and update its existing CONFIG
 after the original dictionary definition. The training helpers and train/upload cells are unchanged:
 
 ```python
 CONFIG.update(
     model_id="LiquidAI/LFM2.5-350M",
     model_revision="9e6c6ccf47cd318696e137d381a7ded8fe4df09f",
-    dataset_revision="00d59dda95867fe5bcb147b1b1c5a34b5ad7f071",
-    expected_split_counts={"train": 1864, "dev": 89, "validation": 81},
+    dataset_revision="36a75c009d008415fad557d49005ba4e5c73f4d7",
+    expected_split_counts={"train": 1979, "dev": 89, "validation": 141},
     hub_model_id="jayshah5696/lfm2.5-350m-rewriter-lora",
     run_name="lfm2.5-350m-rewriter-english",
     output_dir="/content/rewriter-lora-350m",
@@ -92,8 +93,7 @@ serialization and exact adapter reload. It does not establish L4 memory use, BF1
 online W&B authentication or the quality of a trained 230M or 350M model.
 
 ```sh
-uv run --no-project --python /tmp/rewriter-training-check/bin/python python \
-  scripts/check_lora_notebook.py --output artifacts/lora-check-new
+just notebook-check
 ```
 
 The notebook is self-contained. It does not download code or review artifacts from Hugging Face.

@@ -1,7 +1,9 @@
 # English rewriter data workstreams
 
-The user approved separate threads for the next experiments. Data work starts now. Training
-rewards, LoRA ablations and preference training remain deferred. The student models remain
+> **Historical note:** This document is the October 2026 handoff contract for the six parallel data and training workstreams. See [status.md](status.md) and [data-pilot-repair-20261030.md](data-pilot-repair-20261030.md) for pilot results.
+
+Separate threads were created for these experiments. Data work ran first, while training
+rewards, LoRA ablations and preference training remained deferred. The student models remain
 LiquidAI/LFM2.5-230M and LiquidAI/LFM2.5-350M. Qwen is an optional later comparison, not a selected
 model or a current download/training task.
 
@@ -13,7 +15,7 @@ staging namespace. No worker merges to main or changes the active Hub release in
 
 - English only. Keep the existing four rewrite modes and their exact contracts.
 - Preserve `data/rewriter/current`, all earlier train rows, the original source holdouts, the
-  81-case English validation view and the existing private calibration set. Stage additions.
+  81-case English validation view and the existing calibration set. Stage additions.
 - Reuse native Arka generation, all six Luna Decisions dimensions and the existing exact-row
   Sol review loop. The verified Arka HEAD and current pin are both
   `5d353740ae1dd34742841071752814028db1489a`. Do not change the shared pin independently.
@@ -39,8 +41,8 @@ staging namespace. No worker merges to main or changes the active Hub release in
   shortfalls instead of claiming the intended counts are complete.
 - Start from the existing native pipeline and admission/export helpers. Add small task-specific
   configs or wrappers. Do not build another generation/review framework.
-- Write focused failure cases/tests before production code. Run relevant tests, `make check`
-  and `make build`, and exercise the actual staged export. Keep evidence and scripts in Git.
+- Write focused failure cases/tests before production code. Run relevant tests, `just check`
+  and `just build` (requires [just](https://github.com/casey/just)), and exercise the actual staged export. Keep evidence and scripts in Git.
 - No student training, notebook changes, rank sweeps, new model downloads or preference training
   in the active data threads. Tokenizer downloads and small test fixtures are permitted.
 
@@ -82,12 +84,12 @@ but should preserve the identifiers so the other threads can map their coverage.
 
 ## Thread 2: personal English dictation, shortcuts and redaction
 
-**Start now, locally.** The user authorizes using their personal English material and removing
+**Start now, locally.** This workstream uses local personal English material after removing
 obvious PII. The existing raw-personal-data restrictions continue to protect the source records.
 
 - Inspect the existing ignored personal bundle at the main checkout's
-  `projects/finetuning-labs/data/rewriter/personal/calibration-10/`, its source manifest, and the
-  read-only TypeWhisper repository at `/home/jshah/Documents/GitHub/typewhisper-linux`.
+  `data/rewriter/personal/calibration-10/`, its source manifest, and a
+  read-only local checkout of `jayshah5696/typewhisper-linux`.
   Inspect only related app history/config paths discovered from those sources.
 - Keep the existing ten calibration records held out. Select additional records covering actual
   dictation errors, rewrite shortcuts/profiles, shorthand and supplied dictionary behavior.
@@ -99,7 +101,7 @@ obvious PII. The existing raw-personal-data restrictions continue to protect the
   placeholder. Preserve the transformation, numeric relationships, negation and conditions.
 - Keep raw records, direct redacted records, before/after reviews and identity mappings local
   under ignored `data/rewriter/personal/` or `artifacts/`. Do not send raw personal records to
-  hosted models, Git, Hugging Face or Sangam. Obvious-PII removal is not proof of anonymity.
+  hosted models, Git, Hugging Face or external document tools. Obvious-PII removal is not proof of anonymity.
 - Produce a local redacted candidate set and a non-identifying error-pattern inventory. Public
   staged candidates may be independently fictionalized analogues of those patterns. Direct
   personal-derived rows remain local for review; no public release of them is part of this thread.

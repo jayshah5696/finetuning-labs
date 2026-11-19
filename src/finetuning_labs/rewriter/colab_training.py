@@ -206,6 +206,8 @@ def encode_example(guide, tokenizer, *, max_length=MAX_LENGTH, max_new_tokens=MA
 
 
 def pad_batch(features, pad_id):
+    if not features:
+        raise ValueError("features cannot be empty")
     width = max(len(x["input_ids"]) for x in features)
     return {
         key: [x[key] + [padding] * (width - len(x[key])) for x in features]

@@ -121,9 +121,12 @@ def test_native_uncertainty_requires_a_second_matching_sol_pass():
     meta["native_accepted"] = False
     meta["decisions"]["labeling_engine.pair_intent"].update(score=0.61, confidence=0.22)
     assert not verified_pair(row, meta, review)
-    assert verified_pair(row, meta, review, second_review=review)
+    second = review | {"critique": "Independent second-round review confirms action and recipient."}
+    assert verified_pair(row, meta, review, second_review=second)
+    assert not verified_pair(row, meta, review, second_review=review)
+    assert not verified_pair(row, meta, review, second_review=review | {"critique": "   "})
     assert not verified_pair(
-        row, meta, review, second_review=review | {"pair_verdict": "fail", "verdict": "fail"}
+        row, meta, review, second_review=second | {"pair_verdict": "fail", "verdict": "fail"}
     )
 
 

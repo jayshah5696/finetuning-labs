@@ -1,4 +1,4 @@
-"""Verify 100% decision cache hits in state.db and exact parity across parquet stages."""
+"""Current verification script: verify 100% decision cache hits in state.db and exact parity across parquet stages."""
 
 import json
 import sqlite3
@@ -11,10 +11,6 @@ from arka.labeling.rubric import RubricLoader
 from arka.pipeline.decision_stages import record_state, rubric_questions
 from arka.pipeline.output import OutputWriter
 from arka.records.identity import content_hash
-
-from finetuning_labs.rewriter.diverse_expansion import load_openrouter_api_key
-
-load_openrouter_api_key()
 
 
 def verify_run_and_staged(
